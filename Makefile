@@ -52,6 +52,7 @@ distclean: clean
 	rm -rf asm
 
 setup:
+	$(MAKE) -C $(RECOMP) setup
 	$(MAKE) -C $(RECOMP)
 
 disasm:
