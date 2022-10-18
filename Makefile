@@ -8,6 +8,8 @@ else
 endif
 
 RECOMP := tools/recomp
+BUILD  := build
+ASM    := asm
 
 CC       := $(RECOMP)/build/7.1/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
@@ -35,7 +37,7 @@ MIPS_VERSION := -mips2
 CFLAGS += -G 0 -non_shared -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
 
 
-CC_ELF := build/cc
+CC_ELF := $(BUILD)/cc
 
 # Targets
 
@@ -45,25 +47,25 @@ CC_ELF := build/cc
 all: $(CC_ELF)
 
 clean:
-	rm $(CC_ELF)
+	$(RM) -r $(BUILD)
 
 distclean: clean
 	$(MAKE) -C $(RECOMP) clean
-	rm -rf asm
+	$(RM) -r $(ASM)
 
 setup:
 	$(MAKE) -C $(RECOMP) setup
 	$(MAKE) -C $(RECOMP)
 
 disasm:
-	mkdir -p asm/cc
+	mkdir -p buildasm/cc
 	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
 	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --emit-relocs -Map build/cc.map -o $@ || rm -f $@ && exit 1
 
-build/asm/%.o: asm/%.s
+$(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
