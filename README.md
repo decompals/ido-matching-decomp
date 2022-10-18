@@ -21,3 +21,12 @@ Of these,
 - `cc`, `cfe` are written in C, `cfe` also contains Yacc components.
 - `uopt`, `ugen`, `as1`, `as0`, `uld`, `umerge`, `upas`, are written in Pascal.
 - `ld` is unknown at present
+
+## Setup
+
+```
+make setup
+make disasm
+mkdir -p build/asm/cc
+make
+```
