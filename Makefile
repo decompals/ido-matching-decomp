@@ -26,7 +26,7 @@ ASM_PROCESSOR := python3 tools/asm-processor/build.py
 IINC       := -Iinclude -Isrc
 
 
-LDFLAGS := -L$(RECOMP)/ido/7.1/lib/ -lc
+LDFLAGS := -nostdlib -L$(RECOMP)/ido/7.1/usr/lib/ -lc
 
 
 ASMPROCFLAGS := 
