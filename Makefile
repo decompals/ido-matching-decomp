@@ -18,13 +18,13 @@ OBJCOPY    := $(MIPS_BINUTILS_PREFIX)objcopy
 OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
-DISASSEMBLER  := python3 -m spimdisasm/elfObjDisasm
+DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Isrc
 
 
-# LDFLAGS := -L$(RECOMP)/ido/7.1/lib/ -lc
+LDFLAGS := -L$(RECOMP)/ido/7.1/lib/ -lc
 
 
 ASMPROCFLAGS := 
@@ -61,8 +61,9 @@ disasm:
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
-	$(LD) $(LDFLAGS) $^ --no-check-sections --accept-unknown-input-arch --emit-relocs -Map build/cc.map -o $@
+	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --emit-relocs -Map build/cc.map -o $@ || rm -f $@ && exit 1
 
 build/asm/%.o: asm/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
+print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
