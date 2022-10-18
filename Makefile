@@ -58,7 +58,7 @@ setup:
 	$(MAKE) -C $(RECOMP)
 
 disasm:
-	mkdir -p buildasm/cc
+	mkdir -p $(BUILD)/$(ASM)/cc
 	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc
 
 
