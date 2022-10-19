@@ -20,7 +20,8 @@ OBJCOPY    := $(MIPS_BINUTILS_PREFIX)objcopy
 OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
-DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
+DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm 
+#--no-emit-cpload
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Isrc
@@ -31,8 +32,8 @@ LDFLAGS := -nostdlib -L$(RECOMP)/ido/7.1/usr/lib/ -lc
 
 ASMPROCFLAGS := 
 OPTFLAGS := -O2
-ASFLAGS := -march=vr4300 -32 -Iinclude
 MIPS_VERSION := -mips2
+ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 CFLAGS += -G 0 -non_shared -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
 
@@ -63,9 +64,10 @@ disasm:
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
-	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --emit-relocs -Map build/cc.map -o $@ || rm -f $@ && exit 1
+	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map build/cc.map -o $@ || (rm -f $@ && exit 1)
 
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
+	@mkdir -p $(@D)
 	$(AS) $(ASFLAGS) $< -o $@
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
