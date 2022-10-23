@@ -1,6 +1,6 @@
 /* Handwritten */
-// function __start # 0
-// function _mcount # 1
+#pragma GLOBAL_ASM("asm/functions/cc/__start.s")
+#pragma GLOBAL_ASM("asm/functions/cc/_mcount.s")
 
 #include "cc.h"
 //#include "inttypes.h"
@@ -25,19 +25,18 @@ int targetsex = 0;
 
 
 
-// function main # 2
+#pragma GLOBAL_ASM("asm/functions/cc/main.s")
 
-// function process_config # 3
-// function add_info # 4
-// function parse_command # 5
-
-
-// function get_host_chiptype # 6
-// function error # 7
-// function relocate_passes # 8
+#pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
+#pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
+#pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
 
 
-// function newrunlib # 9
+#pragma GLOBAL_ASM("asm/functions/cc/get_host_chiptype.s")
+#pragma GLOBAL_ASM("asm/functions/cc/error.s")
+#pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
+
+
 void newrunlib(void) {
     if (fiveflag != 0) {
         runlib_base = "usr/5lib";
@@ -57,11 +56,10 @@ void newrunlib(void) {
 }
 
 
-// function compose_G0_libs # 10
+#pragma GLOBAL_ASM("asm/functions/cc/compose_G0_libs.s")
 
-// function compose_reg_libs # 11
+#pragma GLOBAL_ASM("asm/functions/cc/compose_reg_libs.s")
 
-// function mkstr # 12
 /*
  * The compiler built-in symbol _VA_INIT_STATE:
  *	-returns 1 if the va_alist marker is the first
@@ -107,29 +105,28 @@ va_dcl // K&R syntax
     return ret;
 }
 
-// function mklist # 13
-// function addstr # 14
-// function addspacedstr # 15
-// function newstr # 16
-// function save_place # 17
-// function set_place # 18
-// function addlist # 19
-// function adduldlist # 20
-// function nodup # 21
-// function getsuf # 22
-// function mksuf # 23
-// function savestr # 24
-// function mktempstr # 25
-// function run # 26
-// function edit_src # 27
-// function get_lino # 28
+#pragma GLOBAL_ASM("asm/functions/cc/mklist.s")
+#pragma GLOBAL_ASM("asm/functions/cc/addstr.s")
+#pragma GLOBAL_ASM("asm/functions/cc/addspacedstr.s")
+#pragma GLOBAL_ASM("asm/functions/cc/newstr.s")
+#pragma GLOBAL_ASM("asm/functions/cc/save_place.s")
+#pragma GLOBAL_ASM("asm/functions/cc/set_place.s")
+#pragma GLOBAL_ASM("asm/functions/cc/addlist.s")
+#pragma GLOBAL_ASM("asm/functions/cc/adduldlist.s")
+#pragma GLOBAL_ASM("asm/functions/cc/nodup.s")
+#pragma GLOBAL_ASM("asm/functions/cc/getsuf.s")
+#pragma GLOBAL_ASM("asm/functions/cc/mksuf.s")
+#pragma GLOBAL_ASM("asm/functions/cc/savestr.s")
+#pragma GLOBAL_ASM("asm/functions/cc/mktempstr.s")
+#pragma GLOBAL_ASM("asm/functions/cc/run.s")
+#pragma GLOBAL_ASM("asm/functions/cc/edit_src.s")
+#pragma GLOBAL_ASM("asm/functions/cc/get_lino.s")
 
-// function show_err # 29
-// function handler # 30
-// function cleanup # 31
-// function whats # 32
+#pragma GLOBAL_ASM("asm/functions/cc/show_err.s")
+#pragma GLOBAL_ASM("asm/functions/cc/handler.s")
+#pragma GLOBAL_ASM("asm/functions/cc/cleanup.s")
+#pragma GLOBAL_ASM("asm/functions/cc/whats.s")
 
-// function settimes # 33
 clock_t time0;
 struct tms tm0;
 
@@ -137,7 +134,6 @@ void settimes(void) {
     time0 = times(&tm0);
 }
 
-// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -154,14 +150,13 @@ void dotime(const char* programName) {
     fprintf(stderr, "%s phase time: %.2fu %.2fs %u:%04.1f %.0f%%\n", programName, milis, seconds, clockTimeDiff / (60 * CLOCK_TICKS), (f64) (clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS, ((milis + seconds) / ((f64) clockTimeDiff / CLOCK_TICKS)) * 100.0);
 }
 
-// function func_0042FD7C # 35
-// function isdir # 36
-// function regular_not_writeable # 37
-// function regular_file # 38
+#pragma GLOBAL_ASM("asm/functions/cc/func_0042FD7C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/isdir.s")
+#pragma GLOBAL_ASM("asm/functions/cc/regular_not_writeable.s")
+#pragma GLOBAL_ASM("asm/functions/cc/regular_file.s")
 
 static char B_1000E5E0[0x400];
 
-// function basename # 39
 // Obtain the base name of a file path, i.e. the part after the final '/'
 char* basename(const char* path) {
     register char* ret;
@@ -190,7 +185,6 @@ char* basename(const char* path) {
     return ret;
 }
 
-// function dirname # 40
 // Obtain the directory name of a file path, i.e. the part before the final '/'
 const char* dirname(const char* path) {
     register char* ret;
@@ -228,25 +222,24 @@ const char* dirname(const char* path) {
     return strcpy(str, ".");
 }
 
-// function func_00430414 # 41
-// function force_use_cfront # 42
-// function exec_OCC # 43
-// function add_cxx_symbol_options # 44
-// function init_curr_dir # 45
-// function full_path # 46
-// function add_static_opt # 47
-// function record_static_fileset # 48
-// function touch # 49
-// function add_prelinker_objects # 50
-// function quoted_length # 51
-// function quote_shell_arg # 52
-// function func_00431A3C # 53
-// function func_00431B38 # 54
-// function func_00431B88 # 55
-// function func_00431D00 # 56
-// function func_00431DD8 # 57
+#pragma GLOBAL_ASM("asm/functions/cc/func_00430414.s")
+#pragma GLOBAL_ASM("asm/functions/cc/force_use_cfront.s")
+#pragma GLOBAL_ASM("asm/functions/cc/exec_OCC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/add_cxx_symbol_options.s")
+#pragma GLOBAL_ASM("asm/functions/cc/init_curr_dir.s")
+#pragma GLOBAL_ASM("asm/functions/cc/full_path.s")
+#pragma GLOBAL_ASM("asm/functions/cc/add_static_opt.s")
+#pragma GLOBAL_ASM("asm/functions/cc/record_static_fileset.s")
+#pragma GLOBAL_ASM("asm/functions/cc/touch.s")
+#pragma GLOBAL_ASM("asm/functions/cc/add_prelinker_objects.s")
+#pragma GLOBAL_ASM("asm/functions/cc/quoted_length.s")
+#pragma GLOBAL_ASM("asm/functions/cc/quote_shell_arg.s")
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431A3C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431B38.s")
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431B88.s")
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431DD8.s")
 
-// function skip_old_ii_controls # 58
 #define EOF	(-1) // can go when headers in
 
 // Search file for the first "----" and move position to the line after it
@@ -280,7 +273,6 @@ void skip_old_ii_controls(FILE* arg0) {
     }
 }
 
-// function make_ii_file_name # 59
 // path/to/file -> path/to/ii_files/file.ii
 // path/to/file.o -> path/to/ii_files/file.ii
 char* make_ii_file_name(const char* arg0) {
@@ -298,7 +290,6 @@ char* make_ii_file_name(const char* arg0) {
     return mkstr(dirname(arg0), "/ii_files/", sp2C, 0);
 }
 
-// function update_instantiation_info_file # 60
 // TODO: type of error(), name vars
 int vflag = 0;
 char *D_1000C2F0 = "";
@@ -345,7 +336,6 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
 
 
 
-// function func_00432940 # 61
 int func_00432940(pid_t arg0) {
     int fd; // sp29C
     char pathname[20]; // sp288
@@ -400,7 +390,6 @@ int func_00432940(pid_t arg0) {
 
 static int B_1000EC98[2];
 
-// function func_00432BDC # 62
 // test pipe read
 void func_00432BDC(void) {
     char buf;
@@ -415,7 +404,6 @@ void func_00432BDC(void) {
     close(B_1000EC98[0]);
 }
 
-// function func_00432C94 # 63
 // test pipe write
 static void func_00432C94(void) {
     char buf;
@@ -430,7 +418,6 @@ static void func_00432C94(void) {
 
 
 
-// function func_00432D3C # 64
 extern int getpagesize(void);
 static prmap_sgi_t B_1000CAC0[100];
 s32 memory_flag = 0;
@@ -556,7 +543,6 @@ void func_00432D3C(const char* arg0, s32 count) {
     }
 }
 
-// function func_00433534 # 65
 // Prepends "--" to a string by copying.
 char* func_00433534(const char* arg0) {
     char* ret = (char*)malloc(strlen(arg0) + 3);
@@ -575,7 +561,6 @@ char* func_00433534(const char* arg0) {
 
 
 /* File boundary, -O2 */
-// function gethostsex # 66
 
 // Write to a word and read as a byte to determine host endian
 int gethostsex(void) {

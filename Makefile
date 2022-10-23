@@ -59,7 +59,7 @@ setup:
 
 disasm:
 	mkdir -p $(BUILD)/$(ASM)/cc
-	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc
+	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --split-functions asm/functions
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
