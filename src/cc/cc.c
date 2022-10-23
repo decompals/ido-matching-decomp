@@ -138,6 +138,22 @@ void settimes(void) {
 }
 
 // function dotime # 34
+#define CLOCK_TICKS 100
+
+void dotime(const char* programName) {
+    clock_t time1; // sp6C;
+    clock_t clockTimeDiff;
+    f64 milis; // sp60
+    f64 seconds; // sp58
+    struct tms tm1; //sp48;
+
+    time1 = times(&tm1);
+    milis = (f64) (tm1.tms_utime + tm1.tms_cutime - tm0.tms_utime - tm0.tms_cutime) / CLOCK_TICKS;
+    seconds = (f64) (tm1.tms_stime + tm1.tms_cstime - tm0.tms_stime - tm0.tms_cstime) / CLOCK_TICKS;
+    clockTimeDiff = time1 - time0;
+    fprintf(stderr, "%s phase time: %.2fu %.2fs %u:%04.1f %.0f%%\n", programName, milis, seconds, clockTimeDiff / (60 * CLOCK_TICKS), (f64) (clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS, ((milis + seconds) / ((f64) clockTimeDiff / CLOCK_TICKS)) * 100.0);
+}
+
 // function func_0042FD7C # 35
 // function isdir # 36
 // function regular_not_writeable # 37
