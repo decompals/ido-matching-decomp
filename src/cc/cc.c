@@ -18,7 +18,7 @@ int fiveflag = 0;
 char *runlib = "/";
 char *runlib_base = "/";
 int irix4 = 0;
-int targetsex = 0;
+int targetsex = BIGENDIAN;
 
 
 
@@ -47,7 +47,7 @@ void newrunlib(void) {
     }
     if (gethostsex() == targetsex) {
         runlib = runlib_base;
-    } else if (targetsex == 0) {
+    } else if (targetsex == BIGENDIAN) {
         runlib = "eb/";
     } else {
         runlib = "el/";
@@ -562,18 +562,4 @@ char* func_00433534(const char* arg0) {
 
 /* File boundary, -O2 */
 
-// Write to a word and read as a byte to determine host endian
-int gethostsex(void) {
-    // Not typedefing this since only used once
-    union {
-        int word;
-        signed char byte;
-    } sex;
-
-    sex.word = 1;
-    if (sex.byte == 1) {
-        return LITTLEENDIAN;
-    } else {
-        return BIGENDIAN;
-    }
-}
+// gethostsex
