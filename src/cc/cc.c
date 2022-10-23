@@ -3,9 +3,11 @@
 // function _mcount # 1
 
 #include "cc.h"
-#include "inttypes.h"
+//#include "inttypes.h"
 #include "sex.h"
 #include "sys/times.h"
+
+#include "varargs.h"
 
 /* File, -O1 */
 static void func_00432C94(void);
@@ -434,20 +436,20 @@ void func_00432D3C(const char* arg0, s32 count) {
             || (flags == MA_READ) 
             || (flags == (MA_READ | MA_WRITE | MA_SHARED)) 
             || (flags == (MA_READ | MA_SHARED))) {
-            if (B_1000CAC0[i].pr_vaddr < 0x10000000) {
+            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
                 mmap_size += B_1000CAC0[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         flags &= ~MA_PRIMARY;
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if (B_1000CAC0[i].pr_vaddr >= 0x10000000) {
+            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
                 data_size += B_1000CAC0[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         if (flags == (MA_READ | MA_WRITE | MA_BREAK | MA_COW)) {
-            if (B_1000CAC0[i].pr_vaddr >= 0x10000000) {
+            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
                 brk_size += B_1000CAC0[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }

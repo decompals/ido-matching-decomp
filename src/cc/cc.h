@@ -434,52 +434,11 @@ extern ssize_t write(int, const void *, size_t);
 
 
 
-
-// varargs.h from indy dump
-// I didn't remove this because I'm not sure if using the stuff from stdarg.h instead is fine
-#if 0
-
-typedef char *va_list;
-typedef unsigned long __va_iptr_t;
-#define _FP 1
-
-#define __VA_REGBYTES 4
-#define __VA_PADJUST(mode)	0
-#define __NO_CFOLD_WARNING(x) x
-#define __VA_SADJUST _VA_INIT_STATE
-#define __VA_MALIGN(mode) \
-    (__NO_CFOLD_WARNING(  \
-       (__builtin_alignof(mode) > __VA_REGBYTES)  \
-	  ? (__va_iptr_t)__builtin_alignof(mode) \
-	  : (__va_iptr_t)__VA_REGBYTES ))
-#define	__VA_PALIGN(p,mode)	\
-  ( ( ((__va_iptr_t)p)+(__VA_MALIGN(mode)-1) ) & (-__VA_MALIGN(mode)) )
-#define __VA_STACK_ARG(vp,mode)	( vp = (va_list) \
-	(__VA_PALIGN(vp,mode)+__VA_PADJUST(mode)+sizeof(mode)) )
-#define __VA_DOUBLE_ARG(vp,mode) ( \
-    (((__va_iptr_t)vp & 0x1) /* 1 byte aligned? */ \
-      ? ((vp = ((va_list)vp + 7)),((va_list)vp-6))\
-      : (((__va_iptr_t)vp & 0x2) /* 2 byte aligned? */ \
-	  ? ((vp = ((va_list)vp +10)),((va_list)vp-24)) \
-	  : __VA_STACK_ARG(vp,mode) )))
-
-#define va_dcl long va_alist;
-
-#define va_start(vp) (vp = ((va_list)&va_alist) - __VA_SADJUST)
-
-#define va_arg(vp,mode) ((mode*)(void *)(  \
-	(__NO_CFOLD_WARNING(                \
-	   (__builtin_classof(mode)==_FP && \
-	    __builtin_alignof(mode)==sizeof(double)) \
-	      ? __VA_DOUBLE_ARG(vp,mode) \
-	      : __VA_STACK_ARG(vp,mode))))) [-1]
-
-#define va_end(__list)
-#endif
-
-
 // errno.h
 extern s32 errno;
 extern const char* sys_errlist[];
 extern s32 sys_nerr;
 
+
+// inttypes.h
+typedef unsigned long int	uintptr_t;
