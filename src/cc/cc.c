@@ -229,7 +229,40 @@ const char* dirname(const char* path) {
 // function func_00431B88 # 55
 // function func_00431D00 # 56
 // function func_00431DD8 # 57
+
 // function skip_old_ii_controls # 58
+#define EOF	(-1) // can go when headers in
+
+// Search file for the first "----" and move position to the line after it
+void skip_old_ii_controls(FILE* arg0) {
+    s32 ch;
+    s32 sp50 = FALSE;
+
+    ch = getc_locked(arg0);
+    while (ch != EOF) {
+        if (ch == '-' 
+            && (ch = getc_locked(arg0)) == '-' 
+            && (ch = getc_locked(arg0)) == '-' 
+            && (ch = getc_locked(arg0)) == '-') {
+            sp50 = TRUE;
+        }
+
+        while ((ch != '\n') && (ch != EOF)) {
+                ch = getc_locked(arg0);
+        }
+
+        if (sp50) {
+            break;
+        }
+
+        if (ch == '\n') {
+            ch = getc_locked(arg0);
+        }
+    }
+    if (ch == EOF) {
+        rewind(arg0);
+    }
+}
 
 // function make_ii_file_name # 59
 // path/to/file -> path/to/ii_files/file.ii
