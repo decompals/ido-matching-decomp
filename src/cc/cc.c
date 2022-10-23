@@ -3,12 +3,12 @@
 // function _mcount # 1
 
 #include "cc.h"
+#include "inttypes.h"
 #include "sex.h"
 #include "sys/times.h"
 
 /* File, -O1 */
-void func_00432C94(void);
-extern int gethostsex();
+static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 char* mkstr();
 
@@ -145,7 +145,7 @@ static char B_1000E5E0[0x400];
 
 // function basename # 39
 // Obtain the base name of a file path, i.e. the part after the final '/'
-char* basename(char* path) {
+char* basename(const char* path) {
     register char* ret;
     register char* str = B_1000E5E0;
     register size_t len;
@@ -250,7 +250,7 @@ char* make_ii_file_name(const char* arg0) {
 // function update_instantiation_info_file # 60
 // TODO: type of error(), name vars
 int vflag = 0;
-static int D_1000C2F0 = 0;
+char *D_1000C2F0 = "";
 
 void update_instantiation_info_file(const char* arg0, const char* arg1) {
     char* sp54 = make_ii_file_name(arg1);
@@ -424,7 +424,7 @@ void func_00432D3C(const char* arg0, s32 count) {
         }
 
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if (B_1000CAC0[i].pr_vaddr < 0x10000000) {
+            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
                 so_data_size += B_1000CAC0[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }

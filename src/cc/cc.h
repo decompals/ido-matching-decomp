@@ -1,3 +1,5 @@
+#include "sys/types.h"
+
 // Many headers
 #define TRUE 1
 #define FALSE 0
@@ -23,7 +25,6 @@ typedef float f32;
 typedef double f64;
 
 
-typedef unsigned int size_t;
 
 char *strcat( char *dest, const char *src );
 char* strcpy(char*, const char*);
@@ -33,63 +34,11 @@ size_t strlen(const char*);
 
 
 
-// sgidefs.h
-
-typedef int __int32_t;
-typedef unsigned  __uint32_t;
-
-/* a 32 bit world */
-typedef __int32_t __scint_t;
-typedef __uint32_t __scunsigned_t;
-
-
-// types.h
-
-/* POSIX Extensions */
-typedef unsigned char   uchar_t;
-typedef unsigned short  ushort_t;
-typedef unsigned int    uint_t;
-typedef unsigned long   ulong_t;
-
-/* Primarily Kernel types */
-typedef	char *		addr_t;		/* ?<core address> type */
-typedef	char *		caddr_t;	/* ?<core address> type */
-typedef	long		daddr_t;	/* <disk address> type */
-typedef	long		pgno_t;		/* virtual page number type */
-// typedef	__uint32_t	pfn_t;		/* physical page number type */
-typedef	short		cnt_t;		/* ?<count> type */
-
-typedef __scint_t	__scoff_t;	/* scaling off_t */
-
-typedef	unsigned long	mode_t;		/* file attrs */
-typedef	unsigned long	dev_t;		/* device type */
-typedef	long		uid_t;
-typedef	long		gid_t;
-typedef unsigned long	nlink_t;	/* used for link counts */
-typedef long		pid_t;		/* proc & grp IDs  */
-typedef	unsigned long	ino_t;		/* <inode> type */
-
-
-typedef	long		off_t;		/* byte offset type */
-
-typedef __uint32_t inst_t;		/* an instruction */
-
-
 // time.h
-typedef long 	clock_t;
-typedef long 	time_t;
 typedef struct timestruc {
 	time_t	tv_sec;		/* seconds */
 	long	tv_nsec;	/* and nanoseconds */
 } timestruc_t;
-
-struct tms {
-	clock_t	tms_utime;		/* user time */
-	clock_t	tms_stime;		/* system time */
-	clock_t	tms_cutime;		/* user time, children */
-	clock_t	tms_cstime;		/* system time, children */
-};
-extern clock_t	times (struct tms *);
 
 
 // ucontext.h
@@ -457,7 +406,7 @@ extern int	__us_rsthread_stdio;
 
 
 // unistd.h
-typedef int    ssize_t;
+//typedef int    ssize_t;
 
 extern pid_t getpid(void);
 extern pid_t getppid(void);
@@ -487,6 +436,8 @@ extern ssize_t write(int, const void *, size_t);
 
 
 // varargs.h from indy dump
+// I didn't remove this because I'm not sure if using the stuff from stdarg.h instead is fine
+#if 0
 
 typedef char *va_list;
 typedef unsigned long __va_iptr_t;
@@ -524,6 +475,7 @@ typedef unsigned long __va_iptr_t;
 	      : __VA_STACK_ARG(vp,mode))))) [-1]
 
 #define va_end(__list)
+#endif
 
 
 // errno.h
