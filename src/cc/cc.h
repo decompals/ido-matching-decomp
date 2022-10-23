@@ -25,7 +25,10 @@ typedef float f32;
 typedef double f64;
 
 
+// string.h
 
+extern int strncmp(const char *, const char *, size_t);
+extern char *strrchr(const char *, int);
 char *strcat( char *dest, const char *src );
 char* strcpy(char*, const char*);
 size_t strlen(const char*);
@@ -269,6 +272,10 @@ extern void *calloc(size_t, size_t);
 extern void free(void *);
 extern void *malloc(size_t);
 extern void *realloc(void *, size_t);
+
+
+extern char *getcwd(char *, size_t);
+extern char *getenv(const char *);
 
 // stdio.h
 

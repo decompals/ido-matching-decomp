@@ -64,28 +64,98 @@ int targetsex = BIGENDIAN;
 
 
 
-#pragma GLOBAL_ASM("asm/functions/cc/main.s")
+// function get_host_chiptype # 6
+// Blank function
+void get_host_chiptype (void) {
+}
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10005C6C.s")
+// function error # 7
+static const char* D_1000C1E0[] = {
+    "Internal", 
+    "Error", 
+    "Warning", 
+    "Info", 
+    "Fix", 
+    "", 
+};
+static char* D_1000C1D8 = NULL;
+static char* D_1000C1DC = NULL;
 
 
-#pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
-
-#pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
-#pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
-
-
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092B4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092C0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092C8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092D0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092D8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100092DC.s")
+extern s32 Vflag;
+extern s32 errno;
+extern s32 sys_nerr;
 
 
-#pragma GLOBAL_ASM("asm/functions/cc/get_host_chiptype.s")
-#pragma GLOBAL_ASM("asm/functions/cc/error.s")
-#pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
+// Print an error. Has to be K&R for the variadic stuff to work in other functions
+void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, argB)
+    s32 arg0;
+    const char* arg1;
+    s32 arg2;
+    const char* arg3;
+    s32 arg4;
+    const char* arg5;
+    s32 arg6;
+    s32 arg7;
+    s32 arg8;
+    s32 arg9;
+    s32 argA;
+    s32 argB;
+{
+    s32 len;
+    s32 i;
+
+    if ((Vflag == 0) && (D_1000C1D8 == NULL)) {
+        D_1000C1D8 = strrchr(progname, '/');
+        if (D_1000C1D8 == NULL) {
+            D_1000C1D8 = progname;
+        } else {
+            D_1000C1D8++;
+        }
+
+        len = strlen(D_1000C1D8);
+        D_1000C1DC = malloc(len + 2);
+        if (D_1000C1DC == NULL) { // malloc failed
+            fprintf(stderr, "%s: Error: error (), %d: Out of memory\n", D_1000C1D8, 13332);
+            
+            if (errno < sys_nerr) {
+                fprintf(stderr, "%s: %s\n", D_1000C1D8, sys_errlist[errno]);
+            }
+            exit(1);
+        }
+
+        for (i = 0; i < len; i++) {
+            D_1000C1DC[i] = ' ';
+        }
+        D_1000C1DC[i] = '\0';
+    }
+
+    if (arg0 == 5) {
+        fprintf(stderr, "%s: ", D_1000C1DC);
+    } else {
+        fprintf(stderr, "%s: %s: ", D_1000C1D8, D_1000C1E0[arg0]);
+    }
+    if (arg1 != NULL) {
+        if (arg2 != 0) {
+            fprintf(stderr, "%s, line %d: ", arg1, arg2);
+        } else {
+            fprintf(stderr, "%s: ", arg1);
+        }
+    }
+    if (arg3 != NULL) {
+        if (arg4 != 0) {
+            fprintf(stderr, "%s, line %d: ", arg3, arg4);
+        } else {
+            fprintf(stderr, "%s: ", arg3);
+        }
+    }
+    if (arg5 == NULL) {
+        arg5 = "";
+    }
+    fprintf(stderr, arg5, arg6, arg7, arg8, arg9, argA, argB);
+}
+
+// function relocate_passes # 8
 
 
 void newrunlib(void) {
@@ -277,89 +347,77 @@ const char* dirname(const char* path) {
     return strcpy(str, ".");
 }
 
+// function func_00430414 # 41
+// function force_use_cfront # 42
+// function exec_OCC # 43
+// function add_cxx_symbol_options # 44
 
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8A4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8AC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8BC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8C4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8CC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8DC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8E4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8EC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8FC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A904.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A908.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A918.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A92C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A934.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A944.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A94C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A954.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A964.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A96C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A970.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A980.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A990.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A99C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9B0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9B8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9C0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9D4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9DC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9E0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9F0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9F8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA00.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA10.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA18.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA20.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA30.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA38.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA40.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA50.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA58.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA64.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA78.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA80.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA84.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA94.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAA8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAAC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AABC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAD0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAD4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAE0.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAF4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAFC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB0C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB14.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB1C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB34.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB40.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB4C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB68.s")
+// function init_curr_dir # 45
+static char* D_1000C1D0 = NULL; // full path of current working directory
+static char* D_1000C2F0 = NULL; // basename of progname (?)
+char* progname;
+
+void init_curr_dir(void) {
+    if (D_1000C2F0 == 0) {
+        D_1000C2F0 = strrchr(progname, '/');
+        if (D_1000C2F0 == 0) {
+            D_1000C2F0 = progname;
+        } else {
+            D_1000C2F0++;
+        }
+    }
+    if (D_1000C1D0 == NULL) {
+        D_1000C1D0 = getcwd(NULL, 0x400);
+        if (D_1000C1D0 == NULL) {
+            D_1000C1D0 = getenv("PWD");
+            if (D_1000C1D0 == NULL) {
+                D_1000C1D0 = ".";
+            }
+        }
+        if (strncmp(D_1000C1D0, "/tmp_mnt", 8) == 0) {
+            D_1000C1D0 += 8;
+        }
+    }
+}
 
 
+// function full_path # 46
+// function add_static_opt # 47
+// function record_static_fileset # 48
 
-#pragma GLOBAL_ASM("asm/functions/cc/func_00430414.s")
-#pragma GLOBAL_ASM("asm/functions/cc/force_use_cfront.s")
-#pragma GLOBAL_ASM("asm/functions/cc/exec_OCC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/add_cxx_symbol_options.s")
-#pragma GLOBAL_ASM("asm/functions/cc/init_curr_dir.s")
-#pragma GLOBAL_ASM("asm/functions/cc/full_path.s")
-#pragma GLOBAL_ASM("asm/functions/cc/add_static_opt.s")
-#pragma GLOBAL_ASM("asm/functions/cc/record_static_fileset.s")
-#pragma GLOBAL_ASM("asm/functions/cc/touch.s")
-#pragma GLOBAL_ASM("asm/functions/cc/add_prelinker_objects.s")
-#pragma GLOBAL_ASM("asm/functions/cc/quoted_length.s")
-#pragma GLOBAL_ASM("asm/functions/cc/quote_shell_arg.s")
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431A3C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431B38.s")
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431B88.s")
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431DD8.s")
+// function touch # 49
+// Needs utime.h
+int touch(const char* arg0) {
+    time_t curtime = time(NULL);
+    struct utimbuf sp34;
+    char* str;
 
+    init_curr_dir();
+    if (vflag != 0) {
+        fprintf(stderr, "%s: touch %s\n", D_1000C2F0, arg0);
+    }
+    sp34.modtime = curtime;
+    sp34.actime = curtime;
+    if (utime(arg0, &sp34) < 0) {
+        str = malloc(strlen(arg0) + strlen(D_1000C2F0) + 10);
+        sprintf(str, "%s: touch %s", D_1000C2F0, arg0);
+        perror(str);
+        free(str);
+        return -1;
+    }
+    return 0;
+}
+// function add_prelinker_objects # 50
+// function quoted_length # 51
+// function quote_shell_arg # 52
+// function func_00431A3C # 53
+// function func_00431B38 # 54
+// function func_00431B88 # 55
+// function func_00431D00 # 56
+// function func_00431DD8 # 57
+
+// function skip_old_ii_controls # 58
 #define EOF	(-1) // can go when headers in
 
 // Search file for the first "----" and move position to the line after it
@@ -412,7 +470,6 @@ char* make_ii_file_name(const char* arg0) {
 
 // TODO: type of error(), name vars
 int vflag = 0;
-char *D_1000C2F0 = "";
 
 void update_instantiation_info_file(const char* arg0, const char* arg1) {
     char* sp54 = make_ii_file_name(arg1);
