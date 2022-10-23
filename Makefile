@@ -20,8 +20,7 @@ OBJCOPY    := $(MIPS_BINUTILS_PREFIX)objcopy
 OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
-DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm 
-#--no-emit-cpload
+DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm --no-emit-cpload
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Isrc
