@@ -3,6 +3,8 @@
 // function _mcount # 1
 
 #include "cc.h"
+#include "sex.h"
+#include "sys/times.h"
 
 /* File, -O1 */
 void func_00432C94(void);
@@ -124,6 +126,7 @@ va_dcl // K&R syntax
 // function handler # 30
 // function cleanup # 31
 // function whats # 32
+
 // function settimes # 33
 clock_t time0;
 struct tms tm0;
@@ -522,12 +525,6 @@ char* func_00433534(const char* arg0) {
 
 /* File boundary, -O2 */
 // function gethostsex # 66
-
-// From sex.h (yes really)
-#define BIGENDIAN	0
-#define LITTLEENDIAN	1
-#define UNKNOWNENDIAN	2
-
 
 // Write to a word and read as a byte to determine host endian
 int gethostsex(void) {

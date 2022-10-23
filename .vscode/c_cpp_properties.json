@@ -1,0 +1,51 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "src",
+                "include"
+            ],
+            "defines": [
+                "_MIPS_FPSET=16",
+                "_MIPS_ISA=2",
+                "_ABIO32=1",
+                "_MIPS_SIM=_ABIO32",
+                "_MIPS_SZINT=32",
+                "_MIPS_SZLONG=32",
+                "_MIPS_SZPTR=32",
+                "__EXTENSIONS__",
+                "LANGUAGE_C",
+                "_LANGUAGE_C",
+                "__INLINE_INTRINSICS",
+                "sgi",
+                "__sgi",
+                "unix",
+                "mips",
+                "host_mips",
+                "__unix",
+                "__host_mips",
+                "_SVR4_SOURCE",
+                "_MODERN_C",
+                "_SGI_SOURCE",
+                "__DSO__",
+                "SYSTYPE_SVR4",
+                "_SYSTYPE_SVR4",
+                "_LONGLONG",
+                "__mips=2",
+                "_MIPSEB",
+                "MIPSEB",
+                "__STDC__=1",
+                "_CFE"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "intelliSenseMode": "linux-clang-x86",
+            "compilerArgs": [
+                "-m32"
+            ],
+            "cStandard": "gnu89"
+        }
+    ],
+    "version": 4
+}
