@@ -28,29 +28,32 @@ int fiveflag = 0;
 int runerror = 0;
 int abi_flag = 0;
 int non_shared = 0;
-char *runlib = "/";
-char *runlib_base = "/";
 int irix4 = 0;
 int targetsex = BIGENDIAN;
 
-// LD
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004000.s")
+struct _struct_suffixes_0x8 {
+    /* 0x0 */ const char *unk0;
+    /* 0x4 */ char pad4[3];
+    /* 0x7 */ u8 unk7; // ?
+}; // size = 0x8
 
-// suffixes
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004004.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004008.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000400C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004010.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004014.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004018.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000401C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004020.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004024.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004028.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000402C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004030.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004034.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004038.s")
+struct _struct_suffixes_0x8 suffixes[0xF] = {
+    {"pl1", 1 },
+    {"pli", 1 },
+    {"cob", 2 },
+    {"il", 3 },
+    {"st", 4 },
+    {"anl", 5 },
+    {"c++", 6 },
+    {"cc", 6 },
+    {"cxx", 6 },
+    {"C", 6 },
+    {"cpp", 6 },
+    {"CXX", 6 },
+    {"CPP", 6 },
+    {".c", 7 },
+    {NULL, 0},
+};
 
 #pragma GLOBAL_ASM("asm/functions/cc/STR_1000403C.s")
 #pragma GLOBAL_ASM("asm/functions/cc/STR_10004044.s")
@@ -71,9 +74,9 @@ int targetsex = BIGENDIAN;
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040B4.s")
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040BC.s")
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040C4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040C8.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040CC.s")
+char* Gnum = "0";
+char *runlib = "/";
+char *runlib_base = "/";
 
 static int D_1000BF88 = 0;
 
