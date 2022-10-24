@@ -219,6 +219,8 @@ void newrunlib(void) {
  */
 #define _VA_INIT_STATE 1
 
+#ifndef PERMUTER
+
 char* mkstr(va_alist)
 va_dcl // K&R syntax
 {
@@ -252,6 +254,7 @@ va_dcl // K&R syntax
     va_end(args);
     return ret;
 }
+#endif /* PERMUTER */
 
 // function mklist # 13
 typedef struct {
