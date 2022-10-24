@@ -1,5 +1,9 @@
 /* Handwritten */
+
+// function __start # 0
 #pragma GLOBAL_ASM("asm/functions/cc/__start.s")
+
+// function _mcount # 1
 #pragma GLOBAL_ASM("asm/functions/cc/_mcount.s")
 
 #include "cc.h"
@@ -76,10 +80,16 @@ static int D_1000BF88 = 0;
 
 
 
+// function main # 2
 #pragma GLOBAL_ASM("asm/functions/cc/main.s")
 
+// function process_config # 3
 #pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
+
+// function add_info # 4
 #pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
+
+// function parse_command # 5
 #pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
 
 
@@ -185,6 +195,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 #pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
 
 
+// function newrunlib # 9
 void newrunlib(void) {
     if (fiveflag != 0) {
         runlib_base = "usr/5lib";
@@ -204,10 +215,13 @@ void newrunlib(void) {
 }
 
 
+// function compose_G0_libs # 10
 #pragma GLOBAL_ASM("asm/functions/cc/compose_G0_libs.s")
 
+// function compose_reg_libs # 11
 #pragma GLOBAL_ASM("asm/functions/cc/compose_reg_libs.s")
 
+// function mkstr # 12
 /*
  * The compiler built-in symbol _VA_INIT_STATE:
  *	-returns 1 if the va_alist marker is the first
@@ -585,6 +599,7 @@ void whats(void) {
     printf("\tMips Computer Systems %d.%d\n", 7, 10);
 }
 
+// function settimes # 33
 clock_t time0;
 struct tms tm0;
 
@@ -592,6 +607,7 @@ void settimes(void) {
     time0 = times(&tm0);
 }
 
+// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -687,6 +703,7 @@ int regular_file(const char* path) {
     return 1;
 }
 
+// function basename # 39
 static char B_1000E5E0[0x400];
 
 // Obtain the base name of a file path, i.e. the part after the final '/'
@@ -717,6 +734,7 @@ char* basename(const char* path) {
     return ret;
 }
 
+// function dirname # 40
 // Obtain the directory name of a file path, i.e. the part before the final '/'
 const char* dirname(const char* path) {
     register char* ret;
@@ -1156,6 +1174,7 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 // function func_00431DD8 # 57
 #pragma GLOBAL_ASM("asm/functions/cc/func_00431DD8.s")
 
+// function skip_old_ii_controls # 58
 #define EOF	(-1) // can go when headers in
 
 // Search file for the first "----" and move position to the line after it
@@ -1189,6 +1208,7 @@ void skip_old_ii_controls(FILE* arg0) {
     }
 }
 
+// function make_ii_file_name # 59
 // path/to/file -> path/to/ii_files/file.ii
 // path/to/file.o -> path/to/ii_files/file.ii
 char* make_ii_file_name(const char* arg0) {
@@ -1206,6 +1226,7 @@ char* make_ii_file_name(const char* arg0) {
     return mkstr(dirname(arg0), "/ii_files/", sp2C, 0);
 }
 
+// function update_instantiation_info_file # 60
 // TODO: type of error(), name vars
 int vflag = 0;
 
@@ -1251,6 +1272,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
 
 
 
+// function func_00432940 # 61
 int func_00432940(pid_t arg0) {
     int fd; // sp29C
     char pathname[20]; // sp288
@@ -1305,6 +1327,7 @@ int func_00432940(pid_t arg0) {
 
 static int B_1000EC98[2];
 
+// function func_00432BDC # 62
 // test pipe read
 void func_00432BDC(void) {
     char buf;
@@ -1319,6 +1342,7 @@ void func_00432BDC(void) {
     close(B_1000EC98[0]);
 }
 
+// function func_00432C94 # 63
 // test pipe write
 static void func_00432C94(void) {
     char buf;
@@ -1337,7 +1361,8 @@ extern int getpagesize(void);
 static prmap_sgi_t B_1000CAC0[100];
 s32 memory_flag = 0;
 
-void func_00432D3C(const char* arg0, s32 count) {
+// function func_00432D3C # 64
+static void func_00432D3C(const char* arg0, s32 count) {
     int i;
     s32 identified_segment;
     u32 flags;
@@ -1458,6 +1483,7 @@ void func_00432D3C(const char* arg0, s32 count) {
     }
 }
 
+// function func_00433534 # 65
 // Prepends "--" to a string by copying.
 char* func_00433534(const char* arg0) {
     char* ret = (char*)malloc(strlen(arg0) + 3);
