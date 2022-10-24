@@ -16,8 +16,14 @@ char* mkstr();
 
 
 // data
+char* LD = "ld";
+int ansi_choice = 3;
+int c_compiler_choice = 0;
+
 int fiveflag = 0;
 int runerror = 0;
+int abi_flag = 0;
+int non_shared = 0;
 char *runlib = "/";
 char *runlib_base = "/";
 int irix4 = 0;
@@ -64,6 +70,9 @@ int targetsex = BIGENDIAN;
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040C4.s")
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040C8.s")
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040CC.s")
+
+static int D_1000BF88 = 0;
+
 
 // bss
 int compiler;
@@ -234,15 +243,174 @@ va_dcl // K&R syntax
 }
 
 // function mklist # 13
+typedef struct {
+    s32 capacity;
+    s32 length;
+    char** entries;
+} list;
+
+void mklist(list* arg0) {
+    if ((arg0->entries = malloc(20 * sizeof(char*))) == NULL) {
+        error(1, NULL, 0, "mklist ()", 14561, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+    }
+    arg0->capacity = 20;
+    arg0->length = 0;
+    *arg0->entries = NULL;
+}
+
 // function addstr # 14
-void addstr(char**, const char*);
+void addstr(list* arg0, char* str) {
+    if ((arg0->length + 1) >= arg0->capacity) {
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == 0) {
+            error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        arg0->capacity += 20;
+    }
+    arg0->entries[arg0->length] = str;
+    arg0->length++;
+    arg0->entries[arg0->length] = NULL;
+}
 
 // function addspacedstr # 15
+void addspacedstr(list* arg0, char* str) {
+    char* str_end = str;
+
+    do {
+        str_end = strchr(str_end, ' ');
+        if (str_end != NULL) {
+            *str_end = '\0';
+            str_end++;
+        }
+        if ((arg0->length + 1) >= arg0->capacity) {
+            if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == NULL) {
+                error(1, 0, 0, "addspacedstr()", 14639, "out of memory\n");
+                if (errno < sys_nerr) {
+                    error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+                exit(1);
+            }
+            arg0->capacity += 20;
+        }
+        arg0->entries[arg0->length] = str;
+        arg0->length += 1;
+        arg0->entries[arg0->length] = NULL;
+    } while ((str = str_end) != NULL);
+}
+
 // function newstr # 16
+char* newstr(const char* src) {
+    char* dest = malloc(strlen(src) + 1);
+
+    if (dest != NULL) {
+        strcpy(dest, src);
+    } else {
+        error(1, NULL, 0, NULL, 0, "newstr: unable to malloc for string %s\n", src);
+        exit(2);
+    }
+    return dest;
+}
+
 // function save_place # 17
+int save_place(list* arg0) {
+    int ret;
+
+    if ((arg0->length + 1) >= arg0->capacity) {
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == NULL) {
+            error(1, 0, 0, "save_place()", 14695, "out of memory\n");
+            
+            if (errno < sys_nerr) {
+                error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        arg0->capacity += 20;
+    }
+    ret = arg0->length;
+    arg0->length++;
+    arg0->entries[arg0->length] = NULL;
+    return ret;
+}
+
 // function set_place # 18
+void set_place(list* arg0, char* str, int place) {
+    if ((place < 0) || (place >= arg0->length)) {
+        error(0, 0, 0, "set_place ()", 14726, "place out of range");
+        exit(1);
+    }
+    arg0->entries[place] = str;
+}
+
 // function addlist # 19
+void addlist(list* arg0, list* arg1) {
+    int i;
+
+    if ((arg0->length + arg1->length + 1) >= arg0->capacity) {
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + arg1->capacity + 20) * sizeof(char*))) == NULL) {
+            error(1, NULL, 0, "addlist ()", 14756, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        arg0->capacity += arg1->capacity + 20;
+    }
+    for (i = 0; i < arg1->length; i++) {
+            if (arg1->entries[i] != NULL) {
+                arg0->entries[arg0->length] = arg1->entries[i];
+                arg0->length++;
+            }
+    }
+    arg0->entries[arg0->length] = NULL;
+}
+
 // function adduldlist # 20
+// Copies onto the end of arg0: up to the first NULL from arg2, then everything from arg1, then the rest of arg2.
+void adduldlist(list* arg0, list* arg1, list* arg2) {
+    s32 sp3C;
+    s32 sp38;
+
+    if ((arg0->length + arg1->length + arg2->length + 1) >= arg0->capacity) {
+        
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + arg1->capacity + arg2->capacity + 20) * sizeof(char*))) == NULL) {
+            error(1, 0, 0, "addlist ()", 14795, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        arg0->capacity += arg1->capacity + arg2->capacity + 20;
+    }
+    
+    for (sp3C = 0; (sp3C < arg2->length) && (arg2->entries[sp3C] != NULL); sp3C++) {
+        arg0->entries[arg0->length] = arg2->entries[sp3C];
+        arg0->length++;
+    }
+
+    for (sp38 = 0; sp38 < arg1->length; sp38++) {
+        if (arg1->entries[sp38] != NULL) {
+            arg0->entries[arg0->length] = arg1->entries[sp38];
+            arg0->length++;
+        }
+    }
+
+    for (; sp3C < arg2->length; sp3C++) {
+        if (arg2->entries[sp3C] != NULL) {
+            arg0->entries[arg0->length] = arg2->entries[sp3C];
+            arg0->length++;
+        }
+    }
+
+    arg0->entries[arg0->length] = NULL;
+}
+
 // function nodup # 21
 // function getsuf # 22
 // function mksuf # 23
@@ -411,6 +579,37 @@ void dotime(const char* programName) {
 }
 
 // function func_0042FD7C # 35
+// Search for a lib in directories (?)
+char* func_0042FD7C(const char* name, char** dirs) {
+    s32 fildes;
+    char* path;
+
+    for (; *dirs != NULL; dirs++) {
+        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            fildes = open(path = mkstr(*dirs, "/DCC", runlib, name, NULL), 0, 0);
+            if (fildes >= 0) {
+                close(fildes);
+                return path;
+            }
+        }
+
+        fildes = open(path = mkstr(*dirs, runlib, name, NULL), 0, 0);
+        if (fildes >= 0) {
+            close(fildes);
+            return path;
+        }
+    }
+
+    if (abi_flag != 0) {
+        path = mkstr("/", "usr/lib/abi", runlib, name, NULL);
+    } else if (non_shared != 0) {
+        path = mkstr("/", "usr/lib/nonshared", runlib, name, NULL);
+    } else {
+        path = mkstr("/", "usr/lib", runlib, name, NULL);
+    }
+    return path;
+}
+
 
 // function isdir # 36
 int isdir(const char* path) {
@@ -532,7 +731,7 @@ struct _struct_prod_name_0xC {
     /* 0x8 */ const char *unk8; // description?
 }; // size = 0xC
 
-struct _struct_prod_name_0xC prod_name[0x14] = {
+struct _struct_prod_name_0xC prod_name[] = {
     { "accom", "/usr/lib/accom", "ANSI C" },
     { "ccom", "/usr/lib/ccom", "ANSI C" },
     { "acpp", "/usr/lib/acpp", "ANSI C" },
@@ -581,16 +780,16 @@ const char* func_00430414(char* arg0, int arg1) {
             return prod_name[i].unk8;
         }
     }
-    return 0;
+    return NULL;
 }
 
 // function force_use_cfront # 42
-static s32 D_1000BF7C;
-static s32 D_1000BF90;
-extern s32 LD;
+static int D_1000BF7C;
+static int D_1000BF90;
+
 extern char* comp_host_root;
-extern s32 exception_handling;
-extern char* execlist; // ?
+extern int exception_handling;
+extern list execlist;
 
 int force_use_cfront(int argc, char** argv) {
     int i;
@@ -666,8 +865,152 @@ void init_curr_dir(void) {
 
 
 // function full_path # 46
+char* full_path(const char* relative_path) {
+    char* path;
+
+    init_curr_dir();
+    if (*relative_path == '/') {
+        path = mkstr(relative_path, NULL);
+    } else {
+        path = mkstr(D_1000C1D0, "/", relative_path, 0);
+    }
+    return path;
+}
+
 // function add_static_opt # 47
+list staticopts;
+
+void add_static_opt(const char* opt) {
+    if (D_1000BF88 == 0) {
+        addstr(&staticopts, opt);
+    }
+}
+
 // function record_static_fileset # 48
+static char* D_1000BF80;
+static char* D_1000BF84;
+static char* D_1000C2E8;
+static char* D_1000C2EC;
+char* tmpdir;
+
+void record_static_fileset(s32 arg0) {
+    s32 sp28E4;
+    FILE* sp28E0;
+    FILE* sp28DC;
+    s32 sp28D8;
+    char spD8[0x2800];
+    char* spD4;
+    size_t spD0;
+    char spBC[20];
+    struct stat sp34;
+
+    sprintf(spBC, ".%d", getpid());
+
+    if (D_1000BF80 == NULL) {
+        D_1000BF80 = "";
+    }
+
+    if (D_1000BF84 == NULL) {
+        D_1000BF84 = mkstr("cvstatic.fileset", NULL);
+    }
+
+    if ((*D_1000BF84 == '/') || (*D_1000BF80 == 0)) {
+        D_1000C2E8 = mkstr(D_1000BF84, NULL);
+    } else {
+        D_1000C2E8 = mkstr(D_1000BF80, D_1000BF84, NULL);
+    }
+
+    D_1000C2EC = mkstr(tmpdir, "cvstatic.fileset", &spBC, 0);
+    spD4 = full_path(arg0);
+    spD0 = strlen(spD4);
+
+    if (vflag != 0) {
+        fprintf(stderr, "Static fileset: %s %s", spD4, D_1000C2F0);
+        for (sp28E4 = 0; sp28E4 < staticopts.unk4; sp28E4++) {
+            fprintf(stderr, " %s", staticopts.unk8[sp28E4]);
+        }
+        fprintf(stderr, "\n");
+    }
+
+    sp28E0 = fopen(D_1000C2EC, "w+");
+    if (sp28E0 == NULL) {
+        error(1, 0, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n", D_1000C2EC);
+        perror(D_1000C2F0);
+        cleanup();
+        exit(1);
+    }
+
+    sp28D8 = open(D_1000C2E8, 0x102, 0777);
+    if (sp28D8 < 0) {
+        error(1, 0, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n", D_1000C2E8);
+        perror(D_1000C2F0);
+        unlink(D_1000C2EC);
+        cleanup();
+        exit(1);
+    }
+
+    if (flock(sp28D8, 2) < 0) {
+        error(1, 0, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n", D_1000C2E8);
+        perror(D_1000C2F0);
+        unlink(D_1000C2EC);
+        cleanup();
+        exit(1);
+    }
+
+    if (fstat(sp28D8, &sp34) < 0) {
+        error(1, 0, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n", D_1000C2E8);
+        perror(D_1000C2F0);
+        unlink(D_1000C2EC);
+        cleanup();
+        exit(1);
+    }
+
+    if (sp34.st_size == 0) {
+        fprintf(sp28E0, "-cvstatic\n");
+    }
+
+    sp28DC = fdopen(sp28D8, "r+");
+    if (sp28DC == NULL) {
+        error(1, 0, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n", D_1000C2E8);
+        perror(D_1000C2F0);
+        unlink(D_1000C2EC);
+        cleanup();
+        exit(1);
+    }
+
+    while (fgets(spD8, 0x2800, sp28DC) != 0) {
+        if ((strncmp(spD8, spD4, spD0) != 0) || !(__ctype[spD8[spD0] + 1] & 8)) {
+            fputs(spD8, sp28E0);
+        }
+    }
+    fprintf(sp28E0, "%s %s", spD4, D_1000C2F0);
+
+    for (sp28E4 = 0; sp28E4 < staticopts.unk4; sp28E4++) {
+        fprintf(sp28E0, " %s", staticopts.unk8[sp28E4]);
+    }
+    fprintf(sp28E0, "\n");
+
+    free(spD4);
+    rewind(sp28DC);
+    rewind(sp28E0);
+    ftruncate(sp28DC->_file, 0);
+
+    while ((sp28E4 = fread(spD8, 1, 0x2800, sp28E0)) > 0) {
+        if (fwrite(&spD8, 1, sp28E4, sp28DC) != sp28E4) {
+            error(1, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n", D_1000C2E8);
+            perror(D_1000C2F0);
+            unlink(D_1000C2EC);
+            cleanup();
+            exit(1);
+        }
+    }
+
+    fclose(sp28DC);
+    fclose(sp28E0);
+    unlink(D_1000C2EC);
+    free(D_1000C2E8);
+    free(D_1000C2EC);
+}
 
 // function touch # 49
 // Needs utime.h
@@ -691,7 +1034,35 @@ int touch(const char* arg0) {
     }
     return 0;
 }
+
 // function add_prelinker_objects # 50
+void add_prelinker_objects(list* arg0, list* arg1) {
+    int i;
+
+    for (i = 0; i < arg1->length; i++) {
+        if ((arg1->entries[i][0] == '-') 
+            && (arg1->entries[i][1] != 'l') 
+            && (arg1->entries[i][1] != 'L')) {
+            if (1) {} // FAKE
+
+            if (strcmp(arg1->entries[i], "-nostdlib") == 0) {
+                addstr(arg0, mkstr("-YB", NULL));
+            } else if (strcmp(arg1->entries[i], "-objectlist") == 0) {
+                addstr(arg0, mkstr("-YO=", arg1->entries[i + 1], NULL));
+                i++;
+            } else if (strcmp(arg1->entries[i], "-B") == 0) {
+                i++;
+                if (strcmp(arg1->entries[i], "static") == 0) {
+                    addstr(arg0, mkstr("-Bstatic", NULL));
+                } else if (strcmp(arg1->entries[i], "dynamic") == 0) {
+                    addstr(arg0, mkstr("-Bdynamic", NULL));
+                }
+            }
+        } else {
+            addstr(arg0, arg1->entries[i]);
+        }
+    }
+}
 
 // function quoted_length # 51
 size_t quoted_length(const char* arg0, int* arg1) {
@@ -928,19 +1299,19 @@ static prmap_sgi_t B_1000CAC0[100];
 s32 memory_flag = 0;
 
 void func_00432D3C(const char* arg0, s32 count) {
-    s32 i;
+    int i;
     s32 identified_segment;
     u32 flags;
     s32 pagesize;
-    u32 text_size;
-    u32 data_size;
-    u32 brk_size;
-    u32 stack_size;
-    u32 so_text_size;
-    u32 so_data_size;
-    u32 so_brk_size;
-    u32 mmap_size;
-    s32 memflag;
+    size_t text_size;
+    size_t data_size;
+    size_t brk_size;
+    size_t stack_size;
+    size_t so_text_size;
+    size_t so_data_size;
+    size_t so_brk_size;
+    size_t mmap_size;
+    int memflag;
 
     memflag = (memory_flag > 1);
     mmap_size = 0;
