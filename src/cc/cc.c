@@ -6,13 +6,15 @@
 // function _mcount # 1
 #pragma GLOBAL_ASM("asm/functions/cc/_mcount.s")
 
+#include "signal.h"
+#include "wait.h"
 #include "cc.h"
-//#include "inttypes.h"
 #include "sex.h"
 #include "sys/times.h"
 #include "utime.h"
 #include "varargs.h"
 #include "errno.h"
+#include "unistd.h"
 
 /* File, -O1 */
 typedef struct {
@@ -616,7 +618,7 @@ char* savestr(const char* arg0, s32 arg1) {
 }
 
 // function mktempstr # 25
-s32 filter = 0;
+const char* filter = NULL;
 s32 nofilt = 0;
 extern char* tmpdir;
 extern char* tempstr[34];
@@ -659,6 +661,7 @@ void mktempstr(void) {
 
     tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", 0));
 
+    // 0x10 argument of access doesn't make sense
     if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (nofilt == 0) && (access(filter, 0x10) == 0)) {
         tempstr[32] = mktemp(mkstr(tmpdir, "ctmfiltXXXXXX", NULL));
     } else {
@@ -670,7 +673,83 @@ void mktempstr(void) {
 #pragma GLOBAL_ASM("asm/functions/cc/run.s")
 
 // function edit_src # 27
-#pragma GLOBAL_ASM("asm/functions/cc/edit_src.s")
+extern int editflag;
+extern s32 xserver;
+extern char* errout;
+
+s32 edit_src(const char* arg0, s32 arg1, s32 arg2) {
+    s32 pad[3];
+    s32 sp58;
+    pid_t fokrPid;
+    pid_t sp50;
+    s32 temp_t7; // sp4C
+    SIG_PF sp48;
+    SIG_PF sp44;
+    s32 stat_loc;
+
+    fokrPid = fork();
+    if (fokrPid == -1) {
+        // fork failed
+        error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
+        if (errno < sys_nerr) {
+            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        return -1;
+    }
+
+    if (fokrPid == 0) {
+        // children process
+
+        if (editflag == 2) {
+            get_lino(&sp58, arg1, arg2);
+            execlp(arg0, arg0, &sp58, arg1, "-l", tempstr[25], "-f", "err-window", 0);
+        } else if (xserver == 0) {
+            execlp(arg0, arg0, "+1", errout, arg1, 0);
+        } else {
+            execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", arg0, "+1", errout, arg1, 0);
+        }
+        error(1, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
+        if (errno < sys_nerr) {
+            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+
+        exit(1);
+        return;
+    }
+
+    // this process, fokrPid is the pid of the child process
+
+    sp44 = sigset(SIGINT, SIG_IGN);
+    sp48 = sigset(SIGTERM, SIG_IGN);
+    sp50 = wait(&stat_loc);
+    while (sp50 != fokrPid) {
+        if (sp50 == -1) {
+            return -1;
+        }
+        sp50 = wait(&stat_loc);
+    }
+
+    sigset(SIGINT, sp44);
+    sigset(SIGTERM, sp48);
+    temp_t7 = stat_loc & 0xFF;
+    if ((temp_t7 != 0) && (temp_t7 != 2)) {
+        fprintf(stderr, "Fatal error in: %s ", arg0);
+        printf(" Signal %d ", temp_t7);
+        if (stat_loc & WCOREFLAG) {
+            fprintf(stderr, "- core dumped\n");
+        } else {
+            fprintf(stderr, "\n");
+        }
+        cleanup();
+        exit(temp_t7);
+    }
+    if (temp_t7 == 2) {
+        cleanup();
+        exit(3);
+    }
+
+    return stat_loc & 0xFF00;
+}
 
 // function get_lino # 28
 #pragma GLOBAL_ASM("asm/functions/cc/get_lino.s")

@@ -35,17 +35,6 @@ size_t strlen(const char*);
 
 #pragma intrinsic (strcpy)
 
-// errno.h
-
-extern int errno;
-extern char *   sys_errlist[];
-
-// time.h
-typedef struct timestruc {
-	time_t	tv_sec;		/* seconds */
-	long	tv_nsec;	/* and nanoseconds */
-} timestruc_t;
-
 
 // ucontext.h
 #define NGREG	36
@@ -54,75 +43,6 @@ typedef unsigned int greg_t;
 typedef greg_t gregset_t[NGREG];
 
 // procfs.h
-typedef struct {                /* signal set type */
-        __uint32_t sigbits[4];
-} sigset_t;
-
-#define	__sigret_t	void
-#define _sigargs	
-
-typedef struct sigaction {
-	int sa_flags;			/* see below for values		*/
-	__sigret_t (*sa_handler)(_sigargs);	/* SIG_DFL, SIG_IGN, or *fn */
-	sigset_t sa_mask;		/* additional set of sigs to be	*/
-					/* blocked during handler execution */
-	int sa_resv[2];
-} sigaction_t;
-
-typedef union sigval {
-	int	sival_int;
-	void	*sival_ptr;
-} sigval_t;
-
-#define SI_MAXSZ	128
-#define SI_PAD		((SI_MAXSZ / sizeof(__int32_t)) - 3)
-
-typedef struct siginfo {
-	int	si_signo;		/* signal from signal.h	*/
-	int 	si_code;		/* code from above	*/
-	int	si_errno;		/* error from errno.h	*/
-	union {
-
-		int	_pad[SI_PAD];	/* for future growth	*/
-
-		struct {			/* kill(), SIGCLD	*/
-			pid_t	_pid;		/* process ID		*/
-			union {
-				struct {
-					uid_t	_uid;
-				} _kill;
-				struct {
-					clock_t _utime;
-					int _status;
-					clock_t _stime;
-				} _cld;
-			} _pdata;
-		} _proc;			
-
-		struct {	/* SIGSEGV, SIGBUS, SIGILL and SIGFPE	*/
-			caddr_t	_addr;		/* faulting address	*/
-		} _fault;
-
-		struct {			/* SIGPOLL, SIGXFSZ	*/
-		/* fd not currently available for SIGPOLL */
-			int	_fd;	/* file descriptor	*/
-			int	_band;
-		} _file;
-#if !defined (_XOPEN_SOURCE) // ??
-		union sigval	_value;
-#define si_value	_data._value
-#endif
-
-	} _data;
-
-} siginfo_t;
-
-struct sigaltstack {
-	char	*ss_sp;
-	int	ss_size;
-	int	ss_flags;
-};
-typedef struct sigaltstack stack_t;
 
 #define PRSYSARGS	6		/* max number of syscall arguments */
 
@@ -285,7 +205,6 @@ extern char *getenv(const char *);
 // stdio.h
 
 typedef long	fpos_t;
-#define NULL (void*)0
 
 #define BUFSIZ	4096
 #define _NFILE	100	/* initial number of streams */
@@ -415,37 +334,6 @@ extern int	__us_rsthread_stdio;
 #define	O_TRUNC		0x200	/* open with truncation */
 #define	O_EXCL		0x400	/* exclusive open */
 #define	O_NOCTTY	0x800	/* don't allocate controlling tty (POSIX) */
-
-
-// unistd.h
-//typedef int    ssize_t;
-
-extern pid_t getpid(void);
-extern pid_t getppid(void);
-extern uid_t getuid(void);
-extern int isatty(int);
-extern int link(const char *, const char *);
-extern off_t lseek(int, off_t, int);
-extern long pathconf(const char *, int);
-extern int pause(void);
-extern int pipe(int *);
-extern ssize_t read(int, void *, size_t);
-extern int rename(const char *, const char *);
-extern int rmdir(const char *);
-extern int setgid(gid_t);
-extern int setpgid(pid_t, pid_t);
-extern pid_t setsid(void);
-extern int setuid(uid_t);
-extern unsigned sleep(unsigned);
-extern long sysconf(int);
-extern pid_t tcgetpgrp(int);
-extern int tcsetpgrp(int, pid_t);
-extern char *ttyname(int);
-extern int unlink(const char *);
-extern ssize_t write(int, const void *, size_t);
-
-extern int open(const char *pathname, int flags, ...);
-extern int close(int fildes);
 
 
 // stat.h
