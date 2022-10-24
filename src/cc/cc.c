@@ -227,12 +227,113 @@ void newrunlib(void) {
     relocate_passes("rP1EXCOnMFISU", NULL, NULL);
 }
 
-
 // function compose_G0_libs # 10
-#pragma GLOBAL_ASM("asm/functions/cc/compose_G0_libs.s")
+char* LibCob = NULL;
+char* LibDw = " -ldw";
+char* LibExc = " -lexc";
+char* LibF77 = " -lF77";
+char* LibGProf1 = " -lgprof";
+char* LibI77 = " -lI77";
+char* LibIsam = " -lisam";
+char* LibM = " -lm";
+char* LibMld = " -lmld";
+char* LibP = " -lp";
+char* LibPl1 = NULL;
+char* LibProf1 = " -lprof";
+char* LibSort = NULL;
+char* LibU77 = " -lU77";
+char* LibXmalloc = " -lxmalloc";
+
+void compose_G0_libs(const char* arg0) {
+    for (; *arg0 != '\0'; arg0++) {
+        switch (*arg0) {
+        case 'P':
+            LibP = mkstr(LibP, "_G0", NULL);
+            break;
+        case 'E':
+            LibExc = mkstr(LibExc, "_G0", NULL);
+            break;
+        case '1':
+            LibPl1 = mkstr(LibPl1, "_G0", NULL);
+            break;
+        case 'C':
+            LibCob = mkstr(LibCob, "_G0", NULL);
+            break;
+        case 'O':
+            LibSort = mkstr(LibSort, "_G0", NULL);
+            break;
+        case 'M':
+            LibM = mkstr(LibM, "_G0", NULL);
+            break;
+        case 'F':
+            LibF77 = mkstr(LibF77, "_G0", NULL);
+            break;
+        case 'I':
+            LibI77 = mkstr(LibI77, "_G0", NULL);
+            break;
+        case 'U':
+            LibU77 = mkstr(LibU77, "_G0", NULL);
+            break;
+        case 'S':
+            LibIsam = mkstr(LibIsam, "_G0", NULL);
+            break;
+        case 'W':
+            LibDw = mkstr(LibDw, "_G0", NULL);
+            break;
+        case 'X':
+            LibXmalloc = mkstr(LibXmalloc, "_G0", NULL);
+            break;
+        case 'n':
+            LibProf1 = mkstr(LibProf1, "_G0", NULL);
+            break;
+        }
+    }
+}
 
 // function compose_reg_libs # 11
-#pragma GLOBAL_ASM("asm/functions/cc/compose_reg_libs.s")
+void compose_reg_libs(char* arg0) {
+    for (; *arg0 != '\0'; arg0++) {
+        switch (*arg0) {
+        case 'P':
+            LibP = mkstr("libp", ".a", NULL);
+            break;
+        case 'E':
+            LibExc = mkstr("libexc", ".a", NULL);
+            break;
+        case '1':
+            LibPl1 = mkstr("libpl1", ".a", NULL);
+            break;
+        case 'C':
+            LibCob = mkstr("libcob", ".a", NULL);
+            break;
+        case 'O':
+            LibSort = mkstr("libsort", ".a", NULL);
+            break;
+        case 'M':
+            LibM = mkstr("libm", ".a", NULL);
+            break;
+        case 'F':
+            LibF77 = mkstr("libF77", ".a", NULL);
+            break;
+        case 'I':
+            LibI77 = mkstr("libI77", ".a", NULL);
+            break;
+        case 'U':
+            LibU77 = mkstr("libU77", ".a", NULL);
+            break;
+        case 'S':
+            LibIsam = mkstr("libisam", ".a", NULL);
+            break;
+        case 'n':
+            LibProf1 = mkstr("libprof", ".a", NULL);
+            LibGProf1 = mkstr("libgprof", ".a", NULL);
+            break;
+        case 'X':
+            LibXmalloc = mkstr("libxmalloc", ".a", NULL);
+            break;
+        }
+    }
+}
 
 // function mkstr # 12
 /*
