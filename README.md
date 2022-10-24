@@ -25,6 +25,14 @@ Of these,
 - `uopt`, `ugen`, `as1`, `as0`, `uld`, `umerge`, `upas`, are written in Pascal.
 - `ld` is unknown at present
 
+## Build dependencies
+
+TODO
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
 ## Setup
 
 ```bash
