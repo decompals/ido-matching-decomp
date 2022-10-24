@@ -74,6 +74,17 @@ int targetsex = BIGENDIAN;
 static int D_1000BF88 = 0;
 
 
+
+
+#pragma GLOBAL_ASM("asm/functions/cc/main.s")
+
+#pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
+#pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
+#pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
+
+
+
+
 // bss
 int compiler;
 
@@ -82,6 +93,7 @@ int compiler;
 // Blank function
 void get_host_chiptype (void) {
 }
+
 
 // function error # 7
 static const char* D_1000C1E0[] = {
@@ -170,6 +182,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 }
 
 // function relocate_passes # 8
+#pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
 
 
 void newrunlib(void) {
@@ -409,14 +422,32 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
     arg0->entries[arg0->length] = NULL;
 }
 
+
+
 // function nodup # 21
+#pragma GLOBAL_ASM("asm/functions/cc/nodup.s")
+
 // function getsuf # 22
+#pragma GLOBAL_ASM("asm/functions/cc/getsuf.s")
+
 // function mksuf # 23
+#pragma GLOBAL_ASM("asm/functions/cc/mksuf.s")
+
 // function savestr # 24
+#pragma GLOBAL_ASM("asm/functions/cc/savestr.s")
+
 // function mktempstr # 25
+#pragma GLOBAL_ASM("asm/functions/cc/mktempstr.s")
+
 // function run # 26
+#pragma GLOBAL_ASM("asm/functions/cc/run.s")
+
 // function edit_src # 27
+#pragma GLOBAL_ASM("asm/functions/cc/edit_src.s")
+
 // function get_lino # 28
+#pragma GLOBAL_ASM("asm/functions/cc/get_lino.s")
+
 
 // function show_err # 29
 #define BUF_SIZE 0x10000
@@ -551,7 +582,6 @@ void whats(void) {
     printf("\tMips Computer Systems %d.%d\n", 7, 10);
 }
 
-// function settimes # 33
 clock_t time0;
 struct tms tm0;
 
@@ -559,7 +589,6 @@ void settimes(void) {
     time0 = times(&tm0);
 }
 
-// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -1083,6 +1112,7 @@ size_t quoted_length(const char* arg0, int* arg1) {
     return len;
 }
 
+
 // function quote_shell_arg # 52
 size_t quote_shell_arg(const char* arg0, char* arg1) {
     char ch;
@@ -1109,12 +1139,20 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 }
 
 // function func_00431A3C # 53
-// function func_00431B38 # 54
-// function func_00431B88 # 55
-// function func_00431D00 # 56
-// function func_00431DD8 # 57
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431A3C.s")
 
-// function skip_old_ii_controls # 58
+// function func_00431B38 # 54
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431B38.s")
+
+// function func_00431B88 # 55
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431B88.s")
+
+// function func_00431D00 # 56
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
+
+// function func_00431DD8 # 57
+#pragma GLOBAL_ASM("asm/functions/cc/func_00431DD8.s")
+
 #define EOF	(-1) // can go when headers in
 
 // Search file for the first "----" and move position to the line after it
