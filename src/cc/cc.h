@@ -439,12 +439,42 @@ extern char *ttyname(int);
 extern int unlink(const char *);
 extern ssize_t write(int, const void *, size_t);
 
-
+extern int open(const char *pathname, int flags, ...);
+extern int close(int fildes);
 
 // errno.h
 extern s32 errno;
 extern const char* sys_errlist[];
 extern s32 sys_nerr;
+
+
+// stat.h
+typedef struct timestruc {
+	time_t	tv_sec;		/* seconds */
+	long	tv_nsec;	/* and nanoseconds */
+} timestruc_t;
+
+#define _ST_FSTYPSZ 16		/* array size for file system type name */
+struct	stat {
+	dev_t	st_dev;
+	long	st_pad1[3];	/* reserved for network id */
+	ino_t	st_ino;
+	mode_t	st_mode;
+	nlink_t st_nlink;
+	uid_t 	st_uid;
+	gid_t 	st_gid;
+	dev_t	st_rdev;
+	long	st_pad2[2];	/* dev and off_t expansion */
+	off_t	st_size;
+	long	st_pad3;	/* future off_t expansion */
+	timestruc_t st_atim;	
+	timestruc_t st_mtim;	
+	timestruc_t st_ctim;	
+	long	st_blksize;
+	long	st_blocks;
+	char	st_fstype[_ST_FSTYPSZ];
+	long	st_pad4[8];	/* expansion area */
+};
 
 
 // inttypes.h

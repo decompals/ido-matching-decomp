@@ -14,7 +14,10 @@ static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 char* mkstr();
 
+
+// data
 int fiveflag = 0;
+int runerror = 0;
 char *runlib = "/";
 char *runlib_base = "/";
 int irix4 = 0;
@@ -62,6 +65,8 @@ int targetsex = BIGENDIAN;
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040C8.s")
 #pragma GLOBAL_ASM("asm/functions/cc/STR_100040CC.s")
 
+// bss
+int compiler;
 
 
 // function get_host_chiptype # 6
@@ -228,30 +233,159 @@ va_dcl // K&R syntax
     return ret;
 }
 
-#endif /* PERMUTER */
+// function mklist # 13
+// function addstr # 14
+void addstr(char**, const char*);
 
-#pragma GLOBAL_ASM("asm/functions/cc/mklist.s")
-#pragma GLOBAL_ASM("asm/functions/cc/addstr.s")
-#pragma GLOBAL_ASM("asm/functions/cc/addspacedstr.s")
-#pragma GLOBAL_ASM("asm/functions/cc/newstr.s")
-#pragma GLOBAL_ASM("asm/functions/cc/save_place.s")
-#pragma GLOBAL_ASM("asm/functions/cc/set_place.s")
-#pragma GLOBAL_ASM("asm/functions/cc/addlist.s")
-#pragma GLOBAL_ASM("asm/functions/cc/adduldlist.s")
-#pragma GLOBAL_ASM("asm/functions/cc/nodup.s")
-#pragma GLOBAL_ASM("asm/functions/cc/getsuf.s")
-#pragma GLOBAL_ASM("asm/functions/cc/mksuf.s")
-#pragma GLOBAL_ASM("asm/functions/cc/savestr.s")
-#pragma GLOBAL_ASM("asm/functions/cc/mktempstr.s")
-#pragma GLOBAL_ASM("asm/functions/cc/run.s")
-#pragma GLOBAL_ASM("asm/functions/cc/edit_src.s")
-#pragma GLOBAL_ASM("asm/functions/cc/get_lino.s")
+// function addspacedstr # 15
+// function newstr # 16
+// function save_place # 17
+// function set_place # 18
+// function addlist # 19
+// function adduldlist # 20
+// function nodup # 21
+// function getsuf # 22
+// function mksuf # 23
+// function savestr # 24
+// function mktempstr # 25
+// function run # 26
+// function edit_src # 27
+// function get_lino # 28
 
-#pragma GLOBAL_ASM("asm/functions/cc/show_err.s")
-#pragma GLOBAL_ASM("asm/functions/cc/handler.s")
-#pragma GLOBAL_ASM("asm/functions/cc/cleanup.s")
-#pragma GLOBAL_ASM("asm/functions/cc/whats.s")
+// function show_err # 29
+#define BUF_SIZE 0x10000
+void show_err(const char* path) {
+    int desc;
+    int bytes_read;
+    char buf[BUF_SIZE];
 
+    desc = open(path, O_RDONLY);
+    bytes_read = read(desc, buf, BUF_SIZE);
+    close(desc);
+
+    if (bytes_read < BUF_SIZE) {
+        buf[bytes_read] = '\0';
+    } else {
+        buf[BUF_SIZE - 1] = '\0';
+    }
+    fprintf(stderr, "%s\n", buf);
+}
+#undef BUF_SIZE
+
+// function handler # 30
+void handler(void) {
+    cleanup();
+    exit(3);
+}
+
+// function cleanup # 31
+int Kflag = 0;
+char* passout;
+char* passin;
+char srcsuf;
+int Eflag = 0;
+int tmpst;
+char* symtab;
+char* lpi_st;
+char* lpi_p1;
+char* lpi_pd;
+char* lpi_dd;
+char* uopt0str;
+char* ddoptstr;
+char* optstr;
+char* gentmp;
+char* binasm;
+char* linkorder;
+char* tmp_uldobj;
+int editflag;
+char* tempstr[34];
+
+char* errout;
+
+void cleanup(void) {
+    if (Kflag == 0) {
+        if (passout != NULL) {
+            unlink(passout);
+        }
+        if (passin != NULL) {
+            char sp27 = getsuf(passin);
+            if (((sp27 == 0)) || ((sp27 != srcsuf) && (sp27 != 'm'))) {
+                if (Eflag == 0) {
+                    unlink(passin);
+                }
+            }
+        }
+        if (tmpst != 0) {
+            if (symtab != NULL) {
+                unlink(symtab);
+            }
+        }
+        if (lpi_st != NULL) {
+            unlink(lpi_st);
+        }
+        if (lpi_p1 != NULL) {
+            unlink(lpi_p1);
+        }
+        if (lpi_pd != NULL) {
+            unlink(lpi_pd);
+        }
+        if (lpi_dd != NULL) {
+            unlink(lpi_dd);
+        }
+        if (uopt0str != NULL) {
+            unlink(uopt0str);
+        }
+        if (ddoptstr != NULL) {
+            unlink(ddoptstr);
+        }
+        if (optstr != NULL) {
+            unlink(optstr);
+        }
+        if (gentmp != NULL) {
+            unlink(gentmp);
+        }
+        if (binasm != NULL) {
+            unlink(binasm);
+        }
+        if (linkorder != NULL) {
+            unlink(linkorder);
+        }
+        if (tmp_uldobj != NULL) {
+            unlink(tmp_uldobj);
+        }
+        if (editflag != 0) {
+            unlink(errout);
+            if (editflag == 2) {
+                unlink(tempstr[25]);
+            }
+        }
+        if (compiler == 1) {
+            unlink(tempstr[33]);
+        }
+    }
+}
+
+// function whats # 32
+void whats(void) {
+    s32 sp24 = runerror;
+
+    if (compiler == 2) {
+        printf("%s  (%s)\n", progname, "pc");
+    } else if (compiler == 4) {
+        printf("%s  (%s)\n", progname, "as");
+    } else if (compiler == 3) {
+        printf("%s  (%s)\n", progname, "f77");
+    } else if (compiler == 5) {
+        printf("%s  (%s)\n", progname, "pl1");
+    } else if (compiler == 6) {
+        printf("%s  (%s)\n", progname, "cobol");
+    } else {
+        printf("%s  (%s)\n", progname, "cc");
+    }
+    printf("\tMips Computer Systems %d.%d\n", 7, 10);
+}
+
+// function settimes # 33
 clock_t time0;
 struct tms tm0;
 
@@ -259,6 +393,7 @@ void settimes(void) {
     time0 = times(&tm0);
 }
 
+// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -275,10 +410,53 @@ void dotime(const char* programName) {
     fprintf(stderr, "%s phase time: %.2fu %.2fs %u:%04.1f %.0f%%\n", programName, milis, seconds, clockTimeDiff / (60 * CLOCK_TICKS), (f64) (clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS, ((milis + seconds) / ((f64) clockTimeDiff / CLOCK_TICKS)) * 100.0);
 }
 
-#pragma GLOBAL_ASM("asm/functions/cc/func_0042FD7C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/isdir.s")
-#pragma GLOBAL_ASM("asm/functions/cc/regular_not_writeable.s")
-#pragma GLOBAL_ASM("asm/functions/cc/regular_file.s")
+// function func_0042FD7C # 35
+
+// function isdir # 36
+int isdir(const char* path) {
+    s32 spAC;
+    struct stat statbuf;
+
+    spAC = stat(path, &statbuf);
+    if (spAC == -1) {
+        return 0;
+    }
+    if ((statbuf.st_mode & 0xF000) == 0x4000) {
+        return 1;
+    }
+    return 0;
+}
+
+// function regular_not_writeable # 37
+int regular_not_writeable(const char* arg0) {
+    s32 sp24;
+
+    if (regular_file(arg0) != 1) {
+        return 0;
+    }
+    sp24 = open(arg0, 2, 0777);
+    if (sp24 >= 0) {
+        close(sp24);
+        return 0;
+    }
+    return 1;
+}
+
+// function regular_file # 38
+// Needs stat.h
+int regular_file(const char* path) {
+    s32 spAC;
+    struct stat statbuf;
+
+    spAC = stat(path, &statbuf);
+    if (spAC == -1) {
+        return -1;
+    }
+    if ((statbuf.st_mode & 0xF000) != 0x8000) {
+        return 0;
+    }
+    return 1;
+}
 
 static char B_1000E5E0[0x400];
 
@@ -348,10 +526,58 @@ const char* dirname(const char* path) {
 }
 
 // function func_00430414 # 41
-// function force_use_cfront # 42
-// function exec_OCC # 43
-// function add_cxx_symbol_options # 44
 
+// function force_use_cfront # 42
+static s32 D_1000BF7C;
+static s32 D_1000BF90;
+extern s32 LD;
+extern char* comp_host_root;
+extern s32 exception_handling;
+extern char* execlist; // ?
+
+int force_use_cfront(int argc, char** argv) {
+    int i;
+    char* sp28 = getenv("USE_CFRONT");
+    int sp24 = 0;
+
+    if ((sp28 != NULL) && (*sp28 != 0x30)) {
+        return 1;
+    }
+
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-exceptions") == 0) {
+            D_1000BF7C = 1;
+        }
+        if ((D_1000BF7C == 0) && (exception_handling == 0) && ((strcmp(argv[i], "-F") == 0) || (strcmp(argv[i], "-Fc") == 0))) {
+            return 1;
+        }
+        if ((strcmp(argv[i], "-use_cfront") == 0) || (strcmp(argv[i], "-v2") == 0) || (strcmp(argv[i], "+I") == 0) || (strncmp(argv[i], "-.", 2) == 0)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// function exec_OCC # 43
+void exec_OCC(int argc, char** argv) {
+    char spB8[0x400];
+    char pad[0x88]; // !
+
+    sprintf(spB8, "%susr/bin/OCC", comp_host_root);
+    *argv = spB8;
+    execv(spB8, argv);
+    error(2, NULL, 0, NULL, 0, "could not exec %s", spB8);
+}
+
+// function add_cxx_symbol_options # 44
+int add_cxx_symbol_options(void) {
+    addstr(&execlist, "-cxx");
+    if ((D_1000BF90 == 0) && (strcmp(LD, "old_ld") != 0)) {
+        addstr(&execlist, "-woff");
+        addstr(&execlist, "134");
+    }
+    return 0;
+}
 
 // function init_curr_dir # 45
 static char* D_1000C1D0 = NULL; // full path of current working directory
