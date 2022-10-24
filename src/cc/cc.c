@@ -20,16 +20,67 @@ char *runlib_base = "/";
 int irix4 = 0;
 int targetsex = BIGENDIAN;
 
+// LD
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004000.s")
 
+// suffixes
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004004.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004008.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000400C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004010.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004014.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004018.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000401C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004020.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004024.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004028.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000402C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004030.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004034.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004038.s")
 
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000403C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004044.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000404C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004054.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000405C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004064.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000406C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004074.s")
+
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000407C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004084.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10004090.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000409C.s")
+
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040A4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040AC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040B4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040BC.s")
+
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040C4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040C8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100040CC.s")
 
 
 
 #pragma GLOBAL_ASM("asm/functions/cc/main.s")
 
+#pragma GLOBAL_ASM("asm/functions/cc/STR_10005C6C.s")
+
+
 #pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
+
 #pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
 #pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
+
+
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092B4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092C0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092C8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092D0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092D8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_100092DC.s")
 
 
 #pragma GLOBAL_ASM("asm/functions/cc/get_host_chiptype.s")
@@ -221,6 +272,71 @@ const char* dirname(const char* path) {
     
     return strcpy(str, ".");
 }
+
+
+
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8A4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8AC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8BC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8C4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8CC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8DC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8E4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8EC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A8FC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A904.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A908.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A918.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A92C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A934.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A944.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A94C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A954.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A964.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A96C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A970.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A980.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A990.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A99C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9B0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9B8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9C0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9D4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9DC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9E0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9F0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000A9F8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA00.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA10.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA18.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA20.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA30.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA38.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA40.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA50.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA58.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA64.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA78.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA80.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA84.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AA94.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAA8.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAAC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AABC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAD0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAD4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAE0.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAF4.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AAFC.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB0C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB14.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB1C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB34.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB40.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB4C.s")
+#pragma GLOBAL_ASM("asm/functions/cc/STR_1000AB68.s")
+
+
 
 #pragma GLOBAL_ASM("asm/functions/cc/func_00430414.s")
 #pragma GLOBAL_ASM("asm/functions/cc/force_use_cfront.s")
@@ -563,3 +679,6 @@ char* func_00433534(const char* arg0) {
 /* File boundary, -O2 */
 
 // gethostsex
+
+
+#pragma GLOBAL_ASM("asm/functions/cc/__Release_ID.s")
