@@ -444,11 +444,6 @@ extern ssize_t write(int, const void *, size_t);
 extern int open(const char *pathname, int flags, ...);
 extern int close(int fildes);
 
-// errno.h
-extern s32 errno;
-extern const char* sys_errlist[];
-extern s32 sys_nerr;
-
 
 // stat.h
 

@@ -12,6 +12,7 @@
 #include "sys/times.h"
 #include "utime.h"
 #include "varargs.h"
+#include "errno.h"
 
 /* File, -O1 */
 static void func_00432C94(void);
@@ -459,7 +460,20 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 #pragma GLOBAL_ASM("asm/functions/cc/mksuf.s")
 
 // function savestr # 24
-#pragma GLOBAL_ASM("asm/functions/cc/savestr.s")
+char* savestr(const char* arg0, s32 arg1) {
+    char* sp34;
+
+    sp34 = malloc(strlen(arg0) + arg1 + 1);
+    if (sp34 == NULL) {
+        error(1, 0, 0, "savestr ()", 15014, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+    }
+    strcpy(sp34, arg0);
+    return sp34;
+}
 
 // function mktempstr # 25
 #pragma GLOBAL_ASM("asm/functions/cc/mktempstr.s")
