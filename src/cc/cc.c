@@ -454,13 +454,13 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 
 
 // function nodup # 21
-s32 nodup(list* arg0, const char* arg1) {
-    register s32 var_s0;
-    register char* temp_s1;
+s32 nodup(list* arg0, const char* str) {
+    register s32 i;
+    register char* entry;
 
-    for (var_s0 = 0; var_s0 < arg0->length; var_s0++) {
-        temp_s1 = arg0->entries[var_s0];
-        if ((temp_s1 != NULL) && (strcmp(temp_s1, arg1) == 0)) {
+    for (i = 0; i < arg0->length; i++) {
+        entry = arg0->entries[i];
+        if ((entry != NULL) && (strcmp(entry, str) == 0)) {
             return 0;
         }
     }
