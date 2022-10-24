@@ -491,7 +491,55 @@ char* savestr(const char* arg0, s32 arg1) {
 }
 
 // function mktempstr # 25
-#pragma GLOBAL_ASM("asm/functions/cc/mktempstr.s")
+s32 filter = 0;
+s32 nofilt = 0;
+extern char* tmpdir;
+extern char* tempstr[34];
+
+void mktempstr(void) {
+    tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", 0));
+    tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", 0));
+    tempstr[2] = mktemp(mkstr(tmpdir, "ctmpXXXXXX", 0));
+    tempstr[3] = mktemp(mkstr(tmpdir, "ctmfXXXXXX", 0));
+    tempstr[4] = mktemp(mkstr(tmpdir, "ctmluXXXXXX", 0));
+    tempstr[5] = mktemp(mkstr(tmpdir, "ctmsXXXXXX", 0));
+    tempstr[6] = mktemp(mkstr(tmpdir, "ctmmXXXXXX", 0));
+    tempstr[7] = mktemp(mkstr(tmpdir, "ctmoXXXXXX", 0));
+    tempstr[8] = mktemp(mkstr(tmpdir, "ctmosXXXXXX", 0));
+    tempstr[9] = mktemp(mkstr(tmpdir, "ctmcbXXXXXX", 0));
+    tempstr[10] = mktemp(mkstr(tmpdir, "ctmcXXXXXX", 0));
+    tempstr[11] = mktemp(mkstr(tmpdir, "ctmaXXXXXX", 0));
+    tempstr[12] = mktemp(mkstr(tmpdir, "ctmbXXXXXX", 0));
+    tempstr[13] = mktemp(mkstr(tmpdir, "ctmlXXXXXX", 0));
+    tempstr[14] = mktemp(mkstr(tmpdir, "ctmm4XXXXXX", 0));
+    tempstr[15] = mktemp(mkstr(tmpdir, "ctmgtXXXXXX", 0));
+    tempstr[16] = mktemp(mkstr(tmpdir, "ctmilXXXXXX", 0));
+    tempstr[17] = mktemp(mkstr(tmpdir, "ctmltXXXXXX", 0));
+    tempstr[18] = mktemp(mkstr(tmpdir, "ctmp1XXXXXX", 0));
+
+    tempstr[20] = mktemp(mkstr(tmpdir, "ctmpdXXXXXX", 0));
+    tempstr[19] = mktemp(mkstr(tmpdir, "ctmddXXXXXX", 0));
+    tempstr[21] = mktemp(mkstr(tmpdir, "ctmloXXXXXX", 0));
+    tempstr[22] = mktemp(mkstr(tmpdir, "ctmciXXXXXX", 0));
+    tempstr[23] = mktemp(mkstr(tmpdir, "ctmvXXXXXX", 0));
+    tempstr[24] = mktemp(mkstr(tmpdir, "ctmerrXXXXXX", 0));
+    tempstr[25] = mktemp(mkstr(tmpdir, "ctmemXXXXXX", 0));
+    tempstr[26] = mktemp(mkstr(tmpdir, "ctmeXXXXXX", 0));
+    tempstr[27] = mktemp(mkstr(tmpdir, "ctmdXXXXXX", 0));
+    tempstr[28] = mktemp(mkstr(tmpdir, "ctmqXXXXXX", 0));
+    tempstr[29] = mktemp(mkstr(tmpdir, "ctmqsXXXXXX", 0));
+    //! @bug 5 Xs instead of 6
+    tempstr[30] = mktemp(mkstr(tmpdir, "ctmelfXXXXX", 0));
+    tempstr[31] = mktemp(mkstr(tmpdir, "ctmkXXXXXX", 0));
+
+    tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", 0));
+
+    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (nofilt == 0) && (access(filter, 0x10) == 0)) {
+        tempstr[32] = mktemp(mkstr(tmpdir, "ctmfiltXXXXXX", NULL));
+    } else {
+        tempstr[32] = NULL;
+    }
+}
 
 // function run # 26
 #pragma GLOBAL_ASM("asm/functions/cc/run.s")

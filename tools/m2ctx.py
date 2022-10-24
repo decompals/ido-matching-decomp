@@ -47,7 +47,6 @@ DEFINES = [
     "MIPSEB",
     # "__STDC__=1", # gcc complains about it being redefined
     "_CFE",
-    "_POSIX_SOURCE",
 
     # m2c tweaks
     "PERMUTER=1"
