@@ -113,6 +113,8 @@ list umergeflags;
 list uopt0flags;
 list upasflags;
 
+void addstr(list* arg0, char* str);
+
 void add_info(char* str) {
     addstr(&upasflags, str);
     addstr(&fcomflags, str);
@@ -429,6 +431,7 @@ void mklist(list* arg0) {
     arg0->length = 0;
     *arg0->entries = NULL;
 }
+
 
 // function addstr # 14
 void addstr(list* arg0, char* str) {
