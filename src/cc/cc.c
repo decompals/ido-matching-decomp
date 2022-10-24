@@ -526,6 +526,63 @@ const char* dirname(const char* path) {
 }
 
 // function func_00430414 # 41
+struct _struct_prod_name_0xC {
+    /* 0x0 */ const char *unk0; // name?
+    /* 0x4 */ const char *unk4; // full path?
+    /* 0x8 */ const char *unk8; // description?
+}; // size = 0xC
+
+struct _struct_prod_name_0xC prod_name[0x14] = {
+    { "accom", "/usr/lib/accom", "ANSI C" },
+    { "ccom", "/usr/lib/ccom", "ANSI C" },
+    { "acpp", "/usr/lib/acpp", "ANSI C" },
+    { "cpp", "/usr/lib/cpp", "Development option" },
+    { "fcom", "/usr/lib/fcom", "Fortran" },
+    { "fopt", "/usr/lib/fopt", "Fortran" },
+    { "pfa", "/usr/lib/pfa", "Power Fortran" },
+    { "accom_mp", "/usr/lib/accom_mp", "Power C" },
+    { "ccom_mp", "/usr/lib/ccom_mp", "Power C" },
+    { "pca", "/usr/lib/pca", "Power C" },
+    { "copt", "/usr/lib/copt", "ANSI C" },
+    { "upas", "/usr/lib/upas", "Pascal" },
+    { "pl1fe", "/usr/lib/pl1fe", "PL/1" },
+    { "pl1error", "/usr/lib/pl1error", "PL/1" },
+    { "as0", "/usr/lib/as0", "Development option" },
+    { "as1", "/usr/lib/as1", "Development option" },
+    { "ld", "/usr/lib/ld", "Development option" },
+    { "cobfe", "/usr/lib/cobfe", "COBOL" },
+    { "edgcpfe", "/usr/lib/DCC/edgcpfe", "Delta C++" },
+    { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
+};
+
+const char* func_00430414(char* arg0, int arg1) {
+    int i;
+    int sp28;
+    char* sp24;
+    char* sp20;
+
+    if (arg1 != 0) {
+        sp24 = arg0;
+    } else {
+        sp24 = strrchr(arg0, '/');
+        if (sp24 != NULL) {
+            sp24++;
+        }
+    }
+
+    sp28 = 20;
+    for(i = 0; i < sp28; i++) {
+        if (arg1 != 0) {
+            sp20 = prod_name[i].unk4;
+        } else {
+            sp20 = prod_name[i].unk0;
+        }
+        if (strcmp(sp24, sp20) == 0) {
+            return prod_name[i].unk8;
+        }
+    }
+    return 0;
+}
 
 // function force_use_cfront # 42
 static s32 D_1000BF7C;
@@ -540,7 +597,7 @@ int force_use_cfront(int argc, char** argv) {
     char* sp28 = getenv("USE_CFRONT");
     int sp24 = 0;
 
-    if ((sp28 != NULL) && (*sp28 != 0x30)) {
+    if ((sp28 != NULL) && (*sp28 != '0')) {
         return 1;
     }
 
@@ -635,8 +692,53 @@ int touch(const char* arg0) {
     return 0;
 }
 // function add_prelinker_objects # 50
+
 // function quoted_length # 51
+size_t quoted_length(const char* arg0, int* arg1) {
+    u32 len = 0;
+    u8 ch;
+
+    *arg1 = 0;
+    while (ch = *arg0++) { // != 0 does not match
+        if (*arg1 == 0) {
+            if ((ch == '\'') || (ch == '|') || (ch == '&') || (ch == '*') || (ch == '?') || (ch == '[') || (ch == ']') || (ch == ';') || (ch == '!') || (ch == '(') || (ch == ')') || (ch == '^') || (ch == '<') || (ch == '>') || (ch <= ' ') || (ch == '\t') || (ch == '\"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
+                *arg1 = 1;
+                len += 2;
+            }
+        }
+        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
+            len++;
+        }
+        len++;
+    }
+    return len;
+}
+
 // function quote_shell_arg # 52
+size_t quote_shell_arg(const char* arg0, char* arg1) {
+    char ch;
+    int sp28;
+    size_t len;
+
+    sp28 = 0;
+    len = quoted_length(arg0, &sp28);
+    if (sp28 != 0) {
+        *arg1++ = '""';
+    }
+    
+    while ((ch = *arg0++)) { // != 0 does not match
+        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
+            *arg1++ = '\\';
+        }
+        *arg1++ = ch;
+    }
+
+    if (sp28 != 0) {
+        *arg1++ = '"';
+    }
+    return len;
+}
+
 // function func_00431A3C # 53
 // function func_00431B38 # 54
 // function func_00431B88 # 55
