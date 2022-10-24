@@ -10,7 +10,7 @@
 //#include "inttypes.h"
 #include "sex.h"
 #include "sys/times.h"
-
+#include "utime.h"
 #include "varargs.h"
 
 /* File, -O1 */
@@ -18,6 +18,8 @@ static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 char* mkstr();
 
+void cleanup(void);
+extern int vflag;
 
 // data
 char* LD = "ld";
@@ -124,6 +126,9 @@ static char* D_1000C1DC = NULL;
 extern s32 Vflag;
 extern s32 errno;
 extern s32 sys_nerr;
+
+
+char* progname;
 
 
 // Print an error. Has to be K&R for the variadic stuff to work in other functions
@@ -809,7 +814,7 @@ const char* func_00430414(char* arg0, int arg1) {
     int i;
     int sp28;
     char* sp24;
-    char* sp20;
+    const char* sp20;
 
     if (arg1 != 0) {
         sp24 = arg0;
@@ -889,7 +894,6 @@ int add_cxx_symbol_options(void) {
 // function init_curr_dir # 45
 static char* D_1000C1D0 = NULL; // full path of current working directory
 static char* D_1000C2F0 = NULL; // basename of progname (?)
-char* progname;
 
 void init_curr_dir(void) {
     if (D_1000C2F0 == 0) {
@@ -931,7 +935,7 @@ char* full_path(const char* relative_path) {
 // function add_static_opt # 47
 list staticopts;
 
-void add_static_opt(const char* opt) {
+void add_static_opt(char* opt) {
     if (D_1000BF88 == 0) {
         addstr(&staticopts, opt);
     }

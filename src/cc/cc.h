@@ -451,10 +451,6 @@ extern s32 sys_nerr;
 
 
 // stat.h
-typedef struct timestruc {
-	time_t	tv_sec;		/* seconds */
-	long	tv_nsec;	/* and nanoseconds */
-} timestruc_t;
 
 #define _ST_FSTYPSZ 16		/* array size for file system type name */
 struct	stat {
