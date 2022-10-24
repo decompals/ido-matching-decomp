@@ -1199,7 +1199,13 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 #pragma GLOBAL_ASM("asm/functions/cc/func_00431A3C.s")
 
 // function func_00431B38 # 54
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431B38.s")
+void func_00431B38(int first, int count) {
+    int i;
+
+    for (i = 0; i < count; i++) {
+            B_1000E4C4[first + i] = NULL;
+    }
+}
 
 // function func_00431B88 # 55
 #pragma GLOBAL_ASM("asm/functions/cc/func_00431B88.s")
