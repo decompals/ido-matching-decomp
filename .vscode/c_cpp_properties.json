@@ -37,8 +37,7 @@
                 "_MIPSEB",
                 "MIPSEB",
                 "__STDC__=1",
-                "_CFE",
-                "_POSIX_SOURCE"
+                "_CFE"
             ],
             "compilerPath": "/usr/bin/clang",
             "intelliSenseMode": "linux-clang-x86",

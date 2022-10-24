@@ -131,6 +131,7 @@ extern s32 sys_nerr;
 
 char* progname;
 
+#ifndef PERMUTER
 
 // Print an error. Has to be K&R for the variadic stuff to work in other functions
 void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, argB)
@@ -199,6 +200,9 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
     }
     fprintf(stderr, arg5, arg6, arg7, arg8, arg9, argA, argB);
 }
+#else
+void error(s32 arg0, const char* arg1, s32 arg2, const char* arg3, s32 arg4, const char* arg5, ...);
+#endif /* PERMUTER */
 
 // function relocate_passes # 8
 #pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
@@ -449,9 +453,20 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 }
 
 
-
 // function nodup # 21
-#pragma GLOBAL_ASM("asm/functions/cc/nodup.s")
+s32 nodup(list* arg0, const char* arg1) {
+    register s32 var_s0;
+    register char* temp_s1;
+
+    for (var_s0 = 0; var_s0 < arg0->length; var_s0++) {
+        temp_s1 = arg0->entries[var_s0];
+        if ((temp_s1 != NULL) && (strcmp(temp_s1, arg1) == 0)) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
 
 // function getsuf # 22
 #pragma GLOBAL_ASM("asm/functions/cc/getsuf.s")
