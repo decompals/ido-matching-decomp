@@ -206,8 +206,6 @@ void newrunlib(void) {
  */
 #define _VA_INIT_STATE 1
 
-#ifndef PERMUTER
-
 char* mkstr(va_alist)
 va_dcl // K&R syntax
 {
@@ -926,8 +924,8 @@ void record_static_fileset(s32 arg0) {
 
     if (vflag != 0) {
         fprintf(stderr, "Static fileset: %s %s", spD4, D_1000C2F0);
-        for (sp28E4 = 0; sp28E4 < staticopts.unk4; sp28E4++) {
-            fprintf(stderr, " %s", staticopts.unk8[sp28E4]);
+        for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
+            fprintf(stderr, " %s", staticopts.entries[sp28E4]);
         }
         fprintf(stderr, "\n");
     }
@@ -985,8 +983,8 @@ void record_static_fileset(s32 arg0) {
     }
     fprintf(sp28E0, "%s %s", spD4, D_1000C2F0);
 
-    for (sp28E4 = 0; sp28E4 < staticopts.unk4; sp28E4++) {
-        fprintf(sp28E0, " %s", staticopts.unk8[sp28E4]);
+    for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
+        fprintf(sp28E0, " %s", staticopts.entries[sp28E4]);
     }
     fprintf(sp28E0, "\n");
 

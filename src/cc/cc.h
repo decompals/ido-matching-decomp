@@ -268,6 +268,8 @@ typedef struct prmap_sgi {
 
 // stdlib.h
 
+extern unsigned char 	__ctype[];
+
 extern void *calloc(size_t, size_t);
 extern void free(void *);
 extern void *malloc(size_t);
