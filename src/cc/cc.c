@@ -15,6 +15,12 @@
 #include "errno.h"
 
 /* File, -O1 */
+typedef struct {
+    s32 capacity;
+    s32 length;
+    char** entries;
+} list;
+
 static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 char* mkstr();
@@ -93,7 +99,31 @@ static int D_1000BF88 = 0;
 #pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
 
 // function add_info # 4
-#pragma GLOBAL_ASM("asm/functions/cc/add_info.s")
+list asflags;
+list ddoptflags;
+list fcomflags;
+list genflags;
+list ldflags;
+list optflags;
+list uloopflags;
+list ulpiflags;
+list umergeflags;
+list uopt0flags;
+list upasflags;
+
+void add_info(char* str) {
+    addstr(&upasflags, str);
+    addstr(&fcomflags, str);
+    addstr(&ulpiflags, str);
+    addstr(&uopt0flags, str);
+    addstr(&ddoptflags, str);
+    addstr(&optflags, str);
+    addstr(&umergeflags, str);
+    addstr(&uloopflags, str);
+    addstr(&genflags, str);
+    addstr(&asflags, str);
+    addstr(&ldflags, str);
+}
 
 // function parse_command # 5
 #pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
@@ -385,12 +415,6 @@ va_dcl // K&R syntax
 #endif /* PERMUTER */
 
 // function mklist # 13
-typedef struct {
-    s32 capacity;
-    s32 length;
-    char** entries;
-} list;
-
 void mklist(list* arg0) {
     if ((arg0->entries = malloc(20 * sizeof(char*))) == NULL) {
         error(1, NULL, 0, "mklist ()", 14561, "out of memory\n");
