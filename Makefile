@@ -7,9 +7,10 @@ else
   $(error Please install or build mips-linux-gnu)
 endif
 
-RECOMP := tools/recomp
-BUILD  := build
-ASM    := asm
+RECOMP  := tools/recomp
+BUILD   := build
+ASM     := asm
+CONTEXT := context
 
 CC       := $(RECOMP)/build/7.1/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
@@ -76,7 +77,7 @@ setup:
 disasm:
 	$(RM) -rf $(ASM)
 	mkdir -p $(BUILD)/$(ASM)/cc
-	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --split-functions asm/functions --aggressive-string-guesser
+	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --split-functions asm/functions --aggressive-string-guesser --save-context $(CONTEXT)/cc.ctx
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
