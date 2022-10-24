@@ -122,6 +122,8 @@ void newrunlib(void) {
  */
 #define _VA_INIT_STATE 1
 
+#ifndef PERMUTER
+
 char* mkstr(va_alist)
 va_dcl // K&R syntax
 {
@@ -155,6 +157,8 @@ va_dcl // K&R syntax
     va_end(args);
     return ret;
 }
+
+#endif /* PERMUTER */
 
 #pragma GLOBAL_ASM("asm/functions/cc/mklist.s")
 #pragma GLOBAL_ASM("asm/functions/cc/addstr.s")

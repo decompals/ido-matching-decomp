@@ -16,6 +16,7 @@ INCLUDES = [
 ]
 
 DEFINES = [
+    # cfe built-in defines
     "_MIPS_FPSET=16",
     "_MIPS_ISA=2",
     "_ABIO32=1",
@@ -47,6 +48,15 @@ DEFINES = [
     # "__STDC__=1", # gcc complains about it being redefined
     "_CFE",
     "_POSIX_SOURCE",
+
+    # m2c tweaks
+    "PERMUTER=1"
+    ## This block is required to avoid the vararg shitshow
+    "va_arg(...)=0",
+    "__VARARGS_H__",
+    "__STDARG_H__",
+    "va_dcl=long va_alist;",
+    "va_list=char *"
 ]
 
 def import_c_file(in_file: Path) -> str:
@@ -69,6 +79,9 @@ def import_c_file(in_file: Path) -> str:
         )
         sys.exit(1)
 
+def postProcessOutput(output: str) -> str:
+    return output.replace("#ident ", "// #ident ")
+
 
 def main():
     parser = argparse.ArgumentParser(usage="./m2ctx.py path/to/file.c",
@@ -81,6 +94,7 @@ def main():
     print(f"Using file: {c_file_path}")
 
     output = import_c_file(c_file_path)
+    output = postProcessOutput(output)
 
     outputPath = root_dir / "ctx.c"
     with outputPath.open("w", encoding="UTF-8") as f:
