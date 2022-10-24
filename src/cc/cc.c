@@ -711,7 +711,7 @@ void dotime(const char* programName) {
 
 // function func_0042FD7C # 35
 // Search for a lib in directories (?)
-char* func_0042FD7C(const char* name, char** dirs) {
+static char* func_0042FD7C(const char* name, char** dirs) {
     s32 fildes;
     char* path;
 
@@ -887,7 +887,7 @@ struct _struct_prod_name_0xC prod_name[] = {
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
 };
 
-const char* func_00430414(char* arg0, int arg1) {
+static const char* func_00430414(char* arg0, int arg1) {
     int i;
     int sp28;
     char* sp24;
@@ -1248,7 +1248,7 @@ static int B_1000E4C0; // argc
 static char** B_1000E4C4; // argv
 static char* B_1000ECDC;
 
-void func_00431A3C(int argc, char** argv) {
+static void func_00431A3C(int argc, char** argv) {
     int i;
 
     B_1000E4C0 = argc;
@@ -1265,7 +1265,7 @@ void func_00431A3C(int argc, char** argv) {
 }
 
 // function func_00431B38 # 54
-void func_00431B38(int first, int count) {
+static void func_00431B38(int first, int count) {
     int i;
 
     for (i = 0; i < count; i++) {
@@ -1274,13 +1274,49 @@ void func_00431B38(int first, int count) {
 }
 
 // function func_00431B88 # 55
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431B88.s")
+static char* B_1000ECCC;
+int cflag = 0;
+list srcfiles;
+
+// arg2 is verbosity?
+static void func_00431B88(FILE* arg0, const char* arg1, s32 arg2) {
+    if (arg2) {
+        fputs("CMDLINE=", arg0);
+    }
+    fprintf(arg0, "%s ", progname);
+    if (cflag == 0) {
+        fputs("-c ", arg0);
+    }
+    if ((srcfiles.length == 1) && (cflag != 0)) {
+        if (B_1000ECCC != 0) {
+            fprintf(arg0, "-o %s ", B_1000ECCC);
+        }
+    }
+    fprintf(arg0, "%s %s\n", B_1000ECDC, arg1);
+    if (arg2) {
+        fputs("PWD=", arg0);
+    }
+    fprintf(arg0, "%s\n", D_1000C1D0);
+    if (arg2) {
+        fputs("----\n", arg0);
+    }
+}
 
 // function func_00431D00 # 56
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
+static void func_00431D00(const char* arg0) {
+    FILE* file = fopen(tempstr[33], "w");
+
+    if (file != NULL) {
+        init_curr_dir();
+        func_00431B88(file, arg0, FALSE);
+        fclose(file);
+    } else {
+        error(2, NULL, 0, NULL, 0, "cannot open commandfile '%s'\n", tempstr[33]);
+    }
+}
 
 // function func_00431DD8 # 57
-void func_00431DD8(void) {
+static void func_00431DD8(void) {
     int sp34 = 0;
     int sp30 = 0;
     int sp2C = 0;
@@ -1386,7 +1422,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
             exit(1);
         }
         skip_old_ii_controls(sp4C);
-        func_00431B88(sp48, arg0, 1);
+        func_00431B88(sp48, arg0, TRUE);
 
         while ((sp44 = getc_locked(sp4C)) != -1) {
             putc_locked(sp44, sp48);
@@ -1409,7 +1445,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
 
 
 // function func_00432940 # 61
-int func_00432940(pid_t arg0) {
+static int func_00432940(pid_t arg0) {
     int fd; // sp29C
     char pathname[20]; // sp288
     prstatus_t status; // sp68
@@ -1465,7 +1501,7 @@ static int B_1000EC98[2];
 
 // function func_00432BDC # 62
 // test pipe read
-void func_00432BDC(void) {
+static void func_00432BDC(void) {
     char buf;
     int failure;
 
@@ -1621,7 +1657,7 @@ static void func_00432D3C(const char* arg0, s32 count) {
 
 // function func_00433534 # 65
 // Prepends "--" to a string by copying.
-char* func_00433534(const char* arg0) {
+static char* func_00433534(const char* arg0) {
     char* ret = (char*)malloc(strlen(arg0) + 3);
 
     ret[0] = '-';
