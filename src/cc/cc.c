@@ -1244,14 +1244,32 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 }
 
 // function func_00431A3C # 53
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431A3C.s")
+static int B_1000E4C0; // argc
+static char** B_1000E4C4; // argv
+static char* B_1000ECDC;
+
+void func_00431A3C(int argc, char** argv) {
+    int i;
+
+    B_1000E4C0 = argc;
+    B_1000E4C4 = malloc((argc + 1) * sizeof(char*));
+
+    for (i = 0; i < argc; i++) {        
+        if (argv[i] != NULL) {
+            B_1000E4C4[i] = strdup(argv[i]);
+        } else {
+            B_1000E4C4[i] = NULL;
+        }
+    }
+    B_1000E4C4[B_1000E4C0] = NULL;
+}
 
 // function func_00431B38 # 54
 void func_00431B38(int first, int count) {
     int i;
 
     for (i = 0; i < count; i++) {
-            B_1000E4C4[first + i] = NULL;
+        B_1000E4C4[first + i] = NULL;
     }
 }
 
@@ -1262,10 +1280,6 @@ void func_00431B38(int first, int count) {
 #pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
 
 // function func_00431DD8 # 57
-static int B_1000E4C0;
-static char** B_1000E4C4;
-static char* B_1000ECDC;
-
 void func_00431DD8(void) {
     int sp34 = 0;
     int sp30 = 0;
