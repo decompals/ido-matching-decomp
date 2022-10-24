@@ -1208,7 +1208,39 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 #pragma GLOBAL_ASM("asm/functions/cc/func_00431D00.s")
 
 // function func_00431DD8 # 57
-#pragma GLOBAL_ASM("asm/functions/cc/func_00431DD8.s")
+static int B_1000E4C0;
+static char** B_1000E4C4;
+static char* B_1000ECDC;
+
+void func_00431DD8(void) {
+    int sp34 = 0;
+    int sp30 = 0;
+    int sp2C = 0;
+    int i;
+    char* sp24;
+
+    for (i = 1; i < B_1000E4C0; i++) {
+        if (B_1000E4C4[i] != NULL) {
+            sp34 += quoted_length(B_1000E4C4[i], &sp2C) + 1;
+        }
+    }
+
+    B_1000ECDC = sp24 = malloc(sp34 + 1);
+    for (i = 1; i < B_1000E4C0; i++) {
+        if (B_1000E4C4[i] != NULL) {
+            sp24 += quote_shell_arg(B_1000E4C4[i], sp24);
+            *sp24 = ' ';
+            sp24++;
+        }
+    }
+
+    if (sp24 > B_1000ECDC) {
+        sp24[-1] = '\0';
+    } else {
+        sp24[0] = '\0';
+    }
+}
+
 
 // function skip_old_ii_controls # 58
 #define EOF	(-1) // can go when headers in

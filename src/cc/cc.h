@@ -35,7 +35,10 @@ size_t strlen(const char*);
 
 #pragma intrinsic (strcpy)
 
+// errno.h
 
+extern int errno;
+extern char *   sys_errlist[];
 
 // time.h
 typedef struct timestruc {
