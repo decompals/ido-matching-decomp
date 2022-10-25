@@ -307,59 +307,5 @@ extern int	__us_rsthread_stdio;
 #define fileno_unlocked(p)	(p)->_file
 
 
-// fcntl.h
-
-/*
- * Flag values accessible to open(2) and fcntl(2)
- * (the first three and O_DIRECT can only be set by open).
- */
-#define	O_RDONLY	0
-#define	O_WRONLY	1
-#define	O_RDWR		2
-#if !defined(_POSIX_SOURCE) 
-#define	O_NDELAY	0x04	/* non-blocking I/O */
-#endif /* !defined(_POSIX_SOURCE) */ 
-#define	O_APPEND	0x08	/* append (writes guaranteed at the end) */
-#if !defined(_POSIX_SOURCE) || defined(_XOPEN_SOURCE) 
-#define	O_SYNC		0x10	/* synchronous write option */
-#endif /* !defined(_POSIX_SOURCE) || defined(_XOPEN_SOURCE */ 
-#define	O_NONBLOCK	0x80	/* non-blocking I/O (POSIX) */
-#if defined(_SGI_SOURCE) && !defined(_POSIX_SOURCE) && !defined(_XOPEN_SOURCE)
-#define O_DIRECT	0x8000	/* direct I/O */
-#endif /* SGI && !POSIX && !XOPEN */
-/*
- * Flag values accessible only to open(2).
- */
-#define	O_CREAT		0x100	/* open with file create (uses third open arg) */
-#define	O_TRUNC		0x200	/* open with truncation */
-#define	O_EXCL		0x400	/* exclusive open */
-#define	O_NOCTTY	0x800	/* don't allocate controlling tty (POSIX) */
-
-
-// stat.h
-
-#define _ST_FSTYPSZ 16		/* array size for file system type name */
-struct	stat {
-	dev_t	st_dev;
-	long	st_pad1[3];	/* reserved for network id */
-	ino_t	st_ino;
-	mode_t	st_mode;
-	nlink_t st_nlink;
-	uid_t 	st_uid;
-	gid_t 	st_gid;
-	dev_t	st_rdev;
-	long	st_pad2[2];	/* dev and off_t expansion */
-	off_t	st_size;
-	long	st_pad3;	/* future off_t expansion */
-	timestruc_t st_atim;	
-	timestruc_t st_mtim;	
-	timestruc_t st_ctim;	
-	long	st_blksize;
-	long	st_blocks;
-	char	st_fstype[_ST_FSTYPSZ];
-	long	st_pad4[8];	/* expansion area */
-};
-
-
 // inttypes.h
 typedef unsigned long int	uintptr_t;

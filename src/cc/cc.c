@@ -16,6 +16,8 @@
 #include "errno.h"
 #include "unistd.h"
 #include "ctype.h"
+#include "sys/stat.h"
+#include "sys/fcntl.h"
 
 /* File, -O1 */
 typedef struct {
