@@ -25,6 +25,7 @@ typedef struct {
 
 static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
+void error();
 char* mkstr();
 void get_lino(char* arg0, const char* arg1, s32 arg2);
 
@@ -93,13 +94,102 @@ char *runlib_base = "/";
 static int D_1000BF88 = 0;
 
 
+int svr4_systype = 0;
+int systype_warn = 0;
+int user_systype = 0;
+
+char* comp_target_root;
+char* currcomp;
+char* systype;
 
 
 // function main # 2
 #pragma GLOBAL_ASM("asm/functions/cc/main.s")
 
 // function process_config # 3
-#pragma GLOBAL_ASM("asm/functions/cc/process_config.s")
+void process_config(int argc, char** argv) {
+    register int i;
+    register char* var_s1;
+    char* sp1144 = comp_target_root;
+    char* sp1140;
+    FILE* sp113C;
+    char sp13C[0x1000];
+    s32 sp138;
+    char* sp38[0x40];
+
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-systype") == 0) {
+            i++;
+            if (i >= argc) {
+                error(1, 0, 0, 0, 0, "-systype must have an argument\n");
+                exit(2);
+            }
+
+            user_systype = 1;
+            systype = argv[i];
+            if (strcmp(systype, "svr4") == 0) {
+                svr4_systype = 1;
+            } else {
+                error(1, 0, 0, 0, 0, "only systype svr4 allowed\n");
+                exit(2);
+            }
+
+            if ((strcmp(systype, "svr4") != 0) 
+                && (strcmp(systype, "bsd43") != 0) 
+                && (strcmp(systype, "svr3") != 0) 
+                && (strcmp(systype, "sysv") != 0) 
+                && (fopen(strcat("/", systype), "r") == NULL) 
+                && (systype_warn == 0)) {
+                error(2, 0, 0, 0, 0, "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                systype_warn = 1;
+                systype = "svr3";
+            }
+
+            if (svr4_systype == 0) {
+                sp1144 = mkstr(comp_target_root, systype, "/", NULL);
+            }
+            break;
+        }
+    }
+
+    
+    if (user_systype == 0) {
+        sp1144 = mkstr(comp_target_root, systype, "/", NULL);
+    }
+    
+    user_systype = 0;
+    sp1140 = mkstr(sp1144, "usr/lib/", currcomp, "comp.config", NULL);
+    sp113C = fopen(sp1140, "r");
+    if (sp113C != NULL) {
+        if (1) {} // FAKE
+        if (fgets(sp13C, 0x1000, sp113C) != NULL) {
+            if (sp13C[strlen(sp13C) - 1] == '\n') {
+                sp13C[strlen(sp13C) - 1] = '\0';
+            }
+            var_s1 = sp13C;
+            i = sp138 = 0;
+            while (*var_s1 != 0) {
+                while ((*var_s1 != '\0') && ((*var_s1 == ' ') || (*var_s1 == '\t'))) {
+                    var_s1++;
+                }
+
+                if (*var_s1 != 0) {
+                    sp38[sp138] = var_s1;
+                    sp138 += 1;
+                }
+    
+                while ((*var_s1 != '\0') && (*var_s1 != ' ') && (*var_s1 != '\t')) {
+                        var_s1++;
+                }
+    
+                if (*var_s1 != 0) {
+                    *var_s1++ = '\0';
+                }
+            }
+            parse_command(sp138, sp38);
+        }
+    }
+}
 
 // function add_info # 4
 list asflags;
