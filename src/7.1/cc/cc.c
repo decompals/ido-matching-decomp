@@ -38,7 +38,8 @@ void error(s32 arg0, const char* arg1, s32 arg2, const char* arg3, s32 arg4, con
 char* mkstr();
 char* savestr(const char* src, size_t extra_length);
 void get_lino(char* arg0, const char* arg1, s32 arg2);
-
+void settimes(void);
+void dotime(const char* programName);
 void cleanup(void);
 extern int vflag;
 
@@ -2005,8 +2006,214 @@ void mktempstr(void) {
     }
 }
 
+extern int getpagesize(void);
+static prmap_sgi_t B_1000CAC0[100];
+static int B_1000EC98[2];
+static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, 0x1900 };
+int time_flag = 0;
+int memory_flag = 0;
+int execute_flag = 1;
+
+static const char* func_00430414(char* arg0, int arg1);
+static int func_00432940(pid_t arg0);
+static void func_00432BDC();
+static void func_00432D3C(const char* arg0, int count);
+
+
 // function run # 26
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/run.s")
+int run(char* arg0, char *const arg1[], char* arg2, char* arg3, char* arg4) {
+    char *const* spA4;
+    pid_t spA0;
+    int sp9C;
+    int sp98;
+    int sp94;
+    int sp90;
+    int sp8C;
+    SIG_PF sp88;
+    SIG_PF sp84;
+    int sp80;
+    int sp7C;
+    const char* sp78;
+    int sp74;
+    sysset_t sp34;
+    register int var_s0;
+
+    if (vflag != 0) {
+        fprintf(stderr, "%s ", arg0);
+        spA4 = arg1 + 1;
+        while (*spA4 != 0) {
+            fprintf(stderr, "%s ", *spA4++);
+        }
+            
+        if (arg2 != NULL) {
+            fprintf(stderr, "< %s ", arg2);
+        }
+        if (arg3 != NULL) {
+            fprintf(stderr, "> %s ", arg3);
+        }
+        fprintf(stderr, "\n");
+    }
+    if (time_flag != 0) {
+        settimes();
+    }
+    if (execute_flag == 0) {
+        return 0;
+    }
+    if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
+        error(1, NULL, 0, NULL, 0, "pipe failed for -showm");
+        return -1;
+    }
+
+    spA0 = fork();
+    if (spA0 == -1) {
+        error(1, NULL, 0, NULL, 0, "no more processes\n");
+        if (errno < sys_nerr) {
+            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        return -1;
+    }
+
+    if (spA0 == 0) {
+        if (memory_flag != 0) {
+            func_00432BDC();
+        }
+
+        if (arg2 != NULL) {
+            sp94 = open(arg2, 0);
+            if (sp94 == -1) {
+                error(1, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
+                if (errno < sys_nerr) {
+                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+                cleanup();
+                exit(1);
+            }
+            dup2(sp94, fileno_unlocked(stdin));
+        }
+
+        if (arg3 != NULL) {
+            sp90 = creat(arg3, 0777);
+            if (sp90 == -1) {
+                error(1, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
+                if (errno < sys_nerr) {
+                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+                cleanup();
+                exit(1);
+            }
+            dup2(sp90, fileno_unlocked(stdout));
+        }
+
+        if (arg4 != NULL) {
+            sp8C = creat(arg4, 0777);
+            if (sp8C == -1) {
+                error(1, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
+                if (errno < sys_nerr) {
+                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+                cleanup();
+                exit(1);
+            }
+            dup2(sp8C, fileno_unlocked(stderr));
+        }
+
+        execvp(arg0, arg1);
+        sp78 = func_00430414(arg0, 1);
+        if ((errno == 2) && (sp78 != NULL)) {
+            error(1, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
+        } else {
+            sp78 = func_00430414(arg0, 0);
+            if ((errno == 2) && (sp78 != NULL)) {
+                error(1, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
+            } else {
+                error(1, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
+                if (errno < sys_nerr) {
+                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+            }
+        }
+        cleanup();
+        exit(1);
+    } else {
+        sp84 = sigset(SIGINT, SIG_IGN);
+        sp88 = sigset(SIGTERM, SIG_IGN);
+        if (memory_flag != 0) {
+            sp74 = func_00432940(spA0);
+            sp7C = ioctl(sp74, PIOCMAP_SGI, &D_1000C1C8);
+            if (sp7C < 0) {
+                perror("PIOCMAP_SGI");
+                kill(spA0, 9);
+                return -1;
+            }
+    
+            var_s0 = 0x10;
+            while (var_s0 != 0) {
+                var_s0--;
+                sp34.word[var_s0] = 0;
+            }
+    
+            if (ioctl(sp74, PIOCSEXIT, &sp34) < 0) {
+                perror("PIOCSEXIT");
+                kill(spA0, 9);
+                return -1;
+            }
+    
+            ioctl(sp74, PIOCRUN, NULL);
+            close(sp74);
+        }
+    
+        while ((sp9C = wait(&sp80)) != spA0) {
+            if (sp9C == -1) {
+                return -1;
+            }        
+        }
+    
+        sigset(SIGINT, sp84);
+        sigset(SIGTERM, sp88);
+        if (time_flag != 0) {
+            dotime(arg0);
+        }
+        if (memory_flag != 0) {
+            func_00432D3C(arg0, sp7C);
+        }
+    
+        if (WIFSTOPPED(sp80)) {
+                sp98 = WSTOPSIG(sp80);
+                fprintf(stderr, "STOPPED signal received from: %s ", arg0);
+                fprintf(stderr, " (Signal %d) ", sp98);
+                fprintf(stderr, " Process  %d abandoned\n", sp9C);
+                return sp98;
+        }
+    
+        if (WIFEXITED(sp80)) {
+            return WEXITSTATUS(sp80);
+        }
+    
+        if (WIFSIGNALED(sp80)) {
+            sp98 = WTERMSIG(sp80);
+            fprintf(stderr, "Fatal error in: %s ", arg0);
+            printf(" child died due to signal %d.\n", sp98);
+            if (sp98 == 9) {
+                printf("Probably caused by running out of swap space -- check /usr/adm/SYSLOG.\n");
+                exit(sp98);
+            }
+            if (sp98 == 2) {
+                cleanup();
+                exit(3);
+            }
+            fprintf(stderr, "Fatal error in: %s ", arg0);
+            fprintf(stderr, " Signal %d ", sp98);
+            if (sp80 & WCOREFLAG) {
+                fprintf(stderr, "- core dumped\n");
+            } else {
+                fprintf(stderr, "\n");
+            }
+            exit(sp98);
+        } else {
+            return 0;
+        }
+    }
+}
 
 // function edit_src # 27
 int editflag = 0;
@@ -2050,41 +2257,41 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
         }
 
         exit(1);
-        return;
-    }
+    } else {
+        // this process, fokrPid is the pid of the child process
 
-    // this process, fokrPid is the pid of the child process
-
-    sp44 = sigset(SIGINT, SIG_IGN);
-    sp48 = sigset(SIGTERM, SIG_IGN);
-    sp50 = wait(&stat_loc);
-    while (sp50 != fokrPid) {
-        if (sp50 == -1) {
-            return -1;
-        }
+        sp44 = sigset(SIGINT, SIG_IGN);
+        sp48 = sigset(SIGTERM, SIG_IGN);
         sp50 = wait(&stat_loc);
-    }
-
-    sigset(SIGINT, sp44);
-    sigset(SIGTERM, sp48);
-    temp_t7 = stat_loc & 0xFF;
-    if ((temp_t7 != 0) && (temp_t7 != 2)) {
-        fprintf(stderr, "Fatal error in: %s ", arg0);
-        printf(" Signal %d ", temp_t7);
-        if (stat_loc & WCOREFLAG) {
-            fprintf(stderr, "- core dumped\n");
-        } else {
-            fprintf(stderr, "\n");
+        while (sp50 != fokrPid) {
+            if (sp50 == -1) {
+                return -1;
+            }
+            sp50 = wait(&stat_loc);
         }
-        cleanup();
-        exit(temp_t7);
-    }
-    if (temp_t7 == 2) {
-        cleanup();
-        exit(3);
+
+        sigset(SIGINT, sp44);
+        sigset(SIGTERM, sp48);
+        temp_t7 = stat_loc & 0xFF;
+        if ((temp_t7 != 0) && (temp_t7 != 2)) {
+            fprintf(stderr, "Fatal error in: %s ", arg0);
+            printf(" Signal %d ", temp_t7);
+            if (stat_loc & WCOREFLAG) {
+                fprintf(stderr, "- core dumped\n");
+            } else {
+                fprintf(stderr, "\n");
+            }
+            cleanup();
+            exit(temp_t7);
+        }
+        if (temp_t7 == 2) {
+            cleanup();
+            exit(3);
+        }
+
+        return stat_loc & 0xFF00;
     }
 
-    return stat_loc & 0xFF00;
 }
 
 // function get_lino # 28
@@ -3115,8 +3322,6 @@ static int func_00432940(pid_t arg0) {
     return fd;
 }
 
-static int B_1000EC98[2];
-
 // function func_00432BDC # 62
 // test pipe read
 static void func_00432BDC(void) {
@@ -3144,12 +3349,6 @@ static void func_00432C94(void) {
     }
     close(B_1000EC98[1]);
 }
-
-
-
-extern int getpagesize(void);
-static prmap_sgi_t B_1000CAC0[100];
-s32 memory_flag = 0;
 
 // function func_00432D3C # 64
 static void func_00432D3C(const char* arg0, s32 count) {

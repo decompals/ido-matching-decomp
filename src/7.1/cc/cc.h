@@ -102,6 +102,16 @@ typedef greg_t gregset_t[NGREG];
 #define PIOCSWATCH	(PIOC|42)	/* set watch point */
 #define PIOCUSAGE	(PIOC|43)	/* get prusage_t structure */
 
+/* SGI calls */
+#ifdef _VM_WS_SWAPPING
+#define PIOCWSINFO_SGI	(PIOC|247)	/* (SGI) get working set info. */
+#endif
+#define PIOCPGD_SGI	(PIOC|248)	/* (SGI) get page tbl information */
+#define PIOCMAP_SGI	(PIOC|249)	/* (SGI) get region map information */
+#if !STAT_TIME
+#define PIOCGETPTIMER	(PIOC|250)	/* get process timers */
+#endif
+
 #define premptyset(sp) \
 	{ register int _i_ = sizeof(*(sp))/sizeof(u32); \
 		while(_i_) ((u32*)(sp))[--_i_] = 0L; }
@@ -155,6 +165,12 @@ typedef struct prstatus {
 typedef struct {
     unsigned long word[0x10];
 } sysset_t;
+
+typedef struct prmap_sgi_arg {
+   caddr_t pr_vaddr;   /* Base of map buffer */
+   ulong_t pr_size;	   /* Size of buffer in	bytes */
+} prmap_sgi_arg_t;
+
 
 typedef struct prmap_sgi {
 	caddr_t	pr_vaddr;	/* Virtual base address */
