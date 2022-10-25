@@ -27,6 +27,7 @@ static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 void error();
 char* mkstr();
+char* savestr(const char* src, size_t extra_length);
 void get_lino(char* arg0, const char* arg1, s32 arg2);
 
 void cleanup(void);
@@ -46,8 +47,7 @@ int targetsex = BIGENDIAN;
 
 struct _struct_suffixes_0x8 {
     /* 0x0 */ const char *unk0;
-    /* 0x4 */ char pad4[3];
-    /* 0x7 */ u8 unk7; // ?
+    /* 0x4 */ int unk4;
 }; // size = 0x8
 
 struct _struct_suffixes_0x8 suffixes[0xF] = {
@@ -690,25 +690,147 @@ s32 nodup(list* arg0, const char* str) {
 }
 
 // function getsuf # 22
-#pragma GLOBAL_ASM("asm/functions/cc/getsuf.s")
+char getsuf(const char* path) {
+    int suflen = 0; // Length of suffix
+    int i;
+    char ch;
+    const char* str = path;
+
+    while (ch = *path++) {
+        if (ch == '/') {
+            suflen = 0;
+            str = path;
+        } else {
+            suflen++;
+        }
+    }
+
+    if (suflen < 3) {
+        return '\0';
+    }
+
+    if (path[-3] == '.') {
+        if (path[-2] == 'C') {
+            return 6; // ACK?
+        }
+        return path[-2];
+    }
+
+    for (i = suflen - 2; i > 0; i--) {
+        if (str[i] == '.') {
+            break;
+        }
+    }
+
+    if (i == 0) {
+        return '\0';
+    }
+
+    str = &str[i + 1];
+    for (i = 0; suffixes[i].unk0 != NULL; i++) {
+        if (strcmp(str, suffixes[i].unk0) == 0) {
+            return suffixes[i].unk4;
+        }
+    }
+
+    if (strcmp(str, "for") == 0) {
+        return 'f';
+    }
+    if (strcmp(str, "FOR") == 0) {
+        return 'F';
+    }
+    return '\0';
+}
 
 // function mksuf # 23
-#pragma GLOBAL_ASM("asm/functions/cc/mksuf.s")
+char* mksuf(const char* path, char value) {
+    s32 i; // sp54
+    s32 j; // sp50, also suffix length
+    size_t sp4C;
+    char* sp48;
+    char* sp44;
+    char* sp40;
+    const char* sp3C = NULL;
+    char ch; // sp38
+
+    if (value < 8) {
+        for (i = 0; suffixes[i].unk0 != NULL; i++) {
+            if (suffixes[i].unk4 == value) {
+                sp3C = suffixes[i].unk0;
+                break;
+            }
+        }
+    
+        if (sp3C == NULL) {
+            error(0, NULL, 0, "mksuf ()", 0x3A5A, "passed an unknown suffix value: %s\n", value);
+            exit(4);
+        }
+        sp4C = strlen(sp3C);
+    } else {
+        sp4C = 0;
+    }
+
+    i = 0;
+    sp40 = sp44 = sp48 = savestr(path, sp4C);
+
+    while (ch = *sp44++) {
+        if (ch == '/') {
+            i = 0;
+            sp40 = sp44;
+        } else {
+            i++;
+        }
+    }
+
+    if ((i >= 3) && (sp44[-3] == '.')) {
+        if (value < 8) {
+            strcpy(sp44 - 2, sp3C);
+        } else {
+            sp44[-2] = value;
+            sp44[-1] = 0;
+        }
+    } else {
+        for (j = i - 2; j > 0; j--) {
+            if (sp40[j] == '.') {
+                break;
+            }
+        }
+
+        if (j == 0) {
+            error(1, NULL, 0, "mksuf ()", 0x3A81, "Bad file name, no suffix: %s\n", path);
+            exit(4);
+        }
+        sp40 = &sp40[j + 1];
+        if (value < 8) {
+            strcpy(sp40, sp3C);
+        } else {
+            sp40[0] = value;
+            sp40[1] = 0;
+        }
+    }
+
+    sp44 = sp48;
+    while (*sp48 != '\0') {
+        if (*sp48++ == '/') {
+            sp44 = sp48;
+        }
+    }
+    return sp44;
+}
 
 // function savestr # 24
-char* savestr(const char* arg0, s32 arg1) {
-    char* sp34;
+char* savestr(const char* src, size_t extra_length) {
+    char* dest = malloc(strlen(src) + extra_length + 1);
 
-    sp34 = malloc(strlen(arg0) + arg1 + 1);
-    if (sp34 == NULL) {
-        error(1, 0, 0, "savestr ()", 15014, "out of memory\n");
+    if (dest == NULL) {
+        error(1, NULL, 0, "savestr ()", 15014, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
-    strcpy(sp34, arg0);
-    return sp34;
+    strcpy(dest, src);
+    return dest;
 }
 
 // function mktempstr # 25
