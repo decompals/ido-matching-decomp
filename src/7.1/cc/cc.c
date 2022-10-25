@@ -1,10 +1,10 @@
 /* Handwritten */
 
 // function __start # 0
-#pragma GLOBAL_ASM("asm/functions/cc/__start.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/__start.s")
 
 // function _mcount # 1
-#pragma GLOBAL_ASM("asm/functions/cc/_mcount.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/_mcount.s")
 
 #include "signal.h"
 #include "wait.h"
@@ -77,24 +77,24 @@ struct _struct_suffixes_0x8 suffixes[0xF] = {
     {NULL, 0},
 };
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000403C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004044.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000404C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004054.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000405C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004064.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000406C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004074.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000403C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004044.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000404C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004054.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000405C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004064.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000406C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004074.s")
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000407C.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004084.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_10004090.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_1000409C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000407C.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004084.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004090.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000409C.s")
 
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040A4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040AC.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040B4.s")
-#pragma GLOBAL_ASM("asm/functions/cc/STR_100040BC.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040A4.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040AC.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040B4.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040BC.s")
 
 char* Gnum = "0";
 char *runlib = "/";
@@ -113,7 +113,7 @@ char* systype;
 
 
 // function main # 2
-#pragma GLOBAL_ASM("asm/functions/cc/main.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/main.s")
 
 // function process_config # 3
 void process_config(int argc, char** argv) {
@@ -230,7 +230,7 @@ void add_info(char* str) {
 }
 
 // function parse_command # 5
-#pragma GLOBAL_ASM("asm/functions/cc/parse_command.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/parse_command.s")
 
 
 
@@ -337,7 +337,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 #endif /* PERMUTER */
 
 // function relocate_passes # 8
-#pragma GLOBAL_ASM("asm/functions/cc/relocate_passes.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/relocate_passes.s")
 
 
 // function newrunlib # 9
@@ -893,7 +893,7 @@ void mktempstr(void) {
 }
 
 // function run # 26
-#pragma GLOBAL_ASM("asm/functions/cc/run.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/run.s")
 
 // function edit_src # 27
 int editflag = 0;
@@ -2183,4 +2183,4 @@ static char* func_00433534(const char* arg0) {
 // gethostsex
 
 
-#pragma GLOBAL_ASM("asm/functions/cc/__Release_ID.s")
+#pragma GLOBAL_ASM("asm/7.1/functions/cc/__Release_ID.s")

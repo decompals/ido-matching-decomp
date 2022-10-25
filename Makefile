@@ -59,19 +59,24 @@ ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 CFLAGS += -G 0 -kPIC -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
 
 
-CC_ELF := $(BUILD)/cc
+CC_ELF := $(BUILD)/7.1/cc.elf
 
 
 SRC_DIRS := $(shell find src -type d)
+ASM_DIRS := $(shell find asm -type d -not -path "asm/7.1/functions*")
+
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
-O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f))
+S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
+
+O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
+            $(foreach f,$(S_FILES:.s=.o),$(BUILD)/$(f))
 
 # Automatic dependency files
 DEP_FILES := $(O_FILES:.o=.d) \
              $(O_FILES:.o=.asmproc.d)
 
 # create build directories
-$(shell mkdir -p $(foreach dir,$(SRC_DIRS),$(BUILD)/$(dir)))
+$(shell mkdir -p $(foreach dir,$(SRC_DIRS),$(BUILD)/$(dir)) $(BUILD)/7.1)
 
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
@@ -97,12 +102,12 @@ setup:
 
 disasm:
 	$(RM) -rf $(ASM)
-	mkdir -p $(BUILD)/$(ASM)/cc
-	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --Mreg-names o32 --split-functions asm/functions --aggressive-string-guesser --save-context $(CONTEXT)/cc.ctx
+	mkdir -p $(BUILD)/$(ASM)/7.1/cc
+	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/7.1/cc --Mreg-names o32 --split-functions asm/7.1/functions --aggressive-string-guesser --save-context $(CONTEXT)/7.1/cc.csv
 
 
-$(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
-	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map build/cc.map -o $@ || (rm -f $@ && exit 1)
+$(CC_ELF): build/asm/7.1/cc/cc.text.o build/asm/7.1/cc/cc.data.o build/asm/7.1/cc/cc.rodata.o build/asm/7.1/cc/cc.bss.o
+	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map build/7.1/cc.map -o $@ || (rm -f $@ && exit 1)
 
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 	@mkdir -p $(@D)
