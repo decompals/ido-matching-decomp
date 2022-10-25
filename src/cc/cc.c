@@ -26,6 +26,7 @@ typedef struct {
 static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
 char* mkstr();
+void get_lino(char* arg0, const char* arg1, s32 arg2);
 
 void cleanup(void);
 extern int vflag;
@@ -676,13 +677,13 @@ void mktempstr(void) {
 #pragma GLOBAL_ASM("asm/functions/cc/run.s")
 
 // function edit_src # 27
-extern int editflag;
+int editflag = 0;
 extern s32 xserver;
 extern char* errout;
 
-s32 edit_src(const char* arg0, s32 arg1, s32 arg2) {
+s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
     s32 pad[3];
-    s32 sp58;
+    char* sp58;
     pid_t fokrPid;
     pid_t sp50;
     s32 temp_t7; // sp4C
@@ -691,7 +692,7 @@ s32 edit_src(const char* arg0, s32 arg1, s32 arg2) {
     s32 stat_loc;
 
     fokrPid = fork();
-    if (fokrPid == -1) {
+    if (fokrPid == (pid_t)-1) {
         // fork failed
         error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
@@ -700,16 +701,16 @@ s32 edit_src(const char* arg0, s32 arg1, s32 arg2) {
         return -1;
     }
 
-    if (fokrPid == 0) {
+    if (fokrPid ==(pid_t)0) {
         // children process
 
         if (editflag == 2) {
-            get_lino(&sp58, arg1, arg2);
-            execlp(arg0, arg0, &sp58, arg1, "-l", tempstr[25], "-f", "err-window", 0);
+            get_lino(sp58, arg1, arg2);
+            execlp(arg0, arg0, sp58, arg1, "-l", tempstr[25], "-f", "err-window", (char*)NULL);
         } else if (xserver == 0) {
-            execlp(arg0, arg0, "+1", errout, arg1, 0);
+            execlp(arg0, arg0, "+1", errout, arg1, (char*)NULL);
         } else {
-            execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", arg0, "+1", errout, arg1, 0);
+            execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", arg0, "+1", errout, arg1, (char*)NULL);
         }
         error(1, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
         if (errno < sys_nerr) {
@@ -755,8 +756,86 @@ s32 edit_src(const char* arg0, s32 arg1, s32 arg2) {
 }
 
 // function get_lino # 28
-#pragma GLOBAL_ASM("asm/functions/cc/get_lino.s")
+#define GET_LINO_BUF_SIZE 0x800
+void get_lino(char* arg0, const char* arg1, s32 arg2) {
+    char* sp83C;
+    int sp838;
+    char* sp834 = arg0;
+    char* sp830;
+    char sp30[GET_LINO_BUF_SIZE];
 
+    *arg0 = '+';
+    sp834++;
+    sp83C = open(errout, 0);
+    sp838 = read(sp83C, &sp30, GET_LINO_BUF_SIZE);
+    close(sp83C);
+
+    if (sp838 < GET_LINO_BUF_SIZE) {
+        sp30[sp838] = 0;
+    } else {
+        sp30[GET_LINO_BUF_SIZE - 1] = 0;
+    }
+
+    switch (arg2) {
+        case 1:
+        case 2:
+            for (sp830 = sp30; sp830 < sp30 + sp838; sp830++) {
+                if ((strncmp(sp830, ": Error: ", 9) == 0) 
+                    && ((sp830 = strchr(sp830, ',')) != NULL) 
+                    && (strncmp(sp830 - strlen(arg1), arg1, strlen(arg1)) == 0) 
+                    && (strncmp(sp830, ", line ", 7) == 0)) {
+                    sp830 += 7;
+                    while (isdigit(*sp830) && ((sp834 - arg0) <= 10)) {
+                        *sp834++ = *sp830++;
+                    }
+                    break;
+                }
+            }
+            break;
+    
+            case 3:
+            for (sp830 = sp30; sp830 < sp30 + sp838; sp830++) {
+                if (strncmp(sp830, "Error on line ", 14) == 0) {
+                    sp830 += 14;
+                    while (isdigit(*sp830) && ((sp834 - arg0) <= 10)) {
+                        *sp834++ = *sp830++;
+                    }
+                    break;
+                }
+            }
+            break;
+    
+        case 5:
+        case 6:
+            for (sp830 = sp30; sp830 < sp30 + sp838; sp830++) {
+                if (strncmp(sp830, "ERROR ", 6) == 0) {
+                    sp830 += 6;
+                    break;
+                }
+            }
+    
+            for (; sp830 < sp30 + sp838; sp830++) {
+                if (strncmp(sp830, " LINE ", 6) == 0) {
+                    sp830 += 6;
+                    while (isdigit(*sp830) && ((sp834 - arg0) <= 10)) {
+                        *sp834++ = *sp830++;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    if ((arg0 + 1) < sp834) {
+        sp834[0] = 0;
+    } else {
+        sp834[0] = 0x31;
+        sp834[1] = 0;
+    }
+}
 
 // function show_err # 29
 #define BUF_SIZE 0x10000
