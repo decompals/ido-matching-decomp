@@ -1,4 +1,7 @@
 
+# if WERROR is 1, pass -Werror to CC_CHECK, so warnings would be treated as errors
+WERROR ?= 0
+CC_CHECK_COMP ?= gcc
 
 #### Tools ####
 ifeq ($(shell type mips-linux-gnu-ld >/dev/null 2>/dev/null; echo $$?), 0)
@@ -26,6 +29,24 @@ ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
 
+# Check code syntax with host compiler
+# TODO
+# CHECK_WARNINGS := -Wall -Wextra -Wno-unknown-pragmas -Wno-int-conversion
+CHECK_WARNINGS := -w
+# Have CC_CHECK pretend to be a MIPS compiler
+MIPS_BUILTIN_DEFS := -D_MIPS_FPSET=16 -D_MIPS_ISA=2 -D_ABIO32=1 -D_MIPS_SIM=_ABIO32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_MIPS_SZPTR=32
+MIPS_BUILTIN_DEFS += -D__EXTENSIONS__ -DLANGUAGE_C -D_LANGUAGE_C -D__INLINE_INTRINSICS
+MIPS_BUILTIN_DEFS += -Dsgi -D__sgi -Dunix -Dmips -Dhost_mips -D__unix -D__host_mips -D_SVR4_SOURCE
+MIPS_BUILTIN_DEFS += -D_MODERN_C -D_SGI_SOURCE -D__DSO__ -DSYSTYPE_SVR4 -D_SYSTYPE_SVR4 -D_LONGLONG
+MIPS_BUILTIN_DEFS += -D__mips=2 -D_MIPSEB -DMIPSEB -D_CFE
+MIPS_BUILTIN_DEFS += -DPERMUTER=1
+#	The -MMD flags additionaly creates a .d file with the same name as the .o file.
+CC_CHECK          := $(CC_CHECK_COMP)
+CC_CHECK_FLAGS    := -MMD -fno-builtin -fsyntax-only -fsigned-char -fdiagnostics-color -std=gnu89 -m32 -DNON_MATCHING -DCC_CHECK=1
+ifneq ($(WERROR), 0)
+	CHECK_WARNINGS += -Werror
+endif
+
 
 LDFLAGS := -nostdlib -L$(RECOMP)/ido/7.1/usr/lib/ -lc
 
@@ -46,8 +67,8 @@ C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f))
 
 # Automatic dependency files
-# (Only asm_processor dependencies are handled for now)
-DEP_FILES := $(O_FILES:.o=.asmproc.d)
+DEP_FILES := $(O_FILES:.o=.d) \
+             $(O_FILES:.o=.asmproc.d)
 
 # create build directories
 $(shell mkdir -p $(foreach dir,$(SRC_DIRS),$(BUILD)/$(dir)))
@@ -77,7 +98,7 @@ setup:
 disasm:
 	$(RM) -rf $(ASM)
 	mkdir -p $(BUILD)/$(ASM)/cc
-	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --split-functions asm/functions --aggressive-string-guesser --save-context $(CONTEXT)/cc.ctx
+	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/cc --Mreg-names o32 --split-functions asm/functions --aggressive-string-guesser --save-context $(CONTEXT)/cc.ctx
 
 
 $(CC_ELF): build/asm/cc/cc.text.o build/asm/cc/cc.data.o build/asm/cc/cc.rodata.o build/asm/cc/cc.bss.o
@@ -88,6 +109,9 @@ $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD)/%.o: %.c
+	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
+
+-include $(DEP_FILES)

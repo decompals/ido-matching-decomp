@@ -38,7 +38,12 @@
                 "_MIPSEB",
                 "MIPSEB",
                 "__STDC__=1",
-                "_CFE"
+                "_CFE",
+                "va_arg(...)=0",
+                "__VARARGS_H__",
+                "__STDARG_H__",
+                "va_dcl=long va_alist;",
+                "va_list=char *"
             ],
             "compilerPath": "/usr/bin/clang",
             "intelliSenseMode": "linux-clang-x86",

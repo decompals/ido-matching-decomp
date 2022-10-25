@@ -26,7 +26,13 @@ typedef struct {
 
 static void func_00432C94(void);
 void relocate_passes(const char *arg0, const char *arg1, const char *arg2);
+
+#ifndef PERMUTER
 void error();
+#else
+void error(s32 arg0, const char* arg1, s32 arg2, const char* arg3, s32 arg4, const char* arg5, ...);
+#endif /* PERMUTER */
+
 char* mkstr();
 char* savestr(const char* src, size_t extra_length);
 void get_lino(char* arg0, const char* arg1, s32 arg2);
@@ -326,8 +332,6 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
     }
     fprintf(stderr, arg5, arg6, arg7, arg8, arg9, argA, argB);
 }
-#else
-void error(s32 arg0, const char* arg1, s32 arg2, const char* arg3, s32 arg4, const char* arg5, ...);
 #endif /* PERMUTER */
 
 // function relocate_passes # 8
