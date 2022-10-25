@@ -77,24 +77,386 @@ struct _struct_suffixes_0x8 suffixes[0xF] = {
     {NULL, 0},
 };
 
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000403C.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004044.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000404C.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004054.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000405C.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004064.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000406C.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004074.s")
+char *LibM = " -lm";
 
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000407C.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004084.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_10004090.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_1000409C.s")
+char *LibP = " -lp";
 
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040A4.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040AC.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040B4.s")
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/STR_100040BC.s")
+char *LibF77 = " -lF77";
+
+char *LibI77 = " -lI77";
+
+char *LibU77 = " -lU77";
+
+char *LibIsam = " -lisam";
+
+char *LibExc = " -lexc";
+
+char *LibDw = " -ldw";
+
+char *LibPl1 = NULL;
+
+char *LibCob = NULL;
+
+char *LibSort = NULL;
+
+char *LibProf1 = " -lprof";
+
+char *LibGProf1 = " -lgprof";
+
+char *LibXmalloc = " -lxmalloc";
+
+char *LibMld = " -lmld";
+
+
+// crtx = 0x00000000;
+
+// crtn = 0x00000000;
+
+// cxx_init = 0x00000000;
+
+// delta_init = 0x00000000;
+
+// libp = 0x00000000;
+
+// libp_b = 0x00000000;
+
+// libm = 0x00000000;
+
+// libm_b = 0x00000000;
+
+// libF77 = 0x00000000;
+
+// libF77_b = 0x00000000;
+
+// libI77 = 0x00000000;
+
+// libI77_b = 0x00000000;
+
+// libU77 = 0x00000000;
+
+// libftn = 0x00000000;
+
+// libU77_b = 0x00000000;
+
+// libisam = 0x00000000;
+
+// libisam_b = 0x00000000;
+
+// libdw_path = 0x00000000;
+
+// libdw = 0x00000000;
+
+// libdw_b = 0x00000000;
+
+// libpl1 = 0x00000000;
+
+// libpl1_b = 0x00000000;
+
+// libexc = 0x00000000;
+
+// libexc_b = 0x00000000;
+
+// libcob = 0x00000000;
+
+// libcob_b = 0x00000000;
+
+// libsort = 0x00000000;
+
+// libsort_b = 0x00000000;
+
+// libprof = 0x00000000;
+
+// libgprof = 0x00000000;
+
+// libxmalloc = 0x00000000;
+
+// libxmalloc_b = 0x00000000;
+
+// cpp_stdflag = 0x00000000;
+
+// libmld = 0x00000000;
+
+// xpg_env = 0x00000000;
+
+// xpg_flag = 0x00000000;
+
+// crtn_required = 0x00000001;
+
+// pca = 0x00000000;
+
+// libc_mp = 0x00000000;
+
+// fopt = 0x00000000;
+
+// copt = 0x00000000;
+
+// D_1000BF74 = 0x00000000;
+
+// D_1000BF78 = 0x00000000;
+
+// D_1000BF7C = 0x00000001;
+
+// D_1000BF80 = 0x00000000;
+
+// D_1000BF84 = 0x00000000;
+
+// D_1000BF88 = 0x00000000;
+
+// D_1000BF8C = 0x00000001;
+
+// D_1000BF90 = 0x00000000;
+
+// D_1000BF94 = 0x00000000;
+
+// Eflag = 0x00000000;
+
+// Pflag = 0x00000000;
+
+// gflag = 0x00000000;
+
+// pflag = 0x00000000;
+
+// pgflag = 0x00000000;
+
+// jflag = 0x00000000;
+
+// cflag = 0x00000000;
+
+// Sflag = 0x00000000;
+
+// Oflag = 0x00000001;
+
+// vflag = 0x00000000;
+
+// time_flag = 0x00000000;
+
+// execute_flag = 0x00000001;
+
+// Vflag = 0x00000000;
+
+// Kflag = 0x00000000;
+
+// nodeflib = 0x00000000;
+
+// minus_M = 0x00000000;
+
+// anachronisms = 0x00000001;
+
+// disable_inlines = 0x00000000;
+
+// cfront_compatible = 0x00000001;
+
+// make_edison_shlib = 0x00000000;
+
+// plusIflag = 0x00000000;
+
+// signedcharflag = 0x00000000;
+
+// Lflag = 0x00000000;
+
+// set_loop_unroll = 0x00000000;
+
+// mflag = 0x00000000;
+
+// Fflag = 0x00000000;
+
+// stdflag = 0x00000000;
+
+// cplusflag = 0x00000000;
+
+// ucodeflag = 0x00000000;
+
+// Bflag = 0x00000000;
+
+// fiveflag = 0x00000000;
+
+// automaticflag = 0x00000001;
+
+// emptyIflag = 0x00000000;
+
+// cordflag = 0x00000000;
+
+// ansiflag = 0x00000000;
+
+// lpilockflag = 0x00000000;
+
+// nolockflag = 0x00000000;
+
+// unrollflag = 0x00000000;
+
+// libm_spec = 0x00000000;
+
+// libfastm_spec = 0x00000000;
+
+// editflag = 0x00000000;
+
+// oldccomflag = 0x00000000;
+
+// oldcflag = 0x00000000;
+
+// oldcppflag = 0x00000000;
+
+// fflag = 0x00000000;
+
+// tpflag = 0x00000000;
+
+// ddoptflag = 0x00000000;
+
+// uopt0flag = 0x00000000;
+
+// protoflag = 0x00000000;
+
+// kminabiflag = 0x00000000;
+
+// kpicopt_flag = 0x00000000;
+
+// nokpicopt_flag = 0x00000000;
+
+// elfflag = 0x00000001;
+
+// coff_spec = 0x00000000;
+
+// elf_spec = 0x00000000;
+
+// compose_first_G0 = 0x00000000;
+
+// mips2_spec_flag = 0x00000000;
+
+// mips1flag = 0x00000000;
+
+// mips2flag = 0x00000001;
+
+// mips3flag = 0x00000000;
+
+// ignore_unresolved_flag = 0x00000000;
+
+// no_unresolved_flag = 0x00000000;
+
+// swopcodeflag = 0x00000000;
+
+// dwopcodeflag = 0x00000000;
+
+// sixty4bit_spec = 0x00000000;
+
+// sixty4bitflag = 0x00000000;
+
+// thirty2bitflag = 0x00000000;
+
+// fullasoptflag = 0x00000000;
+
+// old_non_shared = 0x00000000;
+
+// non_shared_emitted = 0x00000000;
+
+// longlong_emitted = 0x00000000;
+
+// non_shared = 0x00000000;
+
+// Gseen_flag = 0x00000000;
+
+// transitive_link = 0x00000000;
+
+// full_transitive_link = 0x00000000;
+
+// no_transitive_link = 0x00000000;
+
+// quickstart_info = 0x00000000;
+
+// force_rm_dead_code = 0x00000000;
+
+// kpic_flag = 0x00000001;
+
+// kpic_spec = 0x00000000;
+
+// call_shared = 0x00000000;
+
+// excpt_flag = 0x00000000;
+
+// trapuv_flag = 0x00000000;
+
+// dmips_emit = 0x00000000;
+
+// Xvalues_Flag = 0x00000000;
+
+// user_systype = 0x00000000;
+
+// ddoptinfo = 0x00000000;
+
+// systype_seen = 0x00000000;
+
+// multiple_systype = 0x00000000;
+
+// systype_warn = 0x00000000;
+
+// svr4_systype = 0x00000000;
+
+// c_inline = 0x00000000;
+
+// tfp_flag = 0x00000000;
+
+// abi_flag = 0x00000000;
+
+// NoMoreOptions = 0x00000000;
+
+// memory_flag = 0x00000000;
+
+// default_call_shared = 0x00000001;
+
+// haspascal = 0x00000000;
+
+// hasfortran = 0x00000000;
+
+// lmflag = 0x00000000;
+
+// srcexists = 0x00000000;
+
+// w1flag = 0x00000001;
+
+// D_1000C130 = 0x00000000;
+
+// prototype_checking_on = 0x00000000;
+
+// showdirt_flag = 0x00000000;
+
+// mp_prepass_count = 0x00000000;
+
+// not sure about this struct
+typedef struct {
+    const char *unk_0;
+    u32 unk_4;
+} struct_mpflags;
+
+struct_mpflags mpflags[] = {
+    { "list", 0x00010003 },
+    { "keep", 0x00010007 },
+    { 0 },
+};
+struct_mpflags cmpflags[] = {
+    { "list", 0x00010003 },
+    { "keep", 0x00010007 },
+    { 0 },
+};
+
+// acpp = 0x00000000;
+
+// mips_abi = 0x00000001;
+
+// compchoice = 0x00000000;
+
+// cppchoice = 0x00000000;
+
+// acpp_traditional = 0x00000000;
+
+// G_flag = 0x00000000;
+
+// dn_flag = 0x00000000;
+
+// edison_cpp = 0x00000001;
+
+// edison_type = 0x00000001;
+
+// exception_handling = 0x00000000;
+
 
 char* Gnum = "0";
 char *runlib = "/";
@@ -360,21 +722,6 @@ void newrunlib(void) {
 }
 
 // function compose_G0_libs # 10
-char* LibCob = NULL;
-char* LibDw = " -ldw";
-char* LibExc = " -lexc";
-char* LibF77 = " -lF77";
-char* LibGProf1 = " -lgprof";
-char* LibI77 = " -lI77";
-char* LibIsam = " -lisam";
-char* LibM = " -lm";
-char* LibMld = " -lmld";
-char* LibP = " -lp";
-char* LibPl1 = NULL;
-char* LibProf1 = " -lprof";
-char* LibSort = NULL;
-char* LibU77 = " -lU77";
-char* LibXmalloc = " -lxmalloc";
 
 void compose_G0_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
