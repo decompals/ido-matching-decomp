@@ -24,7 +24,7 @@ MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm --no-emit-cpload
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
-IINC       := -Iinclude -Isrc
+IINC       := -Iinclude -Iinclude/indy -Isrc
 
 
 LDFLAGS := -nostdlib -L$(RECOMP)/ido/7.1/usr/lib/ -lc

@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "src",
-                "include"
+                "include",
+                "include/indy"
             ],
             "defines": [
                 "_MIPS_FPSET=16",
@@ -51,7 +52,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "src",
-                "include"
+                "include",
+                "include/indy"
             ],
             "defines": [
                 "_MIPS_FPSET=16",

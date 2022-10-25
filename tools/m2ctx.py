@@ -12,6 +12,7 @@ src_dir = root_dir / "src"
 
 INCLUDES = [
     "include",
+    "include/indy",
     "src",
 ]
 
