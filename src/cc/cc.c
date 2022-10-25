@@ -15,6 +15,7 @@
 #include "varargs.h"
 #include "errno.h"
 #include "unistd.h"
+#include "ctype.h"
 
 /* File, -O1 */
 typedef struct {
