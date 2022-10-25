@@ -380,21 +380,18 @@ extern unsigned char	_ctype[];
 
 #ifndef lint
 
-#define	isalpha(c)	((_ctype + 1)[c] & (_U | _L))
-#define	isupper(c)	((_ctype + 1)[c] & _U)
-#define	islower(c)	((_ctype + 1)[c] & _L)
-#define	isdigit(c)	((_ctype + 1)[c] & _N)
-#define	isxdigit(c)	((_ctype + 1)[c] & _X)
-#define	isalnum(c)	((_ctype + 1)[c] & (_U | _L | _N))
-#define	isspace(c)	((_ctype + 1)[c] & _S)
-#define	ispunct(c)	((_ctype + 1)[c] & _P)
-#define	isprint(c)	((_ctype + 1)[c] & (_P | _U | _L | _N | _B))
-#define	isgraph(c)	((_ctype + 1)[c] & (_P | _U | _L | _N))
-#define	iscntrl(c)	((_ctype + 1)[c] & _C)
-#define	isascii(c)	(!((c) & ~0177))
-#define	_toupper(c)     ((_ctype + 258)[c])
-#define	_tolower(c)	((_ctype + 258)[c])
-#define	toascii(c)	((c) & 0177)
+#define	isalpha(c)	((__ctype + 1)[c] & (_U | _L))
+#define	isupper(c)	((__ctype + 1)[c] & _U)
+#define	islower(c)	((__ctype + 1)[c] & _L)
+#define	isdigit(c)	((__ctype + 1)[c] & _N)
+#define	isxdigit(c)	((__ctype + 1)[c] & _X)
+#define	isalnum(c)	((__ctype + 1)[c] & (_U | _L | _N))
+#define	isspace(c)	((__ctype + 1)[c] & _S)
+#define	ispunct(c)	((__ctype + 1)[c] & _P)
+#define	isprint(c)	((__ctype + 1)[c] & (_P | _U | _L | _N | _B))
+#define	isgraph(c)	((__ctype + 1)[c] & (_P | _U | _L | _N))
+#define	iscntrl(c)	((__ctype + 1)[c] & _C)
+
 
 #endif	/* lint */
 
