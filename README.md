@@ -40,3 +40,5 @@ make setup
 make disasm
 make
 ```
+
+Diff: `./diff.py -mwob --objfile build/src/7.1/cc/cc.o main`
