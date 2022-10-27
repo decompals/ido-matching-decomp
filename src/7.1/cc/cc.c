@@ -794,7 +794,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     for (; *var_s1 != 0; var_s1++) {
         if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == 0)) {
             switch (*var_s1) {
-                case 0x68:
+                case 'h':
                     if (includeB != NULL) {
                         free(includeB);
                     }
@@ -823,7 +823,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         includeB = NULL;
                     }
                     break;
-                case 0x70:
+
+                case 'p':
                     if (cpp != NULL) {
                         free(cpp);
                     }
@@ -834,7 +835,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                     (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp", arg2, 0);
                     }
                     break;
-                case 0x66:
+
+                case 'f':
                     if (mpc != NULL) {
                         free(mpc);
                     }
@@ -894,7 +896,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         ucob = mkstr(comp_host_root, "usr/lib/", currcomp, "cobfe", arg2, 0);
                     }
                     break;
-                case 0x65:
+
+                case 'e':
                     if (pl1err != NULL) {
                         free(pl1err);
                     }
@@ -904,7 +907,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         pl1err = mkstr(comp_host_root, "usr/lib/", currcomp, "pl1error", arg2, 0);
                     }
                     break;
-                case 0x6B:
+
+                case 'k':
                     if (ulpi != NULL) {
                         free(ulpi);
                     }
@@ -914,7 +918,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         ulpi = mkstr(comp_host_root, "usr/lib/", currcomp, "ulpi", arg2, 0);
                     }
                     break;
-                case 0x6A:
+
+                case 'j':
                     if (ujoin != NULL) {
                         free(ujoin);
                     }
@@ -924,7 +929,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         ujoin = mkstr(comp_host_root, "usr/lib/", currcomp, "ujoin", arg2, 0);
                     }
                     break;
-                case 0x75:
+
+                case 'u':
                     if (uld != NULL) {
                         free(uld);
                     }
@@ -934,7 +940,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         uld = mkstr(comp_host_root, "usr/lib/", currcomp, "uld", arg2, 0);
                     }
                     break;
-                case 0x73:
+
+                case 's':
                     if (usplit != NULL) {
                         free(usplit);
                     }
@@ -944,7 +951,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         usplit = mkstr(comp_host_root, "usr/lib/", currcomp, "usplit", arg2, 0);
                     }
                     break;
-                case 0x71:
+
+                case 'q':
                     if (uopt0 != NULL) {
                         free(uopt0);
                     }
@@ -954,7 +962,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         uopt0 = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt0", arg2, 0);
                     }
                     break;
-                case 0x64:
+
+                case 'd':
                     if (ddopt != NULL) {
                         free(ddopt);
                     }
@@ -964,7 +973,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         ddopt = mkstr(comp_host_root, "usr/lib/", currcomp, "ddopt", arg2, 0);
                     }
                     break;
-                case 0x6D:
+
+                case 'm':
                     if (umerge != NULL) {
                         free(umerge);
                     }
@@ -974,7 +984,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         umerge = mkstr(comp_host_root, "usr/lib/", currcomp, "umerge", arg2, 0);
                     }
                     break;
-                case 0x76:
+
+                case 'v':
                     if (uloop != NULL) {
                         free(uloop);
                     }
@@ -984,7 +995,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         uloop = mkstr(comp_host_root, "usr/lib/", currcomp, "uloop", arg2, 0);
                     }
                     break;
-                case 0x6F:
+
+                case 'o':
                     if (opt != NULL) {
                         free(opt);
                     }
@@ -997,7 +1009,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         opt = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt", arg2, 0);
                     }
                     break;
-                case 0x63:
+
+                case 'c':
                     if (gen != NULL) {
                         free(gen);
                     }
@@ -1010,7 +1023,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         gen = mkstr(comp_host_root, "usr/lib/", currcomp, "ugen", arg2, 0);
                     }
                     break;
-                case 0x61:
+
+                case 'a':
                     if (as0 != NULL) {
                         free(as0);
                     }
@@ -1020,7 +1034,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         as0 = mkstr(comp_host_root, "usr/lib/", currcomp, "as0", arg2, 0);
                     }
                     break;
-                case 0x62:
+
+                case 'b':
                     if (as1 != NULL) {
                         free(as1);
                     }
@@ -1033,7 +1048,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         as1 = mkstr(comp_host_root, "usr/lib/", currcomp, "as1", arg2, 0);
                     }
                     break;
-                case 0x77:
+
+                case 'w':
                     if (prelinker != NULL) {
                         free(prelinker);
                     }
@@ -1043,7 +1059,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         prelinker = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "edg_prelink", arg2, 0);
                     }
                     break;
-                case 0x6C:
+
+                case 'l':
                     if (ld != NULL) {
                         free(ld);
                     }
@@ -1070,7 +1087,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         filter = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "c++filt", arg2, 0);
                     }
                     break;
-                case 0x74:
+
+                case 't':
                     if (btou != NULL) {
                         free(btou);
                     }
@@ -1085,7 +1103,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         utob = mkstr(comp_host_root, "usr/lib/", currcomp, "utob", arg2, 0);
                     }
                     break;
-                case 0x78:
+
+                case 'x':
                     if (strip != NULL) {
                         free(strip);
                     }
@@ -1095,7 +1114,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         strip = mkstr(comp_host_root, "usr/bin/", currcomp, "strip", arg2, 0);
                     }
                     break;
-                case 0x79:
+
+                case 'y':
                     if (ftoc != NULL) {
                         free(ftoc);
                     }
@@ -1105,7 +1125,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         ftoc = mkstr(comp_host_root, "usr/lib/", currcomp, "ftoc", arg2, 0);
                     }
                     break;
-                case 0x7A:
+
+                case 'z':
                     if (cord != NULL) {
                         free(cord);
                     }
@@ -1115,7 +1136,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         cord = mkstr(comp_host_root, "usr/bin/", currcomp, "cord", arg2, 0);
                     }
                     break;
-                case 0x72:
+
+                case 'r':
                     if (arg1 != NULL) {
                         if (pflag != 0) {
                             crtx = mkstr(arg1, MCRTX, arg2, 0);
@@ -1168,7 +1190,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         delta_init = func_0042FD7C("delta_init.o", dirs_for_crtn.entries);
                     }
                     break;
-                case 0x50:
+
+                case 'P':
                     if (arg1 != NULL) {
                         libp = ((arg2 != NULL) && (*arg2 != 0)) ? mkstr("-L", arg1, "-B", arg2, LibP, 0)
                                                                 : mkstr("-L", arg1, LibP, 0);
@@ -1182,7 +1205,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x31:
+
+                case '1':
                     if (arg1 != NULL) {
                         libpl1 = mkstr(arg1, LibPl1, arg2, 0);
                         libpl1_b = mkstr(arg1, "libpl1.b", arg2, 0);
@@ -1195,7 +1219,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x45:
+
+                case 'E':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libexc = mkstr("-L", arg1, "-B", arg2, LibExc, 0);
@@ -1220,7 +1245,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x57:
+
+                case 'W':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libdw = mkstr("-L", arg1, "-B", arg2, LibDw, 0);
@@ -1251,7 +1277,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x58:
+
+                case 'X':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libxmalloc = mkstr("-L", arg1, " -B", arg2, LibXmalloc, 0);
@@ -1269,7 +1296,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x4F:
+
+                case 'O':
                     if (arg1 != NULL) {
                         libsort = mkstr(arg1, LibSort, arg2, 0);
                         libsort_b = mkstr(arg1, "libsort.b", arg2, 0);
@@ -1282,7 +1310,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x6E:
+
+                case 'n':
                     if (pflag != 0) {
                         if (arg1 != NULL) {
                             if ((arg2 != NULL) && (*arg2 != 0)) {
@@ -1301,7 +1330,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x4D:
+
+                case 'M':
                     if (arg1 != NULL) {
                         switch (chip_targ) {
                             default:
@@ -1358,7 +1388,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x46:
+
+                case 'F':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libF77 = mkstr("-L", arg1, " -B", arg2, LibF77, 0);
@@ -1376,7 +1407,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x49:
+
+                case 'I':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libI77 = mkstr("-L", arg1, " -B", arg2, LibI77, 0);
@@ -1393,7 +1425,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x53:
+
+                case 'S':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libisam = mkstr("-L", arg1, " -B", arg2, LibIsam, 0);
@@ -1410,7 +1443,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x55:
+
+                case 'U':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             libU77 = mkstr("-L", arg1, " -B", arg2, LibU77, 0);
@@ -1427,7 +1461,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                     }
                     break;
-                case 0x4B:
+
+                case 'K':
                     if (arg1 != NULL) {
                         fopt = mkstr(arg1, "fopt", arg2, 0);
                         copt = mkstr(arg1, "copt", arg2, 0);
@@ -1440,7 +1475,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         pca = mkstr(comp_host_root, "usr/lib/", "pca", arg2, 0);
                     }
                     break;
-                case 0x59:
+
+                case 'Y':
                     if (arg1 != NULL) {
                         libI77_mp = mkstr(arg1, "libI77_mp.a", arg2, 0);
                         libc_mp = mkstr(arg1, "libc_mp.a", arg2, 0);
@@ -1449,6 +1485,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libc_mp = "-lc_mp";
                     }
                     break;
+
                 default:
                     error(1, NULL, 0, NULL, 0, "Unknown character in -t%c\n", *var_s1);
                     exit(2);
@@ -3233,7 +3270,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         }
         sp48 = fopen(sp50, "w");
         if (sp48 == NULL) {
-            error(1, NULL, NULL, "update_instantiation_info_file", NULL, "error in creating file %s\n", sp50);
+            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", sp50);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
@@ -3249,7 +3286,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         fclose(sp48);
 
         if (rename(sp50, sp54) < 0) {
-            error(1, NULL, NULL, "update_instantiation_info_file", NULL, "error in renaming %s to %s\n", sp50, sp54);
+            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", sp50, sp54);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
