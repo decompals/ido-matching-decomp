@@ -1,7 +1,25 @@
+# Build options can be changed by modifying the makefile or by building with 'make SETTING=value'.
+# It is also possible to override the settings in Defaults in a file called .make_options as 'SETTING=value'.
 
+-include .make_options
+
+#### Defaults ####
+
+# select the version and binaries of IDO toolchain to disassemble and build
+VERSION ?= 7.1
 # if WERROR is 1, pass -Werror to CC_CHECK, so warnings would be treated as errors
 WERROR ?= 0
 CC_CHECK_COMP ?= gcc
+
+ifeq ($(VERSION),7.1)
+#	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
+	IDO_TC      := cc cfe
+# else ifeq ($(VERSION),5.3)
+# 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+else
+	$(error Unknown or unsupported IDO version - $(VERSION))
+endif
+
 
 #### Tools ####
 ifeq ($(shell type mips-linux-gnu-ld >/dev/null 2>/dev/null; echo $$?), 0)
@@ -24,7 +42,8 @@ OBJCOPY    := $(MIPS_BINUTILS_PREFIX)objcopy
 OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
-DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm --no-emit-cpload
+DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
+DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
@@ -48,7 +67,7 @@ ifneq ($(WERROR), 0)
 endif
 
 
-LDFLAGS := -nostdlib -L$(RECOMP)/ido/7.1/usr/lib/ -lc
+LDFLAGS := -nostdlib -L$(RECOMP)/ido/$(VERSION)/usr/lib/ -lc
 
 
 ASMPROCFLAGS := 
@@ -59,11 +78,18 @@ ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 CFLAGS += -G 0 -kPIC -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
 
 
-CC_ELF := $(BUILD)/7.1/cc.elf
+# -- Location of original IDO binaries
+IRIX_BASE    ?= $(RECOMP)/ido
+IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
+
+# We use a sentinel file for disassembling each binary
+DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
+
+ELFS     := $(foreach binary,$(IDO_TC),$(BUILD)/$(ASM)/$(VERSION)/$(binary).elf)
 
 
-SRC_DIRS := $(shell find src -type d)
-ASM_DIRS := $(shell find asm -type d -not -path "asm/7.1/functions*")
+SRC_DIRS := $(shell find src/$(VERSION) -type d)
+ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
@@ -76,7 +102,7 @@ DEP_FILES := $(O_FILES:.o=.d) \
              $(O_FILES:.o=.asmproc.d)
 
 # create build directories
-$(shell mkdir -p $(foreach dir,$(SRC_DIRS),$(BUILD)/$(dir)) $(BUILD)/7.1)
+$(shell mkdir -p $(foreach dir,$(SRC_DIRS) $(ASM_DIRS),$(BUILD)/$(dir)))
 
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
@@ -86,7 +112,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 .PHONY: all clean distclean setup disasm
 .DEFAULT_GOAL:= all
 
-all: $(CC_ELF) $(O_FILES)
+all: $(ELFS) $(O_FILES)
 
 clean:
 	$(RM) -r $(BUILD)
@@ -100,22 +126,32 @@ setup:
 	$(MAKE) -C $(RECOMP) DEBUG=0 VERSION=7.1
 	$(MAKE) -C $(RECOMP) DEBUG=0 VERSION=5.3
 
-disasm:
-	$(RM) -rf $(ASM)
-	mkdir -p $(BUILD)/$(ASM)/7.1/cc
-	$(DISASSEMBLER) $(RECOMP)/ido/7.1/usr/bin/cc asm/7.1/cc --Mreg-names o32 --split-functions asm/7.1/functions --aggressive-string-guesser --save-context $(CONTEXT)/7.1/cc.csv
+disasm: $(DISASM_TARGETS)
 
 
-$(CC_ELF): build/asm/7.1/cc/cc.text.o build/asm/7.1/cc/cc.data.o build/asm/7.1/cc/cc.rodata.o build/asm/7.1/cc/cc.bss.o
-	$(LD) $^ $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map build/7.1/cc.map -o $@ || (rm -f $@ && exit 1)
+$(BUILD)/$(ASM)/$(VERSION)/%.elf: | $(O_FILES)
+	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
 
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
-	@mkdir -p $(@D)
 	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD)/%.o: %.c
 	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+
+
+## Disassembly
+
+# cc is special and is stored in a different folder
+$(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
+	@touch $@
+
+$(ASM)/$(VERSION)/%/.disasm:
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
+	@touch $@
+
+
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
 
