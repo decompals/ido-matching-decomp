@@ -107,6 +107,9 @@ $(shell mkdir -p $(foreach dir,$(SRC_DIRS) $(ASM_DIRS),$(BUILD)/$(dir)))
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
+
+build/src/7.1/mld/%.o: OPTFLAGS := -O2
+
 # Targets
 
 .PHONY: all clean distclean setup disasm
@@ -129,7 +132,7 @@ setup:
 disasm: $(DISASM_TARGETS)
 
 
-$(BUILD)/$(ASM)/$(VERSION)/%.elf: | $(O_FILES)
+$(BUILD)/$(ASM)/$(VERSION)/%.elf: $(BUILD)/$(ASM)/$(VERSION)/%/*.o | $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
 
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
