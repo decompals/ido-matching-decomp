@@ -75,7 +75,7 @@ OPTFLAGS := -O1
 MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
-CFLAGS += -G 0 -kPIC -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
+CFLAGS += -G 0 -KPIC -Xfullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712
 
 
 # -- Location of original IDO binaries
