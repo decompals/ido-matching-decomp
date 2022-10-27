@@ -791,7 +791,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
         compose_first_G0 = 0;
         compose_G0_libs("PE1COMFIUSXnW");
     }
-    for (; *var_s1 != 0; var_s1++) {
+    for (; *var_s1 != '\0'; var_s1++) {
         if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == 0)) {
             switch (*var_s1) {
                 case 'h':
@@ -1892,7 +1892,7 @@ char getsuf(const char* path) {
 // function mksuf # 23
 char* mksuf(const char* path, char value) {
     s32 i; // sp54
-    s32 j; // sp50, also suffix length
+    s32 k; // sp50, also suffix length
     size_t sp4C;
     char* sp48;
     char* sp44;
@@ -1937,17 +1937,17 @@ char* mksuf(const char* path, char value) {
             sp44[-1] = 0;
         }
     } else {
-        for (j = i - 2; j > 0; j--) {
-            if (sp40[j] == '.') {
+        for (k = i - 2; k > 0; k--) {
+            if (sp40[k] == '.') {
                 break;
             }
         }
 
-        if (j == 0) {
+        if (k == 0) {
             error(1, NULL, 0, "mksuf ()", 14977, "Bad file name, no suffix: %s\n", path);
             exit(4);
         }
-        sp40 = &sp40[j + 1];
+        sp40 = &sp40[k + 1];
         if (value < 8) {
             strcpy(sp40, sp3C);
         } else {
