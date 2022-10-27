@@ -21,36 +21,45 @@
 
 /* File, -O1 */
 typedef struct {
-    s32 capacity;
-    s32 length;
+    int capacity;
+    int length;
     char** entries;
 } list;
 
+extern int getpagesize(void);
+
+static char* func_0042FD7C(const char* name, char** dirs);
+void compose_G0_libs(const char* arg0);
 static void func_00432C94(void);
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2);
 
 #ifndef PERMUTER
 void error();
 #else
-void error(s32 arg0, const char* arg1, s32 arg2, const char* arg3, s32 arg4, const char* arg5, ...);
+void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
 #endif /* PERMUTER */
 
 char* mkstr();
+void addstr(list* arg0, char* str);
 char* savestr(const char* src, size_t extra_length);
-void get_lino(char* arg0, const char* arg1, s32 arg2);
+
+static const char* func_00430414(char* arg0, int arg1);
+static int func_00432940(pid_t arg0);
+static void func_00432BDC();
+static void func_00432D3C(const char* arg0, int count);
+
+void get_lino(char* arg0, const char* arg1, int arg2);
 void settimes(void);
 void dotime(const char* programName);
 void cleanup(void);
 
 typedef int UNK_TYPE;
 
-
-
 // bss
 static prmap_sgi_t B_1000CAC0[100];
 char perr_msg[0x100];
 static int B_1000E4C0;
-static char **B_1000E4C4;
+static char** B_1000E4C4;
 int plain_g;
 int plain_O;
 int noaliasokflag;
@@ -58,7 +67,7 @@ int haspl1;
 UNK_TYPE p2cstr;
 int align;
 int align_common;
-char *alignarg;
+char* alignarg;
 int use_real_fp;
 int dollar_sign;
 int default_template_instantiation_mode;
@@ -69,9 +78,9 @@ int mp_dlinesflag;
 int mp_caseflag;
 UNK_TYPE efl;
 int mp_66flag;
-char *ratfor;
+char* ratfor;
 int mp_i2flag;
-char *m4;
+char* m4;
 int mp_col120flag;
 int mp_extendflag;
 int mp_uflag;
@@ -80,19 +89,19 @@ UNK_TYPE mp_uniq_specified;
 UNK_TYPE mp_passes_relocated;
 int cmp_flag;
 int fullwarn;
-char *aligndir;
+char* aligndir;
 int docpp;
 int default_nocpp;
 u32 j; // ?
-char *tstring;
-char *hstring;
-char *Bstring;
-const char *allBstring;
+char* tstring;
+char* hstring;
+char* Bstring;
+const char* allBstring;
 static UNK_TYPE B_1000E55C; // Unused
 char alltstring[20];
-char *Warg;
-char *Wpass;
-char *Kpass;
+char* Warg;
+char* Wpass;
+char* Kpass;
 char Karg;
 char Hchar;
 static char B_1000E587; // Unused
@@ -100,32 +109,32 @@ int time0;
 static UNK_TYPE B_1000E58C; // Unused
 struct tms tm0;
 int retcode;
-char *outfile;
-char *passin;
-char *passout;
-char *errout;
-char *symtab;
-char *uopt0str;
-char *ddoptstr;
-char *optstr;
-char *gentmp;
-char *binasm;
-char *uoutfile;
-char *lpi_st;
-char *lpi_p1;
-char *lpi_dd;
+char* outfile;
+char* passin;
+char* passout;
+char* errout;
+char* symtab;
+char* uopt0str;
+char* ddoptstr;
+char* optstr;
+char* gentmp;
+char* binasm;
+char* uoutfile;
+char* lpi_st;
+char* lpi_p1;
+char* lpi_dd;
 static UNK_TYPE B_1000E5DC;
 static char B_1000E5E0[0x400];
-char *lpi_pd;
-char *linkorder;
+char* lpi_pd;
+char* linkorder;
 static UNK_TYPE valuesstr;
 static UNK_TYPE tmp_elfobj;
-char *CRTX;
-FILE *ldw_file;
-char *MCRTX;
-FILE *tmpsfile;
+char* CRTX;
+FILE* ldw_file;
+char* MCRTX;
+FILE* tmpsfile;
 list undefineflags;
-char *editor;
+char* editor;
 list cppflags;
 int xserver;
 list olimitflags;
@@ -144,11 +153,11 @@ static UNK_TYPE B_1000EA7C; // Unused
 list uldlibflags;
 static UNK_TYPE B_1000EA8C; // Unused
 list edisonflags;
-char *comp_target_root;
+char* comp_target_root;
 list prelinkerflags;
-char *comp_host_root;
+char* comp_host_root;
 list ccomflags;
-char *systype;
+char* systype;
 list upasflags;
 int nonshared;
 list fcomflags;
@@ -164,22 +173,22 @@ static UNK_TYPE B_1000EB1C; // Unused
 list ulpiflags;
 static UNK_TYPE B_1000EB2C; // Unused
 list ujoinflags;
-char *tmpdir;
+char* tmpdir;
 list uldflags;
-char *rls_id_object;
+char* rls_id_object;
 list usplitflags;
-char *progname;
+char* progname;
 list umergeflags;
-char *currcomp;
+char* currcomp;
 list uloopflags;
 static UNK_TYPE B_1000EB7C; // Unused
-char* compdirs[7]; // might also be a struct?
+char* compdirs[7];          // might also be a struct?
 static UNK_TYPE B_1000EB9C; // Unused
 list uopt0flags;
 int compiler;
 list ddoptflags;
 static UNK_TYPE B_1000EBBC; // Unused
-char *tempstr[34];
+char* tempstr[34];
 list optflags;
 static UNK_TYPE B_1000EC54; // Unused
 list genflags;
@@ -196,9 +205,9 @@ static UNK_TYPE B_1000ECAC; // Unused
 list ftocflags;
 static UNK_TYPE B_1000ECBC; // Unused
 list cordflags;
-static char *B_1000ECCC;
+static char* B_1000ECCC;
 list srcfiles;
-static char *B_1000ECDC;
+static char* B_1000ECDC;
 list ufiles;
 static UNK_TYPE B_1000ECEC; // Unused
 list objfiles;
@@ -219,8 +228,8 @@ static UNK_TYPE B_1000ED64; // Unused
 list ldZflags;
 static int B_1000ED74;
 list pfaflags;
-char *pfa;
-char *libI77_mp;
+char* pfa;
+char* libI77_mp;
 static UNK_TYPE B_1000ED8C; // Unused
 list pcaflags;
 static UNK_TYPE B_1000ED9C; // Unused
@@ -231,9 +240,6 @@ static UNK_TYPE B_1000EDBC; // Unused
 char** __Argv;
 UNK_TYPE __rld_obj_head;
 int __Argc; // Unused
-
-
-
 
 // data
 
@@ -252,42 +258,42 @@ struct _struct_suffixes_0x8 suffixes[0xF] = {
     { "cxx", 6 }, { "C", 6 },   { "cpp", 6 }, { "CXX", 6 }, { "CPP", 6 }, { ".c", 7 },  { NULL, 0 },
 };
 
-char *include = NULL;
-char *includeB = NULL;
-char *einclude = NULL;
-char *eincludeB = NULL;
-char *cpp = NULL;
-char *ccom = NULL;
-char *mpc = NULL;
-char *cfe = NULL;
-char *upas = NULL;
-char *fcom = NULL;
-char *upl1 = NULL;
-char *pl1err = NULL;
-char *ulpi = NULL;
-char *ucob = NULL;
-char *ujoin = NULL;
-char *usplit = NULL;
-char *uld = NULL;
-char *umerge = NULL;
-char *uloop = NULL;
-char *uopt0 = NULL;
-char *ddopt = NULL;
-char *opt = NULL;
-char *gen = NULL;
-char *as0 = NULL;
-char *as1 = NULL;
-char *ld = NULL;
-char *ftoc = NULL;
-char *cord = NULL;
-char *btou = NULL;
-char *utob = NULL;
-char *strip = NULL;
-char *patch = NULL;
-char *filter = NULL;
-char *prelinker = NULL;
+char* include = NULL;
+char* includeB = NULL;
+char* einclude = NULL;
+char* eincludeB = NULL;
+char* cpp = NULL;
+char* ccom = NULL;
+char* mpc = NULL;
+char* cfe = NULL;
+char* upas = NULL;
+char* fcom = NULL;
+char* upl1 = NULL;
+char* pl1err = NULL;
+char* ulpi = NULL;
+char* ucob = NULL;
+char* ujoin = NULL;
+char* usplit = NULL;
+char* uld = NULL;
+char* umerge = NULL;
+char* uloop = NULL;
+char* uopt0 = NULL;
+char* ddopt = NULL;
+char* opt = NULL;
+char* gen = NULL;
+char* as0 = NULL;
+char* as1 = NULL;
+char* ld = NULL;
+char* ftoc = NULL;
+char* cord = NULL;
+char* btou = NULL;
+char* utob = NULL;
+char* strip = NULL;
+char* patch = NULL;
+char* filter = NULL;
+char* prelinker = NULL;
 int smart_build = 0;
-char *sbrepos = NULL;
+char* sbrepos = NULL;
 int do_strip = 0;
 int no_prelink = 0;
 int nofilt = 0;
@@ -311,52 +317,52 @@ char* LibProf1 = " -lprof";
 char* LibGProf1 = " -lgprof";
 char* LibXmalloc = " -lxmalloc";
 char* LibMld = " -lmld";
-char *crtx = NULL;
-char *crtn = NULL;
-char *cxx_init = NULL;
-char *delta_init = NULL;
-char *libp = NULL;
-char *libp_b = NULL;
-char *libm = NULL;
-char *libm_b = NULL;
-char *libF77 = NULL;
-char *libF77_b = NULL;
-char *libI77 = NULL;
-char *libI77_b = NULL;
-char *libU77 = NULL;
-char *libftn = NULL;
-char *libU77_b = NULL;
-char *libisam = NULL;
-char *libisam_b = NULL;
-char *libdw_path = NULL;
-char *libdw = NULL;
-char *libdw_b = NULL;
-char *libpl1 = NULL;
-char *libpl1_b = NULL;
-char *libexc = NULL;
-char *libexc_b = NULL;
-char *libcob = NULL;
-char *libcob_b = NULL; // Unused
-char *libsort = NULL;
-char *libsort_b = NULL;
-char *libprof = NULL;
-char *libgprof = NULL;
-char *libxmalloc = NULL;
-char *libxmalloc_b = NULL;
-char *cpp_stdflag = NULL;
-char *libmld = NULL;
-char *xpg_env = NULL;
+char* crtx = NULL;
+char* crtn = NULL;
+char* cxx_init = NULL;
+char* delta_init = NULL;
+char* libp = NULL;
+char* libp_b = NULL;
+char* libm = NULL;
+char* libm_b = NULL;
+char* libF77 = NULL;
+char* libF77_b = NULL;
+char* libI77 = NULL;
+char* libI77_b = NULL;
+char* libU77 = NULL;
+char* libftn = NULL;
+char* libU77_b = NULL;
+char* libisam = NULL;
+char* libisam_b = NULL;
+char* libdw_path = NULL;
+char* libdw = NULL;
+char* libdw_b = NULL;
+char* libpl1 = NULL;
+char* libpl1_b = NULL;
+char* libexc = NULL;
+char* libexc_b = NULL;
+char* libcob = NULL;
+char* libcob_b = NULL; // Unused
+char* libsort = NULL;
+char* libsort_b = NULL;
+char* libprof = NULL;
+char* libgprof = NULL;
+char* libxmalloc = NULL;
+char* libxmalloc_b = NULL;
+char* cpp_stdflag = NULL;
+char* libmld = NULL;
+char* xpg_env = NULL;
 int xpg_flag = 0;
 int crtn_required = 1;
-char *pca = NULL;
-char *libc_mp = NULL;
-char *fopt = NULL;
-char *copt = NULL;
+char* pca = NULL;
+char* libc_mp = NULL;
+char* fopt = NULL;
+char* copt = NULL;
 static int D_1000BF74 = 0;
 static int D_1000BF78 = 0;
 static int D_1000BF7C = 1;
-static char *D_1000BF80 = NULL;
-static char *D_1000BF84 = NULL;
+static char* D_1000BF80 = NULL;
+static char* D_1000BF84 = NULL;
 static int D_1000BF88 = 0;
 static int D_1000BF8C = 1;
 static int D_1000BF90 = 0;
@@ -494,13 +500,13 @@ int acpp_traditional = 0;
 int G_flag = 0;
 int dn_flag = 0;
 int edison_cpp = 1;
-char *edison_type = (char *)1;
+char* edison_type = (char*)1;
 int exception_handling = 0;
 char* Gnum = "0";
 int runerror = 0;
 int uload = 0;
 int uldobj_place = -1;
-char *tmp_uldobj = NULL;
+char* tmp_uldobj = NULL;
 int chip_targ = -1;
 int nobjs = 0;
 int targetsex = BIGENDIAN;
@@ -532,7 +538,7 @@ void process_config(int argc, char** argv) {
         if (strcmp(argv[i], "-systype") == 0) {
             i++;
             if (i >= argc) {
-                error(1, 0, 0, 0, 0, "-systype must have an argument\n");
+                error(1, NULL, 0, NULL, 0, "-systype must have an argument\n");
                 exit(2);
             }
 
@@ -541,7 +547,7 @@ void process_config(int argc, char** argv) {
             if (strcmp(systype, "svr4") == 0) {
                 svr4_systype = 1;
             } else {
-                error(1, 0, 0, 0, 0, "only systype svr4 allowed\n");
+                error(1, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
                 exit(2);
             }
 
@@ -553,7 +559,7 @@ void process_config(int argc, char** argv) {
                 && (fopen(strcat("/", systype), "r") == NULL) 
                 && (systype_warn == 0)) {
                 // clang-format on
-                error(2, 0, 0, 0, 0, "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                error(2, NULL, 0, NULL, 0, "This systype doesn't exist on this machine; changed systype to svr3.\n");
                 systype_warn = 1;
                 systype = "svr3";
             }
@@ -604,20 +610,6 @@ void process_config(int argc, char** argv) {
 }
 
 // function add_info # 4
-list asflags;
-list ddoptflags;
-list fcomflags;
-list genflags;
-list ldflags;
-list optflags;
-list uloopflags;
-list ulpiflags;
-list umergeflags;
-list uopt0flags;
-list upasflags;
-
-void addstr(list* arg0, char* str);
-
 void add_info(char* str) {
     addstr(&upasflags, str);
     addstr(&fcomflags, str);
@@ -635,16 +627,12 @@ void add_info(char* str) {
 // function parse_command # 5
 #pragma GLOBAL_ASM("asm/7.1/functions/cc/parse_command.s")
 
-// bss
-int compiler;
-
 // function get_host_chiptype # 6
 // Blank function
 void get_host_chiptype(void) {
 }
 
 // function error # 7
-
 
 static const char* D_1000C1E0[] = {
     "Internal", "Error", "Warning", "Info", "Fix", "",
@@ -655,22 +643,22 @@ static const char* D_1000C1E0[] = {
 // Print an error. Has to be K&R for the variadic stuff to work in other functions
 void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, argB)
     // clang-format off
-    s32 arg0;
+    int arg0;
     const char* arg1;
-    s32 arg2;
+    int arg2;
     const char* arg3;
-    s32 arg4;
+    int arg4;
     const char* arg5;
-    s32 arg6;
-    s32 arg7;
-    s32 arg8;
-    s32 arg9;
-    s32 argA;
-    s32 argB;
+    int arg6;
+    int arg7;
+    int arg8;
+    int arg9;
+    int argA;
+    int argB;
 // clang-format on
 {
-    s32 len;
-    s32 i;
+    int len;
+    int i;
 
     if ((Vflag == 0) && (D_1000C1D8 == NULL)) {
         D_1000C1D8 = strrchr(progname, '/');
@@ -723,12 +711,9 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 }
 #endif /* PERMUTER */
 
-static char* func_0042FD7C(const char* name, char** dirs);
-void compose_G0_libs(const char* arg0);
-
 // function relocate_passes # 8
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
-    register s32 pad;
+    register int pad;
     register const char* var_s1;
 
     currcomp = "";
@@ -758,20 +743,20 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != 0))) {
                         if (arg1 != NULL) {
                             if (fiveflag != 0) {
-                                includeB = mkstr(arg1, "usr/5include", arg2, 0);
+                                includeB = mkstr(arg1, "usr/5include", arg2, NULL);
                             } else if (abi_flag != 0) {
-                                includeB = mkstr(arg1, "usr/include/abi", arg2, 0);
+                                includeB = mkstr(arg1, "usr/include/abi", arg2, NULL);
                             } else {
-                                eincludeB = mkstr(arg1, "usr/include/CC", arg2, 0);
-                                includeB = mkstr(arg1, "usr/include", arg2, 0);
+                                eincludeB = mkstr(arg1, "usr/include/CC", arg2, NULL);
+                                includeB = mkstr(arg1, "usr/include", arg2, NULL);
                             }
                         } else if (fiveflag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/5include", arg2, 0);
+                            includeB = mkstr(comp_target_root, "usr/5include", arg2, NULL);
                         } else if (abi_flag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/include/abi", arg2, 0);
+                            includeB = mkstr(comp_target_root, "usr/include/abi", arg2, NULL);
                         } else {
-                            eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, 0);
-                            includeB = mkstr(comp_target_root, "usr/include", arg2, 0);
+                            eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, NULL);
+                            includeB = mkstr(comp_target_root, "usr/include", arg2, NULL);
                         }
                     } else {
                         includeB = NULL;
@@ -783,10 +768,10 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(cpp);
                     }
                     if (arg1 != NULL) {
-                        cpp = mkstr(arg1, ((cppchoice != 1) && (cppchoice != 3)) ? "cpp" : "acpp", arg2, 0);
+                        cpp = mkstr(arg1, ((cppchoice != 1) && (cppchoice != 3)) ? "cpp" : "acpp", arg2, NULL);
                     } else {
                         cpp = mkstr(comp_host_root, "usr/lib/", currcomp,
-                                    (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp", arg2, 0);
+                                    (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp", arg2, NULL);
                     }
                     break;
 
@@ -814,40 +799,40 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         if (cmp_flag & 0x10000) {
-                            mpc = mkstr(arg1, "mpc", arg2, 0);
+                            mpc = mkstr(arg1, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(arg1, ansichoice ? "accom" : "ccom", arg2, 0);
+                        ccom = mkstr(arg1, ansichoice ? "accom" : "ccom", arg2, NULL);
                         cfe = mkstr(arg1,
                                     ((c_compiler_choice != 0) || ((compiler == 3) && (D_1000BF74 != 0)))
                                         ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                         : "cfe",
-                                    arg2, 0);
-                        upas = mkstr(arg1, "upas", arg2, 0);
-                        fcom = mkstr(arg1, "fcom", arg2, 0);
-                        upl1 = mkstr(arg1, "pl1fe", arg2, 0);
-                        ucob = mkstr(arg1, "cobfe", arg2, 0);
+                                    arg2, NULL);
+                        upas = mkstr(arg1, "upas", arg2, NULL);
+                        fcom = mkstr(arg1, "fcom", arg2, NULL);
+                        upl1 = mkstr(arg1, "pl1fe", arg2, NULL);
+                        ucob = mkstr(arg1, "cobfe", arg2, NULL);
                     } else {
                         if (cmp_flag & 0x10000) {
-                            mpc = mkstr(comp_host_root, "usr/lib/", currcomp, "mpc", arg2, 0);
+                            mpc = mkstr(comp_host_root, "usr/lib/", currcomp, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp, ansichoice ? "accom" : "ccom", arg2, 0);
+                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp, ansichoice ? "accom" : "ccom", arg2, NULL);
                         if (((compiler == 1) && (c_compiler_choice != 0)) || ((compiler == 3) && (D_1000BF74 != 0))) {
                             cfe = mkstr(comp_host_root, "usr/lib/DCC/", currcomp,
                                         ((c_compiler_choice != 0) || ((compiler == 3) && (D_1000BF74 != 0)))
                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                             : "cfe",
-                                        arg2, 0);
+                                        arg2, NULL);
                         } else {
                             cfe = mkstr(comp_host_root, "usr/lib/", currcomp,
                                         ((c_compiler_choice != 0) || ((compiler == 3) && (D_1000BF74 != 0)))
                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                             : "cfe",
-                                        arg2, 0);
+                                        arg2, NULL);
                         }
-                        upas = mkstr(comp_host_root, "usr/lib/", currcomp, "upas", arg2, 0);
-                        fcom = mkstr(comp_host_root, "usr/lib/", currcomp, "fcom", arg2, 0);
-                        upl1 = mkstr(comp_host_root, "usr/lib/", currcomp, "pl1fe", arg2, 0);
-                        ucob = mkstr(comp_host_root, "usr/lib/", currcomp, "cobfe", arg2, 0);
+                        upas = mkstr(comp_host_root, "usr/lib/", currcomp, "upas", arg2, NULL);
+                        fcom = mkstr(comp_host_root, "usr/lib/", currcomp, "fcom", arg2, NULL);
+                        upl1 = mkstr(comp_host_root, "usr/lib/", currcomp, "pl1fe", arg2, NULL);
+                        ucob = mkstr(comp_host_root, "usr/lib/", currcomp, "cobfe", arg2, NULL);
                     }
                     break;
 
@@ -856,9 +841,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(pl1err);
                     }
                     if (arg1 != NULL) {
-                        pl1err = mkstr(arg1, "pl1error", arg2, 0);
+                        pl1err = mkstr(arg1, "pl1error", arg2, NULL);
                     } else {
-                        pl1err = mkstr(comp_host_root, "usr/lib/", currcomp, "pl1error", arg2, 0);
+                        pl1err = mkstr(comp_host_root, "usr/lib/", currcomp, "pl1error", arg2, NULL);
                     }
                     break;
 
@@ -867,9 +852,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(ulpi);
                     }
                     if (arg1 != NULL) {
-                        ulpi = mkstr(arg1, "ulpi", arg2, 0);
+                        ulpi = mkstr(arg1, "ulpi", arg2, NULL);
                     } else {
-                        ulpi = mkstr(comp_host_root, "usr/lib/", currcomp, "ulpi", arg2, 0);
+                        ulpi = mkstr(comp_host_root, "usr/lib/", currcomp, "ulpi", arg2, NULL);
                     }
                     break;
 
@@ -878,9 +863,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(ujoin);
                     }
                     if (arg1 != NULL) {
-                        ujoin = mkstr(arg1, "ujoin", arg2, 0);
+                        ujoin = mkstr(arg1, "ujoin", arg2, NULL);
                     } else {
-                        ujoin = mkstr(comp_host_root, "usr/lib/", currcomp, "ujoin", arg2, 0);
+                        ujoin = mkstr(comp_host_root, "usr/lib/", currcomp, "ujoin", arg2, NULL);
                     }
                     break;
 
@@ -889,7 +874,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(uld);
                     }
                     if (arg1 != NULL) {
-                        uld = mkstr(arg1, "uld", arg2, 0);
+                        uld = mkstr(arg1, "uld", arg2, NULL);
                     } else {
                         uld = mkstr(comp_host_root, "usr/lib/", currcomp, "uld", arg2, 0);
                     }
@@ -900,9 +885,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(usplit);
                     }
                     if (arg1 != NULL) {
-                        usplit = mkstr(arg1, "usplit", arg2, 0);
+                        usplit = mkstr(arg1, "usplit", arg2, NULL);
                     } else {
-                        usplit = mkstr(comp_host_root, "usr/lib/", currcomp, "usplit", arg2, 0);
+                        usplit = mkstr(comp_host_root, "usr/lib/", currcomp, "usplit", arg2, NULL);
                     }
                     break;
 
@@ -911,9 +896,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(uopt0);
                     }
                     if (arg1 != NULL) {
-                        uopt0 = mkstr(arg1, "uopt0", arg2, 0);
+                        uopt0 = mkstr(arg1, "uopt0", arg2, NULL);
                     } else {
-                        uopt0 = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt0", arg2, 0);
+                        uopt0 = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt0", arg2, NULL);
                     }
                     break;
 
@@ -922,9 +907,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(ddopt);
                     }
                     if (arg1 != NULL) {
-                        ddopt = mkstr(arg1, "ddopt", arg2, 0);
+                        ddopt = mkstr(arg1, "ddopt", arg2, NULL);
                     } else {
-                        ddopt = mkstr(comp_host_root, "usr/lib/", currcomp, "ddopt", arg2, 0);
+                        ddopt = mkstr(comp_host_root, "usr/lib/", currcomp, "ddopt", arg2, NULL);
                     }
                     break;
 
@@ -933,9 +918,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(umerge);
                     }
                     if (arg1 != NULL) {
-                        umerge = mkstr(arg1, "umerge", arg2, 0);
+                        umerge = mkstr(arg1, "umerge", arg2, NULL);
                     } else {
-                        umerge = mkstr(comp_host_root, "usr/lib/", currcomp, "umerge", arg2, 0);
+                        umerge = mkstr(comp_host_root, "usr/lib/", currcomp, "umerge", arg2, NULL);
                     }
                     break;
 
@@ -944,9 +929,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(uloop);
                     }
                     if (arg1 != NULL) {
-                        uloop = mkstr(arg1, "uloop", arg2, 0);
+                        uloop = mkstr(arg1, "uloop", arg2, NULL);
                     } else {
-                        uloop = mkstr(comp_host_root, "usr/lib/", currcomp, "uloop", arg2, 0);
+                        uloop = mkstr(comp_host_root, "usr/lib/", currcomp, "uloop", arg2, NULL);
                     }
                     break;
 
@@ -955,12 +940,12 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(opt);
                     }
                     if (arg1 != NULL) {
-                        opt = mkstr(arg1, "uopt", arg2, 0);
+                        opt = mkstr(arg1, "uopt", arg2, NULL);
                     } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
                                (D_1000BF8C != 0)) {
-                        opt = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "uopt", arg2, 0);
+                        opt = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "uopt", arg2, NULL);
                     } else {
-                        opt = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt", arg2, 0);
+                        opt = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt", arg2, NULL);
                     }
                     break;
 
@@ -969,12 +954,12 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(gen);
                     }
                     if (arg1 != NULL) {
-                        gen = mkstr(arg1, "ugen", arg2, 0);
+                        gen = mkstr(arg1, "ugen", arg2, NULL);
                     } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
                                (D_1000BF8C != 0)) {
-                        gen = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "ugen", arg2, 0);
+                        gen = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "ugen", arg2, NULL);
                     } else {
-                        gen = mkstr(comp_host_root, "usr/lib/", currcomp, "ugen", arg2, 0);
+                        gen = mkstr(comp_host_root, "usr/lib/", currcomp, "ugen", arg2, NULL);
                     }
                     break;
 
@@ -983,9 +968,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(as0);
                     }
                     if (arg1 != NULL) {
-                        as0 = mkstr(arg1, "as0", arg2, 0);
+                        as0 = mkstr(arg1, "as0", arg2, NULL);
                     } else {
-                        as0 = mkstr(comp_host_root, "usr/lib/", currcomp, "as0", arg2, 0);
+                        as0 = mkstr(comp_host_root, "usr/lib/", currcomp, "as0", arg2, NULL);
                     }
                     break;
 
@@ -994,12 +979,12 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(as1);
                     }
                     if (arg1 != NULL) {
-                        as1 = mkstr(arg1, "as1", arg2, 0);
+                        as1 = mkstr(arg1, "as1", arg2, NULL);
                     } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
                                (D_1000BF8C != 0)) {
-                        as1 = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "as1", arg2, 0);
+                        as1 = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "as1", arg2, NULL);
                     } else {
-                        as1 = mkstr(comp_host_root, "usr/lib/", currcomp, "as1", arg2, 0);
+                        as1 = mkstr(comp_host_root, "usr/lib/", currcomp, "as1", arg2, NULL);
                     }
                     break;
 
@@ -1008,9 +993,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(prelinker);
                     }
                     if (arg1 != NULL) {
-                        prelinker = mkstr(arg1, "edg_prelink", arg2, 0);
+                        prelinker = mkstr(arg1, "edg_prelink", arg2, NULL);
                     } else {
-                        prelinker = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "edg_prelink", arg2, 0);
+                        prelinker = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "edg_prelink", arg2, NULL);
                     }
                     break;
 
@@ -1025,20 +1010,20 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(filter);
                     }
                     if (arg1 != NULL) {
-                        ld = mkstr(arg1, LD, arg2, 0);
-                        patch = mkstr(arg1, "c++patch", arg2, 0);
-                        filter = mkstr(arg1, "c++filt", arg2, 0);
+                        ld = mkstr(arg1, LD, arg2, NULL);
+                        patch = mkstr(arg1, "c++patch", arg2, NULL);
+                        filter = mkstr(arg1, "c++filt", arg2, NULL);
                     } else {
                         if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
                             (D_1000BF90 != 0)) {
-                            ld = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, LD, arg2, 0);
+                            ld = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, LD, arg2, NULL);
                         } else if (irix4 != 0) {
-                            ld = mkstr(comp_host_root, "usr/bin/", currcomp, LD, arg2, 0);
+                            ld = mkstr(comp_host_root, "usr/bin/", currcomp, LD, arg2, NULL);
                         } else {
-                            ld = mkstr(comp_host_root, "usr/lib/", currcomp, LD, arg2, 0);
+                            ld = mkstr(comp_host_root, "usr/lib/", currcomp, LD, arg2, NULL);
                         }
-                        patch = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "c++patch", arg2, 0);
-                        filter = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "c++filt", arg2, 0);
+                        patch = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "c++patch", arg2, NULL);
+                        filter = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "c++filt", arg2, NULL);
                     }
                     break;
 
@@ -1050,11 +1035,11 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(utob);
                     }
                     if (arg1 != NULL) {
-                        btou = mkstr(arg1, "btou", arg2, 0);
-                        utob = mkstr(arg1, "utob", arg2, 0);
+                        btou = mkstr(arg1, "btou", arg2, NULL);
+                        utob = mkstr(arg1, "utob", arg2, NULL);
                     } else {
-                        btou = mkstr(comp_host_root, "usr/lib/", currcomp, "btou", arg2, 0);
-                        utob = mkstr(comp_host_root, "usr/lib/", currcomp, "utob", arg2, 0);
+                        btou = mkstr(comp_host_root, "usr/lib/", currcomp, "btou", arg2, NULL);
+                        utob = mkstr(comp_host_root, "usr/lib/", currcomp, "utob", arg2, NULL);
                     }
                     break;
 
@@ -1063,9 +1048,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(strip);
                     }
                     if (arg1 != NULL) {
-                        strip = mkstr(arg1, "strip", arg2, 0);
+                        strip = mkstr(arg1, "strip", arg2, NULL);
                     } else {
-                        strip = mkstr(comp_host_root, "usr/bin/", currcomp, "strip", arg2, 0);
+                        strip = mkstr(comp_host_root, "usr/bin/", currcomp, "strip", arg2, NULL);
                     }
                     break;
 
@@ -1074,9 +1059,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(ftoc);
                     }
                     if (arg1 != NULL) {
-                        ftoc = mkstr(arg1, "ftoc", arg2, 0);
+                        ftoc = mkstr(arg1, "ftoc", arg2, NULL);
                     } else {
-                        ftoc = mkstr(comp_host_root, "usr/lib/", currcomp, "ftoc", arg2, 0);
+                        ftoc = mkstr(comp_host_root, "usr/lib/", currcomp, "ftoc", arg2, NULL);
                     }
                     break;
 
@@ -1085,44 +1070,48 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(cord);
                     }
                     if (arg1 != NULL) {
-                        cord = mkstr(arg1, "cord", arg2, 0);
+                        cord = mkstr(arg1, "cord", arg2, NULL);
                     } else {
-                        cord = mkstr(comp_host_root, "usr/bin/", currcomp, "cord", arg2, 0);
+                        cord = mkstr(comp_host_root, "usr/bin/", currcomp, "cord", arg2, NULL);
                     }
                     break;
 
                 case 'r':
                     if (arg1 != NULL) {
                         if (pflag != 0) {
-                            crtx = mkstr(arg1, MCRTX, arg2, 0);
-                            cxx_init = mkstr(arg1, exception_handling ? "c++init_eh.o" : "c++init.o", arg2, 0);
-                            delta_init = mkstr(arg1, "delta_init.o", arg2, 0);
-                            crtn = mkstr(arg1, "crtn.o", arg2, 0);
+                            crtx = mkstr(arg1, MCRTX, arg2, NULL);
+                            cxx_init = mkstr(arg1, exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL);
+                            delta_init = mkstr(arg1, "delta_init.o", arg2, NULL);
+                            crtn = mkstr(arg1, "crtn.o", arg2, NULL);
                         } else {
-                            crtx = mkstr(arg1, CRTX, arg2, 0);
-                            cxx_init = mkstr(arg1, exception_handling ? "c++init_eh.o" : "c++init.o", arg2, 0);
-                            delta_init = mkstr(arg1, "delta_init.o", arg2, 0);
-                            crtn = mkstr(arg1, "crtn.o", arg2, 0);
+                            crtx = mkstr(arg1, CRTX, arg2, NULL);
+                            cxx_init = mkstr(arg1, exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL);
+                            delta_init = mkstr(arg1, "delta_init.o", arg2, NULL);
+                            crtn = mkstr(arg1, "crtn.o", arg2, NULL);
                         }
                     } else if (pflag != 0) {
                         if (abi_flag != 0) {
-                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, 0), dirs_for_abi_crtn.entries);
-                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, 0), dirs_for_abi_crtn.entries);
-                            cxx_init = func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, 0),
-                                                     dirs_for_abi_crtn.entries);
-                            delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, 0), dirs_for_abi_crtn.entries);
+                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, NULL), dirs_for_abi_crtn.entries);
+                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, NULL), dirs_for_abi_crtn.entries);
+                            cxx_init =
+                                func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL),
+                                              dirs_for_abi_crtn.entries);
+                            delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, NULL), dirs_for_abi_crtn.entries);
                         } else if (non_shared != 0) {
-                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, 0), dirs_for_nonshared_crtn.entries);
-                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, 0), dirs_for_nonshared_crtn.entries);
-                            cxx_init = func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, 0),
-                                                     dirs_for_nonshared_crtn.entries);
-                            delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, 0), dirs_for_nonshared_crtn.entries);
+                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, NULL), dirs_for_nonshared_crtn.entries);
+                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, NULL), dirs_for_nonshared_crtn.entries);
+                            cxx_init =
+                                func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL),
+                                              dirs_for_nonshared_crtn.entries);
+                            delta_init =
+                                func_0042FD7C(mkstr("delta_init.o", arg2, NULL), dirs_for_nonshared_crtn.entries);
                         } else {
-                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, 0), dirs_for_crtn.entries);
-                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, 0), dirs_for_crtn.entries);
-                            cxx_init = func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, 0),
-                                                     dirs_for_crtn.entries);
-                            delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, 0), dirs_for_crtn.entries);
+                            crtx = func_0042FD7C(mkstr(MCRTX, arg2, NULL), dirs_for_crtn.entries);
+                            crtn = func_0042FD7C(mkstr("crtn.o", arg2, NULL), dirs_for_crtn.entries);
+                            cxx_init =
+                                func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL),
+                                              dirs_for_crtn.entries);
+                            delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, NULL), dirs_for_crtn.entries);
                         }
                     } else if (abi_flag != 0) {
                         crtx = func_0042FD7C(CRTX, dirs_for_abi_crtn.entries);
@@ -1147,29 +1136,29 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
 
                 case 'P':
                     if (arg1 != NULL) {
-                        libp = ((arg2 != NULL) && (*arg2 != 0)) ? mkstr("-L", arg1, "-B", arg2, LibP, 0)
-                                                                : mkstr("-L", arg1, LibP, 0);
-                        libp_b = mkstr(arg1, "libp.b", arg2, 0);
+                        libp = ((arg2 != NULL) && (*arg2 != 0)) ? mkstr("-L", arg1, "-B", arg2, LibP, NULL)
+                                                                : mkstr("-L", arg1, LibP, NULL);
+                        libp_b = mkstr(arg1, "libp.b", arg2, NULL);
                     } else {
                         libp = "-lp";
                         if (non_shared != 0) {
-                            libp_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libp.b", arg2, 0);
+                            libp_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libp.b", arg2, NULL);
                         } else {
-                            libp_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libp.b", arg2, 0);
+                            libp_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libp.b", arg2, NULL);
                         }
                     }
                     break;
 
                 case '1':
                     if (arg1 != NULL) {
-                        libpl1 = mkstr(arg1, LibPl1, arg2, 0);
-                        libpl1_b = mkstr(arg1, "libpl1.b", arg2, 0);
+                        libpl1 = mkstr(arg1, LibPl1, arg2, NULL);
+                        libpl1_b = mkstr(arg1, "libpl1.b", arg2, NULL);
                     } else {
                         libpl1 = "-lpl1";
                         if (non_shared != 0) {
-                            libpl1_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libpl1.b", arg2, 0);
+                            libpl1_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libpl1.b", arg2, NULL);
                         } else {
-                            libpl1_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libpl1.b", arg2, 0);
+                            libpl1_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libpl1.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1177,25 +1166,25 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'E':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libexc = mkstr("-L", arg1, "-B", arg2, LibExc, 0);
-                            libmld = mkstr("-L", arg1, "-B", arg2, LibMld, 0);
+                            libexc = mkstr("-L", arg1, "-B", arg2, LibExc, NULL);
+                            libmld = mkstr("-L", arg1, "-B", arg2, LibMld, NULL);
                         } else {
-                            libexc = mkstr("-L", arg1, LibExc, 0);
-                            libmld = mkstr("-L", arg1, LibMld, 0);
+                            libexc = mkstr("-L", arg1, LibExc, NULL);
+                            libmld = mkstr("-L", arg1, LibMld, NULL);
                         }
-                        libexc_b = mkstr(arg1, "libexc.b", arg2, 0);
+                        libexc_b = mkstr(arg1, "libexc.b", arg2, NULL);
                     } else {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libexc = mkstr("-L", "-B", arg2, LibExc, 0);
-                            libmld = mkstr("-L", "-B", arg2, LibMld, 0);
+                            libexc = mkstr("-L", "-B", arg2, LibExc, NULL);
+                            libmld = mkstr("-L", "-B", arg2, LibMld, NULL);
                         } else {
                             libexc = "-lexc";
                             libmld = "-lmld";
                         }
                         if (non_shared != 0) {
-                            libexc_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libexc.b", arg2, 0);
+                            libexc_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libexc.b", arg2, NULL);
                         } else {
-                            libexc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libexc.b", arg2, 0);
+                            libexc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libexc.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1203,31 +1192,31 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'W':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libdw = mkstr("-L", arg1, "-B", arg2, LibDw, 0);
+                            libdw = mkstr("-L", arg1, "-B", arg2, LibDw, NULL);
                         } else {
-                            libdw = mkstr("-L", arg1, LibDw, 0);
+                            libdw = mkstr("-L", arg1, LibDw, NULL);
                         }
-                        libdw_path = mkstr(arg1, "libdw.a", arg2, 0);
-                        libdw_b = mkstr(arg1, "libdw.b", arg2, 0);
+                        libdw_path = mkstr(arg1, "libdw.a", arg2, NULL);
+                        libdw_b = mkstr(arg1, "libdw.b", arg2, NULL);
                     } else {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
                             if (non_shared != 0) {
                                 libdw = mkstr("-L", comp_target_root, "usr/lib/nonshared/", currcomp, " -B", arg2,
-                                              LibDw, 0);
+                                              LibDw, NULL);
                             } else {
-                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, " -B", arg2, LibDw, 0);
+                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, " -B", arg2, LibDw, NULL);
                             }
                         } else if (non_shared != 0) {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, 0);
+                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
                         } else {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, 0);
+                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
                         }
                         if (non_shared != 0) {
-                            libdw_path = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.a", arg2, 0);
-                            libdw_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.b", arg2, 0);
+                            libdw_path = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.a", arg2, NULL);
+                            libdw_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.b", arg2, NULL);
                         } else {
-                            libdw_path = mkstr(comp_target_root, "usr/lib/", currcomp, "libdw.a", arg2, 0);
-                            libdw_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libdw.b", arg2, 0);
+                            libdw_path = mkstr(comp_target_root, "usr/lib/", currcomp, "libdw.a", arg2, NULL);
+                            libdw_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libdw.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1235,32 +1224,33 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'X':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libxmalloc = mkstr("-L", arg1, " -B", arg2, LibXmalloc, 0);
+                            libxmalloc = mkstr("-L", arg1, " -B", arg2, LibXmalloc, NULL);
                         } else {
-                            libxmalloc = mkstr("-L", arg1, LibXmalloc, 0);
+                            libxmalloc = mkstr("-L", arg1, LibXmalloc, NULL);
                         }
-                        libxmalloc_b = mkstr(arg1, "libxmalloc.b", arg2, 0);
+                        libxmalloc_b = mkstr(arg1, "libxmalloc.b", arg2, NULL);
                     } else {
                         libxmalloc = "-lxmalloc";
                         if (non_shared != 0) {
                             libxmalloc_b =
-                                mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libxmalloc.b", arg2, 0);
+                                mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libxmalloc.b", arg2, NULL);
                         } else {
-                            libxmalloc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libxmalloc.b", arg2, 0);
+                            libxmalloc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libxmalloc.b", arg2, NULL);
                         }
                     }
                     break;
 
                 case 'O':
                     if (arg1 != NULL) {
-                        libsort = mkstr(arg1, LibSort, arg2, 0);
-                        libsort_b = mkstr(arg1, "libsort.b", arg2, 0);
+                        libsort = mkstr(arg1, LibSort, arg2, NULL);
+                        libsort_b = mkstr(arg1, "libsort.b", arg2, NULL);
                     } else {
                         libsort = "-lsort";
                         if (non_shared != 0) {
-                            libsort_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libsort.b", arg2, 0);
+                            libsort_b =
+                                mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libsort.b", arg2, NULL);
                         } else {
-                            libsort_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libsort.b", arg2, 0);
+                            libsort_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libsort.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1269,11 +1259,11 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if (pflag != 0) {
                         if (arg1 != NULL) {
                             if ((arg2 != NULL) && (*arg2 != 0)) {
-                                libprof = mkstr("-L", arg1, " -B", arg2, LibProf1, 0);
-                                libgprof = mkstr("-L", arg1, " -B", arg2, LibGProf1, 0);
+                                libprof = mkstr("-L", arg1, " -B", arg2, LibProf1, NULL);
+                                libgprof = mkstr("-L", arg1, " -B", arg2, LibGProf1, NULL);
                             } else {
-                                libprof = mkstr("-L", arg1, LibProf1, 0);
-                                libgprof = mkstr("-L", arg1, LibGProf1, 0);
+                                libprof = mkstr("-L", arg1, LibProf1, NULL);
+                                libgprof = mkstr("-L", arg1, LibGProf1, NULL);
                             }
                         } else if (non_shared != 0) {
                             libprof = func_0042FD7C("libprof.a", dirs_for_nonshared_crtn.entries);
@@ -1291,19 +1281,19 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             default:
                             case 0:
                                 if ((arg2 != NULL) && (*arg2 != 0)) {
-                                    libm = mkstr(arg1, " -B", arg2, LibM, 0);
+                                    libm = mkstr(arg1, " -B", arg2, LibM, NULL);
                                 } else {
-                                    libm = mkstr("-L", arg1, LibM, 0);
+                                    libm = mkstr("-L", arg1, LibM, NULL);
                                 }
-                                libm_b = mkstr(arg1, "libm.b", arg2, 0);
+                                libm_b = mkstr(arg1, "libm.b", arg2, NULL);
                                 break;
                             case 1:
-                                libm = mkstr(arg1, "libm_mips2.a", arg2, 0);
-                                libm_b = mkstr(arg1, "libm_mips2.b", arg2, 0);
+                                libm = mkstr(arg1, "libm_mips2.a", arg2, NULL);
+                                libm_b = mkstr(arg1, "libm_mips2.b", arg2, NULL);
                                 break;
                             case 2:
-                                libm = mkstr(arg1, "libm_mips3.a", arg2, 0);
-                                libm_b = mkstr(arg1, "libm_mips3.b", arg2, 0);
+                                libm = mkstr(arg1, "libm_mips3.a", arg2, NULL);
+                                libm_b = mkstr(arg1, "libm_mips3.b", arg2, NULL);
                                 break;
                         }
                     } else {
@@ -1312,31 +1302,32 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             case 0:
                                 libm = "-lm";
                                 if (non_shared != 0) {
-                                    libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm.b", arg2, 0);
+                                    libm_b =
+                                        mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm.b", arg2, NULL);
                                 } else {
-                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm.b", arg2, 0);
+                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm.b", arg2, NULL);
                                 }
                                 break;
                             case 1:
                                 if (non_shared != 0) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.a", arg2,
-                                                 0);
+                                                 NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.b",
-                                                   arg2, 0);
+                                                   arg2, NULL);
                                 } else {
-                                    libm = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.a", arg2, 0);
-                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.b", arg2, 0);
+                                    libm = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.a", arg2, NULL);
+                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.b", arg2, NULL);
                                 }
                                 break;
                             case 2:
                                 if (non_shared != 0) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.a", arg2,
-                                                 0);
+                                                 NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.b",
-                                                   arg2, 0);
+                                                   arg2, NULL);
                                 } else {
-                                    libm = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips3.a", arg2, 0);
-                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips3.b", arg2, 0);
+                                    libm = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips3.a", arg2, NULL);
+                                    libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips3.b", arg2, NULL);
                                 }
                                 break;
                         }
@@ -1346,18 +1337,18 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'F':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libF77 = mkstr("-L", arg1, " -B", arg2, LibF77, 0);
+                            libF77 = mkstr("-L", arg1, " -B", arg2, LibF77, NULL);
                         } else {
-                            libF77 = mkstr("-L", arg1, LibF77, 0);
+                            libF77 = mkstr("-L", arg1, LibF77, NULL);
                         }
-                        libF77_b = mkstr(arg1, "libF77.b", arg2, 0);
+                        libF77_b = mkstr(arg1, "libF77.b", arg2, NULL);
                     } else {
                         libftn = "-lftn";
                         libF77 = "-lF77";
                         if (non_shared != 0) {
-                            libF77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libF77.b", arg2, 0);
+                            libF77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libF77.b", arg2, NULL);
                         } else {
-                            libF77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libF77.b", arg2, 0);
+                            libF77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libF77.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1365,17 +1356,17 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'I':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libI77 = mkstr("-L", arg1, " -B", arg2, LibI77, 0);
+                            libI77 = mkstr("-L", arg1, " -B", arg2, LibI77, NULL);
                         } else {
-                            libI77 = mkstr("-L", arg1, LibI77, 0);
+                            libI77 = mkstr("-L", arg1, LibI77, NULL);
                         }
-                        libI77_b = mkstr(arg1, "libI77.b", arg2, 0);
+                        libI77_b = mkstr(arg1, "libI77.b", arg2, NULL);
                     } else {
                         libI77 = "-lI77";
                         if (non_shared != 0) {
-                            libI77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libI77.b", arg2, 0);
+                            libI77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libI77.b", arg2, NULL);
                         } else {
-                            libI77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libI77.b", arg2, 0);
+                            libI77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libI77.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1383,17 +1374,18 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'S':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libisam = mkstr("-L", arg1, " -B", arg2, LibIsam, 0);
+                            libisam = mkstr("-L", arg1, " -B", arg2, LibIsam, NULL);
                         } else {
-                            libisam = mkstr("-L", arg1, LibIsam, 0);
+                            libisam = mkstr("-L", arg1, LibIsam, NULL);
                         }
-                        libisam_b = mkstr(arg1, "libisam.b", arg2, 0);
+                        libisam_b = mkstr(arg1, "libisam.b", arg2, NULL);
                     } else {
                         libisam = "-lisam";
                         if (non_shared != 0) {
-                            libisam_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libisam.b", arg2, 0);
+                            libisam_b =
+                                mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libisam.b", arg2, NULL);
                         } else {
-                            libisam_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libisam.b", arg2, 0);
+                            libisam_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libisam.b", arg2, NULL);
                         }
                     }
                     break;
@@ -1401,39 +1393,39 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                 case 'U':
                     if (arg1 != NULL) {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            libU77 = mkstr("-L", arg1, " -B", arg2, LibU77, 0);
+                            libU77 = mkstr("-L", arg1, " -B", arg2, LibU77, NULL);
                         } else {
-                            libU77 = mkstr("-L", arg1, LibU77, 0);
+                            libU77 = mkstr("-L", arg1, LibU77, NULL);
                         }
-                        libU77_b = mkstr(arg1, "libU77.b", arg2, 0);
+                        libU77_b = mkstr(arg1, "libU77.b", arg2, NULL);
                     } else {
                         libU77 = "-lU77";
                         if (non_shared != 0) {
-                            libU77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libU77.b", arg2, 0);
+                            libU77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libU77.b", arg2, NULL);
                         } else {
-                            libU77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libU77.b", arg2, 0);
+                            libU77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libU77.b", arg2, NULL);
                         }
                     }
                     break;
 
                 case 'K':
                     if (arg1 != NULL) {
-                        fopt = mkstr(arg1, "fopt", arg2, 0);
-                        copt = mkstr(arg1, "copt", arg2, 0);
-                        pfa = mkstr(arg1, "pfa", arg2, 0);
-                        pca = mkstr(arg1, "pca", arg2, 0);
+                        fopt = mkstr(arg1, "fopt", arg2, NULL);
+                        copt = mkstr(arg1, "copt", arg2, NULL);
+                        pfa = mkstr(arg1, "pfa", arg2, NULL);
+                        pca = mkstr(arg1, "pca", arg2, NULL);
                     } else {
-                        fopt = mkstr(comp_host_root, "usr/lib/", "fopt", arg2, 0);
-                        copt = mkstr(comp_host_root, "usr/lib/", "copt", arg2, 0);
-                        pfa = mkstr(comp_host_root, "usr/lib/", "pfa", arg2, 0);
-                        pca = mkstr(comp_host_root, "usr/lib/", "pca", arg2, 0);
+                        fopt = mkstr(comp_host_root, "usr/lib/", "fopt", arg2, NULL);
+                        copt = mkstr(comp_host_root, "usr/lib/", "copt", arg2, NULL);
+                        pfa = mkstr(comp_host_root, "usr/lib/", "pfa", arg2, NULL);
+                        pca = mkstr(comp_host_root, "usr/lib/", "pca", arg2, NULL);
                     }
                     break;
 
                 case 'Y':
                     if (arg1 != NULL) {
-                        libI77_mp = mkstr(arg1, "libI77_mp.a", arg2, 0);
-                        libc_mp = mkstr(arg1, "libc_mp.a", arg2, 0);
+                        libI77_mp = mkstr(arg1, "libI77_mp.a", arg2, NULL);
+                        libc_mp = mkstr(arg1, "libc_mp.a", arg2, NULL);
                     } else {
                         libI77_mp = "-lI77_mp";
                         libc_mp = "-lc_mp";
@@ -1516,7 +1508,7 @@ void compose_G0_libs(const char* arg0) {
 }
 
 // function compose_reg_libs # 11
-void compose_reg_libs(char* arg0) {
+void compose_reg_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
             case 'P':
@@ -1572,8 +1564,9 @@ void compose_reg_libs(char* arg0) {
  */
 #define _VA_INIT_STATE 1
 
+// Actual prototype is char* mkstr(const char*, ...);
 #ifndef PERMUTER
-
+// Return the concatenation of the passed strings. Arguments are a NULL-terminated list of const char*.
 char* mkstr(va_alist)
     // clang-format off
 va_dcl // K&R syntax
@@ -1581,10 +1574,9 @@ va_dcl // K&R syntax
 {
     register char* ret;
     register const char* arg;
-    register u32 len;
+    register size_t len = 1;
     va_list args;
 
-    len = 1;
     va_start(args);
     while ((arg = va_arg(args, const char*)) != NULL) {
         len += strlen(arg);
@@ -1605,37 +1597,44 @@ va_dcl // K&R syntax
     while ((arg = va_arg(args, const char*)) != NULL) {
         strcat(ret, arg);
     }
-
     va_end(args);
+
     return ret;
 }
 #endif /* PERMUTER */
 
+#undef _VA_INIT_STATE
+
+#define LIST_CAPACITY_INCR 20
+#define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
+
 // function mklist # 13
+// Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
 void mklist(list* arg0) {
-    if ((arg0->entries = malloc(20 * sizeof(char*))) == NULL) {
+    if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
         error(1, NULL, 0, "mklist ()", 14561, "out of memory\n");
         if (errno < sys_nerr) {
             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
-    arg0->capacity = 20;
+    arg0->capacity = LIST_INITIAL_CAPACITY;
     arg0->length = 0;
     *arg0->entries = NULL;
 }
 
 // function addstr # 14
+// Add a single string entry to a list.
 void addstr(list* arg0, char* str) {
     if ((arg0->length + 1) >= arg0->capacity) {
-        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == 0) {
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
             if (errno < sys_nerr) {
                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
-        arg0->capacity += 20;
+        arg0->capacity += LIST_CAPACITY_INCR;
     }
     arg0->entries[arg0->length] = str;
     arg0->length++;
@@ -1643,6 +1642,7 @@ void addstr(list* arg0, char* str) {
 }
 
 // function addspacedstr # 15
+// Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
 void addspacedstr(list* arg0, char* str) {
     char* str_end = str;
 
@@ -1653,14 +1653,15 @@ void addspacedstr(list* arg0, char* str) {
             str_end++;
         }
         if ((arg0->length + 1) >= arg0->capacity) {
-            if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == NULL) {
-                error(1, 0, 0, "addspacedstr()", 14639, "out of memory\n");
+            if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) ==
+                NULL) {
+                error(1, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
                 if (errno < sys_nerr) {
-                    error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 exit(1);
             }
-            arg0->capacity += 20;
+            arg0->capacity += LIST_CAPACITY_INCR;
         }
         arg0->entries[arg0->length] = str;
         arg0->length += 1;
@@ -1669,6 +1670,12 @@ void addspacedstr(list* arg0, char* str) {
 }
 
 // function newstr # 16
+/**
+ * Copy a string
+ *
+ * @param src string to copy
+ * @return char* mallocked pointer to copy
+ */
 char* newstr(const char* src) {
     char* dest = malloc(strlen(src) + 1);
 
@@ -1686,7 +1693,7 @@ int save_place(list* arg0) {
     int ret;
 
     if ((arg0->length + 1) >= arg0->capacity) {
-        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + 20) * sizeof(char*))) == NULL) {
+        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
             error(1, NULL, 0, "save_place()", 14695, "out of memory\n");
 
             if (errno < sys_nerr) {
@@ -1694,7 +1701,7 @@ int save_place(list* arg0) {
             }
             exit(1);
         }
-        arg0->capacity += 20;
+        arg0->capacity += LIST_CAPACITY_INCR;
     }
     ret = arg0->length;
     arg0->length++;
@@ -1703,27 +1710,36 @@ int save_place(list* arg0) {
 }
 
 // function set_place # 18
+/**
+ * Set a specified entry of a list to a particular string
+ *
+ * @param arg0 list to set entry of
+ * @param str string to set entry to
+ * @param place entry to write to
+ */
 void set_place(list* arg0, char* str, int place) {
     if ((place < 0) || (place >= arg0->length)) {
-        error(0, 0, 0, "set_place ()", 14726, "place out of range");
+        error(0, NULL, 0, "set_place ()", 14726, "place out of range");
         exit(1);
     }
     arg0->entries[place] = str;
 }
 
 // function addlist # 19
+// Append all the entries in arg1 to arg0.
 void addlist(list* arg0, list* arg1) {
     int i;
 
     if ((arg0->length + arg1->length + 1) >= arg0->capacity) {
-        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + arg1->capacity + 20) * sizeof(char*))) == NULL) {
+        if ((arg0->entries = realloc(arg0->entries,
+                                     (arg0->capacity + arg1->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
             error(1, NULL, 0, "addlist ()", 14756, "out of memory\n");
             if (errno < sys_nerr) {
                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
-        arg0->capacity += arg1->capacity + 20;
+        arg0->capacity += arg1->capacity + LIST_CAPACITY_INCR;
     }
     for (i = 0; i < arg1->length; i++) {
         if (arg1->entries[i] != NULL) {
@@ -1735,22 +1751,26 @@ void addlist(list* arg0, list* arg1) {
 }
 
 // function adduldlist # 20
-// Copies onto the end of arg0: up to the first NULL from arg2, then everything from arg1, then the rest of arg2.
+// Adds entries from arg1 and arg2 onto the end of arg0:
+// - up to the first NULL from arg2,
+// - then everything from arg1,
+// - then the rest of arg2.
 void adduldlist(list* arg0, list* arg1, list* arg2) {
     s32 sp3C;
     s32 sp38;
 
     if ((arg0->length + arg1->length + arg2->length + 1) >= arg0->capacity) {
 
-        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + arg1->capacity + arg2->capacity + 20) *
-                                                        sizeof(char*))) == NULL) {
-            error(1, 0, 0, "addlist ()", 14795, "out of memory\n");
+        if ((arg0->entries =
+                 realloc(arg0->entries, (arg0->capacity + arg1->capacity + arg2->capacity + LIST_CAPACITY_INCR) *
+                                            sizeof(char*))) == NULL) {
+            error(1, NULL, 0, "addlist ()", 14795, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, 0, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
-        arg0->capacity += arg1->capacity + arg2->capacity + 20;
+        arg0->capacity += arg1->capacity + arg2->capacity + LIST_CAPACITY_INCR;
     }
 
     for (sp3C = 0; (sp3C < arg2->length) && (arg2->entries[sp3C] != NULL); sp3C++) {
@@ -1776,6 +1796,7 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 }
 
 // function nodup # 21
+// Search for a string in a list. If found, return 0, else return 1.
 s32 nodup(list* arg0, const char* str) {
     register s32 i;
     register char* entry;
@@ -1920,6 +1941,7 @@ char* mksuf(const char* path, char value) {
 }
 
 // function savestr # 24
+// Copy a string, adding extra_length bytes to the allocation.
 char* savestr(const char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
 
@@ -1935,44 +1957,43 @@ char* savestr(const char* src, size_t extra_length) {
 }
 
 // function mktempstr # 25
-
 void mktempstr(void) {
-    tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", 0));
-    tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", 0));
-    tempstr[2] = mktemp(mkstr(tmpdir, "ctmpXXXXXX", 0));
-    tempstr[3] = mktemp(mkstr(tmpdir, "ctmfXXXXXX", 0));
-    tempstr[4] = mktemp(mkstr(tmpdir, "ctmluXXXXXX", 0));
-    tempstr[5] = mktemp(mkstr(tmpdir, "ctmsXXXXXX", 0));
-    tempstr[6] = mktemp(mkstr(tmpdir, "ctmmXXXXXX", 0));
-    tempstr[7] = mktemp(mkstr(tmpdir, "ctmoXXXXXX", 0));
-    tempstr[8] = mktemp(mkstr(tmpdir, "ctmosXXXXXX", 0));
-    tempstr[9] = mktemp(mkstr(tmpdir, "ctmcbXXXXXX", 0));
-    tempstr[10] = mktemp(mkstr(tmpdir, "ctmcXXXXXX", 0));
-    tempstr[11] = mktemp(mkstr(tmpdir, "ctmaXXXXXX", 0));
-    tempstr[12] = mktemp(mkstr(tmpdir, "ctmbXXXXXX", 0));
-    tempstr[13] = mktemp(mkstr(tmpdir, "ctmlXXXXXX", 0));
-    tempstr[14] = mktemp(mkstr(tmpdir, "ctmm4XXXXXX", 0));
-    tempstr[15] = mktemp(mkstr(tmpdir, "ctmgtXXXXXX", 0));
-    tempstr[16] = mktemp(mkstr(tmpdir, "ctmilXXXXXX", 0));
-    tempstr[17] = mktemp(mkstr(tmpdir, "ctmltXXXXXX", 0));
-    tempstr[18] = mktemp(mkstr(tmpdir, "ctmp1XXXXXX", 0));
+    tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", NULL));
+    tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", NULL));
+    tempstr[2] = mktemp(mkstr(tmpdir, "ctmpXXXXXX", NULL));
+    tempstr[3] = mktemp(mkstr(tmpdir, "ctmfXXXXXX", NULL));
+    tempstr[4] = mktemp(mkstr(tmpdir, "ctmluXXXXXX", NULL));
+    tempstr[5] = mktemp(mkstr(tmpdir, "ctmsXXXXXX", NULL));
+    tempstr[6] = mktemp(mkstr(tmpdir, "ctmmXXXXXX", NULL));
+    tempstr[7] = mktemp(mkstr(tmpdir, "ctmoXXXXXX", NULL));
+    tempstr[8] = mktemp(mkstr(tmpdir, "ctmosXXXXXX", NULL));
+    tempstr[9] = mktemp(mkstr(tmpdir, "ctmcbXXXXXX", NULL));
+    tempstr[10] = mktemp(mkstr(tmpdir, "ctmcXXXXXX", NULL));
+    tempstr[11] = mktemp(mkstr(tmpdir, "ctmaXXXXXX", NULL));
+    tempstr[12] = mktemp(mkstr(tmpdir, "ctmbXXXXXX", NULL));
+    tempstr[13] = mktemp(mkstr(tmpdir, "ctmlXXXXXX", NULL));
+    tempstr[14] = mktemp(mkstr(tmpdir, "ctmm4XXXXXX", NULL));
+    tempstr[15] = mktemp(mkstr(tmpdir, "ctmgtXXXXXX", NULL));
+    tempstr[16] = mktemp(mkstr(tmpdir, "ctmilXXXXXX", NULL));
+    tempstr[17] = mktemp(mkstr(tmpdir, "ctmltXXXXXX", NULL));
+    tempstr[18] = mktemp(mkstr(tmpdir, "ctmp1XXXXXX", NULL));
 
-    tempstr[20] = mktemp(mkstr(tmpdir, "ctmpdXXXXXX", 0));
-    tempstr[19] = mktemp(mkstr(tmpdir, "ctmddXXXXXX", 0));
-    tempstr[21] = mktemp(mkstr(tmpdir, "ctmloXXXXXX", 0));
-    tempstr[22] = mktemp(mkstr(tmpdir, "ctmciXXXXXX", 0));
-    tempstr[23] = mktemp(mkstr(tmpdir, "ctmvXXXXXX", 0));
-    tempstr[24] = mktemp(mkstr(tmpdir, "ctmerrXXXXXX", 0));
-    tempstr[25] = mktemp(mkstr(tmpdir, "ctmemXXXXXX", 0));
-    tempstr[26] = mktemp(mkstr(tmpdir, "ctmeXXXXXX", 0));
-    tempstr[27] = mktemp(mkstr(tmpdir, "ctmdXXXXXX", 0));
-    tempstr[28] = mktemp(mkstr(tmpdir, "ctmqXXXXXX", 0));
-    tempstr[29] = mktemp(mkstr(tmpdir, "ctmqsXXXXXX", 0));
+    tempstr[20] = mktemp(mkstr(tmpdir, "ctmpdXXXXXX", NULL));
+    tempstr[19] = mktemp(mkstr(tmpdir, "ctmddXXXXXX", NULL));
+    tempstr[21] = mktemp(mkstr(tmpdir, "ctmloXXXXXX", NULL));
+    tempstr[22] = mktemp(mkstr(tmpdir, "ctmciXXXXXX", NULL));
+    tempstr[23] = mktemp(mkstr(tmpdir, "ctmvXXXXXX", NULL));
+    tempstr[24] = mktemp(mkstr(tmpdir, "ctmerrXXXXXX", NULL));
+    tempstr[25] = mktemp(mkstr(tmpdir, "ctmemXXXXXX", NULL));
+    tempstr[26] = mktemp(mkstr(tmpdir, "ctmeXXXXXX", NULL));
+    tempstr[27] = mktemp(mkstr(tmpdir, "ctmdXXXXXX", NULL));
+    tempstr[28] = mktemp(mkstr(tmpdir, "ctmqXXXXXX", NULL));
+    tempstr[29] = mktemp(mkstr(tmpdir, "ctmqsXXXXXX", NULL));
     //! @bug 5 Xs instead of 6
-    tempstr[30] = mktemp(mkstr(tmpdir, "ctmelfXXXXX", 0));
-    tempstr[31] = mktemp(mkstr(tmpdir, "ctmkXXXXXX", 0));
+    tempstr[30] = mktemp(mkstr(tmpdir, "ctmelfXXXXX", NULL));
+    tempstr[31] = mktemp(mkstr(tmpdir, "ctmkXXXXXX", NULL));
 
-    tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", 0));
+    tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", NULL));
 
     if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (nofilt == 0) &&
         (access(filter, EX_OK) == 0)) {
@@ -1982,12 +2003,6 @@ void mktempstr(void) {
     }
 }
 
-extern int getpagesize(void);
-
-static const char* func_00430414(char* arg0, int arg1);
-static int func_00432940(pid_t arg0);
-static void func_00432BDC();
-static void func_00432D3C(const char* arg0, int count);
 
 // function run # 26
 int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
@@ -2260,6 +2275,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
 
 // function get_lino # 28
 #define GET_LINO_BUF_SIZE 0x800
+// arg2 is probably a size_t
 void get_lino(char* arg0, const char* arg1, s32 arg2) {
     char* sp83C;
     int sp838;
@@ -2652,8 +2668,8 @@ struct _struct_prod_name_0xC prod_name[] = {
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
 };
 
-static char *D_1000C2E8 = NULL;
-static char *D_1000C2EC = NULL;
+static char* D_1000C2E8 = NULL;
+static char* D_1000C2EC = NULL;
 static char* D_1000C2F0 = NULL; // basename of progname (?)
 
 // function func_00430414 # 41
