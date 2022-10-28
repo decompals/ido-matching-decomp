@@ -517,7 +517,7 @@ symbol,0x40FB80,None,.L0040FB80,@branchlabel,None,None,None,0x4,0xFB80,.text,Tru
 symbol,0x40FBE4,None,.L0040FBE4,@branchlabel,None,None,None,0x4,0xFBE4,.text,True,False,True,False,2,None,False,False,False,False
 symbol,0x40FBF4,None,.L0040FBF4,@branchlabel,None,None,None,0x4,0xFBF4,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FBFC,None,.L0040FBFC,@branchlabel,None,None,None,0x4,0xFBFC,.text,True,False,True,False,3,None,False,False,False,False
-symbol,0x40FC14,None,func_0040FC14,@function,None,None,0x54,0x54,0xFC14,.text,True,False,True,False,1,None,False,True,False,False
+symbol,0x40FC14,None,func_0040FC14,@function,None,None,0x54,0x54,0xFC14,.text,True,False,True,False,2,None,False,True,False,False
 symbol,0x40FC68,lint_warning,lint_warning,@function,WORD,0x264,0x264,0x264,0xFC68,.text,True,True,False,False,1,None,False,True,True,False
 symbol,0x40FD28,None,.L0040FD28,@branchlabel,None,None,None,0x4,0xFD28,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FD48,None,.L0040FD48,@branchlabel,None,None,None,0x4,0xFD48,.text,True,False,True,False,2,None,False,False,False,False
@@ -526,12 +526,12 @@ symbol,0x40FD74,None,.L0040FD74,@branchlabel,None,None,None,0x4,0xFD74,.text,Tru
 symbol,0x40FDAC,None,.L0040FDAC,@branchlabel,None,None,None,0x4,0xFDAC,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FDE4,None,.L0040FDE4,@branchlabel,None,None,None,0x4,0xFDE4,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FE18,None,.L0040FE18,@branchlabel,None,None,None,0x4,0xFE18,.text,True,False,True,False,3,None,False,False,False,False
-symbol,0x40FECC,None,func_0040FECC,@function,None,None,0x134,0x134,0xFECC,.text,True,False,True,False,2,None,False,True,False,False
+symbol,0x40FECC,None,func_0040FECC,@function,None,None,0x4F8,0x4F8,0xFECC,.text,True,False,True,False,2,None,False,True,False,False
 symbol,0x40FF24,None,.L0040FF24,@branchlabel,None,None,None,0x4,0xFF24,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FF74,None,.L0040FF74,@branchlabel,None,None,None,0x4,0xFF74,.text,True,False,True,False,2,None,False,False,False,False
 symbol,0x40FFCC,None,.L0040FFCC,@branchlabel,None,None,None,0x4,0xFFCC,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x40FFFC,None,.L0040FFFC,@branchlabel,None,None,None,0x4,0xFFFC,.text,True,False,True,False,1,None,False,False,False,False
-symbol,0x410000,None,func_00410000,@function,WORD,None,0x3C4,0x3C4,0x10000,.text,True,True,False,False,142,None,False,True,False,True
+symbol,0x410000,None,D_410000,,WORD,None,None,0x1,0x0,,False,True,False,False,142,None,False,False,False,True
 symbol,0x410034,None,.L00410034,@branchlabel,None,None,None,0x4,0x10034,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x41006C,None,.L0041006C,@branchlabel,None,None,None,0x4,0x1006C,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x4100A0,None,.L004100A0,@branchlabel,None,None,None,0x4,0x100A0,.text,True,False,True,False,2,None,False,False,False,False

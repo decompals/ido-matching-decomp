@@ -132,7 +132,7 @@ setup:
 disasm: $(DISASM_TARGETS)
 
 
-$(BUILD)/$(ASM)/$(VERSION)/%.elf: $(BUILD)/$(ASM)/$(VERSION)/%/*.o | $(O_FILES)
+$(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
 
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
