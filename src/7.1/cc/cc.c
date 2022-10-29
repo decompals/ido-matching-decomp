@@ -2049,7 +2049,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     }
 
     spA0 = fork();
-    if (spA0 == -1) {
+    if (spA0 == -1) { // fork failed
         error(1, NULL, 0, NULL, 0, "no more processes\n");
         if (errno < sys_nerr) {
             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
@@ -2063,7 +2063,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
 
         if (arg2 != NULL) {
-            sp94 = open(arg2, 0);
+            sp94 = open(arg2, O_RDONLY);
             if (sp94 == -1) {
                 error(1, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
                 if (errno < sys_nerr) {
@@ -2076,7 +2076,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
 
         if (arg3 != NULL) {
-            sp90 = creat(arg3, 0777);
+            sp90 = creat(arg3, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp90 == -1) {
                 error(1, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
                 if (errno < sys_nerr) {
@@ -2089,7 +2089,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
 
         if (arg4 != NULL) {
-            sp8C = creat(arg4, 0777);
+            sp8C = creat(arg4, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp8C == -1) {
                 error(1, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
                 if (errno < sys_nerr) {
@@ -2103,11 +2103,11 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
         execvp(arg0, arg1);
         sp78 = func_00430414(arg0, 1);
-        if ((errno == 2) && (sp78 != NULL)) {
+        if ((errno == ENOENT) && (sp78 != NULL)) {
             error(1, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
         } else {
             sp78 = func_00430414(arg0, 0);
-            if ((errno == 2) && (sp78 != NULL)) {
+            if ((errno == ENOENT) && (sp78 != NULL)) {
                 error(1, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
             } else {
                 error(1, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
@@ -2121,12 +2121,13 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     } else {
         sp84 = sigset(SIGINT, SIG_IGN);
         sp88 = sigset(SIGTERM, SIG_IGN);
+
         if (memory_flag != 0) {
             sp74 = func_00432940(spA0);
             sp7C = ioctl(sp74, PIOCMAP_SGI, &D_1000C1C8);
             if (sp7C < 0) {
                 perror("PIOCMAP_SGI");
-                kill(spA0, 9);
+                kill(spA0, SIGKILL);
                 return -1;
             }
 
@@ -2138,7 +2139,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
             if (ioctl(sp74, PIOCSEXIT, &sp34) < 0) {
                 perror("PIOCSEXIT");
-                kill(spA0, 9);
+                kill(spA0, SIGKILL);
                 return -1;
             }
 
@@ -2154,9 +2155,11 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
         sigset(SIGINT, sp84);
         sigset(SIGTERM, sp88);
+
         if (time_flag != 0) {
             dotime(arg0);
         }
+
         if (memory_flag != 0) {
             func_00432D3C(arg0, sp7C);
         }
@@ -2177,11 +2180,11 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             sp98 = WTERMSIG(sp80);
             fprintf(stderr, "Fatal error in: %s ", arg0);
             printf(" child died due to signal %d.\n", sp98);
-            if (sp98 == 9) {
+            if (sp98 == SIGKILL) {
                 printf("Probably caused by running out of swap space -- check /usr/adm/SYSLOG.\n");
                 exit(sp98);
             }
-            if (sp98 == 2) {
+            if (sp98 == SIGINT) {
                 cleanup();
                 exit(3);
             }
@@ -2211,8 +2214,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
     s32 stat_loc;
 
     fokrPid = fork();
-    if (fokrPid == (pid_t)-1) {
-        // fork failed
+    if (fokrPid == (pid_t)-1) { // fork failed
         error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
@@ -2220,8 +2222,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
         return -1;
     }
 
-    if (fokrPid == (pid_t)0) {
-        // children process
+    if (fokrPid == (pid_t)0) { // child process
 
         if (editflag == 2) {
             get_lino(sp58, arg1, arg2);
@@ -2237,8 +2238,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
         }
 
         exit(1);
-    } else {
-        // this process, fokrPid is the pid of the child process
+    } else { // this process, fokrPid is the pid of the child process
 
         sp44 = sigset(SIGINT, SIG_IGN);
         sp48 = sigset(SIGTERM, SIG_IGN);
@@ -2285,7 +2285,7 @@ void get_lino(char* arg0, const char* arg1, s32 arg2) {
 
     *arg0 = '+';
     sp834++;
-    sp83C = open(errout, 0);
+    sp83C = open(errout, O_RDONLY);
     sp838 = read(sp83C, &sp30, GET_LINO_BUF_SIZE);
     close(sp83C);
 
@@ -2353,26 +2353,26 @@ void get_lino(char* arg0, const char* arg1, s32 arg2) {
     if ((arg0 + 1) < sp834) {
         sp834[0] = 0;
     } else {
-        sp834[0] = 0x31;
+        sp834[0] = '1';
         sp834[1] = 0;
     }
 }
 
 // function show_err # 29
-#define BUF_SIZE 0x10000
+#define SHOW_ERR_BUF_SIZE 0x10000
 void show_err(const char* path) {
     int desc;
     int bytes_read;
-    char buf[BUF_SIZE];
+    char buf[SHOW_ERR_BUF_SIZE];
 
     desc = open(path, O_RDONLY);
-    bytes_read = read(desc, buf, BUF_SIZE);
+    bytes_read = read(desc, buf, SHOW_ERR_BUF_SIZE);
     close(desc);
 
-    if (bytes_read < BUF_SIZE) {
+    if (bytes_read < SHOW_ERR_BUF_SIZE) {
         buf[bytes_read] = '\0';
     } else {
-        buf[BUF_SIZE - 1] = '\0';
+        buf[SHOW_ERR_BUF_SIZE - 1] = '\0';
     }
     fprintf(stderr, "%s\n", buf);
 }
