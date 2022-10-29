@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:decompals/ido-static-recomp.git
 	branch = master
-	commit = a5ef00e27ba2cbfc1bd3789986c1062674c47cf4
+	commit = 012ad12a762c95ff8cb3502b31dc46f0b31ea410
 	parent = b49bfec1c53fefb79b1a005dd0d2a4251ff4b491
 	method = merge
 	cmdver = 0.4.5
