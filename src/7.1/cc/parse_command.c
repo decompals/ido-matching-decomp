@@ -2045,7 +2045,7 @@ void parse_command(int argc, char** argv) {
                     }
                     goto bad_option;
 
-                case 0x66: /* switch 1 */
+                case 'f': /* switch 1 */
                     if ((strcmp(argv[var_s0], "-full_transtive_link") == 0) ||
                         (strcmp(argv[var_s0], "-full_transitive_link") == 0)) {
                         full_transitive_link = 1;
@@ -2063,106 +2063,128 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                     }
+
                     if (strcmp(argv[var_s0], "-fullasopt") == 0) {
                         fullasoptflag = 1;
-                    } else if ((compiler == 1) && (strcmp(argv[var_s0], "-force_load") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && (strcmp(argv[var_s0], "-force_load") == 0)) {
                         addstr(&objfiles, argv[var_s0]);
-                    } else if ((strcmp(argv[var_s0], "-fullwarn") == 0) && (fullwarn = 1, (compiler == 1))) {
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-fullwarn") == 0) && (fullwarn = 1, (compiler == 1))) {
                         addstr(&accomflags, "-Xfullwarn");
                         addstr(&cfeflags, "-verbose");
                         addstr(&cfeflags, "-wimplicit");
-                    } else if (strcmp(argv[var_s0], "-framepointer") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-framepointer") == 0) {
                         if (compiler == 1) {
                             addstr(&ccomflags, argv[var_s0]);
-                        } else if (compiler == 2) {
-                            addstr(&upasflags, argv[var_s0]);
-                        } else if (compiler == 3) {
-                            addstr(&fcomflags, argv[var_s0]);
-                        } else {
-                            goto bad_option;
+                            break;
                         }
-                    } else if ((compiler == 1) && (strcmp(argv[var_s0], "-float") == 0)) {
+                        if (compiler == 2) {
+                            addstr(&upasflags, argv[var_s0]);
+                            break;
+                        }
+                        if (compiler == 3) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            break;
+                        }
+                        goto bad_option;
+                    }
+
+                    if ((compiler == 1) && (strcmp(argv[var_s0], "-float") == 0)) {
                         addstr(&pcaflags, "-float");
                         addstr(&soptflags, "-float");
                         addstr(&ccomflags, "-Xfloat");
-                    } else if (((compiler != 4) && (compiler != 2)) || (strcmp(argv[var_s0], "-float") != 0)) {
-                        if (compiler == 6) {
-                            if (strcmp(argv[var_s0], "-fsc74") == 0) {
-                                addstr(&ucobflags, argv[var_s0]);
-                                break;
-                            } else if (argv[var_s0][2] == '\0') {
-                                var_s0++;
-                                if ((var_s0 < argc) && (addstr(&ucobflags, "-f"), (argv[var_s0][1] == 0)) &&
-                                    ((int)argv[var_s0][0] >= 0x31) && ((int)argv[var_s0][0] < 0x35)) {
-                                    addstr(&ucobflags, argv[var_s0]);
-                                    continue;
-                                } else {
-                                    error(1, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
-                                    exit(2);
-                                }
-                            } else {
-                                goto bad_option;
-                            }
+                        break;
+                    }
+                    if (((compiler == 4) || (compiler == 2)) && (strcmp(argv[var_s0], "-float") == 0)) {
+                        break;
+                    }
+                    if (compiler == 6) {
+                        if (strcmp(argv[var_s0], "-fsc74") == 0) {
+                            addstr(&ucobflags, argv[var_s0]);
+                            break;
                         }
                         if (argv[var_s0][2] == '\0') {
                             var_s0++;
-                            if (var_s0 < argc) {
-                                addstr(&ldflags, "-f");
-                                addstr(&ldflags, argv[var_s0]);
+                            if ((var_s0 < argc) && (addstr(&ucobflags, "-f"), (argv[var_s0][1] == '\0')) &&
+                                (argv[var_s0][0] >= '1') && (argv[var_s0][0] <= '4')) {
+                                addstr(&ucobflags, argv[var_s0]);
+                                break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
+                                error(1, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
                                 exit(2);
-                                goto bad_option;
                             }
                         } else {
                             goto bad_option;
                         }
                     }
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-f");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        error(1, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
+                        exit(2);
+                    }
+                    goto bad_option;
 
-                    break;
-                case 0x67: /* switch 1 */
+                case 'g': /* switch 1 */
                     plain_g = 0;
+                    // "-g" , which is converted to "-g2 -O1"
                     if (argv[var_s0][2] == '\0') {
                         gflag = 2;
                         plain_g = 1;
                         if (plain_O != 0) {
                             Oflag = 1;
                         }
-                    } else if ((argv[var_s0][3] == '\0') && (argv[var_s0][2] >= 0x30) && (argv[var_s0][2] < 0x34)) {
-                        gflag = argv[var_s0][2] - 0x30;
+                        break;
+                    }
+                    // "-gN" for N in 0,1,2,3
+                    if ((argv[var_s0][3] == '\0') && (argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '3')) {
+                        gflag = argv[var_s0][2] - '0';
                         if (gflag == 2) {
                             plain_g = 1;
                             if (plain_O != 0) {
                                 Oflag = 1;
                             }
                         }
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x68: /* switch 1 */
+                    goto bad_option;
+
+                case 'h': /* switch 1 */
                     if (strcmp(argv[var_s0], "-hostcache") == 0) {
                         addstr(&ddoptflags, argv[var_s0]);
                         break;
-                    } else if (strncmp(argv[var_s0], "-help", 5U) == 0) {
+                    }
+                    if (strncmp(argv[var_s0], "-help", 5) == 0) {
                         error(2, NULL, 0, NULL, 0, "-help is ignored.\n");
                         break;
-                    } else if (compiler == 1) {
+                    }
+                    if (compiler == 1) {
                         if (strcmp(argv[var_s0], "-hides") == 0) {
                             addstr(&objfiles, argv[var_s0]);
                             break;
-                        } else if (strcmp(argv[var_s0], "-hidden_symbol") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-hidden_symbol") == 0) {
                             var_s0++;
-                            if ((var_s0 >= argc) || (argv[var_s0][0] == 0x2D)) {
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
                                 error(1, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
                             addstr(&ldflags, argv[var_s0]);
                             break;
-                        } else if (strcmp(argv[var_s0], "-hides_file") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-hides_file") == 0) {
                             var_s0++;
-                            if ((var_s0 >= argc) || (argv[var_s0][0] == 0x2D)) {
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
                                 error(1, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
                                 exit(2);
                             }
@@ -2172,12 +2194,12 @@ void parse_command(int argc, char** argv) {
                         }
                     }
                     hstring = argv[var_s0] + 2;
-                    if (hstring[strlen(hstring) - 1] != 0x2F) {
+                    if (hstring[strlen(hstring) - 1] != '/') {
                         hstring = mkstr(hstring, "/", NULL);
                     }
-
                     break;
-                case 0x69: /* switch 1 */
+
+                case 'i': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         var_s0++;
                         if (var_s0 < argc) {
@@ -2204,11 +2226,17 @@ void parse_command(int argc, char** argv) {
                             }
                         }
                         addstr(&umergeflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-ignore_unresolved") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ignore_unresolved") == 0) {
                         ignore_unresolved_flag = 1;
-                    } else if (strcmp(argv[var_s0], "-ignore_minor") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ignore_minor") == 0) {
                         addstr(&objfiles, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-irix4") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-irix4") == 0) {
                         irix4 = 1;
                         comp_host_root = "/usr/irix4/";
                         Gnum = "8";
@@ -2223,20 +2251,24 @@ void parse_command(int argc, char** argv) {
                         mips_abi = 0;
                         relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
                         add_static_opt(argv[var_s0]);
-                    } else if (((compiler == 3) &&
-                                ((strcmp(argv[var_s0], "-i2") == 0) || (strcmp(argv[var_s0], "-i4") == 0))) ||
-                               (strcmp(argv[var_s0], "-i8") == 0)) {
-                        if ((argv[var_s0][2] == 0x32) || (argv[var_s0][2] == 0x38)) {
+                        break;
+                    }
+                    if (((compiler == 3) &&
+                         ((strcmp(argv[var_s0], "-i2") == 0) || (strcmp(argv[var_s0], "-i4") == 0))) ||
+                        (strcmp(argv[var_s0], "-i8") == 0)) {
+                        if ((argv[var_s0][2] == '2') || (argv[var_s0][2] == '8')) {
                             mp_i2flag = 1;
                         }
                         addstr(&fcomflags, argv[var_s0]);
-                    } else if (compiler == 5) {
+                        break;
+                    }
+                    if (compiler == 5) {
                         if (strcmp(argv[var_s0], "-ipath") == 0) {
                             var_s0++;
                             if (var_s0 < argc) {
                                 addstr(&upl1flags, "-ipath");
                                 addstr(&upl1flags, argv[var_s0]);
-                                continue;
+                                break;
                             } else {
                                 error(1, NULL, 0, NULL, 0, "-ipath must have an argument\n");
                                 exit(2);
@@ -2247,72 +2279,78 @@ void parse_command(int argc, char** argv) {
                             if (var_s0 < argc) {
                                 addstr(&upl1flags, "-isuffix");
                                 addstr(&upl1flags, argv[var_s0]);
-                                continue;
+                                break;
                             } else {
                                 error(1, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
                                 exit(2);
-                                goto bad_option;
                             }
-                        } else {
-                            goto bad_option;
                         }
-                    } else {
-                        goto bad_option;
                     }
+                    goto bad_option;
 
-                    break;
-                case 0x6A: /* switch 1 */
+                case 'j': /* switch 1 */
+                          // "-j"
                     if (argv[var_s0][2] == '\0') {
                         jflag++;
                         uload = 0;
-                    } else if (strcmp(argv[var_s0], "-jalr") == 0) {
-                        addstr(&genflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-jmpopt") == 0) {
-                        addstr(&objfiles, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x6B: /* switch 1 */
+                    if (strcmp(argv[var_s0], "-jalr") == 0) {
+                        addstr(&genflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-jmpopt") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'k': /* switch 1 */
                     if (strcmp(argv[var_s0], "-keep") == 0) {
                         Kflag++;
-                    } else if (strcmp(argv[var_s0], "-kpicopt") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-kpicopt") == 0) {
                         kpicopt_flag = 1;
-                    } else {
-                        switch (argv[var_s0][2]) { /* switch 7; irregular */
-                            case 0x6F:             /* switch 7 */
-                                var_s0++;
-                                if (var_s0 < argc) {
-                                    uoutfile = argv[var_s0];
-                                    var_s1 = getsuf(uoutfile);
-                                    if ((var_s1 == 0x63) || (var_s1 == 0x70) || (var_s1 == 0x66) || (var_s1 == 0x46) ||
-                                        (var_s1 == 0x72) || (var_s1 == 0x65) || (var_s1 == 6) || (var_s1 == 0x73) ||
-                                        (var_s1 == 1) || (var_s1 == 2)) {
-                                        error(1, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
-                                        exit(2);
-                                    }
+                        break;
+                    }
+                    switch (argv[var_s0][2]) { /* switch 7; irregular */
+                        case 'o':              /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                uoutfile = argv[var_s0];
+                                var_s1 = getsuf(uoutfile);
+                                if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
+                                    (var_s1 == 'r') || (var_s1 == 'e') || (var_s1 == 6) || (var_s1 == 's') ||
+                                    (var_s1 == 1) || (var_s1 == 2)) {
+                                    error(1, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
+                                    exit(2);
                                 }
-                                break;
-                            case 0x70: /* switch 7 */
-                                var_s0++;
-                                if (var_s0 < argc) {
-                                    addstr(&uldflags, "-kp");
-                                    addstr(&uldflags, argv[var_s0]);
-                                }
-                                break;
-                            case 0x75: /* switch 7 */
-                                var_s0++;
-                                if (var_s0 < argc) {
-                                    addstr(&uldflags, "-ku");
-                                    addstr(&uldflags, argv[var_s0]);
-                                }
-                                break;
-                            default: /* switch 7 */
-                                addstr(&ufiles, argv[var_s0]);
-                                break;
-                        }
+                            }
+                            break;
+
+                        case 'p': /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&uldflags, "-kp");
+                                addstr(&uldflags, argv[var_s0]);
+                            }
+                            break;
+
+                        case 'u': /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&uldflags, "-ku");
+                                addstr(&uldflags, argv[var_s0]);
+                            }
+                            break;
+
+                        default: /* switch 7 */
+                            addstr(&ufiles, argv[var_s0]);
+                            break;
                     }
                     break;
+
                 case 0x6C: /* switch 1 */
                     if (strcmp("isting", argv[var_s0] + 2) == 0) {
                         addstr(&fcomflags, argv[var_s0]);
