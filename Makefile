@@ -85,8 +85,6 @@ IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 # We use a sentinel file for disassembling each binary
 DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
 
-ELFS     := $(foreach binary,$(IDO_TC),$(BUILD)/$(ASM)/$(VERSION)/$(binary).elf)
-
 
 SRC_DIRS := $(shell find src/$(VERSION) -type d)
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
@@ -148,11 +146,9 @@ $(BUILD)/%.o: %.c
 # cc is special and is stored in a different folder
 $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
-	@touch $@
 
 $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
-	@touch $@
 
 
 
