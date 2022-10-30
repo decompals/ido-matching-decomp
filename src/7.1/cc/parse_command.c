@@ -902,127 +902,134 @@ void parse_command(int argc, char** argv) {
                     break;
 
                 case 'J': /* switch 1 */
-                    if (strcmp(argv[var_s0], "-Jsfm") != 0) {
-                        if (strcmp(argv[var_s0], "-J") == 0) {
-                            sp12C = argv[var_s0 + 1];
-                            for (sp130 = sp12C; *sp130 != 0; sp130++) {
-                                if (!isdigit(*sp130)) {
-                                    error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
-                                    exit(2);
-                                }
-                            }
-                            addstr(&prelinkerflags, argv[var_s0]);
-                            addstr(&prelinkerflags, sp12C);
-                            var_s0++;
-                        } else {
-                            case 'K': /* switch 1 */
-                                if (default_svr4 != 0) {
-                                    Kpass = argv[var_s0] + 2;
-                                    if (*Kpass == 0) {
-                                        Kpass = argv[var_s0] + 3;
-                                    }
-
-                                    while ((*Kpass != 0) || (*Kpass == 0x2C)) {
-                                        for (j = 0, var_s2 = Kpass; (*var_s2 != 0x2C && *var_s2 != 0); j++) {
-                                            (&Karg)[j] = *var_s2++;
-                                        }
-
-                                        Kpass = var_s2;
-                                        if (strncmp(&Karg, "minabi", 6U) == 0) {
-                                            kminabiflag = 1;
-                                        } else if (strncmp(&Karg, "fpe", 3U) == 0) {
-                                            addstr(&ldflags, "-Kfpe");
-                                        } else if (strncmp(&Karg, "sd", 2U) == 0) {
-                                            addstr(&ldflags, "-Ksd");
-                                        } else if (strncmp(&Karg, "sz", 2U) == 0) {
-                                            addstr(&ldflags, "-Ksz");
-                                        } else if (strncmp(&Karg, "mau", 3U) == 0) {
-                                            addstr(&ldflags, "-Kmau");
-                                        } else if (strncmp(&Karg, "PIC", 3U) == 0) {
-                                            if (non_shared != 0) {
-                                                error(2, NULL, 0, NULL, 0,
-                                                      "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                                kpic_flag = 0;
-                                            } else {
-                                                kpic_flag = 1;
-                                                kpic_spec = 1;
-                                            }
-                                        } else {
-                                            goto bad_option;
-                                        }
-                                        for (j = 0; j < strlen(&Karg); j++) {
-                                            (&Karg)[j] = 0x20;
-                                        }
-
-                                        while ((Kpass != NULL) && (*Kpass == 0x2C) && (*Kpass != 0)) {
-                                            Kpass++;
-                                        }
-                                    }
-                                } else if (svr4_systype != 0) {
-                                    Kpass = argv[var_s0] + 2;
-                                    if (*Kpass == 0) {
-                                        Kflag++;
-                                        addstr(&fcomflags, argv[var_s0]);
-                                    }
-                                    while ((*Kpass != 0) || (*Kpass == 0x2C)) {
-                                        for (j = 0, var_s2 = Kpass; (*var_s2 != 0x2C && *var_s2 != 0); j++) {
-                                            (&Karg)[j] = *var_s2++;
-                                        }
-                                        Kpass = var_s2;
-                                        if (strncmp(&Karg, "minabi", 6U) == 0) {
-                                            kminabiflag = 1;
-                                        } else if (strncmp(&Karg, "fpe", 3U) == 0) {
-                                            addstr(&ldflags, "-Kfpe");
-                                        } else if (strncmp(&Karg, "sd", 2U) == 0) {
-                                            addstr(&ldflags, "-Ksd");
-                                        } else if (strncmp(&Karg, "sz", 2U) == 0) {
-                                            addstr(&ldflags, "-Ksz");
-                                        } else if (strncmp(&Karg, "mau", 3U) == 0) {
-                                            addstr(&ldflags, "-Kmau");
-                                        } else if (strncmp(&Karg, "PIC", 3U) == 0) {
-                                            if (non_shared != 0) {
-                                                error(2, NULL, 0, NULL, 0,
-                                                      "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                                kpic_flag = 0;
-                                            } else {
-                                                kpic_flag = 1;
-                                                kpic_spec = 1;
-                                            }
-                                        } else {
-                                            goto bad_option;
-                                        }
-                                        for (j = 0; j < strlen(&Karg); j++) {
-                                            (&Karg)[j] = 0x20;
-                                        }
-
-                                        while ((Kpass != NULL) && (*Kpass == 0x2C) && (*Kpass != 0)) {
-                                            Kpass++;
-                                        }
-                                    }
-                                } else if (argv[var_s0][2] != 0) {
-                                    if (strcmp(argv[var_s0], "-KPIC") == 0) {
-                                        if (non_shared != 0) {
-                                            error(2, NULL, 0, NULL, 0,
-                                                  "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                            kpic_flag = 0;
-                                            break;
-                                        } else {
-                                            kpic_flag = 1;
-                                            kpic_spec = 1;
-                                        }
-                                    } else {
-                                        addstr(&ldflags, argv[var_s0]);
-                                    }
-                                } else {
-                                    Kflag++;
-                                    addstr(&fcomflags, argv[var_s0]);
-                                }
-                        }
+                    if (strcmp(argv[var_s0], "-Jsfm") == 0) {
+                        break;
                     }
+                    if (strcmp(argv[var_s0], "-J") == 0) {
+                        sp12C = argv[var_s0 + 1];
+                        for (sp130 = sp12C; *sp130 != 0; sp130++) {
+                            if (!(__ctype[1 + *sp130] & 4)) {
+                                error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
+                                exit(2);
+                            }
+                        }
+                        addstr(&prelinkerflags, argv[var_s0]);
+                        addstr(&prelinkerflags, sp12C);
+                        var_s0++;
+                        break;
+                    }
+                    //! @bug fallthrough means -K options can also be specified with -J
+                case 'K': /* switch 1 */
+                    if (default_svr4 != 0) {
+                        Kpass = argv[var_s0] + 2;
+                        if (*Kpass == '\0') {
+                            Kpass = argv[var_s0] + 3;
+                        }
+
+                        while ((*Kpass != '\0') || (*Kpass == ',')) {
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++) {
+                                (&Karg)[j] = *var_s2++;
+                            }
+
+                            Kpass = var_s2;
+                            if (strncmp(&Karg, "minabi", 6) == 0) {
+                                kminabiflag = 1;
+                            } else if (strncmp(&Karg, "fpe", 3) == 0) {
+                                addstr(&ldflags, "-Kfpe");
+                            } else if (strncmp(&Karg, "sd", 2) == 0) {
+                                addstr(&ldflags, "-Ksd");
+                            } else if (strncmp(&Karg, "sz", 2) == 0) {
+                                addstr(&ldflags, "-Ksz");
+                            } else if (strncmp(&Karg, "mau", 3) == 0) {
+                                addstr(&ldflags, "-Kmau");
+                            } else if (strncmp(&Karg, "PIC", 3) == 0) {
+                                if (non_shared != 0) {
+                                    error(2, NULL, 0, NULL, 0,
+                                          "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                    kpic_flag = 0;
+                                } else {
+                                    kpic_flag = 1;
+                                    kpic_spec = 1;
+                                }
+                            } else {
+                                goto bad_option;
+                            }
+                            for (j = 0; j < strlen(&Karg); j++) {
+                                (&Karg)[j] = ' ';
+                            }
+
+                            while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
+                                Kpass++;
+                            }
+                        }
+                        break;
+                    }
+                    if (svr4_systype != 0) {
+                        Kpass = argv[var_s0] + 2;
+                        if (*Kpass == '\0') {
+                            Kflag++;
+                            addstr(&fcomflags, argv[var_s0]);
+                        }
+                        while ((*Kpass != '\0') || (*Kpass == ',')) {
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++) {
+                                (&Karg)[j] = *var_s2++;
+                            }
+                            Kpass = var_s2;
+                            if (strncmp(&Karg, "minabi", 6) == 0) {
+                                kminabiflag = 1;
+                            } else if (strncmp(&Karg, "fpe", 3) == 0) {
+                                addstr(&ldflags, "-Kfpe");
+                            } else if (strncmp(&Karg, "sd", 2) == 0) {
+                                addstr(&ldflags, "-Ksd");
+                            } else if (strncmp(&Karg, "sz", 2) == 0) {
+                                addstr(&ldflags, "-Ksz");
+                            } else if (strncmp(&Karg, "mau", 3) == 0) {
+                                addstr(&ldflags, "-Kmau");
+                            } else if (strncmp(&Karg, "PIC", 3) == 0) {
+                                if (non_shared != 0) {
+                                    error(2, NULL, 0, NULL, 0,
+                                          "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                    kpic_flag = 0;
+                                } else {
+                                    kpic_flag = 1;
+                                    kpic_spec = 1;
+                                }
+                            } else {
+                                goto bad_option;
+                            }
+                            for (j = 0; j < strlen(&Karg); j++) {
+                                (&Karg)[j] = ' ';
+                            }
+
+                            while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
+                                Kpass++;
+                            }
+                        }
+                        break;
+                    }
+                    if (argv[var_s0][2] != '\0') {
+                        if (strcmp(argv[var_s0], "-KPIC") == 0) {
+                            if (non_shared != 0) {
+                                error(2, NULL, 0, NULL, 0, "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                kpic_flag = 0;
+                            } else {
+                                kpic_flag = 1;
+                                kpic_spec = 1;
+                            }
+                            break;
+                        } else {
+                            addstr(&ldflags, argv[var_s0]);
+                        }
+                    } else {
+                        Kflag++;
+                        addstr(&fcomflags, argv[var_s0]);
+                    }
+
                     break;
-                case 0x4C: /* switch 1 */
+
+                case 'L': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][0] != 0x2D) && (isdir(argv[var_s0 + 1]) != 0)) {
+                        if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][0] != '-') && isdir(argv[var_s0 + 1])) {
                             var_s0++;
                             sp128 = mkstr(argv[var_s0 - 1], argv[var_s0], NULL);
                             addstr(&ldflags, sp128);
@@ -1037,10 +1044,10 @@ void parse_command(int argc, char** argv) {
                     Lflag = 1;
                     addstr(&ldflags, argv[var_s0]);
                     addstr(&prelinkerflags, argv[var_s0]);
-
                     break;
-                case 0x4D: /* switch 1 */
-                    if (argv[var_s0][2] == 0x44) {
+
+                case 'M':                         /* switch 1 */
+                    if (argv[var_s0][2] == 'D') { // -MD
                         if (strcmp(argv[var_s0] + 3, "update") == 0) {
                             sp15C = argv[var_s0 + 1];
                         } else if (strcmp(argv[var_s0] + 3, "ignore") == 0) {
@@ -1065,30 +1072,22 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                         break;
-                    } else if (argv[var_s0][2] == '\0') {
+                    }
+                    if (argv[var_s0][2] == '\0') {
                         if (1) {} // FAKE
                         addstr(&cppflags, argv[var_s0]);
                         Eflag++;
                         minus_M++;
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x4E: /* switch 1 */
-                    if (argv[var_s0][2] == '\0') {
-                        addstr(&ldflags, argv[var_s0]);
-                    } else if (compiler == 3) {
-                        addstr(&fcomflags, argv[var_s0]);
-                        add_static_opt(argv[var_s0]);
-                    } else {
-                        goto bad_option;
-                    }
-                    break;
-                case 0x4F: /* switch 1 */
+                    goto bad_option;
+
+                case 'O': /* switch 1 */
                     plain_O = 0;
                     if (argv[var_s0][2] == '\0') {
-                        if ((xpg_flag != 0) && (var_s1 == 0x66)) {
-                            fprintf(__iob + 2, "Error: optlevel should be specified\n");
+                        //! @bug var_s1 possibly used uninitialised
+                        if ((xpg_flag != 0) && (var_s1 == 'f')) {
+                            fprintf(stderr, "Error: optlevel should be specified\n");
                             exit(1);
                         }
                         Oflag = 2;
@@ -1096,31 +1095,37 @@ void parse_command(int argc, char** argv) {
                         if (plain_g != 0) {
                             Oflag = 1;
                         }
-                        if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][1] == 0) && (*argv[var_s0 + 1] >= 0x30) &&
-                            (*argv[var_s0 + 1] < 0x35)) {
+                        if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][1] == '\0') && (*argv[var_s0 + 1] >= '0') &&
+                            (*argv[var_s0 + 1] <= '4')) {
                             sp124 = malloc(strlen(argv[var_s0 + 1]) + 3);
-                            sp124[0] = 0x2D;
-                            sp124[1] = 0x4F;
+                            sp124[0] = '-';
+                            sp124[1] = 'O';
                             sp124[2] = 0;
-                            Oflag = *argv[var_s0 + 1] - 0x30;
+                            Oflag = *argv[var_s0 + 1] - '0'; // '0' -> 0, '1' -> 1, etc.
                             addstr(&fcomflags, strcat(sp124, argv[var_s0 + 1]));
                             var_s0++;
                         }
-                    } else if (argv[var_s0][3] == '\0') {
-                        if ((argv[var_s0][2] >= 0x30) && (argv[var_s0][2] < 0x35)) {
-                            Oflag = argv[var_s0][2] - 0x30;
+                        break;
+                    }
+                    if (argv[var_s0][3] == '\0') {
+                        if ((argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '4')) {
+                            Oflag = argv[var_s0][2] - '0';
                             if (Oflag == 3) {
                                 sp120 = "-Olimit";
                                 sp11C = "5000";
                                 Gnum = "0";
                                 addstr(&umergeflags, sp120);
                                 addstr(&umergeflags, sp11C);
+
                                 addstr(&optflags, sp120);
                                 addstr(&optflags, sp11C);
+
                                 addstr(&ddoptflags, sp120);
                                 addstr(&ddoptflags, sp11C);
+
                                 addstr(&uopt0flags, sp120);
                                 addstr(&uopt0flags, sp11C);
+
                                 addstr(&olimitflags, sp120);
                                 addstr(&olimitflags, sp11C);
                             }
@@ -1128,10 +1133,10 @@ void parse_command(int argc, char** argv) {
                                 uload = 1;
                             }
                             break;
-                        } else {
-                            goto bad_option;
                         }
-                    } else if (strcmp(argv[var_s0], "-Olimit") == 0) {
+                        goto bad_option;
+                    }
+                    if (strcmp(argv[var_s0], "-Olimit") == 0) {
                         addstr(&umergeflags, argv[var_s0]);
                         addstr(&optflags, argv[var_s0]);
                         addstr(&ddoptflags, argv[var_s0]);
@@ -1143,7 +1148,7 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                         for (var_s2 = argv[var_s0]; *var_s2 != 0; var_s2++) {
-                            if (!(__ctype[*var_s2 + 1] & 4)) {
+                            if (!isdigit(*var_s2)) {
                                 error(1, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n", argv[var_s0]);
                                 exit(2);
                             }
@@ -1153,13 +1158,15 @@ void parse_command(int argc, char** argv) {
                         addstr(&ddoptflags, argv[var_s0]);
                         addstr(&uopt0flags, argv[var_s0]);
                         addstr(&olimitflags, argv[var_s0]);
-                    } else if (strncmp(argv[var_s0], "-OPT:", 5U) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-OPT options are ignored\n");
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x50: /* switch 1 */
+                    if (strncmp(argv[var_s0], "-OPT:", 5) == 0) {
+                        error(2, NULL, 0, NULL, 0, "-OPT options are ignored\n");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'P': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         if (1) {} // FAKE
                         docpp = 1;
@@ -1167,87 +1174,94 @@ void parse_command(int argc, char** argv) {
                         if (Eflag == 0) {
                             Pflag++;
                         }
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x51: /* switch 1 */
+                    goto bad_option;
+
+                case 'Q': /* switch 1 */
                     if ((strcmp(argv[var_s0], "-Qy") != 0) && (strcmp(argv[var_s0], "-Qn") != 0)) {
                         addstr(&cppflags, argv[var_s0]);
                     }
                     break;
-                case 0x52: /* switch 1 */
+
+                case 'R': /* switch 1 */
                     if (compiler == 3) {
                         addstr(&ratforflags, argv[var_s0] + 2);
                         add_static_opt(argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x53: /* switch 1 */
-                    if (strncmp(argv[var_s0], "-SWP:", 5U) == 0) {
+                    goto bad_option;
+
+                case 'S': /* switch 1 */
+                    if (strncmp(argv[var_s0], "-SWP:", 5) == 0) {
                         error(2, NULL, 0, NULL, 0, "-SWP options are ignored\n");
-                    } else if (argv[var_s0][2] == '\0') {
-                        Sflag++;
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x54: /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        Sflag++;
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'T': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         var_s0++;
                         if (var_s0 < argc) {
                             addstr(&ldflags, "-T");
                             addstr(&ldflags, argv[var_s0]);
                             break;
-                        } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
-                            exit(2);
                         }
+                        error(1, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
+                        exit(2);
                     }
-                    if (strncmp(argv[var_s0], "-TARG:", 6U) == 0) {
+                    if (strncmp(argv[var_s0], "-TARG:", 6) == 0) {
                         error(2, NULL, 0, NULL, 0, "-TARG options are ignored\n");
-                    } else if (strncmp(argv[var_s0], "-TENV:", 6U) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-TENV options are ignored\n");
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x55: /* switch 1 */
+                    if (strncmp(argv[var_s0], "-TENV:", 6) == 0) {
+                        error(2, NULL, 0, NULL, 0, "-TENV options are ignored\n");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'U': /* switch 1 */
                     if ((compiler == 3) && (argv[var_s0][2] == '\0')) {
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
                         mp_caseflag = 1;
-                    } else if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
                         sp118 = malloc(strlen(argv[var_s0 + 1]) + 3);
-                        sp118[0] = 0x2D;
-                        sp118[1] = 0x55;
+                        sp118[0] = '-';
+                        sp118[1] = 'U';
                         sp118[2] = 0;
                         addstr(&undefineflags, strcat(sp118, argv[var_s0 + 1]));
                         var_s0++;
-                    } else {
-                        addstr(&undefineflags, argv[var_s0]);
-                        add_static_opt(argv[var_s0]);
+                        break;
                     }
+                    addstr(&undefineflags, argv[var_s0]);
+                    add_static_opt(argv[var_s0]);
                     break;
-                case 0x56: /* switch 1 */
+
+                case 'V': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         error(2, NULL, 0, NULL, 0, "-V is not supported.\n");
-                    } else if (strcmp(argv[var_s0], "-VS") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-VS") == 0) {
                         var_s0++;
                         if (var_s0 < argc) {
                             addstr(&ldflags, "-VS");
                             addstr(&ldflags, argv[var_s0]);
-                        } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
-                            exit(2);
-                            goto bad_option;
+                            break;
                         }
-                    } else {
-                        goto bad_option;
+                        error(1, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
+                        exit(2);
                     }
-                    break;
-                case 0x57: /* switch 1 */
+                    goto bad_option;
+
+                case 'W': /* switch 1 */
                     Wpass = argv[var_s0] + 2;
                     if (*Wpass != 0) {
                         if (1) {} // FAKE
