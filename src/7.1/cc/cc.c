@@ -4959,7 +4959,7 @@ void process_config(int argc, char** argv) {
             }
             var_s1 = sp13C;
             i = sp138 = 0;
-            while (*var_s1 != 0) {
+            while (*var_s1 != '\0') {
                 while ((*var_s1 != '\0') && ((*var_s1 == ' ') || (*var_s1 == '\t'))) {
                     var_s1++;
                 }
@@ -4973,7 +4973,7 @@ void process_config(int argc, char** argv) {
                     var_s1++;
                 }
 
-                if (*var_s1 != 0) {
+                if (*var_s1 != '\0') {
                     *var_s1++ = '\0';
                 }
             }
