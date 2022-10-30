@@ -547,6 +547,10 @@ int run_sopt = 0;
 static char* D_1000C1D8 = NULL;
 static char* D_1000C1DC = NULL;
 
+// ctype.h macro
+#define tolower(x) ((isupper(x)) ? _tolower(x) : (x))
+#define toupper(x) ((islower(x)) ? _toupper(x) : (x))
+
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
     register int var_s0;
@@ -573,7 +577,7 @@ void parse_command(int argc, char** argv) {
     int sp114;
     char* sp110;
     char* sp10C;
-    int sp108;
+    pid_t sp108; // process group id
     char* sp104;
     char* sp100;
     char* spFC;
@@ -1082,6 +1086,17 @@ void parse_command(int argc, char** argv) {
                     }
                     goto bad_option;
 
+                case 'N': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                    } else if (compiler == 3) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                    } else {
+                        goto bad_option;
+                    }
+                    break;
+
                 case 'O': /* switch 1 */
                     plain_O = 0;
                     if (argv[var_s0][2] == '\0') {
@@ -1267,20 +1282,21 @@ void parse_command(int argc, char** argv) {
                         if (1) {} // FAKE
                         Warg = argv[var_s0] + 3;
 
-                        while (*Warg != 0x2C) {
+                        while (*Warg != ',') {
                             if (*Warg++ == 0) {
                                 goto bad_option;
                             }
                         }
-                        while (*Warg == 0x2C) {
-                            *Warg = 0;
+                        while (*Warg == ',') {
+                            *Warg = '\0';
                             Warg++;
-                            for (var_s2 = Wpass; *var_s2 != 0; var_s2++) {
+                            for (var_s2 = Wpass; *var_s2 != '\0'; var_s2++) {
                                 switch (*var_s2) { /* switch 2 */
-                                    case 0x70:     /* switch 2 */
+                                    case 'p':      /* switch 2 */
                                         addstr(&cppflags, Warg);
                                         break;
-                                    case 0x4B: /* switch 2 */
+
+                                    case 'K': /* switch 2 */
                                         if (compiler == 3) {
                                             addstr(&pfaflags, Warg);
                                         } else if (compiler == 1) {
@@ -1291,8 +1307,9 @@ void parse_command(int argc, char** argv) {
                                             exit(2);
                                         }
                                         break;
-                                    case 0x30:              /* switch 2 */
-                                    case 0x66:              /* switch 2 */
+
+                                    case '0':               /* switch 2 */
+                                    case 'f':               /* switch 2 */
                                         switch (compiler) { /* switch 6; irregular */
                                             case 2:         /* switch 6 */
                                                 addstr(&upasflags, Warg);
@@ -1312,65 +1329,82 @@ void parse_command(int argc, char** argv) {
                                                 break;
                                         }
                                         break;
-                                    case 0x77: /* switch 2 */
+
+                                    case 'w': /* switch 2 */
                                         addstr(&prelinkerflags, Warg);
                                         break;
-                                    case 0x6B: /* switch 2 */
+
+                                    case 'k': /* switch 2 */
                                         addstr(&ulpiflags, Warg);
                                         break;
-                                    case 0x6A: /* switch 2 */
+
+                                    case 'j': /* switch 2 */
                                         addstr(&ujoinflags, Warg);
                                         break;
-                                    case 0x75: /* switch 2 */
+
+                                    case 'u': /* switch 2 */
                                         addstr(&uldflags, Warg);
                                         break;
-                                    case 0x73: /* switch 2 */
+
+                                    case 's': /* switch 2 */
                                         addstr(&usplitflags, Warg);
                                         break;
-                                    case 0x6D: /* switch 2 */
+
+                                    case 'm': /* switch 2 */
                                         addstr(&umergeflags, Warg);
                                         break;
-                                    case 0x71: /* switch 2 */
+
+                                    case 'q': /* switch 2 */
                                         addstr(&uopt0flags, Warg);
                                         break;
-                                    case 0x64: /* switch 2 */
+
+                                    case 'd': /* switch 2 */
                                         addstr(&ddoptflags, Warg);
                                         break;
-                                    case 0x32: /* switch 2 */
+
+                                    case '2': /* switch 2 */
                                         addstr(&optflags, Warg);
                                         break;
-                                    case 0x6F: /* switch 2 */
+
+                                    case 'o': /* switch 2 */
                                         addstr(&optflags, Warg);
                                         if (strstr(Warg, "loopunroll") != 0) {
                                             set_loop_unroll = 1;
                                         }
                                         break;
-                                    case 0x63: /* switch 2 */
+
+                                    case 'c': /* switch 2 */
                                         addstr(&genflags, Warg);
                                         break;
-                                    case 0x61: /* switch 2 */
+
+                                    case 'a': /* switch 2 */
                                         addstr(&asflags, Warg);
                                         break;
-                                    case 0x62: /* switch 2 */
+
+                                    case 'b': /* switch 2 */
                                         addstr(&asflags, Warg);
                                         break;
-                                    case 0x6C: /* switch 2 */
+
+                                    case 'l': /* switch 2 */
                                         addstr(&ldflags, Warg);
                                         break;
-                                    case 0x79: /* switch 2 */
+
+                                    case 'y': /* switch 2 */
                                         addstr(&ftocflags, Warg);
                                         break;
-                                    case 0x7A: /* switch 2 */
+
+                                    case 'z': /* switch 2 */
                                         addstr(&cordflags, Warg);
                                         break;
-                                    case 0x4D: /* switch 2 */
+
+                                    case 'M': /* switch 2 */
                                         addstr(&mpcflags, Warg);
                                         break;
-                                    case 0x78: /* switch 2 */
-                                        // temp_t1_2 = Warg[1];
+
+                                    case 'x':              /* switch 2 */
                                         switch (Warg[1]) { /* switch 3 */
-                                            case 0x47:     /* switch 3 */
-                                                if (Warg[2] == 0) {
+                                            case 'G':      /* switch 3 */
+                                                if (Warg[2] == '\0') {
                                                     var_s0++;
                                                     if (var_s0 >= argc) {
                                                         error(1, NULL, 0, NULL, 0,
@@ -1387,13 +1421,13 @@ void parse_command(int argc, char** argv) {
                                                 } else {
                                                     Gnum = "0";
                                                 }
-                                                for (var_s3 = Gnum; ((*var_s3 != 0x2C) && (*var_s3 != 0));) {
-                                                    if (!(__ctype[1 + *var_s3] & 4)) {
+                                                for (var_s3 = Gnum; ((*var_s3 != ',') && (*var_s3 != 0));) {
+                                                    if (!isdigit(*var_s3)) {
                                                         error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n",
                                                               Gnum);
                                                         exit(2);
                                                     }
-                                                    if (*var_s3 != 0x2C) {
+                                                    if (*var_s3 != ',') {
                                                         var_s3++;
                                                     }
                                                 }
@@ -1403,9 +1437,9 @@ void parse_command(int argc, char** argv) {
                                                 }
                                                 Warg = var_s3;
                                                 break;
-                                            case 0x76: /* switch 3 */
-                                                // temp_t6_3 = Warg[2];
-                                                if ((Warg[2] == 0) || (Warg[2] == 0x2C)) {
+
+                                            case 'v': /* switch 3 */
+                                                if ((Warg[2] == '\0') || (Warg[2] == ',')) {
                                                     vflag = 1;
                                                     if (getenv("ROOTDIR") != NULL) {
                                                         error(2, NULL, 0, NULL, 0,
@@ -1414,14 +1448,15 @@ void parse_command(int argc, char** argv) {
                                                     }
                                                 }
                                                 break;
-                                            case 0x44: /* switch 3 */
+
+                                            case 'D': /* switch 3 */
+                                                // -WxD?
                                                 if (argv[var_s0][2] == '\0') {
                                                     if ((var_s0 + 1) < argc) {
-                                                        sp114 = strtoul(argv[var_s0 + 1], &sp110, 0x10);
+                                                        sp114 = strtoul(argv[var_s0 + 1], &sp110, 16);
                                                         if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
-                                                            (*argv[var_s0 + 1] == 0x2D) ||
-                                                            (*argv[var_s0 + 1] == 0x2B)) {
+                                                            (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
                                                             error(2, NULL, 0, NULL, 0,
                                                                   "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
                                                             break;
@@ -1439,20 +1474,22 @@ void parse_command(int argc, char** argv) {
                                                         exit(2);
                                                     }
                                                 }
-                                            case 0x62: /* switch 3 */
-                                                if ((Warg[2] == 0) || (Warg[2] == 0x2C)) {
+                                                // fallthrough
+                                            case 'b': /* switch 3 */
+                                                if ((Warg[2] == '\0') || (Warg[2] == ',')) {
                                                     addstr(&ldflags, mkstr(argv[var_s0], ",", Warg, NULL));
                                                 }
-                                                // }
                                                 break;
-                                            case 0x4B: /* switch 3 */
+
+                                            case 'K': /* switch 3 */
                                                 if (strcmp(Warg, "-K") != 0) {
                                                     addstr(&ldflags, mkstr(argv[var_s0], ",", Warg, NULL));
                                                 } else {
                                                     Kflag++;
                                                 }
                                                 break;
-                                            case 0x41: /* switch 3 */
+
+                                            case 'A': /* switch 3 */
                                                 if (Warg[2] == 0) {
                                                     var_s0++;
                                                     if (var_s0 < argc) {
@@ -1464,34 +1501,38 @@ void parse_command(int argc, char** argv) {
                                                 break;
                                         }
                                         break;
+
                                     default: /* switch 2 */
                                         error(1, NULL, 0, NULL, 0, "Unknown pass character in %s\n", argv[var_s0]);
                                         exit(2);
                                         break;
                                 }
                             }
-                            while ((*Warg != 0x2C) && (*Warg != 0)) {
+                            while ((*Warg != ',') && (*Warg != '\0')) {
                                 Warg++;
                             }
                         }
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x58: /* switch 1 */
+                    goto bad_option;
+
+                case 'X': /* switch 1 */
                     if (compiler == 1) {
                         if (strcmp(argv[var_s0], "-Xcpluscomm") == 0) {
                             addstr(&ccomflags, argv[var_s0]);
                             break;
-                        } else if (strcmp(argv[var_s0], "-Xt") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-Xt") == 0) {
                             stdflag = 0;
                             addstr(&ccomflags, "-std0");
                             break;
-                        } else if (strcmp(argv[var_s0], "-Xc") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-Xc") == 0) {
                             stdflag = 1;
                             addstr(&ccomflags, "-std1");
                             break;
-                        } else if (strcmp(argv[var_s0], "-Xa") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-Xa") == 0) {
                             stdflag = 1;
                             addstr(&ccomflags, "-std");
                             break;
@@ -1499,35 +1540,40 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-Xprototypes") == 0) {
                         addstr(&ccomflags, argv[var_s0]);
-                    } else {
-                        addstr(&ldflags, argv[var_s0]);
-                        if ((strcmp(argv[var_s0], "-Xndlocaldata") == 0) ||
-                            (strcmp(argv[var_s0], "-Xlocaldata") == 0) || (strcmp(argv[var_s0], "-Xndblock") == 0) ||
-                            (strcmp(argv[var_s0], "-Xblock") == 0) || (strcmp(argv[var_s0], "-Xalignbss") == 0) ||
-                            (strcmp(argv[var_s0], "-Xnoalignbss") == 0) || (strcmp(argv[var_s0], "-Xcachesize") == 0) ||
-                            (strcmp(argv[var_s0], "-Xcachelinesize") == 0) ||
-                            (strcmp(argv[var_s0], "-Xdefmovemax") == 0) || (strcmp(argv[var_s0], "-Xsetalign") == 0) ||
-                            (strcmp(argv[var_s0], "-Xblockrange") == 0)) {
-                            var_s0++;
-                            if (var_s0 < argc) {
-                                addstr(&ldflags, argv[var_s0]);
-                            } else {
-                                error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
-                            }
+                        break;
+                    }
+                    addstr(&ldflags, argv[var_s0]);
+                    if ((strcmp(argv[var_s0], "-Xndlocaldata") == 0) || (strcmp(argv[var_s0], "-Xlocaldata") == 0) ||
+                        (strcmp(argv[var_s0], "-Xndblock") == 0) || (strcmp(argv[var_s0], "-Xblock") == 0) ||
+                        (strcmp(argv[var_s0], "-Xalignbss") == 0) || (strcmp(argv[var_s0], "-Xnoalignbss") == 0) ||
+                        (strcmp(argv[var_s0], "-Xcachesize") == 0) || (strcmp(argv[var_s0], "-Xcachelinesize") == 0) ||
+                        (strcmp(argv[var_s0], "-Xdefmovemax") == 0) || (strcmp(argv[var_s0], "-Xsetalign") == 0) ||
+                        (strcmp(argv[var_s0], "-Xblockrange") == 0)) {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, argv[var_s0]);
+                        } else {
+                            error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
                         }
                     }
-
                     break;
-                case 0x61: /* switch 1 */
+
+                case 'a': /* switch 1 */
                     if ((compiler == 1) && (strcmp(argv[var_s0], "-all") == 0)) {
                         addstr(&objfiles, argv[var_s0]);
-                    } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (strcmp(argv[var_s0], "-auto_include") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        (strcmp(argv[var_s0], "-auto_include") == 0)) {
                         auto_template_include = 1;
-                    } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (strcmp(argv[var_s0], "-anach") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        (strcmp(argv[var_s0], "-anach") == 0)) {
                         anachronisms = 1;
-                    } else if (strcmp(argv[var_s0], "-ansi") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ansi") == 0) {
                         if (compchoice == 1) {
                             compchoice = 0;
                         }
@@ -1537,7 +1583,9 @@ void parse_command(int argc, char** argv) {
                         }
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-ansiposix") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ansiposix") == 0) {
                         if (compchoice == 1) {
                             compchoice = 0;
                         }
@@ -1547,12 +1595,16 @@ void parse_command(int argc, char** argv) {
                         }
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-abi") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-abi") == 0) {
                         abi_flag = 1;
                         addstr(&cppflags, "-D_ABI_SOURCE");
                         addstr(&asflags, "-abi");
                         addstr(&ldflags, "-abi");
-                    } else if (strcmp(argv[var_s0], "-acpp") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-acpp") == 0) {
                         if ((compiler == 1) && (c_compiler_choice != 0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
@@ -1561,93 +1613,112 @@ void parse_command(int argc, char** argv) {
                             acpp = 1;
                             relocate_passes("p", NULL, NULL);
                         }
-                    } else {
-                        if (strcmp(argv[var_s0], "-align8") == 0) {
-                            align = 8;
-                            if (compiler == 3) {
-                                align_common++;
-                            }
-                        } else if (strcmp(argv[var_s0], "-align16") == 0) {
-                            align = 0x10;
-                            if (compiler == 3) {
-                                align_common++;
-                            }
-                        } else if (strcmp(argv[var_s0], "-align32") == 0) {
-                            align = 0x20;
-                            if (compiler == 3) {
-                                align_common++;
-                            }
-                        } else if (strcmp(argv[var_s0], "-align64") == 0) {
-                            align = 0x40;
-                            if (compiler == 3) {
-                                align_common++;
-                            }
-                        } else if (strcmp(argv[var_s0], "-align_common") == 0) {
-                            align_common = 1;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align8") == 0) {
+                        align = 8;
+                        if (compiler == 3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align16") == 0) {
+                        align = 0x10;
+                        if (compiler == 3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align32") == 0) {
+                        align = 0x20;
+                        if (compiler == 3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align64") == 0) {
+                        align = 0x40;
+                        if (compiler == 3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align_common") == 0) {
+                        align_common = 1;
+                        break;
+                    }
+                    if (compiler == 3) {
+                        if ((strcmp(argv[var_s0], "-align8") == 0) || (strcmp(argv[var_s0], "-align16") == 0) ||
+                            (strcmp(argv[var_s0], "-align32") == 0) || (strcmp(argv[var_s0], "-align64") == 0)) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            addstr(&genflags, argv[var_s0]);
+                            addstr(&asflags, argv[var_s0]);
                             break;
                         }
-                        if (compiler == 3) {
-                            if ((strcmp(argv[var_s0], "-align8") == 0) || (strcmp(argv[var_s0], "-align16") == 0) ||
-                                (strcmp(argv[var_s0], "-align32") == 0) || (strcmp(argv[var_s0], "-align64") == 0)) {
-                                addstr(&fcomflags, argv[var_s0]);
-                                addstr(&genflags, argv[var_s0]);
-                                addstr(&asflags, argv[var_s0]);
-                                break;
-                            } else if (strcmp(argv[var_s0], "-automatic") == 0) {
-                                automaticflag = 1;
-                                break;
-                            }
-                        }
-                        if ((compiler == 6) && (strcmp(argv[var_s0], "-ansi") == 0)) {
-                            ansiflag = 1;
-                        } else if ((compiler == 2) && (strcmp(argv[var_s0], "-apc") == 0)) {
-                            addstr(&upasflags, argv[var_s0]);
-                            addstr(&genflags, argv[var_s0]);
-                        } else if (strcmp(argv[var_s0], "-align8") == 0) {
-                            align = 8;
-                            alignarg = savestr(argv[var_s0], 0U);
-                        } else if (strcmp(argv[var_s0], "-align16") == 0) {
-                            align = 0x10;
-                            alignarg = savestr(argv[var_s0], 0U);
-                        } else if (strcmp(argv[var_s0], "-align32") == 0) {
-                            align = 0x20;
-                            alignarg = savestr(argv[var_s0], 0U);
-                        } else if (strcmp(argv[var_s0], "-align64") == 0) {
-                            align = 0x40;
-                            alignarg = savestr(argv[var_s0], 0U);
-                        } else if (strcmp(argv[var_s0], "-ajeop") == 0) {
-                            addstr(&ldflags, argv[var_s0]);
-                            addstr(&cordflags, "-no_r4000_fix");
-                        } else {
-                            goto bad_option;
+                        if (strcmp(argv[var_s0], "-automatic") == 0) {
+                            automaticflag = 1;
+                            break;
                         }
                     }
+                    if ((compiler == 6) && (strcmp(argv[var_s0], "-ansi") == 0)) {
+                        ansiflag = 1;
+                        break;
+                    }
+                    if ((compiler == 2) && (strcmp(argv[var_s0], "-apc") == 0)) {
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align8") == 0) {
+                        align = 8;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align16") == 0) {
+                        align = 0x10;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align32") == 0) {
+                        align = 0x20;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align64") == 0) {
+                        align = 0x40;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ajeop") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&cordflags, "-no_r4000_fix");
+                        break;
+                    }
+                    goto bad_option;
 
-                    break;
-                case 0x62: /* switch 1 */
+                case 'b': /* switch 1 */
                     if ((argv[var_s0][2] == '\0') || (strcmp(argv[var_s0], "-bestGnum") == 0)) {
                         addstr(&ldflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-bytereclen") == 0) {
-                        addstr(&fcomflags, argv[var_s0]);
-                    } else {
-                        if (strcmp(argv[var_s0], "-backslash") == 0) {
-                            mp_backslashflag = 1;
-                            docpp = 0;
-                        }
-                        addstr(&fcomflags, argv[var_s0]);
-                        add_static_opt(argv[var_s0]);
+                        break;
                     }
+                    if (strcmp(argv[var_s0], "-bytereclen") == 0) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-backslash") == 0) {
+                        mp_backslashflag = 1;
+                        docpp = 0;
+                    }
+                    addstr(&fcomflags, argv[var_s0]);
+                    add_static_opt(argv[var_s0]);
                     break;
-                case 0x63: /* switch 1 */
+
+                case 'c': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         cflag++;
-                    } else if (strcmp(argv[var_s0], "-cckr") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cckr") == 0) {
                         ansichoice = 0;
                         if (cppchoice != 1) {
                             cppchoice = 2;
                         }
                         add_static_opt(argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-cfe") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cfe") == 0) {
                         if ((compiler == 1) && (c_compiler_choice != 0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
@@ -1655,17 +1726,23 @@ void parse_command(int argc, char** argv) {
                             compchoice = 3;
                             relocate_passes("p", NULL, NULL);
                         }
-                    } else if (strcmp(argv[var_s0], "-common") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-common") == 0) {
                         if ((compiler == 1) && (c_compiler_choice != 0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
                             addstr(&accomflags, "-Xcommon");
                         }
-                    } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (strcmp(argv[var_s0], "-cfront") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        (strcmp(argv[var_s0], "-cfront") == 0)) {
                         cfront_compatible = 1;
-                    } else if (strcmp(argv[var_s0], "-cachesz") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cachesz") == 0) {
                         addstr(&ddoptflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
@@ -1681,14 +1758,22 @@ void parse_command(int argc, char** argv) {
                         }
 
                         addstr(&ddoptflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-cplus") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cplus") == 0) {
                         cplusflag = 1;
                         addstr(&ccomflags, "-cplus");
-                    } else if (strcmp(argv[var_s0], "-cpp") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cpp") == 0) {
                         error(2, NULL, 0, NULL, 0, "-cpp is default\n");
-                    } else if (strcmp(argv[var_s0], "-cord") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cord") == 0) {
                         cordflag = 1;
-                    } else if (strcmp(argv[var_s0], "-coff") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-coff") == 0) {
                         addstr(&ldflags, argv[var_s0]);
                         coff_spec = 1;
                         if (default_call_shared == 1) {
@@ -1699,18 +1784,26 @@ void parse_command(int argc, char** argv) {
                             default_call_shared = 0;
                             call_shared = 0;
                         }
-                    } else if ((strcmp(argv[var_s0], "-call_shared") == 0) &&
-                               ((strcmp(argv[var_s0], "-count") == 0) || (strcmp(argv[var_s0], "-countall") == 0))) {
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-call_shared") == 0) &&
+                        ((strcmp(argv[var_s0], "-count") == 0) || (strcmp(argv[var_s0], "-countall") == 0))) {
                         addstr(&objfiles, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-call_shared") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-call_shared") == 0) {
                         non_shared = 0;
                         call_shared = 1;
-                    } else if (strcmp(argv[var_s0], "-crt0") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-crt0") == 0) {
                         CRTX = "crt0.o";
                         MCRTX = "mcrt0.o";
                         crtn_required = 0;
                         relocate_passes("r", NULL, NULL);
-                    } else if (strcmp(argv[var_s0], "-crt1") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-crt1") == 0) {
                         if ((ansichoice == 1) || (ansichoice == 2)) {
                             CRTX = "acrt1.o";
                         } else {
@@ -1719,14 +1812,20 @@ void parse_command(int argc, char** argv) {
                         MCRTX = "mcrt1.o";
                         crtn_required = 1;
                         relocate_passes("r", NULL, NULL);
-                    } else if ((compiler == 2) && (strcmp(argv[var_s0], "-casesense") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 2) && (strcmp(argv[var_s0], "-casesense") == 0)) {
                         addstr(&upasflags, argv[var_s0]);
-                    } else if ((compiler == 3) && (strcmp(argv[var_s0], "-change_const") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 3) && (strcmp(argv[var_s0], "-change_const") == 0)) {
                         addstr(&fcomflags, "-change_const");
-                    } else if ((compiler == 3) &&
-                               ((strcmp(argv[var_s0], "-col120") == 0) || (strcmp(argv[var_s0], "-col72") == 0) ||
-                                (strcmp(argv[var_s0], "-charargv") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
-                                (strcmp(argv[var_s0], "-check_bounds") == 0))) {
+                        break;
+                    }
+                    if ((compiler == 3) &&
+                        ((strcmp(argv[var_s0], "-col120") == 0) || (strcmp(argv[var_s0], "-col72") == 0) ||
+                         (strcmp(argv[var_s0], "-charargv") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
+                         (strcmp(argv[var_s0], "-check_bounds") == 0))) {
                         if (strcmp(argv[var_s0], "-col120") == 0) {
                             mp_col120flag = 1;
                         }
@@ -1735,11 +1834,7 @@ void parse_command(int argc, char** argv) {
                         } else if (strncmp(argv[var_s0], "-chunk=", strlen("-chunk=")) == 0) {
                             sp10C = argv[var_s0] + strlen("-chunk=");
                             while (*sp10C != 0) {
-                                if (__ctype[1 + *sp10C] & 1) {
-                                    *sp10C = __ctype[1 + *sp10C + 0x101];
-                                } else {
-                                    *sp10C = *sp10C;
-                                }
+                                *sp10C = tolower(*sp10C);
                                 sp10C++;
                             }
                             addstr(&fcomflags, mkstr("-mp_chunk=", argv[var_s0] + strlen("-chunk="), NULL));
@@ -1749,9 +1844,13 @@ void parse_command(int argc, char** argv) {
                                 add_static_opt(argv[var_s0]);
                             }
                         }
-                    } else if ((compiler == 6) && (strcmp(argv[var_s0], "-comp_trunc") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 6) && (strcmp(argv[var_s0], "-comp_trunc") == 0)) {
                         addstr(&ucobflags, argv[var_s0]);
-                    } else if ((compiler == 1) && (strcmp(argv[var_s0], "-check_registry") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && (strcmp(argv[var_s0], "-check_registry") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
                             error(1, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
@@ -1759,11 +1858,11 @@ void parse_command(int argc, char** argv) {
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
                         addstr(&ldflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x64: /* switch 1 */
+                    goto bad_option;
+
+                case 'd': /* switch 1 */
                     if ((compiler == 1) && (strcmp(argv[var_s0], "-dollar") == 0)) {
                         addstr(&pcaflags, "-dollar");
                         addstr(&mpcflags, "-dollar");
@@ -1771,91 +1870,115 @@ void parse_command(int argc, char** argv) {
                         addstr(&cfeflags, "-Xdollar");
                         add_static_opt(argv[var_s0]);
                         dollar_sign++;
-                    } else if (argv[var_s0][2] == '\0') {
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
                         addstr(&ldflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-ddoptinfo") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ddoptinfo") == 0) {
                         ddoptinfo = 1;
-                    } else if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
                         if (G_flag != 0) {
                             error(1, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
                             exit(2);
                         }
                         dn_flag = 1;
                         addstr(&ldflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-ddopt") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ddopt") == 0) {
                         ddoptflag = 1;
-                    } else if ((compiler == 3) && (strcmp(argv[var_s0], "-d_lines") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 3) && (strcmp(argv[var_s0], "-d_lines") == 0)) {
                         mp_dlinesflag = 1;
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
-                    } else if ((compiler == 5) && (strcmp(argv[var_s0], "-defext") == 0)) {
-                        addstr(&ulpiflags, argv[var_s0]);
-                    } else if ((compiler == 6) &&
-                               ((strcmp(argv[var_s0], "-dline") == 0) || (strcmp(argv[var_s0], "-defext") == 0))) {
-                        addstr(&ucobflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-delay_load") == 0) {
-                        addstr(&objfiles, argv[var_s0]);
-                    } else if ((compiler == 1) && (strcmp(argv[var_s0], "-default_delay_load") == 0)) {
-                        addstr(&ldflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x65: /* switch 1 */
+                    if ((compiler == 5) && (strcmp(argv[var_s0], "-defext") == 0)) {
+                        addstr(&ulpiflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == 6) &&
+                        ((strcmp(argv[var_s0], "-dline") == 0) || (strcmp(argv[var_s0], "-defext") == 0))) {
+                        addstr(&ucobflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-delay_load") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == 1) && (strcmp(argv[var_s0], "-default_delay_load") == 0)) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'e': /* switch 1 */
                     if (strcmp(argv[var_s0], "-excpt") == 0) {
                         error(1, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
                         exit(2);
                     }
+
                     if (compiler == 1) {
                         if (strcmp(argv[var_s0], "-elf") == 0) {
                             addstr(&ldflags, argv[var_s0]);
-                            continue;
-                        } else if ((strcmp(argv[var_s0], "-export") == 0) || (strcmp(argv[var_s0], "-exports") == 0)) {
+                            break;
+                        }
+                        if ((strcmp(argv[var_s0], "-export") == 0) || (strcmp(argv[var_s0], "-exports") == 0)) {
                             addstr(&objfiles, argv[var_s0]);
-                            continue;
-                        } else if (strcmp(argv[var_s0], "-exported_symbol") == 0) {
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exported_symbol") == 0) {
                             var_s0++;
-                            if ((var_s0 >= argc) || (argv[var_s0][0] == 0x2D)) {
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
                                 error(1, NULL, 0, NULL, 0, "-exported_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
                             addstr(&ldflags, argv[var_s0]);
-                            continue;
-                        } else if (strcmp(argv[var_s0], "-exports_file") == 0) {
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exports_file") == 0) {
                             var_s0++;
-                            if ((var_s0 >= argc) || (argv[var_s0][0] == 0x2D)) {
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
                                 error(1, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
                             addstr(&ldflags, argv[var_s0]);
-                            continue;
-                        } else if (strcmp(argv[var_s0], "-exclude") == 0) {
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exclude") == 0) {
                             var_s0++;
-                            if ((var_s0 >= argc) || (argv[var_s0][0] == 0x2D)) {
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
                                 error(1, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&objfiles, argv[var_s0 - 1]);
                             addstr(&objfiles, argv[var_s0]);
-                            continue;
-                        } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                                   (strcmp(argv[var_s0], "-exceptions") == 0)) {
+                            break;
+                        }
+                        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                            (strcmp(argv[var_s0], "-exceptions") == 0)) {
                             if ((compiler != 1) || (c_compiler_choice != 3)) {
                                 exception_handling = 1;
                                 relocate_passes("f", NULL, NULL);
-                                if (access(cfe, 0x10) == -1) {
+                                if (access(cfe, EX_OK) == -1) {
                                     exception_handling = 0;
                                     relocate_passes("f", NULL, NULL);
-                                    goto bad_option;
+                                } else {
+                                    break;
                                 }
-                            } else {
-                                goto bad_option;
                             }
-                            continue;
+                            goto bad_option;
                         }
                     }
+
                     if (argv[var_s0][2] == '\0') {
                         var_s0++;
                         if (var_s0 < argc) {
@@ -1867,24 +1990,33 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                     }
+
                     if (strcmp(argv[var_s0], "-exact_version") == 0) {
                         addstr(&ldflags, argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-elf") == 0) {
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-elf") == 0) {
                         elfflag = 1;
                         elf_spec = 1;
                         addstr(&asflags, argv[var_s0]);
                         addstr(&ldflags, argv[var_s0]);
-                    } else if ((compiler == 3) && (strcmp(argv[var_s0], "-extend_source") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 3) && (strcmp(argv[var_s0], "-extend_source") == 0)) {
                         mp_extendflag = 1;
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
-                    } else if ((compiler == 3) && (strcmp(argv[var_s0], "-expand_include") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 3) && (strcmp(argv[var_s0], "-expand_include") == 0)) {
                         addstr(&fcomflags, argv[var_s0]);
-                    } else if (strncmp(argv[var_s0], "-edit", 5U) == 0) {
-                        if (argv[var_s0][5] == 0) {
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-edit", 5) == 0) {
+                        if (argv[var_s0][5] == '\0') {
                             edit_cnt_max = 0x100;
-                        } else if ((__ctype[1 + argv[var_s0][5]] & 4) && (argv[var_s0][6] == 0)) {
-                            edit_cnt_max = argv[var_s0][5] - 0x30;
+                        } else if (isdigit(argv[var_s0][5]) && (argv[var_s0][6] == '\0')) {
+                            edit_cnt_max = argv[var_s0][5] - '0';
                         } else {
                             error(1, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
                             exit(2);
@@ -1892,7 +2024,7 @@ void parse_command(int argc, char** argv) {
                         editflag = 1;
                         editor = getenv("EDITOR");
                         if (editor != NULL) {
-                            for (var_s2 = editor; (strlen(var_s2) >= 5); var_s2++) {
+                            for (var_s2 = editor; strlen(var_s2) >= 5; var_s2++) {
                                 if (strncmp(var_s2, "emacs", 5) == 0) {
                                     editflag = 2;
                                     break;
@@ -1902,16 +2034,17 @@ void parse_command(int argc, char** argv) {
                         if ((editflag == 1) && (editor == NULL)) {
                             editor = "vi";
                         }
+
                         xserver = getenv("DISPLAY");
-                        if ((ioctl(2, 0x40047477, &sp108) == 0) && (getpgrp() == sp108) && (xserver == 0)) {
+                        if ((ioctl(2, TIOCGPGRP, &sp108) == 0) && (getpgrp() == sp108) && (xserver == 0)) {
                             editflag = 0;
                             error(2, NULL, 0, NULL, 0, "%s ignored for background compile in non-X environment\n",
                                   argv[var_s0]);
                         }
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
+                    goto bad_option;
+
                 case 0x66: /* switch 1 */
                     if ((strcmp(argv[var_s0], "-full_transtive_link") == 0) ||
                         (strcmp(argv[var_s0], "-full_transitive_link") == 0)) {
