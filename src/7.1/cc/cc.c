@@ -5024,49 +5024,15 @@ void add_info(char* str) {
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
     register int var_s0; // option index
-    register char var_s1;
-    register char* var_s2;
-    register char* var_s3;
-    char* sp15C;
-    char* sp158;
-    char* sp154;
-    char sp153;
-    int sp14C;
-    char* sp148; // env
-    char* sp144;
-    char* sp140;
-    int pad[2];
-    char* sp134;
-    char* sp130;
-    char* sp12C;
-    char* sp128;
-    char* sp124;
-    char* sp120;
-    char* sp11C;
-    char* sp118;
-    int sp114;
-    char* sp110;
-    char* sp10C;
-    pid_t sp108; // process group id
-    char* sp104;
-    char* sp100;
-    char* spFC;
-    struct stat sp74;
-    struct_mpflags* sp70;
-    struct_mpflags* sp6C;
-    char* sp68;
-    char* sp64;
-    int sp60;
-    int sp5C;
-    char* sp58;
-    int sp54;
-
-    sp15C = NULL;
-    sp158 = NULL;
-    sp154 = NULL;
-    sp153 = 0;
-    sp14C = 1;
-    sp148 = getenv("SGI_IRIX4");
+    register char var_s1; // file suffix, multipurpose?
+    register char* var_s2; // multipurpose string pointer
+    register char* var_s3; // used for -G?
+    char* sp15C = NULL; // related to -MD?
+    char* sp158 = NULL;
+    char* sp154 = NULL; // target
+    char sp153 = 0; // unused
+    int sp14C = 1; // Treat bad options as errors
+    char* sp148 = getenv("SGI_IRIX4");
 
     if (sp148 != NULL) {
         irix4 = 1;
@@ -5097,10 +5063,9 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == 3) && (argv[var_s0][2] == '\0')) {
                         mp_onetripflag = 1;
                         addstr(&fcomflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
+                    goto bad_option;
 
                 case '3': /* switch 1 */
                     if ((strcmp(argv[var_s0], "-32bit") == 0) || (strcmp(argv[var_s0], "-32") == 0)) {
@@ -5187,6 +5152,8 @@ void parse_command(int argc, char** argv) {
                         var_s0++;
                         addstr(&objfiles, argv[var_s0]);
                     } else {
+                        char* sp144;
+
                         Bflag = 1;
                         sp144 = argv[var_s0] + 2;
                         relocate_passes(tstring, hstring, sp144);
@@ -5224,7 +5191,10 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] == '\0') {
                         if ((var_s0 + 1) < argc) {
+                            char* sp140;
                             // TODO: work out where these should actually go
+                            int pad[2];
+
                             if (0) {
                                 (void)"-D taken as empty cpp -D, not ld(1) -D hexnum\n";
                                 (void)"-D";
@@ -5361,6 +5331,8 @@ void parse_command(int argc, char** argv) {
                             (isdir(argv[var_s0 + 1]) == 0)) {
                             emptyIflag++;
                         } else {
+                            char* sp134;
+
                             var_s0++;
                             sp134 = mkstr("-I", argv[var_s0], NULL);
                             addstr(&cppflags, sp134);
@@ -5380,7 +5352,9 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-J") == 0) {
-                        sp12C = argv[var_s0 + 1];
+                        char* sp130;
+                        char* sp12C = argv[var_s0 + 1];
+
                         for (sp130 = sp12C; *sp130 != 0; sp130++) {
                             if (!(__ctype[1 + *sp130] & 4)) {
                                 error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
@@ -5504,6 +5478,8 @@ void parse_command(int argc, char** argv) {
                 case 'L': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][0] != '-') && isdir(argv[var_s0 + 1])) {
+                            char* sp128;
+
                             var_s0++;
                             sp128 = mkstr(argv[var_s0 - 1], argv[var_s0], NULL);
                             addstr(&ldflags, sp128);
@@ -5559,13 +5535,14 @@ void parse_command(int argc, char** argv) {
                 case 'N': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         addstr(&ldflags, argv[var_s0]);
-                    } else if (compiler == 3) {
+                        break;
+                    }
+                    if (compiler == 3) {
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
+                    goto bad_option;
 
                 case 'O': /* switch 1 */
                     plain_O = 0;
@@ -5582,7 +5559,8 @@ void parse_command(int argc, char** argv) {
                         }
                         if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][1] == '\0') && (*argv[var_s0 + 1] >= '0') &&
                             (*argv[var_s0 + 1] <= '4')) {
-                            sp124 = malloc(strlen(argv[var_s0 + 1]) + 3);
+                            char* sp124 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
                             sp124[0] = '-';
                             sp124[1] = 'O';
                             sp124[2] = 0;
@@ -5596,8 +5574,9 @@ void parse_command(int argc, char** argv) {
                         if ((argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '4')) {
                             Oflag = argv[var_s0][2] - '0';
                             if (Oflag == 3) {
-                                sp120 = "-Olimit";
-                                sp11C = "5000";
+                                char* sp120 = "-Olimit";
+                                char* sp11C = "5000";
+
                                 Gnum = "0";
                                 addstr(&umergeflags, sp120);
                                 addstr(&umergeflags, sp11C);
@@ -5717,7 +5696,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
-                        sp118 = malloc(strlen(argv[var_s0 + 1]) + 3);
+                        char* sp118 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
                         sp118[0] = '-';
                         sp118[1] = 'U';
                         sp118[2] = 0;
@@ -5923,6 +5903,9 @@ void parse_command(int argc, char** argv) {
                                                 // -WxD?
                                                 if (argv[var_s0][2] == '\0') {
                                                     if ((var_s0 + 1) < argc) {
+                                                        int sp114;
+                                                        char* sp110;
+
                                                         sp114 = strtoul(argv[var_s0 + 1], &sp110, 16);
                                                         if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
@@ -6302,7 +6285,8 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-check_bounds") == 0) {
                             addstr(&fcomflags, "-C");
                         } else if (strncmp(argv[var_s0], "-chunk=", strlen("-chunk=")) == 0) {
-                            sp10C = argv[var_s0] + strlen("-chunk=");
+                            char* sp10C = argv[var_s0] + strlen("-chunk=");
+
                             while (*sp10C != 0) {
                                 *sp10C = tolower(*sp10C);
                                 sp10C++;
@@ -6483,6 +6467,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strncmp(argv[var_s0], "-edit", 5) == 0) {
+                        pid_t sp108; // process group id
+
                         if (argv[var_s0][5] == '\0') {
                             edit_cnt_max = 0x100;
                         } else if (isdigit(argv[var_s0][5]) && (argv[var_s0][6] == '\0')) {
@@ -6828,7 +6814,8 @@ void parse_command(int argc, char** argv) {
                         if ((argv[var_s0][2] == 'm') && (argv[var_s0][3] == '\0')) {
                             lmflag++;
                         } else if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
-                            sp104 = malloc(strlen(argv[var_s0 + 1]) + 3);
+                            char* sp104 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
                             sp104[0] = '-';
                             sp104[1] = 'l';
                             sp104[2] = '\0';
@@ -6971,7 +6958,8 @@ void parse_command(int argc, char** argv) {
                             break;
                         }
                         if (strncmp(argv[var_s0], "-mp_schedtype=", strlen("-mp_schedtype=")) == 0) {
-                            sp100 = argv[var_s0] + strlen("-mp_schedtype=");
+                            char* sp100 = argv[var_s0] + strlen("-mp_schedtype=");
+
                             while (*sp100 != 0) {
                                 *sp100 = tolower(*sp100);
                                 sp100++;
@@ -7132,6 +7120,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if ((compiler == 1) && (c_compiler_choice == 3) && (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
+                        char* spFC;
+
                         if (argv[var_s0][9] == '\0') {
                             spFC = "-YDN";
                         } else if (strcmp(argv[var_s0] + 9, "_expr") == 0) {
@@ -7207,6 +7197,8 @@ void parse_command(int argc, char** argv) {
                     if (argv[var_s0][2] == '\0') {
                         var_s0++;
                         if (var_s0 < argc) {
+                            struct stat sp74;
+                            
                             outfile = argv[var_s0];
                             var_s1 = getsuf(outfile);
                             if (((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
@@ -7256,7 +7248,8 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-pfa") == 0) {
                         mp_flag |= 0x10001;
                         if ((var_s0 + 1) < argc) {
-                            sp70 = mpflags;
+                            struct_mpflags* sp70 = mpflags;
+                               
                             while ((sp70->unk_0 != NULL) && (strcmp(argv[var_s0 + 1], sp70->unk_0) != 0)) {
                                 sp70++;
                             }
@@ -7281,7 +7274,8 @@ void parse_command(int argc, char** argv) {
                         }
                         relocate_passes("fKY", NULL, NULL);
                         if ((var_s0 + 1) < argc) {
-                            sp6C = cmpflags;
+                            struct_mpflags* sp6C = cmpflags;
+
                             while ((sp6C->unk_0 != NULL) && (strcmp(argv[var_s0 + 1], sp6C->unk_0) != 0)) {
                                 sp6C++;
                             }
@@ -7296,7 +7290,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
                         if (strncmp(argv[var_s0], "-pt", 3) == 0) {
-                            sp68 = argv[var_s0] + 3;
+                            char* sp68 = argv[var_s0] + 3;
+
                             if (strcmp(sp68, "v") == 0) {
                                 verbose_prelink++;
                             } else if (strcmp(sp68, "none") == 0) {
@@ -7419,6 +7414,8 @@ void parse_command(int argc, char** argv) {
                         ((argv[var_s0][3] == '\0') || (argv[var_s0][3] == ','))) {
                         D_1000BF74 = 1;
                         if ((argv[var_s0][3] == ',') && (argv[var_s0][4] != '\0')) {
+                            char* sp64;
+
                             for (sp64 = strtok(argv[var_s0] + 4, ","); sp64 != NULL; sp64 = strtok(NULL, ",")) {
                                 if (strcmp(sp64, "nosrc") == 0) {
                                     D_1000BF78 = 1;
@@ -8057,88 +8054,91 @@ void parse_command(int argc, char** argv) {
                     goto bad_option;
             }
             continue;
-        } else {
-            var_s1 = getsuf(argv[var_s0]);
-            if (var_s1 == 'm') {
-                var_s1 = 'f';
-            }
-            if (var_s1 == 'p') {
-                haspascal = 1;
-            }
-            if (var_s1 == 'f') {
-                hasfortran = 1;
-            }
-            if (var_s1 == 1) {
-                haspl1 = 1;
-            }
-            if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
-                (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
-                (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
-                (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') ||
-                (var_s1 == 6) || ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) ||
-                (Eflag != 0) || (compiler == 4)) {
-                srcexists++;
-                if ((argv[var_s0][0] == '-') && (NoMoreOptions == 0)) {
-                    sp60 = 1;
-                    while (argv[var_s0][sp60] == '-') {
-                        sp60++;
-                    }
-                    argv[var_s0] += sp60;
+        }
+
+        var_s1 = getsuf(argv[var_s0]);
+        if (var_s1 == 'm') {
+            var_s1 = 'f';
+        }
+        if (var_s1 == 'p') {
+            haspascal = 1;
+        }
+        if (var_s1 == 'f') {
+            hasfortran = 1;
+        }
+        if (var_s1 == 1) {
+            haspl1 = 1;
+        }
+        if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
+            (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
+            (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
+            (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') ||
+            (var_s1 == 6) || ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) ||
+            (Eflag != 0) || (compiler == 4)) {
+            int sp60; // number of '-' on the end?
+            int sp5C; // option index
+
+            srcexists++;
+            if ((argv[var_s0][0] == '-') && (NoMoreOptions == 0)) {
+                sp60 = 1;
+                while (argv[var_s0][sp60] == '-') {
+                    sp60++;
                 }
-                for (sp5C = 1; sp5C < argc; sp5C++) {
-                    if ((argv[sp5C][1] == 'j') && (strcmp(argv[sp5C], "-j") == 0)) {
-                        jflag++;
-                    }
+                argv[var_s0] += sp60;
+            }
+            for (sp5C = 1; sp5C < argc; sp5C++) {
+                if ((argv[sp5C][1] == 'j') && (strcmp(argv[sp5C], "-j") == 0)) {
+                    jflag++;
                 }
-                if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0) &&
-                    ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
-                     (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == 1) ||
-                     (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
-                    if (var_s1 != 'u') {
-                        addstr(&srcfiles, argv[var_s0]);
-                        var_s2 = mksuf(argv[var_s0], 'u');
-                    } else {
-                        var_s2 = argv[var_s0];
-                    }
-                    uload = 1;
-                    if (uldobj_place == -1) {
-                        uldobj_place = save_place(&objfiles);
-                    }
-                    if (nodup(&ufiles, var_s2) != 0) {
-                        addstr(&ufiles, var_s2);
-                    }
-                    var_s2 = mksuf(argv[var_s0], 'o');
-                    if (nodup(&objfiles, var_s2) != 0) {
-                        sp158 = var_s2;
-                    }
-                } else if ((Eflag == 0) && (compiler != 4)) {
+            }
+            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0) &&
+                ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
+                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == 1) ||
+                 (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
+                if (var_s1 != 'u') {
                     addstr(&srcfiles, argv[var_s0]);
-                    var_s2 = mksuf(argv[var_s0], 'o');
-                    if (nodup(&objfiles, var_s2) != 0) {
-                        addstr(&objfiles, var_s2);
-                        sp158 = var_s2;
-                        nobjs++;
-                    }
+                    var_s2 = mksuf(argv[var_s0], 'u');
                 } else {
-                    addstr(&srcfiles, argv[var_s0]);
+                    var_s2 = argv[var_s0];
                 }
-            } else if (var_s1 == 'b') {
-                if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0)) {
-                    if (uldobj_place == -1) {
-                        uldobj_place = save_place(&objfiles);
-                    }
-                    addstr(&ufiles, argv[var_s0]);
-                    uload = 1;
+                uload = 1;
+                if (uldobj_place == -1) {
+                    uldobj_place = save_place(&objfiles);
                 }
-            } else {
-                addstr(&objfiles, argv[var_s0]);
-                if (var_s1 == 'o') {
+                if (nodup(&ufiles, var_s2) != 0) {
+                    addstr(&ufiles, var_s2);
+                }
+                var_s2 = mksuf(argv[var_s0], 'o');
+                if (nodup(&objfiles, var_s2) != 0) {
+                    sp158 = var_s2;
+                }
+            } else if ((Eflag == 0) && (compiler != 4)) {
+                addstr(&srcfiles, argv[var_s0]);
+                var_s2 = mksuf(argv[var_s0], 'o');
+                if (nodup(&objfiles, var_s2) != 0) {
+                    addstr(&objfiles, var_s2);
+                    sp158 = var_s2;
                     nobjs++;
                 }
+            } else {
+                addstr(&srcfiles, argv[var_s0]);
             }
-            func_00431B38(var_s0 + 1, 1);
-            continue;
+        } else if (var_s1 == 'b') {
+            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0)) {
+                if (uldobj_place == -1) {
+                    uldobj_place = save_place(&objfiles);
+                }
+                addstr(&ufiles, argv[var_s0]);
+                uload = 1;
+            }
+        } else {
+            addstr(&objfiles, argv[var_s0]);
+            if (var_s1 == 'o') {
+                nobjs++;
+            }
         }
+        func_00431B38(var_s0 + 1, 1);
+        continue;
 
     bad_option:
         if (sp14C != 0) {
@@ -8150,12 +8150,14 @@ void parse_command(int argc, char** argv) {
     } /* end of loop */
 
     if (sp15C != NULL) {
+        char* sp58; // name of source file if there is only one
+
         if (srcfiles.length == 1) {
             sp58 = strdup(srcfiles.entries[0]);
             if (sp58 == NULL) {
                 sp58 = sp158;
             } else {
-                sp54 = strlen(sp58);
+                int sp54 = strlen(sp58); // length of single source file's name
                 if ((sp54 >= 3) && (sp58[sp54 - 2] == '.')) {
                     if (Eflag != 0) {
                         sp58[sp54 - 1] = 'i';
