@@ -553,7 +553,7 @@ static char* D_1000C1DC = NULL;
 
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
-    register int var_s0;
+    register int var_s0; // option index
     register char var_s1;
     register char* var_s2;
     register char* var_s3;
@@ -3319,94 +3319,105 @@ void parse_command(int argc, char** argv) {
                     break;
 
                 case 'u': /* switch 1 */
-                    if (strcmp(argv[var_s0], "-uopt0") != 0) {
-                        if (argv[var_s0][2] == '\0') {
-                            if (compiler == 3) {
-                                mp_uflag = 1;
-                                addstr(&fcomflags, argv[var_s0]);
-                                add_static_opt(argv[var_s0]);
+                    if (strcmp(argv[var_s0], "-uopt0") == 0) {
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        if (compiler == 3) {
+                            mp_uflag = 1;
+                            addstr(&fcomflags, argv[var_s0]);
+                            add_static_opt(argv[var_s0]);
+                            break;
+                        } else {
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&objfiles, "-u");
+                                addstr(&objfiles, argv[var_s0]);
                                 break;
                             } else {
-                                var_s0++;
-                                if (var_s0 < argc) {
-                                    addstr(&objfiles, "-u");
-                                    addstr(&objfiles, argv[var_s0]);
-                                    break;
-                                } else {
-                                    error(1, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
-                                    exit(2);
-                                }
-                            }
-                        }
-                        if (strcmp(argv[var_s0], "-unroll") == 0) {
-                            error(1, NULL, 0, NULL, 0, "This flag is no longer supported\n");
-                            exit(2);
-                        } else if ((compiler == 3) && (strcmp(argv[var_s0], "-usefpidx") == 0)) {
-                            addstr(&fcomflags, argv[var_s0]);
-                            break;
-                        }
-                        if (strcmp(argv[var_s0], "-use_readwrite_const") == 0) {
-                            if ((compiler == 1) && (c_compiler_choice != 0)) {
-                                addstr(&edisonflags, "-Yr0");
-                            } else {
-                                addstr(&accomflags, "-use_readwrite_const");
-                            }
-                        } else if (strcmp(argv[var_s0], "-use_readonly_const") == 0) {
-                            if ((compiler == 1) && (c_compiler_choice != 0)) {
-                                addstr(&edisonflags, "-Yr1");
-                            } else {
-                                addstr(&accomflags, "-use_readonly_const");
-                            }
-                        } else if ((compiler == 1) && (strcmp(argv[var_s0], "-update_registry") == 0)) {
-                            var_s0++;
-                            if (var_s0 >= argc) {
-                                error(1, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
+                                error(1, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
                                 exit(2);
                             }
-                            addstr(&ldflags, argv[var_s0 - 1]);
-                            addstr(&ldflags, argv[var_s0]);
-                        } else {
-                            goto bad_option;
                         }
                     }
-                    break;
-                case 0x76: /* switch 1 */
+
+                    if (strcmp(argv[var_s0], "-unroll") == 0) {
+                        error(1, NULL, 0, NULL, 0, "This flag is no longer supported\n");
+                        exit(2);
+                    } else if ((compiler == 3) && (strcmp(argv[var_s0], "-usefpidx") == 0)) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+
+                    if (strcmp(argv[var_s0], "-use_readwrite_const") == 0) {
+                        if ((compiler == 1) && (c_compiler_choice != 0)) {
+                            addstr(&edisonflags, "-Yr0");
+                        } else {
+                            addstr(&accomflags, "-use_readwrite_const");
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-use_readonly_const") == 0) {
+                        if ((compiler == 1) && (c_compiler_choice != 0)) {
+                            addstr(&edisonflags, "-Yr1");
+                        } else {
+                            addstr(&accomflags, "-use_readonly_const");
+                        }
+                        break;
+                    }
+                    if ((compiler == 1) && (strcmp(argv[var_s0], "-update_registry") == 0)) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(1, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
+                            exit(2);
+                        }
+                        addstr(&ldflags, argv[var_s0 - 1]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'v': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         if (default_svr4 == 0) {
                             vflag = 1;
                             time_flag = 1;
                         }
                         break;
-                    } else if (compiler == 1) {
+                    }
+                    if (compiler == 1) {
                         if (strcmp(argv[var_s0], "-volatile") == 0) {
                             error(2, NULL, 0, NULL, 0,
                                   "-volatile is no longer supported; use the volatile qualifier instead\n");
                             break;
-                        } else if (strcmp(argv[var_s0], "-varargs") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-varargs") == 0) {
                             addstr(&ccomflags, "-Xvarargs");
                             break;
-                        } else if (strcmp(argv[var_s0], "-verbose") == 0) {
+                        }
+                        if (strcmp(argv[var_s0], "-verbose") == 0) {
                             addstr(&ccomflags, "-verbose");
                             break;
                         }
                     }
                     if ((compiler == 3) &&
-                        ((strncmp(argv[var_s0], "-vms", 4U) == 0) || (strcmp(argv[var_s0], "-varargs") == 0))) {
+                        ((strncmp(argv[var_s0], "-vms", 4) == 0) || (strcmp(argv[var_s0], "-varargs") == 0))) {
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
-                    } else if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (strcmp(argv[var_s0], "-v2") == 0)) {
+                        break;
+                    }
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        (strcmp(argv[var_s0], "-v2") == 0)) {
                         if ((compiler == 1) && (c_compiler_choice != 0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         }
-                    } else {
-                        goto bad_option;
+                        break;
                     }
+                    goto bad_option;
 
-                    break;
-                case 0x77: /* switch 1 */
-                    if ((compiler == 1) && (strncmp(argv[var_s0], "-wlint", 6U) == 0)) {
+                case 'w': /* switch 1 */
+                    if ((compiler == 1) && (strncmp(argv[var_s0], "-wlint", 6) == 0)) {
                         if ((compiler == 1) && (c_compiler_choice != 0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
@@ -3414,49 +3425,57 @@ void parse_command(int argc, char** argv) {
                             addstr(&ccomflags, argv[var_s0]);
                         }
                         break;
-                    } else if (strcmp(argv[var_s0], "-woff") == 0) {
+                    }
+                    if (strcmp(argv[var_s0], "-woff") == 0) {
                         var_s0++;
                         if (var_s0 < argc) {
                             if (strcmp(argv[var_s0], "options") == 0) {
                                 sp14C = 0;
-                                continue;
-                            } else if ((argv[var_s0][0] < 0x30) || (argv[var_s0][0] >= 0x3A)) {
+                                break;
+                            }
+                            if ((argv[var_s0][0] < '0') || (argv[var_s0][0] > '9')) {
                                 error(2, NULL, 0, NULL, 0,
                                       "-woff requires a comma-separated list of error numbers - ignored\n");
-                                var_s0 -= 1;
-                                continue;
-                            } else {
-                                addstr(&accomflags, mkstr("-Xwoff", argv[var_s0], NULL));
-                                addstr(&edisonflags, mkstr("-YW", argv[var_s0], NULL));
+                                var_s0--;
+                                break;
                             }
+                            addstr(&accomflags, mkstr("-Xwoff", argv[var_s0], NULL));
+                            addstr(&edisonflags, mkstr("-YW", argv[var_s0], NULL));
                             break;
-                        } else {
-                            error(1, NULL, 0, NULL, 0, "-woff requires a warning number (or a list of them)\n");
-                            exit(2);
                         }
+                        error(1, NULL, 0, NULL, 0, "-woff requires a warning number (or a list of them)\n");
+                        exit(2);
                     }
-                    if ((argv[var_s0][2] == 0x31) && (argv[var_s0][3] == '\0')) {
+                    if ((argv[var_s0][2] == '1') && (argv[var_s0][3] == '\0')) {
                         if (compiler != 3) {
                             error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 1;
                         }
-                    } else if ((argv[var_s0][2] == 0x30) && (argv[var_s0][3] == '\0')) {
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '0') && (argv[var_s0][3] == '\0')) {
                         if (compiler != 3) {
                             error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 0;
                         }
-                    } else if (argv[var_s0][2] == 0x36) {
-                        if ((compiler == 3) && (argv[var_s0][2] == 0x36)) {
+                        break;
+                    }
+                    if (argv[var_s0][2] == '6') {
+                        if ((compiler == 3) && (argv[var_s0][2] == '6')) {
                             mp_66flag = 1;
                         }
                         addstr(&fcomflags, argv[var_s0]);
-                    } else if ((argv[var_s0][2] != 0) && (compiler == 1) && (c_compiler_choice != 0)) {
+                        break;
+                    }
+                    if ((argv[var_s0][2] != 0) && (compiler == 1) && (c_compiler_choice != 0)) {
                         error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
-                    } else if ((argv[var_s0][2] == '\0') ||
-                               ((argv[var_s0][3] == '\0') && ((argv[var_s0][2] == 0x31) || (argv[var_s0][2] == 0x32) ||
-                                                              (argv[var_s0][2] == 0x33)))) {
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '\0') ||
+                        ((argv[var_s0][3] == '\0') &&
+                         ((argv[var_s0][2] == '1') || (argv[var_s0][2] == '2') || (argv[var_s0][2] == '3')))) {
                         addstr(&cppflags, argv[var_s0]);
                         addstr(&ccomflags, argv[var_s0]);
                         addstr(&edisonflags, argv[var_s0]);
@@ -3475,18 +3494,18 @@ void parse_command(int argc, char** argv) {
                         addstr(&asflags, argv[var_s0]);
                         addstr(&ldflags, argv[var_s0]);
                         addstr(&ftocflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x79: /* switch 1 */
-                    if (argv[var_s0][2] != 0) {
+                    goto bad_option;
+
+                case 'y': /* switch 1 */
+                    if (argv[var_s0][2] != '\0') {
                         addstr(&objfiles, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x78: /* switch 1 */
+                    goto bad_option;
+
+                case 'x': /* switch 1 */
                     if (strcmp(argv[var_s0], "-xansi") == 0) {
                         if (compchoice == 1) {
                             compchoice = 0;
@@ -3495,21 +3514,25 @@ void parse_command(int argc, char** argv) {
                         cppchoice = 3;
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
-                    } else if (strcmp(argv[var_s0], "-xgot") == 0) {
-                        addstr(&asflags, "-big_got");
-                    } else if (argv[var_s0][2] == '\0') {
-                        addstr(&ldflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
-                case 0x7A: /* switch 1 */
+                    if (strcmp(argv[var_s0], "-xgot") == 0) {
+                        addstr(&asflags, "-big_got");
+                        break;
+                    }
                     if (argv[var_s0][2] == '\0') {
                         addstr(&ldflags, argv[var_s0]);
-                    } else {
-                        goto bad_option;
+                        break;
                     }
-                    break;
+                    goto bad_option;
+
+                case 'z': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
                 default:
                     goto bad_option;
             }
