@@ -36,6 +36,10 @@ typedef unsigned long int	uintptr_t;
 #define _UINTPTR_T
 #endif
 
+// ctype.h macro
+#define TO_LOWER(x) ((isupper(x)) ? _tolower(x) : (x))
+#define TO_UPPER(x) ((islower(x)) ? _toupper(x) : (x))
+
 /* File, -O1 */
 typedef struct {
     int capacity;
@@ -5016,22 +5020,18 @@ void add_info(char* str) {
     addstr(&ldflags, str);
 }
 
-// ctype.h macro
-#define tolower(x) ((isupper(x)) ? _tolower(x) : (x))
-#define toupper(x) ((islower(x)) ? _toupper(x) : (x))
-
 // function parse_command # 5
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
-    register int var_s0; // option index
-    register char var_s1; // file suffix, multipurpose?
+    register int var_s0;   // option index
+    register char var_s1;  // file suffix, multipurpose?
     register char* var_s2; // multipurpose string pointer
     register char* var_s3; // used for -G?
-    char* sp15C = NULL; // related to -MD?
+    char* sp15C = NULL;    // related to -MD?
     char* sp158 = NULL;
     char* sp154 = NULL; // target
-    char sp153 = 0; // unused
-    int sp14C = 1; // Treat bad options as errors
+    char sp153 = 0;     // unused
+    int sp14C = 1;      // Treat bad options as errors
     char* sp148 = getenv("SGI_IRIX4");
 
     if (sp148 != NULL) {
@@ -6288,7 +6288,7 @@ void parse_command(int argc, char** argv) {
                             char* sp10C = argv[var_s0] + strlen("-chunk=");
 
                             while (*sp10C != 0) {
-                                *sp10C = tolower(*sp10C);
+                                *sp10C = TO_LOWER(*sp10C);
                                 sp10C++;
                             }
                             addstr(&fcomflags, mkstr("-mp_chunk=", argv[var_s0] + strlen("-chunk="), NULL));
@@ -6961,7 +6961,7 @@ void parse_command(int argc, char** argv) {
                             char* sp100 = argv[var_s0] + strlen("-mp_schedtype=");
 
                             while (*sp100 != 0) {
-                                *sp100 = tolower(*sp100);
+                                *sp100 = TO_LOWER(*sp100);
                                 sp100++;
                             }
                             addstr(&fcomflags, argv[var_s0]);
@@ -7198,7 +7198,7 @@ void parse_command(int argc, char** argv) {
                         var_s0++;
                         if (var_s0 < argc) {
                             struct stat sp74;
-                            
+
                             outfile = argv[var_s0];
                             var_s1 = getsuf(outfile);
                             if (((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
@@ -7249,7 +7249,7 @@ void parse_command(int argc, char** argv) {
                         mp_flag |= 0x10001;
                         if ((var_s0 + 1) < argc) {
                             struct_mpflags* sp70 = mpflags;
-                               
+
                             while ((sp70->unk_0 != NULL) && (strcmp(argv[var_s0 + 1], sp70->unk_0) != 0)) {
                                 sp70++;
                             }
@@ -8072,9 +8072,9 @@ void parse_command(int argc, char** argv) {
         if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
             (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
             (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
-            (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') ||
-            (var_s1 == 6) || ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) ||
-            (Eflag != 0) || (compiler == 4)) {
+            (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') || (var_s1 == 6) ||
+            ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) || (Eflag != 0) ||
+            (compiler == 4)) {
             int sp60; // number of '-' on the end?
             int sp5C; // option index
 
