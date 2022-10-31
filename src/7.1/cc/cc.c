@@ -5356,7 +5356,7 @@ void parse_command(int argc, char** argv) {
                         char* sp12C = argv[var_s0 + 1];
 
                         for (sp130 = sp12C; *sp130 != 0; sp130++) {
-                            if (!(__ctype[1 + *sp130] & 4)) {
+                            if (!isdigit(*sp130)) {
                                 error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
                                 exit(2);
                             }
@@ -6204,7 +6204,7 @@ void parse_command(int argc, char** argv) {
                         }
 
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
-                            if (!(__ctype[*var_s2 + 1] & 4)) {
+                            if (!isdigit(*var_s2)) {
                                 error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
@@ -6556,7 +6556,8 @@ void parse_command(int argc, char** argv) {
                         addstr(&ccomflags, "-Xfloat");
                         break;
                     }
-                    if (((compiler == COMPILER_4) || (compiler == COMPILER_2)) && (strcmp(argv[var_s0], "-float") == 0)) {
+                    if (((compiler == COMPILER_4) || (compiler == COMPILER_2)) &&
+                        (strcmp(argv[var_s0], "-float") == 0)) {
                         break;
                     }
                     if (compiler == COMPILER_6) {
@@ -6676,7 +6677,7 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
-                            if (!(__ctype[*var_s2 + 1] & 4)) {
+                            if (!isdigit(*var_s2)) {
                                 error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
@@ -7119,7 +7120,8 @@ void parse_command(int argc, char** argv) {
                         add_static_opt(argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && (c_compiler_choice == 3) && (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == 3) &&
+                        (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
                         char* spFC;
 
                         if (argv[var_s0][9] == '\0') {
@@ -7569,7 +7571,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (compiler == COMPILER_1) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0) && (strncmp(argv[var_s0], "-smart", 6U) == 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0) &&
+                            (strncmp(argv[var_s0], "-smart", 6U) == 0)) {
                             if ((argv[var_s0][6] == 0x2C) && (argv[var_s0][7] != 0)) {
                                 sbrepos = argv[var_s0] + 7;
                             } else {
@@ -8424,7 +8427,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             mpc = mkstr(comp_host_root, "usr/lib/", currcomp, "mpc", arg2, NULL);
                         }
                         ccom = mkstr(comp_host_root, "usr/lib/", currcomp, ansichoice ? "accom" : "ccom", arg2, NULL);
-                        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) || ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
+                        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) ||
+                            ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
                             cfe = mkstr(comp_host_root, "usr/lib/DCC/", currcomp,
                                         ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
@@ -10511,7 +10515,7 @@ void record_static_fileset(int arg0) {
     }
 
     while (fgets(spD8, 0x2800, sp28DC) != 0) {
-        if ((strncmp(spD8, spD4, spD0) != 0) || !(__ctype[spD8[spD0] + 1] & 8)) {
+        if ((strncmp(spD8, spD4, spD0) != 0) || !isspace(spD8[spD0])) {
             fputs(spD8, sp28E0);
         }
     }
