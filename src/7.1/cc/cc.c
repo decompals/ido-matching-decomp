@@ -5076,15 +5076,15 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
     s32 pad[3];
     char* sp58;
-    pid_t fokrPid;
+    pid_t forkPid;
     pid_t sp50;
     s32 temp_t7; // sp4C
     SIG_PF sp48;
     SIG_PF sp44;
     s32 stat_loc;
 
-    fokrPid = fork();
-    if (fokrPid == (pid_t)-1) { // fork failed
+    forkPid = fork();
+    if (forkPid == (pid_t)-1) { // fork failed
         error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
@@ -5092,7 +5092,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
         return -1;
     }
 
-    if (fokrPid == (pid_t)0) { // child process
+    if (forkPid == (pid_t)0) { // child process
 
         if (editflag == 2) {
             get_lino(sp58, arg1, arg2);
@@ -5108,12 +5108,12 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
         }
 
         exit(1);
-    } else { // this process, fokrPid is the pid of the child process
+    } else { // this process, forkPid is the pid of the child process
 
         sp44 = sigset(SIGINT, SIG_IGN);
         sp48 = sigset(SIGTERM, SIG_IGN);
         sp50 = wait(&stat_loc);
-        while (sp50 != fokrPid) {
+        while (sp50 != forkPid) {
             if (sp50 == -1) {
                 return -1;
             }
