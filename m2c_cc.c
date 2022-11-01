@@ -4551,6 +4551,7 @@ void parse_command(s32 argc, s8** argv) {
     s8* temp_t8;
     s8* temp_t8_5;
     s8* temp_t9_2;
+    s8* temp_t9_3;
     s8* temp_v0;
     s8* temp_v0_2;
     s8* var_s2;
@@ -4852,7 +4853,7 @@ block_101:
                         temp_t6 = argv[var_s0]->unk_2;
                         var_s2_2 = "fKMdkjusmocab";
                         Hchar = (s8) temp_t6;
-                        if ((*"fKMdkjusmocab" != 0) && (*"fKMdkjusmocab" != temp_t6)) {
+                        if ((*var_s2_2 != 0) && (*var_s2_2 != temp_t6)) {
 loop_112:
                             temp_t5_2 = var_s2_2->unk_1;
                             var_s2_2 += 1;
@@ -5192,10 +5193,11 @@ block_225:
                             temp_t4_2 = argv[var_s0]->unk_2 - 0x30;
                             Oflag = temp_t4_2;
                             if (temp_t4_2 == 3) {
-                                sp120 = "-Olimit";
+                                temp_t9_2 = "-Olimit";
+                                sp120 = temp_t9_2;
                                 sp11C = "5000";
                                 Gnum = "0";
-                                addstr(&umergeflags, "-Olimit");
+                                addstr(&umergeflags, temp_t9_2);
                                 addstr(&umergeflags, sp11C);
                                 addstr(&optflags, sp120);
                                 addstr(&optflags, sp11C);
@@ -6593,9 +6595,9 @@ block_961:
                     } else if (argv[var_s0]->unk_2 == 0) {
                         var_s0 += 1;
                         if (var_s0 < argc) {
-                            temp_t9_2 = argv[var_s0];
-                            outfile = temp_t9_2;
-                            var_s1 = getsuf(temp_t9_2) & 0xFF;
+                            temp_t9_3 = argv[var_s0];
+                            outfile = temp_t9_3;
+                            var_s1 = getsuf(temp_t9_3) & 0xFF;
                             if (((var_s1 == 0x63) || (var_s1 == 0x70) || (var_s1 == 0x66) || (var_s1 == 0x46) || (var_s1 == 0x72) || (var_s1 == 0x65) || ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (var_s1 == 6)) || (var_s1 == 0x73) || (var_s1 == 1) || (var_s1 == 2)) && (stat(outfile, &sp74) == 0)) {
                                 error(1, NULL, 0, NULL, 0, "-o %s resembles the name of a source file, disallowed\n", argv[var_s0]);
                                 exit(2);
@@ -9676,6 +9678,7 @@ s32 regular_file(s8* path) {
 }
 
 s8* basename(s8* path) {
+    ?* temp_t8;
     s8* temp_v0;
     s8* var_s0;
     u8 temp_t1;
@@ -9683,8 +9686,9 @@ s8* basename(s8* path) {
     u8 temp_t3;
 
     if ((path == NULL) || ((u8) *path == 0)) {
-        B_1000E5E0->unk_0 = (s8) "."->unk_0;
-        B_1000E5E0->unk_1 = (u8) "."->unk_1;
+        temp_t8 = ".";
+        B_1000E5E0->unk_0 = (s8) temp_t8->unk_0;
+        B_1000E5E0->unk_1 = (u8) temp_t8->unk_1;
         return B_1000E5E0;
     }
     temp_v0 = strcpy(B_1000E5E0, path);
@@ -9718,6 +9722,10 @@ loop_8:
 }
 
 s8* dirname(s8* path) {
+    ?* temp_t3;
+    ?* temp_t4;
+    ?* temp_t8;
+    ?* temp_t8_2;
     s8* temp_v0;
     s8* var_s0;
     u8 temp_t1;
@@ -9726,8 +9734,9 @@ s8* dirname(s8* path) {
     u8 temp_t7;
 
     if ((path == NULL) || ((u8) *path == 0)) {
-        B_1000E5E0->unk_0 = (s8) "."->unk_0;
-        B_1000E5E0->unk_1 = (u8) "."->unk_1;
+        temp_t8 = ".";
+        B_1000E5E0->unk_0 = (s8) temp_t8->unk_0;
+        B_1000E5E0->unk_1 = (u8) temp_t8->unk_1;
         return B_1000E5E0;
     }
     temp_v0 = strcpy(B_1000E5E0, path);
@@ -9747,8 +9756,9 @@ loop_5:
         }
     }
     if ((var_s0 == B_1000E5E0) && ((u8) *var_s0 == 0x2F)) {
-        B_1000E5E0->unk_0 = (s8) "/"->unk_0;
-        B_1000E5E0->unk_1 = (u8) "/"->unk_1;
+        temp_t4 = "/";
+        B_1000E5E0->unk_0 = (s8) temp_t4->unk_0;
+        B_1000E5E0->unk_1 = (u8) temp_t4->unk_1;
         return B_1000E5E0;
     }
     if (var_s0 != B_1000E5E0) {
@@ -9757,8 +9767,9 @@ loop_11:
         var_s0 -= 1;
         if (temp_t7 == 0x2F) {
             if (var_s0 == B_1000E5E0) {
-                B_1000E5E0->unk_0 = (s8) "/"->unk_0;
-                B_1000E5E0->unk_1 = (u8) "/"->unk_1;
+                temp_t8_2 = "/";
+                B_1000E5E0->unk_0 = (s8) temp_t8_2->unk_0;
+                B_1000E5E0->unk_1 = (u8) temp_t8_2->unk_1;
                 return B_1000E5E0;
             }
             if ((u8) *var_s0 == 0x2F) {
@@ -9776,8 +9787,9 @@ loop_11:
         goto loop_11;
     }
 block_18:
-    B_1000E5E0->unk_0 = (s8) "."->unk_0;
-    B_1000E5E0->unk_1 = (u8) "."->unk_1;
+    temp_t3 = ".";
+    B_1000E5E0->unk_0 = (s8) temp_t3->unk_0;
+    B_1000E5E0->unk_1 = (u8) temp_t3->unk_1;
     return B_1000E5E0;
 }
 
@@ -10399,6 +10411,7 @@ loop_32:
 s8* make_ii_file_name(s8* arg0) {
     s8* sp2C;
     u32 sp28;
+    ?* temp_t1;
     s8* temp_t8;
 
     sp2C = basename(arg0);
@@ -10406,9 +10419,10 @@ s8* make_ii_file_name(s8* arg0) {
     sp2C = mkstr(sp2C, "   ", NULL);
     temp_t8 = &sp2C[sp28];
     if ((temp_t8->unk_-2 == 0x2E) && (temp_t8->unk_-1 == 0x6F)) {
-        temp_t8->unk_-1 = (u8) "ii"->unk_0;
-        temp_t8->unk_0 = (s8) "ii"->unk_1;
-        temp_t8->unk_1 = (u8) "ii"->unk_2;
+        temp_t1 = "ii";
+        temp_t8->unk_-1 = (u8) temp_t1->unk_0;
+        temp_t8->unk_0 = (s8) temp_t1->unk_1;
+        temp_t8->unk_1 = (u8) temp_t1->unk_2;
     } else {
         sp2C[sp28] = (unaligned s32) *".ii";
     }
