@@ -160,8 +160,8 @@ static UNK_TYPE B_1000E55C; // Unused
 char alltstring[20];
 char* Warg;
 char* Wpass;
-char* Kpass;
-char Karg;
+char* Kpass;  // Start of current "-K" argument
+char Karg[6]; // Current "-K" argument
 char Hchar;
 static char B_1000E587; // Unused
 int time0;
@@ -5315,9 +5315,9 @@ void parse_command(int argc, char** argv) {
                         if (1) {} // FAKE
                         Hchar = argv[var_s0][2];
 
-                        for (var_s2 = "fKMdkjusmocab"; (*var_s2 != 0 && *var_s2 != Hchar); var_s2++) {}
+                        for (var_s2 = "fKMdkjusmocab"; (*var_s2 != '\0' && *var_s2 != Hchar); var_s2++) {}
 
-                        if (*var_s2 == 0) {
+                        if (*var_s2 == '\0') {
                             error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                             exit(2);
                         }
@@ -5375,22 +5375,24 @@ void parse_command(int argc, char** argv) {
                         }
 
                         while ((*Kpass != '\0') || (*Kpass == ',')) {
-                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++) {
-                                (&Karg)[j] = *var_s2++;
+                            //! @bug Specifying a long argument to "-K" will overwrite subsequent bss variables.
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++, var_s2++) {
+                                Karg[j] = *var_s2;
                             }
 
                             Kpass = var_s2;
-                            if (strncmp(&Karg, "minabi", 6) == 0) {
+
+                            if (strncmp(Karg, "minabi", 6) == 0) {
                                 kminabiflag = 1;
-                            } else if (strncmp(&Karg, "fpe", 3) == 0) {
+                            } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
-                            } else if (strncmp(&Karg, "sd", 2) == 0) {
+                            } else if (strncmp(Karg, "sd", 2) == 0) {
                                 addstr(&ldflags, "-Ksd");
-                            } else if (strncmp(&Karg, "sz", 2) == 0) {
+                            } else if (strncmp(Karg, "sz", 2) == 0) {
                                 addstr(&ldflags, "-Ksz");
-                            } else if (strncmp(&Karg, "mau", 3) == 0) {
+                            } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
-                            } else if (strncmp(&Karg, "PIC", 3) == 0) {
+                            } else if (strncmp(Karg, "PIC", 3) == 0) {
                                 if (non_shared != 0) {
                                     error(2, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
@@ -5402,8 +5404,9 @@ void parse_command(int argc, char** argv) {
                             } else {
                                 goto bad_option;
                             }
-                            for (j = 0; j < strlen(&Karg); j++) {
-                                (&Karg)[j] = ' ';
+
+                            for (j = 0; j < strlen(Karg); j++) {
+                                Karg[j] = ' ';
                             }
 
                             while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
@@ -5418,22 +5421,26 @@ void parse_command(int argc, char** argv) {
                             Kflag++;
                             addstr(&fcomflags, argv[var_s0]);
                         }
+
                         while ((*Kpass != '\0') || (*Kpass == ',')) {
-                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++) {
-                                (&Karg)[j] = *var_s2++;
+                            //! @bug Specifying a long argument to "-K" will overwrite subsequent bss variables.
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++, var_s2++) {
+                                Karg[j] = *var_s2;
                             }
+
                             Kpass = var_s2;
-                            if (strncmp(&Karg, "minabi", 6) == 0) {
+
+                            if (strncmp(Karg, "minabi", 6) == 0) {
                                 kminabiflag = 1;
-                            } else if (strncmp(&Karg, "fpe", 3) == 0) {
+                            } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
-                            } else if (strncmp(&Karg, "sd", 2) == 0) {
+                            } else if (strncmp(Karg, "sd", 2) == 0) {
                                 addstr(&ldflags, "-Ksd");
-                            } else if (strncmp(&Karg, "sz", 2) == 0) {
+                            } else if (strncmp(Karg, "sz", 2) == 0) {
                                 addstr(&ldflags, "-Ksz");
-                            } else if (strncmp(&Karg, "mau", 3) == 0) {
+                            } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
-                            } else if (strncmp(&Karg, "PIC", 3) == 0) {
+                            } else if (strncmp(Karg, "PIC", 3) == 0) {
                                 if (non_shared != 0) {
                                     error(2, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
@@ -5445,8 +5452,9 @@ void parse_command(int argc, char** argv) {
                             } else {
                                 goto bad_option;
                             }
-                            for (j = 0; j < strlen(&Karg); j++) {
-                                (&Karg)[j] = ' ';
+
+                            for (j = 0; j < strlen(Karg); j++) {
+                                Karg[j] = ' ';
                             }
 
                             while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
@@ -7572,7 +7580,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (compiler == COMPILER_1) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != 0) &&
-                            (strncmp(argv[var_s0], "-smart", 6U) == 0)) {
+                            (strncmp(argv[var_s0], "-smart", 6) == 0)) {
                             if ((argv[var_s0][6] == 0x2C) && (argv[var_s0][7] != 0)) {
                                 sbrepos = argv[var_s0] + 7;
                             } else {
