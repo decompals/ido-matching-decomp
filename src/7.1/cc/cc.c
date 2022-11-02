@@ -28,12 +28,14 @@ typedef struct {
 
 extern int getpagesize(void);
 
+void process_config(int argc, char** argv);
+void add_info(char* str);
 void parse_command(int argc, char** argv);
+void get_host_chiptype(void);
 void newrunlib(void);
 char getsuf(const char* path);
 char* mksuf(const char* path, char value);
-char* full_path(const char* relative_path);
-void add_static_opt(char* opt);
+
 void compose_G0_libs(const char* arg0);
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2);
 
@@ -47,9 +49,16 @@ void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, con
 #endif /* PERMUTER */
 
 char* mkstr();
+void mklist(list* arg0);
 void addstr(); // (list* arg0, char* str), but sometimes called incorrectly
+void addspacedstr(list* arg0, char* str);
 char* newstr(const char* src);
+int save_place(list* arg0);
+void set_place(list* arg0, char* str, int place);
+void addlist(list* arg0, list* arg1);
+void adduldlist(list* arg0, list* arg1, list* arg2);
 char* savestr(const char* src, size_t extra_length);
+void mktempstr(void);
 
 static const char* func_00430414(char* arg0, int arg1);
 static void func_00431A3C(int argc, char** argv);
@@ -62,12 +71,25 @@ static void func_00432D3C(const char* arg0, int count);
 static char* func_00433534(const char* arg0);
 
 char* make_ii_file_name(const char* arg0);
+void update_instantiation_info_file(const char* arg0, const char* arg1);
 
 void get_lino(char* arg0, const char* arg1, int arg2);
-void settimes(void);
-void dotime(const char* programName);
+void show_err(const char* path);
 void handler(void);
 void cleanup(void);
+void whats(void);
+void settimes(void);
+void dotime(const char* programName);
+
+void exec_OCC(int argc, char** argv);
+int add_cxx_symbol_options(void);
+char* full_path(const char* relative_path);
+void add_static_opt(char* opt);
+
+void record_static_fileset(s32 arg0);
+int touch(const char* arg0);
+void add_prelinker_objects(list* arg0, list* arg1);
+
 
 typedef int UNK_TYPE;
 
