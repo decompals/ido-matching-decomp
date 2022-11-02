@@ -1277,9 +1277,6 @@ int main(int argc, char** argv) {
     }
     mktempstr();
     for (var_s0 = 0; (var_s0 < srcfiles.length) || (uload != 0); var_s0++) {
-        // var_s0 = 0;
-        // if ((srcfiles.length > 0) || (uload != 0))
-    loop_363:
         nocompileneeded = 0;
         sp118 = NULL;
         longlong_emitted = 0;
@@ -1442,7 +1439,8 @@ int main(int argc, char** argv) {
                     break;
             }
         }
-    loop_484:
+
+repeat_after_edit:
         if (compchoice == 0) {
             if (irix4 != 0) {
                 if (ansichoice == 0) {
@@ -1985,12 +1983,9 @@ int main(int argc, char** argv) {
                             sp118 = "a.out";
                         } else {
                             sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
-                            // goto block_870;
                         }
                     } else {
                         sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
-                        // block_870:
-                        //                         sp118 = var_v0_4;
                     }
                     addstr(&execlist, mkstr("-YN", sp118, NULL));
                     if (c_compiler_choice == 2) {
@@ -2621,9 +2616,7 @@ int main(int argc, char** argv) {
                             if (retcode == 0xFF) {
                                 c_inline = 1;
                                 addstr(&umergeflags, "-c_inline");
-                                goto block_1317;
-                            }
-                            if (retcode != 0) {
+                            } else if (retcode != 0) {
                                 if (editflag != 0) {
                                     if (times_edited < edit_cnt_max) {
                                         times_edited += 1;
@@ -2638,12 +2631,10 @@ int main(int argc, char** argv) {
                                         unlink(errout);
                                         unlink(symtab);
                                         passin = srcfiles.entries[var_s0];
-                                        goto loop_484;
+                                        goto repeat_after_edit;
                                     }
                                     show_err(errout);
-                                    goto block_1311;
                                 }
-                            block_1311:
                                 runerror += 1;
                                 if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
                                     unlink(passin);
@@ -2654,7 +2645,6 @@ int main(int argc, char** argv) {
                                 }
                                 break;
                             }
-                        block_1317:
                             if (editflag != 0) {
                                 unlink(errout);
                             }
@@ -2730,7 +2720,7 @@ int main(int argc, char** argv) {
                                         unlink(errout);
                                         unlink(symtab);
                                         passin = srcfiles.entries[var_s0];
-                                        goto loop_484;
+                                        goto repeat_after_edit;
                                     }
                                     show_err(errout);
                                     goto block_1361;
@@ -2822,7 +2812,7 @@ int main(int argc, char** argv) {
                                         unlink(lpi_st);
                                         unlink(lpi_p1);
                                         passin = srcfiles.entries[var_s0];
-                                        goto loop_484;
+                                        goto repeat_after_edit;
                                     }
                                     show_err(errout);
                                     goto block_1404;
@@ -2969,7 +2959,7 @@ int main(int argc, char** argv) {
                                         unlink(lpi_pd);
                                         unlink(lpi_dd);
                                         passin = srcfiles.entries[var_s0];
-                                        goto loop_484;
+                                        goto repeat_after_edit;
                                     }
                                     show_err(errout);
                                     goto block_1469;
@@ -3378,7 +3368,7 @@ int main(int argc, char** argv) {
                                         unlink(errout);
                                         unlink(symtab);
                                         passin = srcfiles.entries[var_s0];
-                                        goto loop_484;
+                                        goto repeat_after_edit;
                                     }
                                     show_err(errout);
                                     goto block_1701;
