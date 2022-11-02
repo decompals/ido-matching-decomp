@@ -3252,14 +3252,12 @@ int main(int argc, char** argv) {
                                     addstr(&execlist, "-ur=1");
 
                                     sp100++;
-                                    if (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
-                                        do {
-                                            sp100++;
-                                            if (argv[sp100] == NULL) {
-                                                error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
-                                                exit(2);
-                                            }
-                                        } while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0);
+                                    while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
+                                        sp100++;
+                                        if (argv[sp100] == NULL) {
+                                            error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
+                                            exit(2);
+                                        }
                                     }
 
                                     spE8 = argv[sp100] + strlen("-pfaprepass");
@@ -8790,12 +8788,12 @@ void compose_reg_libs(const char* arg0) {
 // function mkstr # 12
 /*
  * The compiler built-in symbol _VA_INIT_STATE:
- *	-returns 1 if the va_alist marker is the first
- *		parameter in the parameter list, or
- *	-returns 2 if the va_alist marker is the second
- *		parameter in the parameter list, and the
- *		first parameter has type double, or
- *	-returns 0 otherwise.
+ *  -returns 1 if the va_alist marker is the first
+ *      parameter in the parameter list, or
+ *  -returns 2 if the va_alist marker is the second
+ *      parameter in the parameter list, and the
+ *      first parameter has type double, or
+ *  -returns 0 otherwise.
  */
 #define _VA_INIT_STATE 1
 
