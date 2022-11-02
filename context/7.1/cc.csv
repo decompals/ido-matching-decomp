@@ -2661,6 +2661,7 @@ symbol,0xFB4E580,__us_rsthread_stdio,__us_rsthread_stdio,,None,None,None,0x4,0x0
 symbol,0xFB4EC80,errno,errno,,None,0x4,None,0x4,0x0,,False,True,False,False,0,None,False,True,True,False
 symbol,0xFB4ECA0,_environ,_environ,,None,0x4,None,0x4,0x0,,False,True,False,False,0,None,False,False,True,False
 symbol,0xFB4EE44,__iob,__iob,,None,None,None,0x4,0x0,,False,True,False,False,0,None,False,True,True,False
+symbol,0xFB6C7E0,$$.LazyResolver,$$.LazyResolver,,None,None,None,0x4,0x0,,False,True,False,False,0,None,False,False,False,True
 symbol,0x10004000,STR_10004000,STR_10004000,,None,None,None,0x4,0x34000,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10004004,STR_10004004,STR_10004004,,None,None,None,0x4,0x34004,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10004008,STR_10004008,STR_10004008,,None,None,None,0x4,0x34008,.rodata,True,False,True,True,0,None,False,False,False,False

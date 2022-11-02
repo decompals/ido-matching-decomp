@@ -13541,6 +13541,7 @@ symbol,0xFB4E580,__us_rsthread_stdio,__us_rsthread_stdio,,None,None,None,0x4,0x0
 symbol,0xFB4EC80,errno,errno,,None,0x4,None,0x4,0x0,,False,True,False,False,0,None,False,True,True,False
 symbol,0xFB4ECA0,_environ,_environ,,None,0x4,None,0x4,0x0,,False,True,False,False,0,None,False,False,True,False
 symbol,0xFB4EE44,__iob,__iob,,None,None,None,0x4,0x0,,False,True,False,False,0,None,False,True,True,False
+symbol,0xFB6C7E0,$$.LazyResolver,$$.LazyResolver,,None,None,None,0x4,0x0,,False,True,False,False,0,None,False,False,False,True
 symbol,0x10005000,STR_10005000,STR_10005000,,None,None,None,0x4,0xA5000,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10005074,STR_10005074,STR_10005074,,None,None,None,0x4,0xA5074,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x100050A8,STR_100050A8,STR_100050A8,,None,None,None,0x4,0xA50A8,.rodata,True,False,True,True,1,None,False,True,False,True
@@ -14818,6 +14819,7 @@ symbol,0x1000BEC0,None,jtbl_1000BEC0,@jumptable,WORD,None,None,0x1,0xABEC0,.roda
 symbol,0x1000BF04,None,jtbl_1000BF04,@jumptable,WORD,None,None,0x1,0xABF04,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000C0B8,None,jtbl_1000C0B8,@jumptable,WORD,None,None,0x1,0xAC0B8,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000C110,None,jtbl_1000C110,@jumptable,WORD,None,None,0x1,0xAC110,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000C160,STR_1000C160,STR_1000C160,,None,None,None,0x4,0xAC160,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000C1D8,STR_1000C1D8,STR_1000C1D8,,None,None,None,0x4,0xAC1D8,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000C1E4,STR_1000C1E4,STR_1000C1E4,,None,None,None,0x4,0xAC1E4,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000C1F0,STR_1000C1F0,STR_1000C1F0,,None,None,None,0x4,0xAC1F0,.rodata,True,False,True,True,0,None,False,False,False,False
@@ -15100,6 +15102,7 @@ symbol,0x1000DBF0,None,jtbl_1000DBF0,@jumptable,WORD,None,None,0x1,0xADBF0,.roda
 symbol,0x1000DC40,None,jtbl_1000DC40,@jumptable,WORD,None,None,0x1,0xADC40,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000DC78,None,jtbl_1000DC78,@jumptable,WORD,None,None,0x1,0xADC78,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000DCC8,None,jtbl_1000DCC8,@jumptable,WORD,None,None,0x1,0xADCC8,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000DDA0,STR_1000DDA0,STR_1000DDA0,,None,None,None,0x4,0xADDA0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000DE18,STR_1000DE18,STR_1000DE18,,None,None,None,0x4,0xADE18,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000DE20,STR_1000DE20,STR_1000DE20,,None,None,None,0x4,0xADE20,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000DE2C,STR_1000DE2C,STR_1000DE2C,,None,None,None,0x4,0xADE2C,.rodata,True,False,True,True,1,None,False,True,False,True
@@ -15176,6 +15179,7 @@ symbol,0x1000E468,STR_1000E468,STR_1000E468,,None,None,None,0x4,0xAE468,.rodata,
 symbol,0x1000E46C,STR_1000E46C,STR_1000E46C,,None,None,None,0x4,0xAE46C,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000E470,STR_1000E470,STR_1000E470,,None,None,None,0x4,0xAE470,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000E474,None,jtbl_1000E474,@jumptable,WORD,None,None,0x1,0xAE474,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000E5A0,STR_1000E5A0,STR_1000E5A0,,None,None,None,0x4,0xAE5A0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000E61C,None,RO_1000E61C,u8,BYTE,None,None,0x1,0xAE61C,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000E61D,None,RO_1000E61D,,None,None,None,0x1,0xAE61D,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000E654,None,RO_1000E654,u8,BYTE,None,None,0x1,0xAE654,.rodata,True,False,True,False,1,None,False,True,False,True
@@ -15239,6 +15243,7 @@ symbol,0x1000EB60,STR_1000EB60,STR_1000EB60,,None,None,None,0x4,0xAEB60,.rodata,
 symbol,0x1000EB64,None,jtbl_1000EB64,@jumptable,WORD,None,None,0x1,0xAEB64,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000EC30,None,jtbl_1000EC30,@jumptable,WORD,None,None,0x1,0xAEC30,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000ECC8,None,jtbl_1000ECC8,@jumptable,WORD,None,None,0x1,0xAECC8,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000ECF0,STR_1000ECF0,STR_1000ECF0,,None,None,None,0x4,0xAECF0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000ED70,STR_1000ED70,STR_1000ED70,,None,None,None,0x4,0xAED70,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000EDE8,STR_1000EDE8,STR_1000EDE8,,None,None,None,0x4,0xAEDE8,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000EDF0,STR_1000EDF0,STR_1000EDF0,,None,None,None,0x4,0xAEDF0,.rodata,True,False,True,True,0,None,False,False,False,False
@@ -15376,6 +15381,7 @@ symbol,0x1000F4EC,STR_1000F4EC,STR_1000F4EC,,None,None,None,0x4,0xAF4EC,.rodata,
 symbol,0x1000F4F8,STR_1000F4F8,STR_1000F4F8,,None,None,None,0x4,0xAF4F8,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000F504,None,jtbl_1000F504,@jumptable,WORD,None,None,0x1,0xAF504,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000F520,None,jtbl_1000F520,@jumptable,WORD,None,None,0x1,0xAF520,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000F5E0,STR_1000F5E0,STR_1000F5E0,,None,None,None,0x4,0xAF5E0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000F658,STR_1000F658,STR_1000F658,,None,None,None,0x4,0xAF658,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000F678,STR_1000F678,STR_1000F678,,None,None,None,0x4,0xAF678,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1000F684,STR_1000F684,STR_1000F684,,None,None,None,0x4,0xAF684,.rodata,True,False,True,True,0,None,False,False,False,False
@@ -15489,6 +15495,7 @@ symbol,0x1000FE20,STR_1000FE20,STR_1000FE20,,None,None,None,0x4,0xAFE20,.rodata,
 symbol,0x1000FE98,None,jtbl_1000FE98,@jumptable,WORD,None,None,0x1,0xAFE98,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000FEE0,STR_1000FEE0,STR_1000FEE0,,None,None,None,0x4,0xAFEE0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000FF5C,None,jtbl_1000FF5C,@jumptable,WORD,None,None,0x1,0xAFF5C,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000FF80,STR_1000FF80,STR_1000FF80,,None,None,None,0x4,0xAFF80,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x1000FFF8,STR_1000FFF8,STR_1000FFF8,,None,None,None,0x4,0xAFFF8,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x10010010,STR_10010010,STR_10010010,,None,None,None,0x4,0xB0010,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x10010014,STR_10010014,STR_10010014,,None,None,None,0x4,0xB0014,.rodata,True,False,True,True,1,None,False,True,False,True
@@ -15594,6 +15601,7 @@ symbol,0x10010758,STR_10010758,STR_10010758,,None,None,None,0x4,0xB0758,.rodata,
 symbol,0x10010764,STR_10010764,STR_10010764,,None,None,None,0x4,0xB0764,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1001076C,STR_1001076C,STR_1001076C,,None,None,None,0x4,0xB076C,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x10010778,None,jtbl_10010778,@jumptable,WORD,None,None,0x1,0xB0778,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x10010790,STR_10010790,STR_10010790,,None,None,None,0x4,0xB0790,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10010808,STR_10010808,STR_10010808,,None,None,None,0x4,0xB0808,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x10010820,STR_10010820,STR_10010820,,None,None,None,0x4,0xB0820,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x1001082C,STR_1001082C,STR_1001082C,,None,None,None,0x4,0xB082C,.rodata,True,False,True,True,1,None,False,True,False,True
@@ -16333,6 +16341,7 @@ symbol,0x10013D68,None,jtbl_10013D68,@jumptable,WORD,None,None,0x1,0xB3D68,.roda
 symbol,0x10013DE0,None,jtbl_10013DE0,@jumptable,WORD,None,None,0x1,0xB3DE0,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x10013E38,None,jtbl_10013E38,@jumptable,WORD,None,None,0x1,0xB3E38,.rodata,True,False,True,False,1,None,False,True,False,True
 symbol,0x10013E74,None,jtbl_10013E74,@jumptable,WORD,None,None,0x1,0xB3E74,.rodata,True,False,True,False,1,None,False,True,False,True
+symbol,0x10013EB0,STR_10013EB0,STR_10013EB0,,None,None,None,0x4,0xB3EB0,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10013F30,STR_10013F30,STR_10013F30,,None,None,None,0x4,0xB3F30,.rodata,True,False,True,True,0,None,False,False,False,False
 symbol,0x10013FA8,STR_10013FA8,STR_10013FA8,,None,None,None,0x4,0xB3FA8,.rodata,True,False,True,True,1,None,False,True,False,True
 symbol,0x10013FB4,STR_10013FB4,STR_10013FB4,,None,None,None,0x4,0xB3FB4,.rodata,True,False,True,True,1,None,False,True,False,True
@@ -17973,11 +17982,3 @@ new_pointer_in_data,0x04200000
 new_pointer_in_data,0x08000000
 new_pointer_in_data,0x0FB4EE64
 new_pointer_in_data,0x10000000
-new_pointer_in_data,0x1000C160
-new_pointer_in_data,0x1000DDA0
-new_pointer_in_data,0x1000E5A0
-new_pointer_in_data,0x1000ECF0
-new_pointer_in_data,0x1000F5E0
-new_pointer_in_data,0x1000FF80
-new_pointer_in_data,0x10010790
-new_pointer_in_data,0x10013EB0
