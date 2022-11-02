@@ -865,8 +865,8 @@ int main(int argc, char** argv) {
             if (strcmp(argv[var_s0], "-nostdlib") == 0) {
                 sp148 = 1;
             } else {
-                switch (argv[var_s0][1]) { /* switch 9; irregular */
-                    case 0x45:             /* switch 9 */
+                switch (argv[var_s0][1]) {
+                    case 0x45:
                         if ((argv[var_s0][3] == 0) && ((argv[var_s0][2] == 0x42) || (argv[var_s0][2] == 0x4C))) {
                             if (argv[var_s0][2] == 0x42) {
                                 if ((Bflag != 0) && (targetsex != 0)) {
@@ -886,7 +886,7 @@ int main(int argc, char** argv) {
                             newrunlib();
                         }
                         break;
-                    case 0x4C: /* switch 9 */
+                    case 0x4C:
                         if (argv[var_s0][2] == 0) {
                             if (((var_s0 + 1) >= argc) || (argv[var_s0 + 1][0] == 0x2D) ||
                                 (isdir(argv[var_s0 + 1]) == 0)) {
@@ -1085,8 +1085,8 @@ int main(int argc, char** argv) {
         addstr(&asflags, "-EL");
         addstr(&ldflags, "-EL");
     }
-    switch (gflag) { /* switch 10; irregular */
-        case 0:      /* switch 10 */
+    switch (gflag) {
+        case 0:
             addstr(&ccomflags, "-Xg0");
             addstr(&upasflags, "-g0");
             addstr(&fcomflags, "-g0");
@@ -1103,17 +1103,17 @@ int main(int argc, char** argv) {
                 addstr(&edisonflags, "-Zg0");
             }
             break;
-        case 1: /* switch 10 */
+        case 1:
             addstr(&edisonflags, "-Zg1");
             addstr(&ccomflags, "-Xg1");
             add_info("-g1");
             break;
-        case 2: /* switch 10 */
+        case 2:
             addstr(&edisonflags, "-Zg2");
             addstr(&ccomflags, "-Xg2");
             add_info("-g2");
             break;
-        case 3: /* switch 10 */
+        case 3:
             gflag += 1;
             addstr(&edisonflags, "-Zg3");
             addstr(&ccomflags, "-Xg3");
@@ -1337,7 +1337,7 @@ int main(int argc, char** argv) {
             tmpst = 1;
             symtab = tempstr[0];
         }
-        switch (srcsuf) { /* switch 11; irregular */
+        switch (srcsuf) { /* switch 11 */
             case 0x73:    /* switch 11 */
                 if ((compiler == 1) && (compdirs[0] != currcomp)) {
                     currcomp = compdirs[0];
@@ -1428,16 +1428,16 @@ int main(int argc, char** argv) {
             record_static_fileset(srcfiles.entries[var_s0]);
         }
         if ((compiler == 1) && (c_compiler_choice == 1)) {
-            switch (ansichoice) { /* switch 12; irregular */
-                case 1:           /* switch 12 */
-                case 2:           /* switch 12 */
+            switch (ansichoice) {
+                case 1:
+                case 2:
                     edison_type = (char*)2;
                     break;
-                case 3: /* switch 12 */
+                case 3:
                     edison_type = (char*)1;
                     break;
-                default: /* switch 12 */
-                case 0:  /* switch 12 */
+                default:
+                case 0:
                     edison_type = (char*)3;
                     break;
             }
@@ -1457,7 +1457,7 @@ int main(int argc, char** argv) {
             }
         }
         if ((Eflag == 0) || (srcsuf == 0x61)) {
-            switch (srcsuf) { /* switch 19; irregular */
+            switch (srcsuf) { /* switch 19 */
                 case 0x6:     /* switch 19 */
                 case 0x63:    /* switch 19 */
                     if (oldccomflag != 1) {
@@ -1471,7 +1471,7 @@ int main(int argc, char** argv) {
                     }
                     goto block_531;
                 case 0x69:              /* switch 19 */
-                    switch (compiler) { // switch 4
+                    switch (compiler) {
                         case 1:
                             goto block_940;
                         case 2:
@@ -1482,7 +1482,7 @@ int main(int argc, char** argv) {
                             goto block_512;
                         case 5:
                             goto block_1388;
-                        case 6: /* switch 4 */
+                        case 6:
                             goto block_1453;
                     }
                     // fallthrough
@@ -1651,7 +1651,7 @@ int main(int argc, char** argv) {
                 }
             }
 
-            switch (srcsuf) { /* switch 13; irregular */
+            switch (srcsuf) { /* switch 13 */
                 case 0x6:
                 case 0x63:
                 case 0x68:
@@ -1871,35 +1871,35 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-E");
                 }
                 if ((compiler != 1) || (c_compiler_choice == 0)) {
-                    switch (srcsuf) { /* switch 16; irregular */
-                        case 0x63:    /* switch 16 */
+                    switch (srcsuf) {
+                        case 0x63:
                             addstr(&execlist, "-D_LANGUAGE_C");
                             if (oldcflag == 0) {
                                 addstr(&execlist, "-D_CFE");
                             }
                             break;
-                        case 0x70: /* switch 16 */
+                        case 0x70:
                             addstr(&execlist, "-DLANGUAGE_PASCAL");
                             addstr(&execlist, "-D_LANGUAGE_PASCAL");
                             addstr(&execlist, "-Q");
                             break;
-                        case 0x46: /* switch 16 */
-                        case 0x65: /* switch 16 */
-                        case 0x66: /* switch 16 */
-                        case 0x72: /* switch 16 */
+                        case 0x46:
+                        case 0x65:
+                        case 0x66:
+                        case 0x72:
                             addstr(&execlist, "-DLANGUAGE_FORTRAN");
                             addstr(&execlist, "-D_LANGUAGE_FORTRAN");
                             break;
-                        case 0x73: /* switch 16 */
+                        case 0x73:
                             addstr(&execlist, "-std0");
                             addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
                             addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
                             break;
-                        case 0x1: /* switch 16 */
+                        case 0x1:
                             addstr(&execlist, "-DLANGUAGE_PL1");
                             addstr(&execlist, "-D_LANGUAGE_PL1");
                             break;
-                        case 0x2: /* switch 16 */
+                        case 0x2:
                             addstr(&execlist, "-DLANGUAGE_COBOL");
                             addstr(&execlist, "-D_LANGUAGE_COBOL");
                             break;
@@ -2047,7 +2047,7 @@ int main(int argc, char** argv) {
                     }
                     passin = passout;
                     dmips_emit = 0;
-                    switch (srcsuf) { /* switch 17; irregular */
+                    switch (srcsuf) { /* switch 17 */
                         case 0x1:
                             goto block_1388;
                         case 0x2: /* switch 17 */
@@ -4255,11 +4255,11 @@ int main(int argc, char** argv) {
                                                                     }
                                                                     addstr(&execlist, "-G");
                                                                     addstr(&execlist, Gnum);
-                                                                    switch (pflag) { /* switch 15; irregular */
-                                                                        case 0:      /* switch 15 */
+                                                                    switch (pflag) {
+                                                                        case 0:
                                                                             addstr(&execlist, "-p0");
                                                                             break;
-                                                                        case 1: /* switch 15 */
+                                                                        case 1:
                                                                             addstr(&execlist, "-p1");
                                                                             break;
                                                                     }
@@ -5698,20 +5698,20 @@ void parse_command(int argc, char** argv) {
                                         break;
                                     case 0x30:              /* switch 2 */
                                     case 0x66:              /* switch 2 */
-                                        switch (compiler) { /* switch 6; irregular */
-                                            case 2:         /* switch 6 */
+                                        switch (compiler) {
+                                            case 2:
                                                 addstr(&upasflags, Warg);
                                                 break;
-                                            case 3: /* switch 6 */
+                                            case 3:
                                                 addstr(&fcomflags, Warg);
                                                 break;
-                                            case 5: /* switch 6 */
+                                            case 5:
                                                 addstr(&upl1flags, Warg);
                                                 break;
-                                            case 6: /* switch 6 */
+                                            case 6:
                                                 addstr(&ucobflags, Warg);
                                                 break;
-                                            default: /* switch 6 */
+                                            default:
                                                 addstr(&ccomflags, Warg);
                                                 addstr(&edisonflags, Warg);
                                                 break;
@@ -6551,8 +6551,8 @@ void parse_command(int argc, char** argv) {
                     } else if (strcmp(argv[var_s0], "-kpicopt") == 0) {
                         kpicopt_flag = 1;
                     } else {
-                        switch (argv[var_s0][2]) { /* switch 7; irregular */
-                            case 0x6F:             /* switch 7 */
+                        switch (argv[var_s0][2]) {
+                            case 0x6F:
                                 var_s0++;
                                 if (var_s0 < argc) {
                                     uoutfile = argv[var_s0];
@@ -6565,21 +6565,21 @@ void parse_command(int argc, char** argv) {
                                     }
                                 }
                                 break;
-                            case 0x70: /* switch 7 */
+                            case 0x70:
                                 var_s0++;
                                 if (var_s0 < argc) {
                                     addstr(&uldflags, "-kp");
                                     addstr(&uldflags, argv[var_s0]);
                                 }
                                 break;
-                            case 0x75: /* switch 7 */
+                            case 0x75:
                                 var_s0++;
                                 if (var_s0 < argc) {
                                     addstr(&uldflags, "-ku");
                                     addstr(&uldflags, argv[var_s0]);
                                 }
                                 break;
-                            default: /* switch 7 */
+                            default:
                                 addstr(&ufiles, argv[var_s0]);
                                 break;
                         }
@@ -7432,14 +7432,14 @@ void parse_command(int argc, char** argv) {
                             NoMoreOptions++;
                         }
                     } else {
-                        switch (argv[var_s0][2]) { /* switch 8; irregular */
-                            case 0x6E:             /* switch 8 */
+                        switch (argv[var_s0][2]) {
+                            case 0x6E:
                                 error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
-                            case 0x78: /* switch 8 */
+                            case 0x78:
                                 error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
-                            default: /* switch 8 */
+                            default:
                                 error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                                 exit(2);
                                 break;
