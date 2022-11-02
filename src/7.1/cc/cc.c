@@ -1544,6 +1544,16 @@ repeat_after_edit:
                     goto block_1729;
                 case 0x53: /* switch 19 */
                     goto block_1913;
+                case 0x4D: /* switch 19 */
+                    goto block_1933;
+                case 0x47: /* switch 19 */
+                    goto block_2159;
+                case 0x44: /* switch 19 */
+                case 0x51: /* switch 19 */
+                case 0x56: /* switch 19 */
+                    goto block_2015;
+                case 0x4F: /* switch 19 */
+                    goto block_2068;
             }
         }
         {
@@ -2073,8 +2083,11 @@ repeat_after_edit:
                             continue;
                     }
                     dmips_emit = 0;
-                    switch (srcsuf) { /* switch 18; irregular */
+                    switch (srcsuf) { /* switch 18 */
+                        case 0x73: /* switch 18 */
+                            goto block_2130;
                         default:
+                        case 0x06: /* switch 18 */
                         case 0x63: /* switch 18 */
                         case 0x64: /* switch 18 */
                         case 0x67: /* switch 18 */
@@ -3755,7 +3768,6 @@ repeat_after_edit:
                                         }
                                         break;
 
-                                        // case 0x4D:              /* switch 19 */
                                     block_1933:
                                         if (unrollflag != 0) {
                                             execlist.length = 0;
@@ -3910,9 +3922,6 @@ repeat_after_edit:
                                                         }
                                                     }
                                                 } else {
-                                                    // case 0x44:  /* switch 19 */
-                                                    // case 0x51:  /* switch 19 */
-                                                    // case 0x56:  /* switch 19 */
                                                 block_2015:
                                                     if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
                                                         execlist.length = 0;
@@ -4008,7 +4017,6 @@ repeat_after_edit:
                                                             }
                                                         }
                                                     } else {
-                                                        // case 0x4F: /* switch 19 */
                                                     block_2068:
                                                         execlist.length = 0;
                                                         addstr(&execlist, "ugen");
@@ -4124,7 +4132,6 @@ repeat_after_edit:
                                                                 }
                                                             } else if (Hchar != 0x63) {
                                                                 passin = passout;
-                                                                // case 0x73: /* switch 18 */
                                                             block_2130:
                                                                 if (srcsuf == 0x73) {
                                                                     execlist.length = 0;
@@ -4191,7 +4198,6 @@ repeat_after_edit:
                                                                         }
                                                                     }
                                                                 } else {
-                                                                    // case 0x47: /* switch 19 */
                                                                 block_2159:
                                                                     execlist.length = 0;
                                                                     addstr(&execlist, "as1");
