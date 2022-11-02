@@ -542,735 +542,748 @@ static char* D_1000C1DC = NULL;
 #else
 
 int main(int argc, char** argv) {
-	register int var_s0;
-	register char* var_s1;
-	register char* var_s2;
-	int sp148;
-	char* sp144;
-	char* sp140;
-	char* sp13C;
-	char* sp138;
-	char* sp134;
-	int sp130;
-	char* sp12C;
-	char* sp128;
-	char* sp124;
-	int sp120;
-	int sp11C;
-	char* sp118;
-	int sp114;
-	char* sp110;
-	char* sp10C;
-	char* sp108;
-	char* sp104;
-	int sp100;
-	int spFC;
-	char* spF8;
-	char* spF4;
-	char spF0[4];
-	char* spEC;
-	char* spE8;
-	char spE7;
+    register int var_s0;
+    register char* var_s1;
+    register char* var_s2;
+    int sp148;
+    char* sp144;
+    char* sp140;
+    char* sp13C;
+    char* sp138;
+    char* sp134;
+    int sp130;
+    char* sp12C;
+    char* sp128;
+    char* sp124;
+    int sp120;
+    int sp11C;
+    char* sp118;
+    int sp114;
+    char* sp110;
+    char* sp10C;
+    char* sp108;
+    char* sp104;
+    int sp100;
+    int spFC;
+    char* spF8;
+    char* spF4;
+    char spF0[4];
+    char* spEC;
+    char* spE8;
+    char spE7;
+    int spE0;
+    int spDC;
+    u32 spD8;
+    char* spD4;
+    int spD0;
+    struct stat sp48;
 
-	int spE0;
-	int spDC;
-	u32 spD8;
-	char* spD4;
-	int spD0;
-	struct stat sp48;
+    sp148 = 0;
+    sp144 = NULL;
+    sp140 = NULL;
+    progname = *argv;
+    if ((ansichoice == 1) || (ansichoice == 2)) {
+        CRTX = "acrt1.o";
+    } else {
+        CRTX = "crt1.o";
+    }
+    MCRTX = "mcrt1.o";
+    m4 = "/usr/bin/m4";
+    ratfor = "/usr/bin/ratfor";
+    xpg_env = getenv("_XPG");
+    if (xpg_env != NULL) {
+        xpg_flag = 1;
+    }
+    mklist(&undefineflags);
+    mklist(&cppflags);
+    mklist(&ccomflags);
+    mklist(&cfeflags);
+    mklist(&upasflags);
+    mklist(&fcomflags);
+    mklist(&upl1flags);
+    mklist(&ucobflags);
+    mklist(&ulpiflags);
+    mklist(&eflflags);
+    mklist(&ratforflags);
+    mklist(&ujoinflags);
+    mklist(&uldflags);
+    mklist(&olimitflags);
+    mklist(&ldZflags);
+    mklist(&acppflags);
+    mklist(&cpp2flags);
+    mklist(&mpcflags);
+    mklist(&accomflags);
+    mklist(&uldlibflags);
+    mklist(&edisonflags);
+    mklist(&prelinkerflags);
+    mklist(&pfaflags);
+    mklist(&pcaflags);
+    mklist(&soptflags);
+    mklist(&usplitflags);
+    mklist(&umergeflags);
+    mklist(&uloopflags);
+    mklist(&uopt0flags);
+    mklist(&ddoptflags);
+    mklist(&optflags);
+    mklist(&genflags);
+    mklist(&asflags);
+    mklist(&as1flags);
+    mklist(&ldflags);
+    mklist(&nldflags);
+    mklist(&ftocflags);
+    mklist(&cordflags);
+    mklist(&srcfiles);
+    mklist(&ufiles);
+    mklist(&objfiles);
+    mklist(&execlist);
+    mklist(&feedlist);
+    mklist(&dashlfiles);
 
-	sp148 = 0;
-	sp144 = NULL;
-	sp140 = NULL;
-	progname = *argv;
-	if ((ansichoice == 1) || (ansichoice == 2)) {
-		CRTX = "acrt1.o";
-	} else {
-		CRTX = "crt1.o";
-	}
-	MCRTX = "mcrt1.o";
-	m4 = "/usr/bin/m4";
-	ratfor = "/usr/bin/ratfor";
-	xpg_env = getenv("_XPG");
-	if (xpg_env != NULL) {
-		xpg_flag = 1;
-	}
-	mklist(&undefineflags);
-	mklist(&cppflags);
-	mklist(&ccomflags);
-	mklist(&cfeflags);
-	mklist(&upasflags);
-	mklist(&fcomflags);
-	mklist(&upl1flags);
-	mklist(&ucobflags);
-	mklist(&ulpiflags);
-	mklist(&eflflags);
-	mklist(&ratforflags);
-	mklist(&ujoinflags);
-	mklist(&uldflags);
-	mklist(&olimitflags);
-	mklist(&ldZflags);
-	mklist(&acppflags);
-	mklist(&cpp2flags);
-	mklist(&mpcflags);
-	mklist(&accomflags);
-	mklist(&uldlibflags);
-	mklist(&edisonflags);
-	mklist(&prelinkerflags);
-	mklist(&pfaflags);
-	mklist(&pcaflags);
-	mklist(&soptflags);
-	mklist(&usplitflags);
-	mklist(&umergeflags);
-	mklist(&uloopflags);
-	mklist(&uopt0flags);
-	mklist(&ddoptflags);
-	mklist(&optflags);
-	mklist(&genflags);
-	mklist(&asflags);
-	mklist(&as1flags);
-	mklist(&ldflags);
-	mklist(&nldflags);
-	mklist(&ftocflags);
-	mklist(&cordflags);
-	mklist(&srcfiles);
-	mklist(&ufiles);
-	mklist(&objfiles);
-	mklist(&execlist);
-	mklist(&feedlist);
-	mklist(&dashlfiles);
+    compdirs[1] = mkstr("cc", "/", NULL);
+    compdirs[2] = mkstr("pc", "/", NULL);
+    compdirs[3] = mkstr("f77", "/", NULL);
+    compdirs[4] = mkstr("cc", "/", NULL);
+    compdirs[5] = mkstr("pl1", "/", NULL);
+    compdirs[6] = mkstr("cobol", "/", NULL);
 
-	compdirs[1] = mkstr("cc", "/", NULL);
-	compdirs[2] = mkstr("pc", "/", NULL);
-	compdirs[3] = mkstr("f77", "/", NULL);
-	compdirs[4] = mkstr("cc", "/", NULL);
-	compdirs[5] = mkstr("pl1", "/", NULL);
-	compdirs[6] = mkstr("cobol", "/", NULL);
+    call_shared = default_call_shared;
+    sp13C = getenv("SGI_SVR4");
+    if (sp13C != NULL) {
+        default_svr4 = 1;
+    }
+    sp138 = getenv("SGI_CC");
+    if (sp138 != NULL) {
+        while (isspace(*sp138)) {
+            sp138++;
+        }
+        sp130 = strlen(sp138);
+        if (sp130 <= 0) {
+            error(2, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
+        } else {
+            sp134 = sp130 + sp138 - 1;
+            while (isspace(*sp134)) {
+                sp134--;
+            }
+            sp134++;
+            sp134[0] = 0;
+            if (strcmp(sp138, "-cckr") == 0) {
+                ansichoice = 0;
+                cppchoice = 2;
+                relocate_passes("p", NULL, NULL);
+            } else if (strcmp(sp138, "-ansi") == 0) {
+                ansichoice = 1;
+                cppchoice = 3;
+                relocate_passes("p", NULL, NULL);
+            } else if (strcmp(sp138, "-xansi") == 0) {
+                ansichoice = 3;
+                cppchoice = 3;
+                relocate_passes("p", NULL, NULL);
+            } else if (strcmp(sp138, "-ansiposix") == 0) {
+                ansichoice = 2;
+                cppchoice = 3;
+                relocate_passes("p", NULL, NULL);
+            } else {
+                error(2, NULL, 0, NULL, 0,
+                      "Environment variable SGI_CC contents unrecognizable and ignored; \"%s\" not one of: -cckr -ansi "
+                      "-xansi -ansiposix\n",
+                      sp138);
+                sp138 = NULL;
+            }
+        }
+    }
+    compiler = 1;
 
-	call_shared = default_call_shared;
-	sp13C = getenv("SGI_SVR4");
-	if (sp13C != NULL) {
-		default_svr4 = 1;
-	}
-	sp138 = getenv("SGI_CC");
-	if (sp138 != NULL) {
-		while (isspace(*sp138)) {
-			sp138++;
-		}
-		sp130 = strlen(sp138);
-		if (sp130 <= 0) {
-			error(2, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
-		} else {
-			sp134 = sp138 + sp130 - 1;
-			while (isspace(*sp134)) {
-				sp134--;
-			}
-			sp134++;
-			sp134[0] = 0;
-			if (strcmp(sp138, "-cckr") == 0) {
-				ansichoice = 0;
-				cppchoice = 2;
-				relocate_passes("p", NULL, NULL);
-			} else if (strcmp(sp138, "-ansi") == 0) {
-				ansichoice = 1;
-				cppchoice = 3;
-				relocate_passes("p", NULL, NULL);
-			} else if (strcmp(sp138, "-xansi") == 0) {
-				ansichoice = 3;
-				cppchoice = 3;
-				relocate_passes("p", NULL, NULL);
-			} else if (strcmp(sp138, "-ansiposix") == 0) {
-				ansichoice = 2;
-				cppchoice = 3;
-				relocate_passes("p", NULL, NULL);
-			} else {
-				error(2, NULL, 0, NULL, 0, "Environment variable SGI_CC contents unrecognizable and ignored; \"%s\" not one of: -cckr -ansi -xansi -ansiposix\n", sp138);
-				sp138 = NULL;
-			}
-		}
-	}
-	compiler = 1;
+    var_s1 = strrchr(progname, '/');
+    var_s1 = (var_s1 == NULL) ? progname : var_s1 + 1;
+    compdirs[0] = mkstr(var_s1, "/", NULL);
 
-	var_s1 = strrchr(progname, '/');
-	var_s1 = (var_s1 == NULL) ? progname : var_s1 + 1;
-	compdirs[0] = mkstr(var_s1, "/", NULL);
+    if (strncmp(var_s1, "cc", strlen("cc")) == 0) {
+        compiler = 1;
+        Bstring = var_s1 + strlen("cc");
+    } else if (strncmp(var_s1, "pc", strlen("pc")) == 0) {
+        compiler = 2;
+        Bstring = var_s1 + strlen("pc");
+    } else if (strncmp(var_s1, "f77", strlen("f77")) == 0) {
+        compiler = 3;
+        Bstring = var_s1 + strlen("f77");
+    } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) {
+        error(1, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
+        exit(2);
+    } else if (strncmp(var_s1, "as", strlen("as")) == 0) {
+        compiler = 4;
+        Bstring = var_s1 + strlen("as");
+        strcpy(compdirs[0], compdirs[1]);
+    } else if (strncmp(var_s1, "pl1", strlen("pl1")) == 0) {
+        compiler = 5;
+        Bstring = var_s1 + strlen("pl1");
+    } else if (strncmp(var_s1, "cobol", strlen("cobol")) == 0) {
+        compiler = 6;
+        Bstring = var_s1 + strlen("cobol");
+    } else if (strncmp(var_s1, "ncc", strlen("ncc")) == 0) {
+        compiler = 1;
+        c_compiler_choice = 1;
+        edison_cpp = 1;
+        Bstring = var_s1 + strlen("ncc");
+    } else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
+        compiler = 1;
+        c_compiler_choice = 2;
+        edison_cpp = 1;
+        anachronisms = 0;
+        cfront_compatible = 0;
+        D_1000BF7C = 0;
+        exception_handling = 1;
+        Bstring = var_s1 + strlen("CC");
+    } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
+        compiler = 1;
+        c_compiler_choice = 2;
+        edison_cpp = 1;
+        D_1000BF7C = 0;
+        Bstring = var_s1 + strlen("CC");
+    } else if (strncmp(var_s1, "NCC", strlen("NCC")) == 0) {
+        compiler = 1;
+        c_compiler_choice = 2;
+        edison_cpp = 1;
+        Bstring = var_s1 + strlen("NCC");
+    } else if (strncmp(var_s1, "DCC", strlen("DCC")) == 0) {
+        compiler = 1;
+        c_compiler_choice = 3;
+        edison_cpp = 1;
+        Bstring = var_s1 + strlen("DCC");
+        D_1000BF90 = 1;
+    }
+    Bstring = NULL;
+    comp_target_root = getenv("COMP_TARGET_ROOT");
+    if (comp_target_root == NULL) {
+        comp_target_root = "/";
+    } else if (comp_target_root[strlen(comp_target_root) - 1] != '/') {
+        comp_target_root = mkstr(comp_target_root, "/", NULL);
+    }
+    comp_host_root = getenv("TOOLROOT");
+    if (comp_host_root == NULL) {
+        comp_host_root = "/";
+    } else if (comp_host_root[strlen(comp_host_root) - 1] != '/') {
+        comp_host_root = mkstr(comp_host_root, "/", NULL);
+    }
+    aligndir = mkstr(comp_host_root, "lib/align", NULL);
+    sp12C = getenv("DCC_STD_PATHS");
+    D_1000BF8C = sp12C == NULL || *sp12C == 0 || *sp12C == '0';
+    if (D_1000BF8C == 0) {
+        D_1000BF90 = D_1000BF8C;
+    }
+    if (force_use_cfront(argc, argv)) {
+        exec_OCC(argc, argv);
+    }
+    func_00431A3C(argc, argv);
+    tmpdir = getenv("TMPDIR");
+    if (tmpdir == NULL) {
+        tmpdir = "/tmp/";
+    } else if (tmpdir[strlen(tmpdir) - 1] != '/') {
+        tmpdir = mkstr(tmpdir, "/", NULL);
+    }
+    passout = mktemp(mkstr(tmpdir, "ctmtstXXXXXX", NULL));
+    tmpsfile = fopen(passout, "w");
+    if (tmpsfile == NULL) {
+        sprintf(perr_msg, "cc: can't write to $TMPDIR: %s", tmpdir);
+        perror(perr_msg);
+        exit(2);
+    } else {
+        fclose(tmpsfile);
+        unlink(passout);
+    }
+    rls_id_object = getenv("RLS_ID_OBJECT");
 
-	if (strncmp(var_s1, "cc", strlen("cc")) == 0) {
-		compiler = 1;
-		Bstring = var_s1 + strlen("cc");
-	} else if (strncmp(var_s1, "pc", strlen("pc")) == 0) {
-		compiler = 2;
-		Bstring = var_s1 + strlen("pc");
-	} else if (strncmp(var_s1, "f77", strlen("f77")) == 0) {
-		compiler = 3;
-		Bstring = var_s1 + strlen("f77");
-	} else if (strncmp(var_s1, "f90", strlen("f90")) == 0) {
-		error(1, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
-		exit(2);
-	} else if (strncmp(var_s1, "as", strlen("as")) == 0) {
-		compiler = 4;
-		Bstring = var_s1 + strlen("as");
-		strcpy(compdirs[0], compdirs[1]);
-	} else if (strncmp(var_s1, "pl1", strlen("pl1")) == 0) {
-		compiler = 5;
-		Bstring = var_s1 + strlen("pl1");
-	} else if (strncmp(var_s1, "cobol", strlen("cobol")) == 0) {
-		compiler = 6;
-		Bstring = var_s1 + strlen("cobol");
-	} else if (strncmp(var_s1, "ncc", strlen("ncc")) == 0) {
-		compiler = 1;
-		c_compiler_choice = 1;
-		edison_cpp = 1;
-		Bstring = var_s1 + strlen("ncc");
-	} else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
-		compiler = 1;
-		c_compiler_choice = 2;
-		edison_cpp = 1;
-		anachronisms = 0;
-		cfront_compatible = 0;
-		D_1000BF7C = 0;
-		exception_handling = 1;
-		Bstring = var_s1 + strlen("CC");
-	} else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
-		compiler = 1;
-		c_compiler_choice = 2;
-		edison_cpp = 1;
-		D_1000BF7C = 0;
-		Bstring = var_s1 + strlen("CC");
-	} else if (strncmp(var_s1, "NCC", strlen("NCC")) == 0) {
-		compiler = 1;
-		c_compiler_choice = 2;
-		edison_cpp = 1;
-		Bstring = var_s1 + strlen("NCC");
-	} else if (strncmp(var_s1, "DCC", strlen("DCC")) == 0) {
-		compiler = 1;
-		c_compiler_choice = 3;
-		edison_cpp = 1;
-		Bstring = var_s1 + strlen("DCC");
-		D_1000BF90 = 1;
-	}
-	Bstring = NULL;
-	comp_target_root = getenv("COMP_TARGET_ROOT");
-	if (comp_target_root == NULL) {
-		comp_target_root = "/";
-	} else if (comp_target_root[strlen(comp_target_root) - 1] != '/') {
-		comp_target_root = mkstr(comp_target_root, "/", NULL);
-	}
-	comp_host_root = getenv("TOOLROOT");
-	if (comp_host_root == NULL) {
-		comp_host_root = "/";
-	} else if (comp_host_root[strlen(comp_host_root) - 1] != '/') {
-		comp_host_root = mkstr(comp_host_root, "/", NULL);
-	}
-	aligndir = mkstr(comp_host_root, "lib/align", NULL);
-	sp12C = getenv("DCC_STD_PATHS");
-	D_1000BF8C = sp12C == NULL || *sp12C == 0 || *sp12C == '0';
-	if (D_1000BF8C == 0) {
-		D_1000BF90 = D_1000BF8C;
-	}
-	if (force_use_cfront(argc, argv)) {
-		exec_OCC(argc, argv);
-	}
-	func_00431A3C(argc, argv);
-	tmpdir = getenv("TMPDIR");
-	if (tmpdir == NULL) {
-		tmpdir = "/tmp/";
-	} else if (tmpdir[strlen(tmpdir) - 1] != '/') {
-		tmpdir = mkstr(tmpdir, "/", NULL);
-	}
-	passout = mktemp(mkstr(tmpdir, "ctmtstXXXXXX", NULL));
-	tmpsfile = fopen(passout, "w");
-	if (tmpsfile == NULL) {
-		sprintf(perr_msg, "cc: can't write to $TMPDIR: %s", tmpdir);
-		perror(perr_msg);
-		exit(2);
-	} else {
-		fclose(tmpsfile);
-		unlink(passout);
-	}
-	rls_id_object = getenv("RLS_ID_OBJECT");
+    for (var_s0 = 1; var_s0 < argc; var_s0++) {
+        if (strcmp(argv[var_s0], "-non_shared") == 0) {
+            non_shared = 1;
+            if (Oflag < 3) {
+                Gnum = "8";
+            }
+        } else if (strcmp(argv[var_s0], "-irix4") == 0) {
+            irix4 = 1;
+            Gnum = "8";
+        } else if (strcmp(argv[var_s0], "-coff") == 0) {
+            LD = "old_ld";
+            coff_spec = 1;
+            kpic_flag = 0;
+            Gnum = "8";
+        } else if (strcmp(argv[var_s0], "-mips3") == 0) {
+            mips3flag = 1;
+            Gnum = "8";
+            kpic_flag = 0;
+        } else if (strcmp(argv[var_s0], "-excpt") == 0) {
+            excpt_flag = 1;
+            kpic_flag = 0;
+            Gnum = "8";
+        } else if (strcmp(argv[var_s0], "-abi") == 0) {
+            abi_flag = 1;
+            mips1flag = 1;
+            mips2flag = 0;
+        } else if (strcmp(argv[var_s0], "-O3") == 0) {
+            Oflag = 3;
+        } else if (strcmp(argv[var_s0], "-old_ld") == 0) {
+            LD = "old_ld";
+            D_1000BF90 = 0;
+        }
+    }
 
-	for (var_s0 = 1; var_s0 < argc; var_s0++) {
-		if (strcmp(argv[var_s0], "-non_shared") == 0) {
-			non_shared = 1;
-			if (Oflag < 3) {
-				Gnum = "8";
-			}
-		} else if (strcmp(argv[var_s0], "-irix4") == 0) {
-			irix4 = 1;
-			Gnum = "8";
-		} else if (strcmp(argv[var_s0], "-coff") == 0) {
-			LD = "old_ld";
-			coff_spec = 1;
-			kpic_flag = 0;
-			Gnum = "8";
-		} else if (strcmp(argv[var_s0], "-mips3") == 0) {
-			mips3flag = 1;
-			Gnum = "8";
-			kpic_flag = 0;
-		} else if (strcmp(argv[var_s0], "-excpt") == 0) {
-			excpt_flag = 1;
-			kpic_flag = 0;
-			Gnum = "8";
-		} else if (strcmp(argv[var_s0], "-abi") == 0) {
-			abi_flag = 1;
-			mips1flag = 1;
-			mips2flag = 0;
-		} else if (strcmp(argv[var_s0], "-O3") == 0) {
-			Oflag = 3;
-		} else if (strcmp(argv[var_s0], "-old_ld") == 0) {
-			LD = "old_ld";
-			D_1000BF90 = 0;
-		}
-	}
+    if ((compiler == 1) || (compiler == 2) || (compiler == 3) || (compiler == 4)) {
+        docpp = 1;
+        default_nocpp = 0;
+    } else {
+        docpp = 0;
+        default_nocpp = 1;
+    }
+    currcomp = compdirs[0];
+    mklist(&dirs_for_nonshared_crtn);
+    mklist(&dirs_for_abi_crtn);
+    mklist(&dirs_for_crtn);
 
-	if ((compiler == 1) || (compiler == 2) || (compiler == 3) || (compiler == 4)) {
-		docpp = 1;
-		default_nocpp = 0;
-	} else {
-		docpp = 0;
-		default_nocpp = 1;
-	}
-	currcomp = compdirs[0];
-	mklist(&dirs_for_nonshared_crtn);
-	mklist(&dirs_for_abi_crtn);
-	mklist(&dirs_for_crtn);
+    for (var_s0 = 1; var_s0 < argc; var_s0++) {
+        if (argv[var_s0][0] == 0x2D) {
+            if (strcmp(argv[var_s0], "-nostdlib") == 0) {
+                sp148 = 1;
+            } else {
+                switch (argv[var_s0][1]) { /* switch 9; irregular */
+                    case 0x45:             /* switch 9 */
+                        if ((argv[var_s0][3] == 0) && ((argv[var_s0][2] == 0x42) || (argv[var_s0][2] == 0x4C))) {
+                            if (argv[var_s0][2] == 0x42) {
+                                if ((Bflag != 0) && (targetsex != 0)) {
+                                    error(1, NULL, 0, NULL, 0,
+                                          "-EB or -EL must precede any -B flags for ucode compilers.\n");
+                                    exit(2);
+                                }
+                                targetsex = 0;
+                            } else {
+                                if ((Bflag != 0) && (targetsex != 1)) {
+                                    error(1, NULL, 0, NULL, 0,
+                                          "-EB or -EL must precede any -B flags for ucode compilers.\n");
+                                    exit(2);
+                                }
+                                targetsex = 1;
+                            }
+                            newrunlib();
+                        }
+                        break;
+                    case 0x4C: /* switch 9 */
+                        if (argv[var_s0][2] == 0) {
+                            if (((var_s0 + 1) >= argc) || (argv[var_s0 + 1][0] == 0x2D) ||
+                                (isdir(argv[var_s0 + 1]) == 0)) {
+                                sp148 = 1;
+                                break;
+                            } else {
+                                var_s0 += 1;
+                                sp128 = mkstr(argv[var_s0], NULL);
+                            }
+                        } else {
+                            sp128 = mkstr(argv[var_s0] + 2, NULL);
+                        }
+                        if (sp128[strlen(sp128) - 1] == 0x2F) {
+                            sp128[strlen(sp128) - 1] = 0;
+                        }
+                        addstr(&dirs_for_crtn, sp128);
+                        addstr(&dirs_for_nonshared_crtn, sp128);
+                        addstr(&dirs_for_abi_crtn, sp128);
+                        break;
+                }
+            }
+        }
+    done:;
+    }
 
-	for (var_s0 = 1; var_s0 < argc; var_s0++) {
-		if (argv[var_s0][0] == 0x2D) {
-			if (strcmp(argv[var_s0], "-nostdlib") == 0) {
-				sp148 = 1;
-			} else {
-				switch (argv[var_s0][1]) {              /* switch 9; irregular */
-				case 0x45:                      /* switch 9 */
-					if ((argv[var_s0][3] == 0) && ((argv[var_s0][2] == 0x42) || (argv[var_s0][2] == 0x4C))) {
-						if (argv[var_s0][2] == 0x42) {
-							if ((Bflag != 0) && (targetsex != 0)) {
-								error(1, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags for ucode compilers.\n");
-								exit(2);
-							}
-							targetsex = 0;
-						} else {
-							if ((Bflag != 0) && (targetsex != 1)) {
-								error(1, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags for ucode compilers.\n");
-								exit(2);
-							}
-							targetsex = 1;
-						}
-						newrunlib();
-					}
-					break;
-				case 0x4C:                      /* switch 9 */
-					if (argv[var_s0][2] == 0) {
-						if (((var_s0 + 1) >= argc) || (argv[var_s0 + 1][0] == 0x2D) || (isdir(argv[var_s0 + 1]) == 0)) {
-							sp148 = 1;
-							break;
-						} else {
-							var_s0 += 1;
-							sp128 = mkstr(argv[var_s0], NULL);
-						}
-					} else {
-						sp128 = mkstr(argv[var_s0] + 2, NULL);
-					}
-					if (sp128[strlen(sp128) - 1] == 0x2F) {
-						sp128[strlen(sp128) - 1] = 0;
-					}
-					addstr(&dirs_for_crtn, sp128);
-					addstr(&dirs_for_nonshared_crtn, sp128);
-					addstr(&dirs_for_abi_crtn, sp128);
-					break;
-				}
-			}
-		}
-done:;
-	}
-
-	if (sp148 == 0) {
-		if ((non_shared != 0) || (coff_spec != 0) || (mips3flag != 0) || (excpt_flag != 0)) {
-			addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
-		} else if (abi_flag != 0) {
-			addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
-		} else {
-			addstr(&dirs_for_crtn, mkstr(comp_target_root, "usr/lib", NULL));
-			addstr(&dirs_for_crtn, mkstr(comp_target_root, "lib", NULL));
-		}
-	}
-	relocate_passes(tstring, NULL, Bstring);
-	relocate_passes("h", NULL, Bstring);
-	if (strcmp("/", comp_target_root) != 0) {
-		einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
-		include = mkstr(comp_target_root, "usr/include", NULL);
-	}
-	if (compiler == 1) {
-		oldcflag = 0;
-	} else {
-		cpp_stdflag = "-std0";
-	}
-	systype = "svr4";
-	svr4_systype = 1;
-	process_config(argc, argv);
-	parse_command(argc - 1, argv + 4);
-	func_00431DD8();
-	if (D_1000BF74 != 0) {
-		if (D_1000BF80 == NULL) {
-			D_1000BF80 = "";
-		}
-		sp144 = mkstr(D_1000BF78 != 0 ? "-YSv" : "-YSz", D_1000BF80, NULL);
-		if (compiler == 1) {
-			addstr(&edisonflags, sp144);
-		} else {
-			if (D_1000BF78 != 0) {
-				sp140 = "-cvs_nosrc";
-			} else {
-				sp140 = "-cvs";
-			}
-			if (D_1000BF80[0] != 0) {
-				sp140 = mkstr(sp140, ",", D_1000BF80, NULL);
-			}
-			addstr(&fcomflags, sp140);
-		}
-	}
-	if (user_systype == 0) {
-		if (fiveflag != 0) {
-			include = mkstr(comp_target_root, "usr/5include", NULL);
-		} else {
-			einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
-			include = mkstr(comp_target_root, "usr/include", NULL);
-		}
-		// include = var_v0_2;
-		if (Bstring != NULL) {
-			relocate_passes("h", NULL, Bstring);
-		}
-		newrunlib();
-	}
-	if (((mips2flag != 0) || (mips3flag != 0) || (sixty4bitflag != 0)) && (kpic_flag == 0) && ((non_shared != 0) || (call_shared != 0) || (default_call_shared != 0))) {
-		if (non_shared == 0) {
-			non_shared = 1;
-			old_non_shared = 1;
-		}
-		default_call_shared = 0;
-		call_shared = 0;
-		if (non_shared_emitted == 0) {
-			addstr(&ldflags, "-non_shared");
-			addstr(&cfeflags, "-non_shared");
-			non_shared_emitted = 1;
-		}
-	}
-	if ((non_shared != 0) && (non_shared_emitted == 0)) {
-		addstr(&ldflags, "-non_shared");
-		addstr(&cfeflags, "-non_shared");
-		non_shared_emitted = 1;
-	} else if (call_shared != 0) {
-		addstr(&ldflags, "-call_shared");
-		addstr(&cfeflags, "-call_shared");
-	}
-	if ((Vflag == 0) && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
-		error(1, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
-		exit(2);
-	}
-	if (w1flag == 1) {
-		addstr(&fcomflags, "-w1");
-	} else if (w1flag == 2) {
-		addstr(&fcomflags, "-w");
-	}
-	if ((srcexists == 0) && ((cflag != 0) || (Sflag != 0))) {
-		error(1, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
-		exit(4);
-	}
-	if ((mp_flag != 0) && (gflag != 0) && (mp_flag & 1)) {
-		mp_flag |= 4;
-	}
-	if ((cmp_flag != 0) && (gflag != 0) && (cmp_flag & 1)) {
-		cmp_flag |= 4;
-	}
-	if ((ansichoice == 1) || (ansichoice == 2)) {
-		CRTX = "acrt1.o";
-		crtn_required = 1;
-	}
-	relocate_passes("r", NULL, NULL);
-	if ((B_1000ED30 != 0) && (compiler == 1) && ((ansichoice == 1) || (ansichoice == 2))) {
-		error(2, NULL, 0, NULL, 0, "'-lc_s' specified. Shared version of C library does not conform to ANSI X3.159-1989.\n");
-	}
-	// The second and third comparison of this if check are fake and optimized out
-	if (Oflag >= 3 && Oflag >= 3 && Oflag >= 3) {
-	}
-	if ((kpic_flag != 0) && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
-		error(2, NULL, 0, NULL, 0, "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
-		Gnum = "0";
-	}
-	if ((abi_flag != 0) && (non_shared != 0)) {
-		error(2, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
-		non_shared = 0;
-		kpic_flag = 1;
-		Gnum = "0";
-	}
-	if ((Oflag >= 3) && (compiler == 4)) {
-		error(2, NULL, 0, NULL, 0, "-O3 is not supported for assembly compiles for ucode compilers; changing to -O2.\n");
-		Oflag = 2;
-		uload = 0;
-	}
-	get_host_chiptype();
-	if (targetsex == 0) {
-		addstr(&cppflags, "-D_MIPSEB");
-		if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
-			addstr(&cppflags, "-DMIPSEB");
-		}
-		if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
-			addstr(&cppflags, "-D__STDC__=1");
-		}
-		if ((compiler == 1) && (ansichoice == 2)) {
-			addstr(&cppflags, "-D_POSIX_SOURCE=1");
-		}
-		addstr(&ccomflags, "-EB");
-		addstr(&upasflags, "-EB");
-		addstr(&fcomflags, "-EB");
-		addstr(&upl1flags, "-EB");
-		addstr(&ulpiflags, "-EB");
-		addstr(&ucobflags, "-EB");
-		addstr(&umergeflags, "-EB");
-		addstr(&optflags, "-EB");
-		addstr(&genflags, "-EB");
-		addstr(&asflags, "-EB");
-	} else {
-		addstr(&cppflags, "-D_MIPSEL");
-		addstr(&cppflags, "-D_MIPSEL");
-		if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
-			addstr(&cppflags, "-DMIPSEL");
-		}
-		if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
-			addstr(&cppflags, "-D__STDC__=1");
-		}
-		if ((compiler == 1) && (ansichoice == 2)) {
-			addstr(&cppflags, "-D_POSIX_SOURCE=1");
-		}
-		addstr(&ccomflags, "-EL");
-		addstr(&upasflags, "-EL");
-		addstr(&fcomflags, "-EL");
-		addstr(&upl1flags, "-EL");
-		addstr(&ulpiflags, "-EL");
-		addstr(&ucobflags, "-EL");
-		addstr(&genflags, "-EL");
-		addstr(&umergeflags, "-EL");
-		addstr(&optflags, "-EL");
-		addstr(&asflags, "-EL");
-		addstr(&ldflags, "-EL");
-	}
-	switch (gflag) {                                /* switch 10; irregular */
-	case 0:                                         /* switch 10 */
-		addstr(&ccomflags, "-Xg0");
-		addstr(&upasflags, "-g0");
-		addstr(&fcomflags, "-g0");
-		addstr(&ulpiflags, "-g0");
-		addstr(&uopt0flags, "-g0");
-		addstr(&ddoptflags, "-g0");
-		addstr(&optflags, "-g0");
-		addstr(&umergeflags, "-g0");
-		addstr(&uloopflags, "-g0");
-		addstr(&genflags, "-g0");
-		addstr(&asflags, "-g0");
-		addstr(&ldflags, "-g0");
-		if (nocode == 0) {
-			addstr(&edisonflags, "-Zg0");
-		}
-		break;
-	case 1:                                         /* switch 10 */
-		addstr(&edisonflags, "-Zg1");
-		addstr(&ccomflags, "-Xg1");
-		add_info("-g1");
-		break;
-	case 2:                                         /* switch 10 */
-		addstr(&edisonflags, "-Zg2");
-		addstr(&ccomflags, "-Xg2");
-		add_info("-g2");
-		break;
-	case 3:                                         /* switch 10 */
-		gflag += 1;
-		addstr(&edisonflags, "-Zg3");
-		addstr(&ccomflags, "-Xg3");
-		add_info("-g3");
-		break;
-	}
-	if ((mp_flag != 0) && (ddoptflag != 0)) {
-		error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
-		exit(2);
-	}
-	if ((mips3flag != 0) && (thirty2bitflag == 0)) {
-		error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
-		exit(2);
-	}
-	if ((irix4 != 0) && (compiler == 1) && (c_compiler_choice != 0)) {
-		error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
-		exit(2);
-	}
-	if ((irix4 != 0) && (compiler == 3) && (D_1000BF74 != 0)) {
-		error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
-		exit(2);
-	}
-	if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && (make_edison_shlib != 0)) {
-		error(1, NULL, 0, NULL, 0, "-shared can be specified only when a link is to be performed for ucode compilers\n");
-		exit(2);
-	}
-	if ((cflag == 0) && (nocode == 0) && (srcfiles.length == 1) && (objfiles.length == 1)) {
-		default_template_instantiation_mode = 1;
-	}
-	if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (Fflag != 0) && (smart_build != 0)) {
-		error(2, NULL, 0, NULL, 0, "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
-		smart_build = 0;
-	}
-	if ((default_template_instantiation_mode != 0) && (force_prelink == 0)) {
-		no_prelink = 1;
-	}
-	if ((compiler == 1) && (c_compiler_choice == 3)) {
-		sp124 = getenv("DCC_FORCE_OPT");
-		sp120 = 1;
-		if (Oflag >= 3) {
-			Oflag = 2;
-			uload = 0;
-		}
-		if (sp124 != NULL) {
-			// temp_t6 = sp124->unk_0;
-			if ((sp124[0] >= 0x30) && (sp124[0] < 0x34) && (sp124[1] == 0)) {
-				sp120 = sp124[0] - 0x30;
-			}
-		}
-		if (Oflag > sp120) {
-			Oflag = sp120;
-		}
-	}
-	addstr(&execlist, "-Dunix");
-	if (dmips_emit == 0) {
-		if (mips2flag != 0) {
-			if (dwopcodeflag != 0) {
-				error(1, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
-				exit(2);
-			}
-			addstr(&execlist, "-Dmips=2");
-		}
-		if (mips3flag != 0) {
-			addstr(&execlist, "-Dmips=3");
-		} else {
-			addstr(&execlist, "-Dmips=1");
-		}
-	}
-	addstr(&execlist, "-Dhost_mips");
-	if (sixty4bitflag != 0) {
-		addstr(&ccomflags, "-64bit");
-		add_info("-64bit");
-		addstr(&ccomflags, "-dwopcode");
-		add_info("-dwopcode");
-		if (mips3flag == 0) {
-			chip_targ = 2;
-			mips3flag = 1;
-			addstr(&ccomflags, "-mips3");
-			add_info("-mips3");
-			relocate_passes("M", NULL, NULL);
-		}
-	} else if (dwopcodeflag != 0) {
-		addstr(&ccomflags, "-dwopcode");
-		add_info("-dwopcode");
-		if (mips3flag == 0) {
-			chip_targ = 2;
-			mips3flag = 1;
-			addstr(&ccomflags, "-mips3");
-			add_info("-mips3");
-			relocate_passes("M", NULL, NULL);
-		}
-	}
-	switch (Oflag) {                                /* switch 1 */
-	case 0:                                         /* switch 1 */
-		var_s1 = "-O0";
-		break;
-	case 1:                                         /* switch 1 */
-		var_s1 = "-O1";
-		break;
-	case 2:                                         /* switch 1 */
-		var_s1 = "-O2";
-		break;
-	case 3:                                         /* switch 1 */
-		var_s1 = "-O3";
-		break;
-	case 4:                                         /* switch 1 */
-		var_s1 = "-O4";
-		break;
-	}
-	addstr(&ccomflags, var_s1);
-	addstr(&upasflags, var_s1);
-	addstr(&fcomflags, var_s1);
-	addstr(&upl1flags, var_s1);
-	addstr(&ulpiflags, var_s1);
-	addstr(&ucobflags, var_s1);
-	addstr(&uopt0flags, var_s1);
-	addstr(&ddoptflags, var_s1);
-	addstr(&optflags, var_s1);
-	addstr(&umergeflags, var_s1);
-	addstr(&uloopflags, var_s1);
-	addstr(&genflags, var_s1);
-	addstr(&asflags, var_s1);
-	if (compiler == 3) {
-		if (automaticflag != 0) {
-			addstr(&fcomflags, "-automatic");
-		} else {
-			addstr(&fcomflags, "-static");
-			addstr(&optflags, "-static");
-		}
-	}
-	if (Vflag != 0) {
-		whats();
-	}
-	if (runerror != 0) {
-		exit(1);
-	}
-	if (sigset(2, (void (*)())1) != (void (*)())1) {
-		sigset(2, handler);
-	}
-	if (sigset(0xF, (void (*)())1) != (void (*)())1) {
-		sigset(0xF, handler);
-	}
-	if (sigset(0xD, (void (*)())1) != (void (*)())1) {
-		sigset(0xD, handler);
-	}
-	if ((compiler == 6) && (nolockflag != 0) && (lpilockflag != 0)) {
-		error(1, NULL, 0, NULL, 0, "Conflicting flags; -nolock and -lpilock can't both be specified for ucode compilers\n");
-		exit(2);
-	}
-	if ((Oflag >= 3) && (cflag != 0) && (srcfiles.length == 1)) {
-		error(2, NULL, 0, NULL, 0, "-c should not be used with ucode -O3 -o32 on a single file; use -j instead to get inter-module optimization.\n");
-	}
-	if ((srcfiles.length >= 2) && (compiler == 4) && (Eflag == 0) && (Pflag == 0)) {
-		error(1, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n", "as");
-		exit(2);
-	}
-	mktempstr();
-	for (var_s0 = 0; (var_s0 < srcfiles.length) || (uload != 0); var_s0++) {
-		// var_s0 = 0;
-		// if ((srcfiles.length > 0) || (uload != 0))
-loop_363:
-		nocompileneeded = 0;
-		sp118 = NULL;
-		longlong_emitted = 0;
-		sp11C = D_1000BF74;
-		if (var_s0 == srcfiles.length) {
-			uload = 0;
-			if ((runerror == 0) && (Eflag == 0) && (Pflag == 0)) {
-				if (uoutfile == NULL) {
-					addstr(&srcfiles, "u.out.?");
-				} else if (getsuf(uoutfile) != 0) {
-					addstr(&srcfiles, mksuf(uoutfile, 0x3F));
-				} else {
-					addstr(&srcfiles, mkstr(uoutfile, ".?", NULL));
-				}
-				srcsuf = 0x3F;
-				if ((Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x63) || (Kflag != 0)) {
-					symtab = mksuf(srcfiles.entries[var_s0], 0x54);
-					tmpst = 0;
-				} else {
-					symtab = tempstr[0];
-					tmpst = 1;
-				}
+    if (sp148 == 0) {
+        if ((non_shared != 0) || (coff_spec != 0) || (mips3flag != 0) || (excpt_flag != 0)) {
+            addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
+        } else if (abi_flag != 0) {
+            addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
+        } else {
+            addstr(&dirs_for_crtn, mkstr(comp_target_root, "usr/lib", NULL));
+            addstr(&dirs_for_crtn, mkstr(comp_target_root, "lib", NULL));
+        }
+    }
+    relocate_passes(tstring, NULL, Bstring);
+    relocate_passes("h", NULL, Bstring);
+    if (strcmp("/", comp_target_root) != 0) {
+        einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
+        include = mkstr(comp_target_root, "usr/include", NULL);
+    }
+    if (compiler == 1) {
+        oldcflag = 0;
+    } else {
+        cpp_stdflag = "-std0";
+    }
+    systype = "svr4";
+    svr4_systype = 1;
+    process_config(argc, argv);
+    parse_command(argc - 1, argv + 1);
+    func_00431DD8();
+    if (D_1000BF74 != 0) {
+        if (D_1000BF80 == NULL) {
+            D_1000BF80 = "";
+        }
+        sp144 = mkstr(D_1000BF78 != 0 ? "-YSv" : "-YSz", D_1000BF80, NULL);
+        if (compiler == 1) {
+            addstr(&edisonflags, sp144);
+        } else {
+            if (D_1000BF78 != 0) {
+                sp140 = "-cvs_nosrc";
+            } else {
+                sp140 = "-cvs";
+            }
+            if (D_1000BF80[0] != 0) {
+                sp140 = mkstr(sp140, ",", D_1000BF80, NULL);
+            }
+            addstr(&fcomflags, sp140);
+        }
+    }
+    if (user_systype == 0) {
+        if (fiveflag != 0) {
+            include = mkstr(comp_target_root, "usr/5include", NULL);
+        } else {
+            einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
+            include = mkstr(comp_target_root, "usr/include", NULL);
+        }
+        // include = var_v0_2;
+        if (Bstring != NULL) {
+            relocate_passes("h", NULL, Bstring);
+        }
+        newrunlib();
+    }
+    if (((mips2flag != 0) || (mips3flag != 0) || (sixty4bitflag != 0)) && (kpic_flag == 0) &&
+        ((non_shared != 0) || (call_shared != 0) || (default_call_shared != 0))) {
+        if (non_shared == 0) {
+            non_shared = 1;
+            old_non_shared = 1;
+        }
+        default_call_shared = 0;
+        call_shared = 0;
+        if (non_shared_emitted == 0) {
+            addstr(&ldflags, "-non_shared");
+            addstr(&cfeflags, "-non_shared");
+            non_shared_emitted = 1;
+        }
+    }
+    if ((non_shared != 0) && (non_shared_emitted == 0)) {
+        addstr(&ldflags, "-non_shared");
+        addstr(&cfeflags, "-non_shared");
+        non_shared_emitted = 1;
+    } else if (call_shared != 0) {
+        addstr(&ldflags, "-call_shared");
+        addstr(&cfeflags, "-call_shared");
+    }
+    if ((Vflag == 0) && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
+        error(1, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
+        exit(2);
+    }
+    if (w1flag == 1) {
+        addstr(&fcomflags, "-w1");
+    } else if (w1flag == 2) {
+        addstr(&fcomflags, "-w");
+    }
+    if ((srcexists == 0) && ((cflag != 0) || (Sflag != 0))) {
+        error(1, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
+        exit(4);
+    }
+    if ((mp_flag != 0) && (gflag != 0) && (mp_flag & 1)) {
+        mp_flag |= 4;
+    }
+    if ((cmp_flag != 0) && (gflag != 0) && (cmp_flag & 1)) {
+        cmp_flag |= 4;
+    }
+    if ((ansichoice == 1) || (ansichoice == 2)) {
+        CRTX = "acrt1.o";
+        crtn_required = 1;
+    }
+    relocate_passes("r", NULL, NULL);
+    if ((B_1000ED30 != 0) && (compiler == 1) && ((ansichoice == 1) || (ansichoice == 2))) {
+        error(2, NULL, 0, NULL, 0,
+              "'-lc_s' specified. Shared version of C library does not conform to ANSI X3.159-1989.\n");
+    }
+    // The second and third comparison of this if check are fake and optimized out
+    if (Oflag >= 3 && Oflag >= 3 && Oflag >= 3) {}
+    if ((kpic_flag != 0) && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
+        error(2, NULL, 0, NULL, 0,
+              "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
+        Gnum = "0";
+    }
+    if ((abi_flag != 0) && (non_shared != 0)) {
+        error(2, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
+        non_shared = 0;
+        kpic_flag = 1;
+        Gnum = "0";
+    }
+    if ((Oflag >= 3) && (compiler == 4)) {
+        error(2, NULL, 0, NULL, 0,
+              "-O3 is not supported for assembly compiles for ucode compilers; changing to -O2.\n");
+        Oflag = 2;
+        uload = 0;
+    }
+    get_host_chiptype();
+    if (targetsex == 0) {
+        addstr(&cppflags, "-D_MIPSEB");
+        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+            addstr(&cppflags, "-DMIPSEB");
+        }
+        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+            addstr(&cppflags, "-D__STDC__=1");
+        }
+        if ((compiler == 1) && (ansichoice == 2)) {
+            addstr(&cppflags, "-D_POSIX_SOURCE=1");
+        }
+        addstr(&ccomflags, "-EB");
+        addstr(&upasflags, "-EB");
+        addstr(&fcomflags, "-EB");
+        addstr(&upl1flags, "-EB");
+        addstr(&ulpiflags, "-EB");
+        addstr(&ucobflags, "-EB");
+        addstr(&umergeflags, "-EB");
+        addstr(&optflags, "-EB");
+        addstr(&genflags, "-EB");
+        addstr(&asflags, "-EB");
+    } else {
+        addstr(&cppflags, "-D_MIPSEL");
+        addstr(&cppflags, "-D_MIPSEL");
+        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+            addstr(&cppflags, "-DMIPSEL");
+        }
+        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+            addstr(&cppflags, "-D__STDC__=1");
+        }
+        if ((compiler == 1) && (ansichoice == 2)) {
+            addstr(&cppflags, "-D_POSIX_SOURCE=1");
+        }
+        addstr(&ccomflags, "-EL");
+        addstr(&upasflags, "-EL");
+        addstr(&fcomflags, "-EL");
+        addstr(&upl1flags, "-EL");
+        addstr(&ulpiflags, "-EL");
+        addstr(&ucobflags, "-EL");
+        addstr(&genflags, "-EL");
+        addstr(&umergeflags, "-EL");
+        addstr(&optflags, "-EL");
+        addstr(&asflags, "-EL");
+        addstr(&ldflags, "-EL");
+    }
+    switch (gflag) { /* switch 10; irregular */
+        case 0:      /* switch 10 */
+            addstr(&ccomflags, "-Xg0");
+            addstr(&upasflags, "-g0");
+            addstr(&fcomflags, "-g0");
+            addstr(&ulpiflags, "-g0");
+            addstr(&uopt0flags, "-g0");
+            addstr(&ddoptflags, "-g0");
+            addstr(&optflags, "-g0");
+            addstr(&umergeflags, "-g0");
+            addstr(&uloopflags, "-g0");
+            addstr(&genflags, "-g0");
+            addstr(&asflags, "-g0");
+            addstr(&ldflags, "-g0");
+            if (nocode == 0) {
+                addstr(&edisonflags, "-Zg0");
+            }
+            break;
+        case 1: /* switch 10 */
+            addstr(&edisonflags, "-Zg1");
+            addstr(&ccomflags, "-Xg1");
+            add_info("-g1");
+            break;
+        case 2: /* switch 10 */
+            addstr(&edisonflags, "-Zg2");
+            addstr(&ccomflags, "-Xg2");
+            add_info("-g2");
+            break;
+        case 3: /* switch 10 */
+            gflag += 1;
+            addstr(&edisonflags, "-Zg3");
+            addstr(&ccomflags, "-Xg3");
+            add_info("-g3");
+            break;
+    }
+    if ((mp_flag != 0) && (ddoptflag != 0)) {
+        error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
+        exit(2);
+    }
+    if ((mips3flag != 0) && (thirty2bitflag == 0)) {
+        error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
+        exit(2);
+    }
+    if ((irix4 != 0) && (compiler == 1) && (c_compiler_choice != 0)) {
+        error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
+        exit(2);
+    }
+    if ((irix4 != 0) && (compiler == 3) && (D_1000BF74 != 0)) {
+        error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
+        exit(2);
+    }
+    if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && (make_edison_shlib != 0)) {
+        error(1, NULL, 0, NULL, 0,
+              "-shared can be specified only when a link is to be performed for ucode compilers\n");
+        exit(2);
+    }
+    if ((cflag == 0) && (nocode == 0) && (srcfiles.length == 1) && (objfiles.length == 1)) {
+        default_template_instantiation_mode = 1;
+    }
+    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (Fflag != 0) &&
+        (smart_build != 0)) {
+        error(2, NULL, 0, NULL, 0, "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
+        smart_build = 0;
+    }
+    if ((default_template_instantiation_mode != 0) && (force_prelink == 0)) {
+        no_prelink = 1;
+    }
+    if ((compiler == 1) && (c_compiler_choice == 3)) {
+        sp124 = getenv("DCC_FORCE_OPT");
+        sp120 = 1;
+        if (Oflag >= 3) {
+            Oflag = 2;
+            uload = 0;
+        }
+        if (sp124 != NULL) {
+            // temp_t6 = sp124->unk_0;
+            if ((sp124[0] >= 0x30) && (sp124[0] < 0x34) && (sp124[1] == 0)) {
+                sp120 = sp124[0] - 0x30;
+            }
+        }
+        if (Oflag > sp120) {
+            Oflag = sp120;
+        }
+    }
+    addstr(&execlist, "-Dunix");
+    if (dmips_emit == 0) {
+        if (mips2flag != 0) {
+            if (dwopcodeflag != 0) {
+                error(1, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
+                exit(2);
+            }
+            addstr(&execlist, "-Dmips=2");
+        }
+        if (mips3flag != 0) {
+            addstr(&execlist, "-Dmips=3");
+        } else {
+            addstr(&execlist, "-Dmips=1");
+        }
+    }
+    addstr(&execlist, "-Dhost_mips");
+    if (sixty4bitflag != 0) {
+        addstr(&ccomflags, "-64bit");
+        add_info("-64bit");
+        addstr(&ccomflags, "-dwopcode");
+        add_info("-dwopcode");
+        if (mips3flag == 0) {
+            chip_targ = 2;
+            mips3flag = 1;
+            addstr(&ccomflags, "-mips3");
+            add_info("-mips3");
+            relocate_passes("M", NULL, NULL);
+        }
+    } else if (dwopcodeflag != 0) {
+        addstr(&ccomflags, "-dwopcode");
+        add_info("-dwopcode");
+        if (mips3flag == 0) {
+            chip_targ = 2;
+            mips3flag = 1;
+            addstr(&ccomflags, "-mips3");
+            add_info("-mips3");
+            relocate_passes("M", NULL, NULL);
+        }
+    }
+    switch (Oflag) { /* switch 1 */
+        case 0:      /* switch 1 */
+            var_s1 = "-O0";
+            break;
+        case 1: /* switch 1 */
+            var_s1 = "-O1";
+            break;
+        case 2: /* switch 1 */
+            var_s1 = "-O2";
+            break;
+        case 3: /* switch 1 */
+            var_s1 = "-O3";
+            break;
+        case 4: /* switch 1 */
+            var_s1 = "-O4";
+            break;
+    }
+    addstr(&ccomflags, var_s1);
+    addstr(&upasflags, var_s1);
+    addstr(&fcomflags, var_s1);
+    addstr(&upl1flags, var_s1);
+    addstr(&ulpiflags, var_s1);
+    addstr(&ucobflags, var_s1);
+    addstr(&uopt0flags, var_s1);
+    addstr(&ddoptflags, var_s1);
+    addstr(&optflags, var_s1);
+    addstr(&umergeflags, var_s1);
+    addstr(&uloopflags, var_s1);
+    addstr(&genflags, var_s1);
+    addstr(&asflags, var_s1);
+    if (compiler == 3) {
+        if (automaticflag != 0) {
+            addstr(&fcomflags, "-automatic");
+        } else {
+            addstr(&fcomflags, "-static");
+            addstr(&optflags, "-static");
+        }
+    }
+    if (Vflag != 0) {
+        whats();
+    }
+    if (runerror != 0) {
+        exit(1);
+    }
+    if (sigset(2, (void (*)())1) != (void (*)())1) {
+        sigset(2, handler);
+    }
+    if (sigset(0xF, (void (*)())1) != (void (*)())1) {
+        sigset(0xF, handler);
+    }
+    if (sigset(0xD, (void (*)())1) != (void (*)())1) {
+        sigset(0xD, handler);
+    }
+    if ((compiler == 6) && (nolockflag != 0) && (lpilockflag != 0)) {
+        error(1, NULL, 0, NULL, 0,
+              "Conflicting flags; -nolock and -lpilock can't both be specified for ucode compilers\n");
+        exit(2);
+    }
+    if ((Oflag >= 3) && (cflag != 0) && (srcfiles.length == 1)) {
+        error(2, NULL, 0, NULL, 0,
+              "-c should not be used with ucode -O3 -o32 on a single file; use -j instead to get inter-module "
+              "optimization.\n");
+    }
+    if ((srcfiles.length >= 2) && (compiler == 4) && (Eflag == 0) && (Pflag == 0)) {
+        error(1, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n", "as");
+        exit(2);
+    }
+    mktempstr();
+    for (var_s0 = 0; (var_s0 < srcfiles.length) || (uload != 0); var_s0++) {
+        // var_s0 = 0;
+        // if ((srcfiles.length > 0) || (uload != 0))
+    loop_363:
+        nocompileneeded = 0;
+        sp118 = NULL;
+        longlong_emitted = 0;
+        sp11C = D_1000BF74;
+        if (var_s0 == srcfiles.length) {
+            uload = 0;
+            if ((runerror == 0) && (Eflag == 0) && (Pflag == 0)) {
+                if (uoutfile == NULL) {
+                    addstr(&srcfiles, "u.out.?");
+                } else if (getsuf(uoutfile) != 0) {
+                    addstr(&srcfiles, mksuf(uoutfile, 0x3F));
+                } else {
+                    addstr(&srcfiles, mkstr(uoutfile, ".?", NULL));
+                }
+                srcsuf = 0x3F;
+                if ((Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x63) || (Kflag != 0)) {
+                    symtab = mksuf(srcfiles.entries[var_s0], 0x54);
+                    tmpst = 0;
+                } else {
+                    symtab = tempstr[0];
+                    tmpst = 1;
+                }
                 goto c8d8;
-			}
-			continue;
-		}
+            }
+            continue;
+        }
 
         if (srcfiles.length >= 2) {
             fprintf(stderr, "%s:\n", srcfiles.entries[var_s0]);
@@ -1288,7 +1301,10 @@ loop_363:
         } else {
             srcsuf = 0x73;
         }
-        if ((Hchar == 0x66) || (Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x6B) || (Hchar == 0x63) || (Kflag != 0) || (srcsuf == 0x42) || (srcsuf == 0x55) || (srcsuf == 0x4F) || (srcsuf == 0x47) || (srcsuf == 0x53) || (srcsuf == 0x4D) || (srcsuf == 0x56) || (srcsuf == 0x44) || (srcsuf == 0x51)) {
+        if ((Hchar == 0x66) || (Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x6B) ||
+            (Hchar == 0x63) || (Kflag != 0) || (srcsuf == 0x42) || (srcsuf == 0x55) || (srcsuf == 0x4F) ||
+            (srcsuf == 0x47) || (srcsuf == 0x53) || (srcsuf == 0x4D) || (srcsuf == 0x56) || (srcsuf == 0x44) ||
+            (srcsuf == 0x51)) {
             tmpst = 0;
             if ((compiler == 4) && (getsuf(srcfiles.entries[var_s0]) == 0)) {
                 symtab = mkstr(srcfiles.entries[var_s0], ".T", NULL);
@@ -1299,88 +1315,88 @@ loop_363:
             tmpst = 1;
             symtab = tempstr[0];
         }
-        switch (srcsuf) {                /* switch 11; irregular */
-        case 0x73:                                  /* switch 11 */
-            if ((compiler == 1) && (compdirs[0] != currcomp)) {
-                currcomp = compdirs[0];
-                relocate_passes("pKfjsmvocabtyz", NULL, NULL);
-            }
-            /* fallthrough */
-        case 0x69:                                  /* switch 11 */
-            if ((compiler == 1) && (compdirs[0] != currcomp)) {
-                currcomp = compdirs[0];
-                relocate_passes("pKfjsmvocabtyz", NULL, NULL);
-            }
-            /* fallthrough */
-        case 0x6:                                   /* switch 11 */
-        case 0x63:                                  /* switch 11 */
-            if (compiler != 1) {
-                if (compdirs[1] != currcomp) {
-                    currcomp = compdirs[1];
+        switch (srcsuf) { /* switch 11; irregular */
+            case 0x73:    /* switch 11 */
+                if ((compiler == 1) && (compdirs[0] != currcomp)) {
+                    currcomp = compdirs[0];
                     relocate_passes("pKfjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pKfjsmvocabtyz", NULL, NULL);
-            }
-            compchoice = 0;
-            break;
-        case 0x70:                                  /* switch 11 */
-            if (compiler != 2) {
-                if (compdirs[2] != currcomp) {
-                    currcomp = compdirs[2];
+                /* fallthrough */
+            case 0x69: /* switch 11 */
+                if ((compiler == 1) && (compdirs[0] != currcomp)) {
+                    currcomp = compdirs[0];
+                    relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                }
+                /* fallthrough */
+            case 0x6:  /* switch 11 */
+            case 0x63: /* switch 11 */
+                if (compiler != 1) {
+                    if (compdirs[1] != currcomp) {
+                        currcomp = compdirs[1];
+                        relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
+                    relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                }
+                compchoice = 0;
+                break;
+            case 0x70: /* switch 11 */
+                if (compiler != 2) {
+                    if (compdirs[2] != currcomp) {
+                        currcomp = compdirs[2];
+                        relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
                     relocate_passes("pfjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pfjsmvocabtyz", NULL, NULL);
-            }
-            break;
-        case 0x46:                                  /* switch 11 */
-        case 0x66:                                  /* switch 11 */
-            if (compiler != 3) {
-                if (compdirs[3] != currcomp) {
-                    currcomp = compdirs[3];
+                break;
+            case 0x46: /* switch 11 */
+            case 0x66: /* switch 11 */
+                if (compiler != 3) {
+                    if (compdirs[3] != currcomp) {
+                        currcomp = compdirs[3];
+                        relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
                     relocate_passes("pfjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pfjsmvocabtyz", NULL, NULL);
-            }
-            break;
-        case 0x1:                                   /* switch 11 */
-            if (compiler != 5) {
-                if (compdirs[5] != currcomp) {
-                    currcomp = compdirs[5];
+                break;
+            case 0x1: /* switch 11 */
+                if (compiler != 5) {
+                    if (compdirs[5] != currcomp) {
+                        currcomp = compdirs[5];
+                        relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
                     relocate_passes("pfekjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pfekjsmvocabtyz", NULL, NULL);
-            }
-            break;
-        case 0x2:                                   /* switch 11 */
-            if (compiler != 6) {
-                if (compdirs[6] != currcomp) {
-                    currcomp = compdirs[6];
+                break;
+            case 0x2: /* switch 11 */
+                if (compiler != 6) {
+                    if (compdirs[6] != currcomp) {
+                        currcomp = compdirs[6];
+                        relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
                     relocate_passes("pfekjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pfekjsmvocabtyz", NULL, NULL);
-            }
-            break;
-        case 0x3:                                   /* switch 11 */
-            if ((compiler != 1) && (compiler != 5) && (compiler != 6)) {
-                if ((compdirs[1] != currcomp) && (compdirs[5] != currcomp) && (compdirs[6] != currcomp)) {
-                    currcomp = compdirs[1];
-                    relocate_passes("pekjsmvocabtyz", NULL, NULL);
+                break;
+            case 0x3: /* switch 11 */
+                if ((compiler != 1) && (compiler != 5) && (compiler != 6)) {
+                    if ((compdirs[1] != currcomp) && (compdirs[5] != currcomp) && (compdirs[6] != currcomp)) {
+                        currcomp = compdirs[1];
+                        relocate_passes("pekjsmvocabtyz", NULL, NULL);
+                    }
+                } else if (compdirs[0] != currcomp) {
+                    currcomp = compdirs[0];
+                    relocate_passes("pfjsmvocabtyz", NULL, NULL);
                 }
-            } else if (compdirs[0] != currcomp) {
-                currcomp = compdirs[0];
-                relocate_passes("pfjsmvocabtyz", NULL, NULL);
-            }
-            break;
+                break;
         }
         if ((compiler == 3) && (D_1000BF74 != 0) && (srcsuf != 0x66) && (srcsuf != 0x46)) {
             D_1000BF74 = 0;
@@ -1390,21 +1406,21 @@ loop_363:
             record_static_fileset(srcfiles.entries[var_s0]);
         }
         if ((compiler == 1) && (c_compiler_choice == 1)) {
-            switch (ansichoice) {                   /* switch 12; irregular */
-            case 1:                                 /* switch 12 */
-            case 2:                                 /* switch 12 */
-                edison_type = (char* )2;
-                break;
-            case 3:                                 /* switch 12 */
-                edison_type = (char* )1;
-                break;
-            default:                                /* switch 12 */
-            case 0:                                 /* switch 12 */
-                edison_type = (char* )3;
-                break;
+            switch (ansichoice) { /* switch 12; irregular */
+                case 1:           /* switch 12 */
+                case 2:           /* switch 12 */
+                    edison_type = (char*)2;
+                    break;
+                case 3: /* switch 12 */
+                    edison_type = (char*)1;
+                    break;
+                default: /* switch 12 */
+                case 0:  /* switch 12 */
+                    edison_type = (char*)3;
+                    break;
             }
         }
-loop_484:
+    loop_484:
         if (compchoice == 0) {
             if (irix4 != 0) {
                 if (ansichoice == 0) {
@@ -1419,99 +1435,99 @@ loop_484:
             }
         }
         if ((Eflag == 0) || (srcsuf == 0x61)) {
-            switch (srcsuf) {            /* switch 19; irregular */
-            case 0x6:                               /* switch 19 */
-            case 0x63:                              /* switch 19 */
-                if (oldccomflag != 1) {
-                    oldcflag = 0;
-                }
-                if (docpp == 0) {
-                    if (default_nocpp != 0) {
+            switch (srcsuf) { /* switch 19; irregular */
+                case 0x6:     /* switch 19 */
+                case 0x63:    /* switch 19 */
+                    if (oldccomflag != 1) {
+                        oldcflag = 0;
+                    }
+                    if (docpp == 0) {
+                        if (default_nocpp != 0) {
+                            goto block_531;
+                        }
+                        goto block_940;
+                    }
+                    goto block_531;
+                case 0x69:              /* switch 19 */
+                    switch (compiler) { // switch 4
+                        case 1:
+                            goto block_940;
+                        case 2:
+                            goto block_1341;
+                        case 3:
+                            goto block_1505;
+                        case 4:
+                            goto block_512;
+                        case 5:
+                            goto block_1388;
+                        case 6: /* switch 4 */
+                            goto block_1453;
+                    }
+                    // fallthrough
+                case 0x70: /* switch 19 */
+                block_512:
+                    if (stdflag == 0) {
+                        if ((docpp == 0) && (default_nocpp == 0)) {
+                            goto block_1341;
+                        }
                         goto block_531;
                     }
-                    goto block_940;
-                }
-                goto block_531;
-            case 0x69:                              /* switch 19 */
-                switch (compiler) { // switch 4
-                case 1:
-                    goto block_940;
-                case 2:
                     goto block_1341;
-                case 3:
+                case 0x66: /* switch 19 */
+                    if (docpp != 0) {
+                        goto block_531;
+                    }
                     goto block_1505;
-                case 4:
-                    goto block_512;
-                case 5:
+                case 0x1: /* switch 19 */
+                    if (docpp != 0) {
+                        goto block_531;
+                    }
                     goto block_1388;
-                case 6:                     /* switch 4 */
+                case 0x2: /* switch 19 */
+                    if (docpp != 0) {
+                        goto block_531;
+                    }
                     goto block_1453;
-                }
-                // fallthrough
-            case 0x70:                          /* switch 19 */
-block_512:
-                if (stdflag == 0) {
-                    if ((docpp == 0) && (default_nocpp == 0)) {
-                        goto block_1341;
+                case 0x3: /* switch 19 */
+                    goto block_1417;
+                case 0x55: /* switch 19 */
+                    execlist.length = 0;
+                    addstr(&execlist, "utob");
+                    addstr(&execlist, srcfiles.entries[var_s0]);
+                    if (Kflag != 0) {
+                        passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                    } else {
+                        passout = tempstr[1];
                     }
-                    goto block_531;
-                }
-                goto block_1341;
-            case 0x66:                              /* switch 19 */
-                if (docpp != 0) {
-                    goto block_531;
-                }
-                goto block_1505;
-            case 0x1:                               /* switch 19 */
-                if (docpp != 0) {
-                    goto block_531;
-                }
-                goto block_1388;
-            case 0x2:                               /* switch 19 */
-                if (docpp != 0) {
-                    goto block_531;
-                }
-                goto block_1453;
-            case 0x3:                               /* switch 19 */
-                goto block_1417;
-            case 0x55:                              /* switch 19 */
-                execlist.length = 0;
-                addstr(&execlist, "utob");
-                addstr(&execlist, srcfiles.entries[var_s0]);
-                if (Kflag != 0) {
-                    passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                } else {
-                    passout = tempstr[1];
-                }
-                if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                    exit(2);
-                }
-                addstr(&execlist, passout);
-                if (run(utob, execlist.entries, NULL, NULL, NULL) != 0) {
-                    runerror += 1;
-                    if (Kflag == 0) {
-                        unlink(passout);
+                    if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
+                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                        exit(2);
                     }
-                } else {
-                    passin = passout;
+                    addstr(&execlist, passout);
+                    if (run(utob, execlist.entries, NULL, NULL, NULL) != 0) {
+                        runerror += 1;
+                        if (Kflag == 0) {
+                            unlink(passout);
+                        }
+                    } else {
+                        passin = passout;
+                        goto block_1729;
+                    }
+                    continue;
+                case 0x65: /* switch 19 */
+                case 0x72: /* switch 19 */
+                case 0x73: /* switch 19 */
+                    goto block_A;
+                case 0x75: /* switch 19 */
+                    goto block_1896;
+                case 0x42: /* switch 19 */
                     goto block_1729;
-                }
-                goto done;
-            case 0x65:                              /* switch 19 */
-            case 0x72:                              /* switch 19 */
-            case 0x73:                              /* switch 19 */
-                goto block_A;
-            case 0x75:                              /* switch 19 */
-                goto block_1896;
-            case 0x42:                              /* switch 19 */
-                goto block_1729;
-            case 0x53:                              /* switch 19 */
-                goto block_1913;
+                case 0x53: /* switch 19 */
+                    goto block_1913;
             }
         }
         {
-block_531:
+        block_531:
             dmips_emit = 0;
             execlist.length = 0;
             sp114 = cppchoice;
@@ -1521,7 +1537,8 @@ block_531:
             } else if (srcsuf == 0x73) {
                 compchoice = 4;
             }
-            if ((srcsuf == 0x63) || (srcsuf == 6) || ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 0x68))) {
+            if ((srcsuf == 0x63) || (srcsuf == 6) ||
+                ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 0x68))) {
                 if ((cppchoice != 2) || ((oldcppflag != 0) && (ansichoice != 0))) {
                     cppchoice = 1;
                     relocate_passes("p", NULL, NULL);
@@ -1604,64 +1621,64 @@ block_531:
                 }
             } else {
                 addstr(&execlist, "-YE");
-                if (edison_type == (char* )2) {
+                if (edison_type == (char*)2) {
                     addstr(&execlist, "-a");
                 }
-                if ((edison_type == (char* )1) || (edison_type == (char* )3)) {
+                if ((edison_type == (char*)1) || (edison_type == (char*)3)) {
                     addstr(&execlist, "-D__EXTENSIONS__");
                 }
             }
 
-            switch (srcsuf) {        /* switch 13; irregular */
-            case 0x6:
-            case 0x63:
-            case 0x68:
-                if ((srcsuf != 0x68) || (D_1000BF74 != 0)) {
-                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                        addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
-                        addstr(&execlist, "-D__cplusplus=1");
-                        addstr(&execlist, "-D__ANSI_CPP__=1");
-                        if ((compiler == 1) && (c_compiler_choice == 3)) {
-                            addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
-                        }
-                    } else {
-                        if ((ansichoice == 0) || (ansichoice == 3)) {
-                            addstr(&execlist, "-DLANGUAGE_C");
-                        }
-                        addstr(&execlist, "-D_LANGUAGE_C");
-                        if (cmp_flag != 0) {
-                            addstr(&execlist, "-D_LANGUAGE_PWRC");
-                        }
-                        if (((cmp_flag & 1) || (run_sopt != 0)) && (cppchoice == 1)) {
-                            addstr(&execlist, "-trigraphs");
+            switch (srcsuf) { /* switch 13; irregular */
+                case 0x6:
+                case 0x63:
+                case 0x68:
+                    if ((srcsuf != 0x68) || (D_1000BF74 != 0)) {
+                        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                            addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
+                            addstr(&execlist, "-D__cplusplus=1");
+                            addstr(&execlist, "-D__ANSI_CPP__=1");
+                            if ((compiler == 1) && (c_compiler_choice == 3)) {
+                                addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
+                            }
+                        } else {
+                            if ((ansichoice == 0) || (ansichoice == 3)) {
+                                addstr(&execlist, "-DLANGUAGE_C");
+                            }
+                            addstr(&execlist, "-D_LANGUAGE_C");
+                            if (cmp_flag != 0) {
+                                addstr(&execlist, "-D_LANGUAGE_PWRC");
+                            }
+                            if (((cmp_flag & 1) || (run_sopt != 0)) && (cppchoice == 1)) {
+                                addstr(&execlist, "-trigraphs");
+                            }
                         }
                     }
-                }
-                break;
-            case 0x70:
-                addstr(&execlist, "-DLANGUAGE_PASCAL");
-                addstr(&execlist, "-D_LANGUAGE_PASCAL");
-                addstr(&execlist, "-Q");
-                break;
-            case 0x46:
-            case 0x65:
-            case 0x66:
-            case 0x72:
-                addstr(&execlist, "-DLANGUAGE_FORTRAN");
-                addstr(&execlist, "-D_LANGUAGE_FORTRAN");
-                break;
-            case 0x73:                          /* switch 13 */
-                addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
-                addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
-                break;
-            case 0x1:
-                addstr(&execlist, "-DLANGUAGE_PL1");
-                addstr(&execlist, "-D_LANGUAGE_PL1");
-                break;
-            case 0x2:
-                addstr(&execlist, "-DLANGUAGE_COBOL");
-                addstr(&execlist, "-D_LANGUAGE_COBOL");
-                break;
+                    break;
+                case 0x70:
+                    addstr(&execlist, "-DLANGUAGE_PASCAL");
+                    addstr(&execlist, "-D_LANGUAGE_PASCAL");
+                    addstr(&execlist, "-Q");
+                    break;
+                case 0x46:
+                case 0x65:
+                case 0x66:
+                case 0x72:
+                    addstr(&execlist, "-DLANGUAGE_FORTRAN");
+                    addstr(&execlist, "-D_LANGUAGE_FORTRAN");
+                    break;
+                case 0x73: /* switch 13 */
+                    addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
+                    addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
+                    break;
+                case 0x1:
+                    addstr(&execlist, "-DLANGUAGE_PL1");
+                    addstr(&execlist, "-D_LANGUAGE_PL1");
+                    break;
+                case 0x2:
+                    addstr(&execlist, "-DLANGUAGE_COBOL");
+                    addstr(&execlist, "-D_LANGUAGE_COBOL");
+                    break;
             }
 
             if ((ansichoice == 0) || (ansichoice == 3)) {
@@ -1758,7 +1775,9 @@ block_531:
             if (irix4 != 0) {
                 include = mkstr("/usr/irix4/", "usr/include", NULL);
             }
-            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || (fiveflag != 0)) && ((compiler != 1) || (c_compiler_choice == 0)) && ((compiler != 3) || (D_1000BF74 == 0))) {
+            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
+                 (fiveflag != 0)) &&
+                ((compiler != 1) || (c_compiler_choice == 0)) && ((compiler != 3) || (D_1000BF74 == 0))) {
                 addstr(&execlist, "-I");
             }
             addlist(&execlist, &cppflags);
@@ -1806,10 +1825,12 @@ block_531:
             if (c_compiler_choice == 0) {
                 addstr(&execlist, passin);
             }
-            if (((compchoice != 3) && (compchoice != 4)) || ((compiler != 1) && (compiler != 4)) || (run_sopt != 0) || (cmp_flag & 1) || (cmp_flag & 8) || (acpp != 0) || (oldcppflag != 0)) {
+            if (((compchoice != 3) && (compchoice != 4)) || ((compiler != 1) && (compiler != 4)) || (run_sopt != 0) ||
+                (cmp_flag & 1) || (cmp_flag & 8) || (acpp != 0) || (oldcppflag != 0)) {
                 if (run((compiler == 3) && (D_1000BF74 != 0) ? cfe : cpp, execlist.entries, NULL, passout, NULL) != 0) {
                     runerror += 1;
-                    if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) || ((srcsuf == 0x73) && (mflag != 0)))) {
+                    if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
+                                         ((srcsuf == 0x73) && (mflag != 0)))) {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -1821,43 +1842,45 @@ block_531:
             }
             cppchoice = sp114;
             relocate_passes("p", NULL, NULL);
-            if (((srcsuf != 0x63) && (srcsuf != 6) && ((compiler != 1) || (nocode == 0) || (D_1000BF74 == 0) || (srcsuf != 0x68))) || (Pflag != 0) || (Eflag != 0)) {
+            if (((srcsuf != 0x63) && (srcsuf != 6) &&
+                 ((compiler != 1) || (nocode == 0) || (D_1000BF74 == 0) || (srcsuf != 0x68))) ||
+                (Pflag != 0) || (Eflag != 0)) {
                 if (minus_M == 0) {
                     addstr(&execlist, "-E");
                 }
                 if ((compiler != 1) || (c_compiler_choice == 0)) {
-                    switch (srcsuf) {    /* switch 16; irregular */
-                    case 0x63:                      /* switch 16 */
-                        addstr(&execlist, "-D_LANGUAGE_C");
-                        if (oldcflag == 0) {
-                            addstr(&execlist, "-D_CFE");
-                        }
-                        break;
-                    case 0x70:                      /* switch 16 */
-                        addstr(&execlist, "-DLANGUAGE_PASCAL");
-                        addstr(&execlist, "-D_LANGUAGE_PASCAL");
-                        addstr(&execlist, "-Q");
-                        break;
-                    case 0x46:                      /* switch 16 */
-                    case 0x65:                      /* switch 16 */
-                    case 0x66:                      /* switch 16 */
-                    case 0x72:                      /* switch 16 */
-                        addstr(&execlist, "-DLANGUAGE_FORTRAN");
-                        addstr(&execlist, "-D_LANGUAGE_FORTRAN");
-                        break;
-                    case 0x73:                      /* switch 16 */
-                        addstr(&execlist, "-std0");
-                        addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
-                        addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
-                        break;
-                    case 0x1:                       /* switch 16 */
-                        addstr(&execlist, "-DLANGUAGE_PL1");
-                        addstr(&execlist, "-D_LANGUAGE_PL1");
-                        break;
-                    case 0x2:                       /* switch 16 */
-                        addstr(&execlist, "-DLANGUAGE_COBOL");
-                        addstr(&execlist, "-D_LANGUAGE_COBOL");
-                        break;
+                    switch (srcsuf) { /* switch 16; irregular */
+                        case 0x63:    /* switch 16 */
+                            addstr(&execlist, "-D_LANGUAGE_C");
+                            if (oldcflag == 0) {
+                                addstr(&execlist, "-D_CFE");
+                            }
+                            break;
+                        case 0x70: /* switch 16 */
+                            addstr(&execlist, "-DLANGUAGE_PASCAL");
+                            addstr(&execlist, "-D_LANGUAGE_PASCAL");
+                            addstr(&execlist, "-Q");
+                            break;
+                        case 0x46: /* switch 16 */
+                        case 0x65: /* switch 16 */
+                        case 0x66: /* switch 16 */
+                        case 0x72: /* switch 16 */
+                            addstr(&execlist, "-DLANGUAGE_FORTRAN");
+                            addstr(&execlist, "-D_LANGUAGE_FORTRAN");
+                            break;
+                        case 0x73: /* switch 16 */
+                            addstr(&execlist, "-std0");
+                            addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
+                            addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
+                            break;
+                        case 0x1: /* switch 16 */
+                            addstr(&execlist, "-DLANGUAGE_PL1");
+                            addstr(&execlist, "-D_LANGUAGE_PL1");
+                            break;
+                        case 0x2: /* switch 16 */
+                            addstr(&execlist, "-DLANGUAGE_COBOL");
+                            addstr(&execlist, "-D_LANGUAGE_COBOL");
+                            break;
                     }
                     addstr(&execlist, "-D__unix");
                     if (sixty4bitflag != 0) {
@@ -1898,7 +1921,9 @@ block_531:
                     }
                 }
                 if ((Eflag == 0) && (Pflag == 0)) {
-                    if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || (fiveflag != 0)) && (c_compiler_choice == 0)) {
+                    if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
+                         (fiveflag != 0)) &&
+                        (c_compiler_choice == 0)) {
                         addstr(&execlist, "-I");
                     }
                     addlist(&execlist, &cppflags);
@@ -1950,7 +1975,7 @@ block_531:
 
                     } else if (c_compiler_choice == 3) {
                         addstr(&execlist, "-YD");
-                    } else if (edison_type == (char* )3) {
+                    } else if (edison_type == (char*)3) {
                         addstr(&execlist, "-K");
                     } else {
                         addstr(&execlist, "-m");
@@ -1986,385 +2011,567 @@ block_531:
 
                 if (retcode != 0) {
                     runerror += 1;
-                    if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) || ((srcsuf == 0x73) && (mflag != 0)))) {
+                    if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
+                                         ((srcsuf == 0x73) && (mflag != 0)))) {
                         unlink(passin);
                     }
                     unlink(passout);
                     goto block_2269;
                 }
                 if ((Pflag == 0) && (Eflag == 0)) {
-                    if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) || ((srcsuf == 0x73) && (mflag != 0))) {
+                    if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
+                        ((srcsuf == 0x73) && (mflag != 0))) {
                         unlink(passin);
                     }
                     passin = passout;
                     dmips_emit = 0;
-                    switch (srcsuf) {    /* switch 17; irregular */
-                    case 0x1:
-                        goto block_1388;
-                    case 0x2:                       /* switch 17 */
-                        goto block_1453;
-                    case 0x63:
-                        goto block_940;
-                    case 0x70:                      /* switch 17 */
-                        goto block_1341;
-                    case 0x73:                      /* switch 17 */
-                        goto block_2130;
-                    case 0x46:                      /* switch 17 */
-                    case 0x65:                      /* switch 17 */
-                    case 0x66:                      /* switch 17 */
-                    case 0x72:                      /* switch 17 */
-                        goto block_1505;
+                    switch (srcsuf) { /* switch 17; irregular */
+                        case 0x1:
+                            goto block_1388;
+                        case 0x2: /* switch 17 */
+                            goto block_1453;
+                        case 0x63:
+                            goto block_940;
+                        case 0x70: /* switch 17 */
+                            goto block_1341;
+                        case 0x73: /* switch 17 */
+                            goto block_2130;
+                        case 0x46: /* switch 17 */
+                        case 0x65: /* switch 17 */
+                        case 0x66: /* switch 17 */
+                        case 0x72: /* switch 17 */
+                            goto block_1505;
                     }
-block_922:
+                block_922:
                     cppchoice = sp114;
                     relocate_passes("p", NULL, NULL);
                     if (c_compiler_choice == 0) {
                         if ((Pflag == 0) && (Eflag == 0)) {
-                            if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) || ((srcsuf == 0x73) && (mflag != 0))) {
+                            if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
+                                ((srcsuf == 0x73) && (mflag != 0))) {
                                 unlink(passin);
                             }
                             passin = passout;
-                        }
-                        else break;
+                        } else
+                            continue;
                     }
                     dmips_emit = 0;
                     switch (srcsuf) { /* switch 18; irregular */
-                    case 0x63:                  /* switch 18 */
-                    case 0x64:                  /* switch 18 */
-                    case 0x67:                  /* switch 18 */
-                    case 0x68:                  /* switch 18 */
-                    case 0x69:                  /* switch 18 */
-                    case 0x6A:                  /* switch 18 */
-                    case 0x6B:                  /* switch 18 */
-                    case 0x6C:                  /* switch 18 */
-                    case 0x6D:                  /* switch 18 */
-                    case 0x6E:                  /* switch 18 */
-                    case 0x6F:                  /* switch 18 */
-                    case 0x71:                  /* switch 18 */
-block_940:
-                        if (run_sopt != 0) {
-                            if (cmp_flag & 1) {
-                                error(2, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
-                                goto block_989;
-                            }
-                            execlist.length = 0;
-                            addstr(&execlist, "copt");
-                            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                                addstr(&optflags, "-loopunroll");
-                                addstr(&optflags, "0");
-                            }
-                            addstr(&execlist, mkstr("-I=", passin, NULL));
-                            if ((Hchar == 0x4B) || (Kflag != 0)) {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x4D);
-                            } else {
-                                passout = mkstr(tempstr[31], "M", NULL);
-                            }
-                            addstr(&execlist, mkstr("-CMP=", passout, NULL));
-                            addstr(&execlist, "-cp=i");
-                            if (ansichoice == 0) {
-                                addstr(&execlist, "-sy=k");
-                            }
-                            addlist(&execlist, &soptflags);
-                            if (run(copt, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                                if ((Hchar != 0x4B) || (Kflag != 0)) {
-                                    unlink(passout);
-                                }
-                                break;
-                            }
-                            if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                unlink(passin);
-                            }
-                            passin = passout;
-                            if ((compchoice != 3) || (cmp_flag & 0x10000)) {
-                                if (Hchar == 0x4B) {
-                                    break;
-                                }
-                                if ((Hchar == 0x4B) || (Kflag != 0)) {
-                                    passout = mksuf(srcfiles.entries[var_s0], 0x49);
-                                } else {
-                                    passout = mkstr(tempstr[31], "I", NULL);
-                                }
-                                // passout = var_v0_7;
-                                if (vflag != 0) {
-                                    addstr(&execlist, "-v");
+                        default:
+                        case 0x63: /* switch 18 */
+                        case 0x64: /* switch 18 */
+                        case 0x67: /* switch 18 */
+                        case 0x68: /* switch 18 */
+                        case 0x69: /* switch 18 */
+                        case 0x6A: /* switch 18 */
+                        case 0x6B: /* switch 18 */
+                        case 0x6C: /* switch 18 */
+                        case 0x6D: /* switch 18 */
+                        case 0x6E: /* switch 18 */
+                        case 0x6F: /* switch 18 */
+                        case 0x71: /* switch 18 */
+                        block_940:
+                            if (run_sopt != 0) {
+                                if (cmp_flag & 1) {
+                                    error(2, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
+                                    goto block_989;
                                 }
                                 execlist.length = 0;
-                                addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
-                                addstr(&execlist, passin);
-                                if (cppchoice != 2) {
-                                    cppchoice = 1;
+                                addstr(&execlist, "copt");
+                                if ((Oflag >= 2) && (set_loop_unroll == 0)) {
+                                    addstr(&optflags, "-loopunroll");
+                                    addstr(&optflags, "0");
+                                }
+                                addstr(&execlist, mkstr("-I=", passin, NULL));
+                                if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x4D);
                                 } else {
-                                    addstr(&execlist, "-l");
+                                    passout = mkstr(tempstr[31], "M", NULL);
                                 }
-                                if (emptyIflag != 0) {
-                                    addstr(&execlist, "-nostdinc");
+                                addstr(&execlist, mkstr("-CMP=", passout, NULL));
+                                addstr(&execlist, "-cp=i");
+                                if (ansichoice == 0) {
+                                    addstr(&execlist, "-sy=k");
                                 }
-                                addlist(&execlist, &cpp2flags);
-                                relocate_passes("p", NULL, NULL);
-                                if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
+                                addlist(&execlist, &soptflags);
+                                if (run(copt, execlist.entries, NULL, NULL, NULL) != 0) {
                                     runerror += 1;
-                                    if (Kflag == 0) {
+                                    if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
                                         unlink(passin);
                                     }
-                                    unlink(passout);
-                                    goto block_2269;
-                                }
-                                if (Kflag == 0) {
-                                    unlink(passin);
-                                }
-                                passin = passout;
-                                goto block_1042;
-
-                                break;
-                            }
-                            goto block_1042;
-                        }
-block_989:
-                        if ((Hchar == 0x4B) || (Kflag != 0)) {
-                            cmp_flag |= 6;
-                        }
-                        if (cmp_flag & 1) {
-                            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                                addstr(&optflags, "-loopunroll");
-                                addstr(&optflags, "0");
-                            }
-                            execlist.length = 0;
-                            addstr(&execlist, "pca");
-                            addstr(&execlist, mkstr("-I=", passin, NULL));
-                            if (cmp_flag & 4) {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x4D);
-                            } else {
-                                passout = mkstr(tempstr[31], "M", NULL);
-                            }
-                            addstr(&execlist, mkstr("-CMP=", passout, NULL));
-                            if (cmp_flag & 2) {
-                                sp110 = mksuf(srcfiles.entries[var_s0], 0x4C);
-                            } else {
-                                sp110 = mkstr(tempstr[31], "L", NULL);
-                            }
-                            addstr(&execlist, mkstr("-L=", sp110, NULL));
-                            addstr(&execlist, "-lo=ls");
-                            addstr(&execlist, "-cp=i");
-                            if (ansichoice == 0) {
-                                addstr(&execlist, "-sy=k");
-                            }
-                            addlist(&execlist, &pcaflags);
-                            if (run(pca, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                                if (!(cmp_flag & 4)) {
-                                    unlink(passout);
-                                }
-                                break;
-                            }
-                            if (!(cmp_flag & 2)) {
-                                unlink(sp110);
-                            }
-                            if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                unlink(passin);
-                            }
-                            passin = passout;
-                            if (Hchar != 0x4B) {
-                                execlist.length = 0;
-                                addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
-                                if ((Hchar == 0x4B) || (Kflag != 0)) {
-                                    passout = mksuf(srcfiles.entries[var_s0], 0x49);
-                                } else {
-                                    passout = mkstr(tempstr[31], "I", NULL);
-                                }
-                                if (vflag != 0) {
-                                    addstr(&execlist, "-v");
-                                }
-                                addstr(&execlist, passin);
-                                if (cppchoice != 2) {
-                                    cppchoice = 1;
-                                } else {
-                                    addstr(&execlist, "-l");
-                                }
-                                if (emptyIflag != 0) {
-                                    addstr(&execlist, "-nostdinc");
-                                }
-                                addlist(&execlist, &cpp2flags);
-                                addlist(&execlist, &undefineflags);
-                                relocate_passes("p", NULL, NULL);
-                                if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
-                                    runerror += 1;
-                                    if ((Kflag == 0) && !(cmp_flag & 4)) {
-                                        unlink(passin);
-                                    }
-                                    unlink(passout);
-                                    goto block_2269;
-                                }
-                                if ((Kflag == 0) && !(cmp_flag & 4)) {
-                                    unlink(passin);
-                                }
-                                passin = passout;
-                            }
-                            else break;
-                        }
-
-
-block_1042:
-                        if (gflag >= 2) {
-                            func_00431D00(srcfiles.entries[var_s0]);
-                        }
-                        if ((compiler == 1) && (c_compiler_choice != 0)) {
-                            if ((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) || (acpp != 0)) {
-                                execlist.length = 0;
-                                addstr(&execlist, cfe);
-                            }
-                            if (vflag != 0) {
-                                addstr(&execlist, "-v");
-                            }
-                            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                                if (anachronisms != 0) {
-                                    addstr(&execlist, "-O");
-                                }
-                                if (cfront_compatible != 0) {
-                                    addstr(&execlist, "-b");
-                                }
-                            }
-                            if (nocode != 0) {
-                                addstr(&execlist, "-n");
-                            }
-                            if (Fflag == 0) {
-                                addstr(&execlist, "-Zz");
-                                addstr(&execlist, "-ZO");
-                                addstr(&execlist, mkstr("-ZS", symtab, NULL));
-                            }
-                            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                                if (Oflag >= 3) {
-                                    addstr(&execlist, "-Qz");
-                                }
-                                if (non_shared != 0) {
-                                    addstr(&execlist, "-Qn");
-                                }
-                            }
-                            if (signedcharflag != 0) {
-                                addstr(&execlist, "-s");
-                            } else {
-                                addstr(&execlist, "-u");
-                            }
-                            if (fullwarn != 0) {
-                                addstr(&execlist, "-Yw");
-                            }
-                            if (disable_inlines != 0) {
-                                addstr(&execlist, "-YJ");
-                            }
-                            if (c_compiler_choice == 2) {
-                            } else if (c_compiler_choice == 3) {
-                                addstr(&execlist, "-YD");
-                            } else if (edison_type == (char* )3) {
-                                addstr(&execlist, "-K");
-                            } else {
-                                addstr(&execlist, "-m");
-                            }
-
-                            if (srcsuf == 0x69) {
-                                addstr(&execlist, "-Yp");
-                            }
-                            if (smart_build != 0) {
-                                addstr(&execlist, mkstr("-YR", sbrepos, NULL));
-                            }
-                            if (srcfiles.length == 1) {
-                                if (outfile != NULL) {
-                                    sp118 = outfile;
-                                } else if (cflag == 0) {
-                                    sp118 = "a.out";
-                                } else {
-                                    sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
-                                }
-                            } else {
-                                sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
-                            }
-                            addstr(&execlist, mkstr("-YN", sp118, NULL));
-                            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                                switch (default_template_instantiation_mode) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    addstr(&execlist, "-tused");
-                                    break;
-                                case 2:
-                                    addstr(&execlist, "-tall");
-                                    break;
-                                }
-                                if (no_prelink != 0) {
-                                    addstr(&execlist, "-T");
-                                } else {
-                                    if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
-                                        sp10C = outfile;
-                                    } else {
-                                        sp10C = mksuf(srcfiles.entries[var_s0], 0x6F);
-                                    }
-                                    sp108 = make_ii_file_name(sp10C);
-                                    addstr(&execlist, mkstr("-YO", sp108, NULL));
-                                    free(sp108);
-                                }
-                                if (auto_template_include == 0) {
-                                    addstr(&execlist, "-B");
-                                }
-                            }
-                            if (gflag >= 2) {
-                                addstr(&execlist, mkstr("-Zc", tempstr[33], NULL));
-                            }
-                            addstr(&execlist, mkstr("-YG", Gnum, NULL));
-                            addlist(&execlist, &edisonflags);
-                            if (dollar_sign != 0) {
-                                addstr(&execlist, "-$");
-                            }
-                            if (Fflag != 0) {
-                                addstr(&execlist, mkstr("-", NULL));
-                            } else {
-                                addstr(&execlist, passin);
-                            }
-                            var_s1 = 0;
-                        }
-                        if (compchoice == 3) {
-                            if (cmp_flag & 0x10000) {
-                                if ((Hchar == 0x4D) || (Kflag != 0) || (cmp_flag & 4)) {
-                                    passout = mksuf(srcfiles.entries[var_s0], 0x50);
-                                } else {
-                                    passout = mkstr(tempstr[31], "P", NULL);
-                                }
-                                execlist.length = 0;
-                                addstr(&execlist, mpc);
-                                addstr(&execlist, passin);
-                                addstr(&execlist, mkstr("-K", passout, NULL));
-                                if ((ansichoice == 1) || (ansichoice == 2)) {
-                                    addstr(&execlist, "-ansi");
-                                } else if (ansichoice == 0) {
-                                    addstr(&execlist, "-cckr");
-                                } else {
-                                    addstr(&execlist, "-xansi");
-                                }
-                                addlist(&execlist, &mpcflags);
-                                retcode = run(mpc, execlist.entries, NULL, NULL, errout);
-                                if (Kflag == 0) {
-                                    unlink(passin);
-                                }
-                                if (retcode != 0) {
-                                    runerror += 1;
-                                    if ((Hchar != 0x4D) && (Kflag == 0) && !(cmp_flag & 4)) {
+                                    if ((Hchar != 0x4B) || (Kflag != 0)) {
                                         unlink(passout);
                                     }
                                     break;
                                 }
-                                if (Hchar != 0x4D) {
-                                    passin = passout;
+                                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                    unlink(passin);
                                 }
-                                else break;
+                                passin = passout;
+                                if ((compchoice != 3) || (cmp_flag & 0x10000)) {
+                                    if (Hchar == 0x4B) {
+                                        break;
+                                    }
+                                    if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                        passout = mksuf(srcfiles.entries[var_s0], 0x49);
+                                    } else {
+                                        passout = mkstr(tempstr[31], "I", NULL);
+                                    }
+                                    // passout = var_v0_7;
+                                    if (vflag != 0) {
+                                        addstr(&execlist, "-v");
+                                    }
+                                    execlist.length = 0;
+                                    addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
+                                    addstr(&execlist, passin);
+                                    if (cppchoice != 2) {
+                                        cppchoice = 1;
+                                    } else {
+                                        addstr(&execlist, "-l");
+                                    }
+                                    if (emptyIflag != 0) {
+                                        addstr(&execlist, "-nostdinc");
+                                    }
+                                    addlist(&execlist, &cpp2flags);
+                                    relocate_passes("p", NULL, NULL);
+                                    if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
+                                        runerror += 1;
+                                        if (Kflag == 0) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        goto block_2269;
+                                    }
+                                    if (Kflag == 0) {
+                                        unlink(passin);
+                                    }
+                                    passin = passout;
+                                    goto block_1042;
+
+                                    break;
+                                }
+                                goto block_1042;
                             }
-                            if (((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) || (acpp != 0) || (cmp_flag & 0x10000)) && (c_compiler_choice == 0)) {
+                        block_989:
+                            if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                cmp_flag |= 6;
+                            }
+                            if (cmp_flag & 1) {
+                                if ((Oflag >= 2) && (set_loop_unroll == 0)) {
+                                    addstr(&optflags, "-loopunroll");
+                                    addstr(&optflags, "0");
+                                }
                                 execlist.length = 0;
-                                addstr(&execlist, cfe);
-                                addstr(&execlist, passin);
+                                addstr(&execlist, "pca");
+                                addstr(&execlist, mkstr("-I=", passin, NULL));
+                                if (cmp_flag & 4) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x4D);
+                                } else {
+                                    passout = mkstr(tempstr[31], "M", NULL);
+                                }
+                                addstr(&execlist, mkstr("-CMP=", passout, NULL));
+                                if (cmp_flag & 2) {
+                                    sp110 = mksuf(srcfiles.entries[var_s0], 0x4C);
+                                } else {
+                                    sp110 = mkstr(tempstr[31], "L", NULL);
+                                }
+                                addstr(&execlist, mkstr("-L=", sp110, NULL));
+                                addstr(&execlist, "-lo=ls");
+                                addstr(&execlist, "-cp=i");
+                                if (ansichoice == 0) {
+                                    addstr(&execlist, "-sy=k");
+                                }
+                                addlist(&execlist, &pcaflags);
+                                if (run(pca, execlist.entries, NULL, NULL, NULL) != 0) {
+                                    runerror += 1;
+                                    if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                        unlink(passin);
+                                    }
+                                    if (!(cmp_flag & 4)) {
+                                        unlink(passout);
+                                    }
+                                    break;
+                                }
+                                if (!(cmp_flag & 2)) {
+                                    unlink(sp110);
+                                }
+                                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                    unlink(passin);
+                                }
+                                passin = passout;
+                                if (Hchar != 0x4B) {
+                                    execlist.length = 0;
+                                    addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
+                                    if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                        passout = mksuf(srcfiles.entries[var_s0], 0x49);
+                                    } else {
+                                        passout = mkstr(tempstr[31], "I", NULL);
+                                    }
+                                    if (vflag != 0) {
+                                        addstr(&execlist, "-v");
+                                    }
+                                    addstr(&execlist, passin);
+                                    if (cppchoice != 2) {
+                                        cppchoice = 1;
+                                    } else {
+                                        addstr(&execlist, "-l");
+                                    }
+                                    if (emptyIflag != 0) {
+                                        addstr(&execlist, "-nostdinc");
+                                    }
+                                    addlist(&execlist, &cpp2flags);
+                                    addlist(&execlist, &undefineflags);
+                                    relocate_passes("p", NULL, NULL);
+                                    if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
+                                        runerror += 1;
+                                        if ((Kflag == 0) && !(cmp_flag & 4)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        goto block_2269;
+                                    }
+                                    if ((Kflag == 0) && !(cmp_flag & 4)) {
+                                        unlink(passin);
+                                    }
+                                    passin = passout;
+                                } else
+                                    break;
+                            }
+
+                        block_1042:
+                            if (gflag >= 2) {
+                                func_00431D00(srcfiles.entries[var_s0]);
+                            }
+                            if ((compiler == 1) && (c_compiler_choice != 0)) {
+                                if ((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) ||
+                                    (acpp != 0)) {
+                                    execlist.length = 0;
+                                    addstr(&execlist, cfe);
+                                }
+                                if (vflag != 0) {
+                                    addstr(&execlist, "-v");
+                                }
+                                if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                                    if (anachronisms != 0) {
+                                        addstr(&execlist, "-O");
+                                    }
+                                    if (cfront_compatible != 0) {
+                                        addstr(&execlist, "-b");
+                                    }
+                                }
+                                if (nocode != 0) {
+                                    addstr(&execlist, "-n");
+                                }
+                                if (Fflag == 0) {
+                                    addstr(&execlist, "-Zz");
+                                    addstr(&execlist, "-ZO");
+                                    addstr(&execlist, mkstr("-ZS", symtab, NULL));
+                                }
+                                if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                                    if (Oflag >= 3) {
+                                        addstr(&execlist, "-Qz");
+                                    }
+                                    if (non_shared != 0) {
+                                        addstr(&execlist, "-Qn");
+                                    }
+                                }
+                                if (signedcharflag != 0) {
+                                    addstr(&execlist, "-s");
+                                } else {
+                                    addstr(&execlist, "-u");
+                                }
+                                if (fullwarn != 0) {
+                                    addstr(&execlist, "-Yw");
+                                }
+                                if (disable_inlines != 0) {
+                                    addstr(&execlist, "-YJ");
+                                }
+                                if (c_compiler_choice == 2) {
+                                } else if (c_compiler_choice == 3) {
+                                    addstr(&execlist, "-YD");
+                                } else if (edison_type == (char*)3) {
+                                    addstr(&execlist, "-K");
+                                } else {
+                                    addstr(&execlist, "-m");
+                                }
+
+                                if (srcsuf == 0x69) {
+                                    addstr(&execlist, "-Yp");
+                                }
+                                if (smart_build != 0) {
+                                    addstr(&execlist, mkstr("-YR", sbrepos, NULL));
+                                }
+                                if (srcfiles.length == 1) {
+                                    if (outfile != NULL) {
+                                        sp118 = outfile;
+                                    } else if (cflag == 0) {
+                                        sp118 = "a.out";
+                                    } else {
+                                        sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
+                                    }
+                                } else {
+                                    sp118 = mksuf(srcfiles.entries[var_s0], 0x6F);
+                                }
+                                addstr(&execlist, mkstr("-YN", sp118, NULL));
+                                if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                                    switch (default_template_instantiation_mode) {
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            addstr(&execlist, "-tused");
+                                            break;
+                                        case 2:
+                                            addstr(&execlist, "-tall");
+                                            break;
+                                    }
+                                    if (no_prelink != 0) {
+                                        addstr(&execlist, "-T");
+                                    } else {
+                                        if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                                            sp10C = outfile;
+                                        } else {
+                                            sp10C = mksuf(srcfiles.entries[var_s0], 0x6F);
+                                        }
+                                        sp108 = make_ii_file_name(sp10C);
+                                        addstr(&execlist, mkstr("-YO", sp108, NULL));
+                                        free(sp108);
+                                    }
+                                    if (auto_template_include == 0) {
+                                        addstr(&execlist, "-B");
+                                    }
+                                }
+                                if (gflag >= 2) {
+                                    addstr(&execlist, mkstr("-Zc", tempstr[33], NULL));
+                                }
+                                addstr(&execlist, mkstr("-YG", Gnum, NULL));
+                                addlist(&execlist, &edisonflags);
+                                if (dollar_sign != 0) {
+                                    addstr(&execlist, "-$");
+                                }
+                                if (Fflag != 0) {
+                                    addstr(&execlist, mkstr("-", NULL));
+                                } else {
+                                    addstr(&execlist, passin);
+                                }
+                                var_s1 = 0;
+                            }
+                            if (compchoice == 3) {
+                                if (cmp_flag & 0x10000) {
+                                    if ((Hchar == 0x4D) || (Kflag != 0) || (cmp_flag & 4)) {
+                                        passout = mksuf(srcfiles.entries[var_s0], 0x50);
+                                    } else {
+                                        passout = mkstr(tempstr[31], "P", NULL);
+                                    }
+                                    execlist.length = 0;
+                                    addstr(&execlist, mpc);
+                                    addstr(&execlist, passin);
+                                    addstr(&execlist, mkstr("-K", passout, NULL));
+                                    if ((ansichoice == 1) || (ansichoice == 2)) {
+                                        addstr(&execlist, "-ansi");
+                                    } else if (ansichoice == 0) {
+                                        addstr(&execlist, "-cckr");
+                                    } else {
+                                        addstr(&execlist, "-xansi");
+                                    }
+                                    addlist(&execlist, &mpcflags);
+                                    retcode = run(mpc, execlist.entries, NULL, NULL, errout);
+                                    if (Kflag == 0) {
+                                        unlink(passin);
+                                    }
+                                    if (retcode != 0) {
+                                        runerror += 1;
+                                        if ((Hchar != 0x4D) && (Kflag == 0) && !(cmp_flag & 4)) {
+                                            unlink(passout);
+                                        }
+                                        break;
+                                    }
+                                    if (Hchar != 0x4D) {
+                                        passin = passout;
+                                    } else
+                                        break;
+                                }
+                                if (((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) ||
+                                     (acpp != 0) || (cmp_flag & 0x10000)) &&
+                                    (c_compiler_choice == 0)) {
+                                    execlist.length = 0;
+                                    addstr(&execlist, cfe);
+                                    addstr(&execlist, passin);
+                                }
+                                if (Hchar == 0x66) {
+                                    if (ucodeflag != 0) {
+                                        passout = tempstr[3];
+                                    } else {
+                                        passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                                    }
+                                } else if (((Fflag != 0) && (plusIflag == 0)) || (nocode != 0)) {
+                                    passout = NULL;
+                                } else if (plusIflag != 0) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 7);
+                                } else if (Kflag != 0) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                                } else {
+                                    passout = tempstr[3];
+                                }
+                                if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
+                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                    exit(2);
+                                }
+                                if (((docpp == 0) || (srcsuf == 0x69) || (acpp != 0) || (oldcppflag != 0)) &&
+                                    (run_sopt == 0)) {
+                                    if ((default_nocpp == 0) &&
+                                        ((srcsuf == 0x63) || (srcsuf == 0x73) || (srcsuf == 0x70))) {
+                                        addstr(&execlist, "-nocpp");
+                                    }
+                                    if (srcsuf == var_s0) {
+                                        addstr(&execlist, "-nocpp");
+                                    }
+                                }
+                                if (c_compiler_choice == 0) {
+                                    if (vflag != 0) {
+                                        addstr(&execlist, "-Xv");
+                                    }
+                                    if (compiler == 1) {
+                                        if ((run_sopt == 0) && !(cmp_flag & 1)) {
+                                            addstr(&execlist, "-D_CFE");
+                                            addstr(&execlist, "-Amachine(mips)");
+                                            addstr(&execlist, "-Asystem(unix)");
+                                            addlist(&execlist, &accomflags);
+                                        }
+                                        addlist(&execlist, &cfeflags);
+                                        addstr(&execlist, "-G");
+                                        addstr(&execlist, Gnum);
+                                    }
+                                    if ((ansichoice == 1) || (ansichoice == 2)) {
+                                        addstr(&execlist, "-std1");
+                                    } else if (ansichoice == 3) {
+                                        addstr(&execlist, "-std");
+                                    } else if (ansichoice == 0) {
+                                        addstr(&execlist, "-std0");
+                                    }
+                                    if (prototype_checking_on != 0) {
+                                        addstr(&execlist, "-Xprototypes");
+                                    }
+                                    addstr(&execlist, mkstr("-XS", symtab, NULL));
+                                    addlist(&execlist, &ccomflags);
+                                    if (gflag >= 2) {
+                                        addstr(&execlist, mkstr("-Xcmd:", tempstr[33], NULL));
+                                    }
+                                }
+                                if ((run_sopt != 0) || (cmp_flag & 1)) {
+                                    unlink(tempstr[2]);
+                                }
+                                if (run_sopt != 0) {
+                                    addlist(&execlist, &undefineflags);
+                                }
+                                retcode = run(cfe, execlist.entries, Fflag != 0 ? passin : NULL, passout, errout);
+                                if ((smart_build != 0) && (retcode == 0xFA)) {
+                                    retcode = 0;
+                                    nocompileneeded = 1;
+                                    if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                                        sp104 = outfile;
+                                    } else if ((srcsuf == 0x3F) && (Hchar != 0x62) && (Kflag == 0)) {
+                                        tmp_uldobj = sp104 = tempstr[12];
+                                    } else {
+                                        sp104 = mksuf(srcfiles.entries[var_s0], 0x6F);
+                                    }
+                                    if (touch(sp118) < 0) {
+                                        runerror += 1;
+                                    }
+                                    if ((srcfiles.length != 1) || (cflag != 0)) {
+                                        goto block_1227;
+                                    }
+                                    goto block_2588;
+                                }
+                            block_1227:
+                                if (Fflag == 0) {
+                                    if (retcode == 0xFF) {
+                                        c_inline = 1;
+                                        addstr(&umergeflags, "-c_inline");
+                                        goto block_1238;
+                                    }
+                                    if (retcode != 0) {
+                                        runerror += 1;
+                                        if ((oldcflag == 1) && (docpp != 0) && (srcsuf != 0x69) &&
+                                            (c_compiler_choice == 0)) {
+                                            unlink(passin);
+                                        }
+                                        if (Kflag == 0) {
+                                            unlink(passout);
+                                            unlink(symtab);
+                                        }
+                                    } else {
+                                    block_1238:
+                                        if (((run_sopt != 0) && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) ||
+                                            (cmp_flag & 0x10000)) {
+                                            unlink(passin);
+                                        }
+                                        if ((NoMoreOptions != 0) && (*passout == 0x2D)) {
+                                            passout = func_00433534(passout);
+                                        }
+                                        passin = passout;
+                                        if ((Hchar == 0x66) && (ucodeflag != 0)) {
+                                            execlist.length = 0;
+                                            addstr(&execlist, "btou");
+                                            addstr(&execlist, passin);
+                                            passout = mksuf(srcfiles.entries[var_s0], 0x55);
+                                            if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
+                                                error(1, NULL, 0, NULL, 0,
+                                                      "can't overwrite a write-protected file %s \n", passout);
+                                                exit(2);
+                                            }
+                                            addstr(&execlist, passout);
+                                            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                runerror += 1;
+                                                if (Kflag == 0) {
+                                                    unlink(passin);
+                                                    unlink(passout);
+                                                }
+                                                if (tmpst != 0) {
+                                                    unlink(symtab);
+                                                }
+                                            } else if (Kflag == 0) {
+                                                unlink(passin);
+                                            }
+                                        } else {
+                                            passin = passout;
+                                            if (Hchar != 0x66) {
+                                                if ((compiler == 1) && (c_compiler_choice != 0) &&
+                                                    ((Eflag != 0) || (nocode != 0) || (nocompileneeded != 0))) {
+                                                    unlink(passout);
+                                                } else {
+                                                    goto block_1729;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            execlist.length = 0;
+                            addstr(&execlist, ansichoice != 0 ? "accom" : "ccom");
+                            if (vflag != 0) {
+                                addstr(&execlist, "-Xv");
+                            }
+                            if (cmp_flag & 0x10000) {
+                                addstr(&execlist, "-XMP");
+                            }
+                            addlist(&execlist, &ccomflags);
+                            if (dollar_sign != 0) {
+                                addstr(&execlist, "-Xdollar");
+                            }
+                            if (use_real_fp != 0) {
+                                addstr(&execlist, "-Xreal_fp");
+                            }
+                            if ((prototype_checking_on != 0) || (ansichoice != 0)) {
+                                addstr(&execlist, "-Xprototypes");
+                            }
+                            if (ansichoice != 0) {
+                                if (ansichoice == 3) {
+                                    addstr(&execlist, "-Xxansi");
+                                } else {
+                                    addstr(&execlist, "-Xansi");
+                                }
+                                addlist(&execlist, &accomflags);
                             }
                             if (Hchar == 0x66) {
                                 if (ucodeflag != 0) {
@@ -2372,117 +2579,304 @@ block_1042:
                                 } else {
                                     passout = mksuf(srcfiles.entries[var_s0], 0x42);
                                 }
-                            } else if (((Fflag != 0) && (plusIflag == 0)) || (nocode != 0)) {
-                                passout = NULL;
-                            } else if (plusIflag != 0) {
-                                passout = mksuf(srcfiles.entries[var_s0], 7);
                             } else if (Kflag != 0) {
                                 passout = mksuf(srcfiles.entries[var_s0], 0x42);
                             } else {
                                 passout = tempstr[3];
                             }
-                            if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
+                            if (regular_not_writeable(passout) == 1) {
                                 error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                                 exit(2);
                             }
-                            if (((docpp == 0) || (srcsuf == 0x69) || (acpp != 0) || (oldcppflag != 0)) && (run_sopt == 0)) {
-                                if ((default_nocpp == 0) && ((srcsuf == 0x63) || (srcsuf == 0x73) || (srcsuf == 0x70))) {
-                                    addstr(&execlist, "-nocpp");
-                                }
-                                if (srcsuf == var_s0) {
-                                    addstr(&execlist, "-nocpp");
-                                }
+                            addstr(&execlist, mkstr("-XS", symtab, NULL));
+                            if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
+                                var_s1 = passin;
+                            } else {
+                                addstr(&execlist, passin);
+                                var_s1 = NULL;
                             }
-                            if (c_compiler_choice == 0) {
-                                if (vflag != 0) {
-                                    addstr(&execlist, "-Xv");
-                                }
-                                if (compiler == 1) {
-                                    if ((run_sopt == 0) && !(cmp_flag & 1)) {
-                                        addstr(&execlist, "-D_CFE");
-                                        addstr(&execlist, "-Amachine(mips)");
-                                        addstr(&execlist, "-Asystem(unix)");
-                                        addlist(&execlist, &accomflags);
+                            retcode = run(ccom, execlist.entries, var_s1, passout, errout);
+                            if (retcode == 0xFF) {
+                                c_inline = 1;
+                                addstr(&umergeflags, "-c_inline");
+                                goto block_1317;
+                            }
+                            if (retcode != 0) {
+                                if (editflag != 0) {
+                                    if (times_edited < edit_cnt_max) {
+                                        times_edited += 1;
+                                        if (edit_src(editor, srcfiles.entries[var_s0], 1) != 0) {
+                                            show_err(errout);
+                                            exit(1);
+                                        }
+                                        if ((docpp != 0) && (srcsuf != 0x69)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        unlink(errout);
+                                        unlink(symtab);
+                                        passin = srcfiles.entries[var_s0];
+                                        goto loop_484;
                                     }
-                                    addlist(&execlist, &cfeflags);
-                                    addstr(&execlist, "-G");
-                                    addstr(&execlist, Gnum);
+                                    show_err(errout);
+                                    goto block_1311;
                                 }
-                                if ((ansichoice == 1) || (ansichoice == 2)) {
-                                    addstr(&execlist, "-std1");
-                                } else if (ansichoice == 3) {
-                                    addstr(&execlist, "-std");
-                                } else if (ansichoice == 0) {
-                                    addstr(&execlist, "-std0");
+                            block_1311:
+                                runerror += 1;
+                                if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
+                                    unlink(passin);
                                 }
-                                if (prototype_checking_on != 0) {
-                                    addstr(&execlist, "-Xprototypes");
+                                if (Kflag == 0) {
+                                    unlink(passout);
+                                    unlink(symtab);
                                 }
-                                addstr(&execlist, mkstr("-XS", symtab, NULL));
-                                addlist(&execlist, &ccomflags);
-                                if (gflag >= 2) {
-                                    addstr(&execlist, mkstr("-Xcmd:", tempstr[33], NULL));
-                                }
+                                break;
                             }
-                            if ((run_sopt != 0) || (cmp_flag & 1)) {
-                                unlink(tempstr[2]);
+                        block_1317:
+                            if (editflag != 0) {
+                                unlink(errout);
                             }
-                            if (run_sopt != 0) {
-                                addlist(&execlist, &undefineflags);
+                            if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
+                                unlink(passin);
                             }
-                            retcode = run(cfe, execlist.entries, Fflag != 0 ? passin : NULL, passout, errout);
-                            if ((smart_build != 0) && (retcode == 0xFA)) {
-                                retcode = 0;
-                                nocompileneeded = 1;
-                                if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
-                                    sp104 = outfile;
-                                } else if ((srcsuf == 0x3F) && (Hchar != 0x62) && (Kflag == 0)) {
-                                    tmp_uldobj = sp104 = tempstr[12];
+                            passin = passout;
+                            if ((Hchar == 0x66) && (ucodeflag != 0)) {
+                                execlist.length = 0;
+                                addstr(&execlist, "btou");
+                                addstr(&execlist, passin);
+                                passout = mksuf(srcfiles.entries[var_s0], 0x55);
+                                if (regular_not_writeable(passout) == 1) {
+                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                    exit(2);
+                                }
+                                addstr(&execlist, passout);
+                                if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                                    runerror += 1;
+                                    if (Kflag == 0) {
+                                        unlink(passin);
+                                        unlink(passout);
+                                    }
+                                    if (tmpst != 0) {
+                                        unlink(symtab);
+                                    }
+                                } else if (Kflag == 0) {
+                                    unlink(passin);
+                                }
+                                continue;
+                            } else if (Hchar == 0x66 || ((compiler == 1 && c_compiler_choice != 0) &&
+                                                         (Eflag != 0 || nocode != 0 || nocompileneeded != 0))) {
+                                continue;
+                            } else {
+                                goto block_1729;
+                            }
+
+                        case 0x70: /* switch 18 */
+                        block_1341:
+                            execlist.length = 0;
+                            addstr(&execlist, "upas");
+                            if (vflag != 0) {
+                                addstr(&execlist, "-v");
+                            }
+                            addstr(&execlist, "-G");
+                            addstr(&execlist, Gnum);
+                            addlist(&execlist, &upasflags);
+                            addstr(&execlist, passin);
+                            if (((Hchar == 0x66) && (ucodeflag == 0)) || (Kflag != 0)) {
+                                passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                                if (regular_not_writeable(passout) == 1) {
+                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                    exit(2);
+                                }
+                            } else {
+                                passout = tempstr[3];
+                            }
+                            addstr(&execlist, passout);
+                            addstr(&execlist, "-t");
+                            addstr(&execlist, symtab);
+                            if (run(upas, execlist.entries, NULL, NULL, errout) != 0) {
+                                if (editflag != 0) {
+                                    if (times_edited < edit_cnt_max) {
+                                        times_edited += 1;
+                                        if (edit_src(editor, srcfiles.entries[var_s0], 2) != 0) {
+                                            show_err(errout);
+                                            exit(1);
+                                        }
+                                        if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        unlink(errout);
+                                        unlink(symtab);
+                                        passin = srcfiles.entries[var_s0];
+                                        goto loop_484;
+                                    }
+                                    show_err(errout);
+                                    goto block_1361;
+                                }
+                            block_1361:
+                                runerror += 1;
+                                if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                    unlink(passin);
+                                }
+                                if (Kflag == 0) {
+                                    unlink(passout);
+                                    unlink(symtab);
+                                }
+                                break;
+                            }
+                            if (editflag != 0) {
+                                unlink(errout);
+                            }
+                            if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                                unlink(passin);
+                            }
+                            passin = passout;
+                            if ((Hchar == 0x66) && (ucodeflag != 0)) {
+                                execlist.length = 0;
+                                addstr(&execlist, "btou");
+                                addstr(&execlist, passin);
+                                passout = mksuf(srcfiles.entries[var_s0], 0x55);
+                                if (regular_not_writeable(passout) == 1) {
+                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                    exit(2);
+                                }
+                                addstr(&execlist, passout);
+                                if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                                    runerror += 1;
+                                    if (Kflag == 0) {
+                                        unlink(passin);
+                                        unlink(passout);
+                                    }
+                                    if (tmpst != 0) {
+                                        unlink(symtab);
+                                    }
+                                } else if (Kflag == 0) {
+                                    unlink(passin);
+                                }
+                            } else if (Hchar == 0x66) {
+
+                            } else {
+                                goto block_1729;
+                            }
+                            break;
+                        case 0x1: /* switch 18 */
+                        block_1388:
+                            execlist.length = 0;
+                            addstr(&execlist, "pl1fe");
+                            if (vflag != 0) {
+                                addstr(&execlist, "-v");
+                            }
+                            addlist(&execlist, &upl1flags);
+                            addstr(&execlist, passin);
+                            if ((Hchar == 0x66) || (Kflag != 0)) {
+                                passout = mksuf(srcfiles.entries[var_s0], 3);
+                                lpi_st = mksuf(srcfiles.entries[var_s0], 4);
+                            } else {
+                                passout = tempstr[16];
+                                lpi_st = tempstr[17];
+                            }
+                            lpi_p1 = tempstr[18];
+                            addstr(&execlist, "-o");
+                            addstr(&execlist, passout);
+                            addstr(&execlist, "-s");
+                            addstr(&execlist, lpi_st);
+                            addstr(&execlist, "-p");
+                            addstr(&execlist, lpi_p1);
+                            addstr(&execlist, "-e");
+                            addstr(&execlist, pl1err);
+                            if (run(upl1, execlist.entries, NULL, errout, NULL) != 0) {
+                                if (editflag != 0) {
+                                    if (times_edited < edit_cnt_max) {
+                                        times_edited += 1;
+                                        if (edit_src(editor, srcfiles.entries[var_s0], 5) != 0) {
+                                            show_err(errout);
+                                            exit(1);
+                                        }
+                                        if ((docpp != 0) && (srcsuf != 0x69)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        unlink(errout);
+                                        unlink(lpi_st);
+                                        unlink(lpi_p1);
+                                        passin = srcfiles.entries[var_s0];
+                                        goto loop_484;
+                                    }
+                                    show_err(errout);
+                                    goto block_1404;
+                                }
+                            block_1404:
+                                runerror += 1;
+                                if ((docpp != 0) && (srcsuf != 0x69)) {
+                                    unlink(passin);
+                                }
+                                if (Kflag == 0) {
+                                    unlink(passout);
+                                    unlink(lpi_st);
+                                }
+                                unlink(lpi_p1);
+                                goto block_2269;
+                            }
+                            if (editflag != 0) {
+                                unlink(errout);
+                            }
+                            unlink(lpi_p1);
+                            if ((docpp != 0) && (srcsuf != 0x69)) {
+                                unlink(passin);
+                            }
+                            if (Hchar != 0x66) {
+                                passin = passout;
+                            block_1417:
+                                execlist.length = 0;
+                                addstr(&execlist, "ulpi");
+                                if (vflag != 0) {
+                                    addstr(&execlist, "-v");
+                                }
+                                addlist(&execlist, &ulpiflags);
+                                addstr(&execlist, passin);
+                                if (((Hchar == 0x6B) && (ucodeflag == 0)) || (Kflag != 0)) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x42);
                                 } else {
-                                    sp104 = mksuf(srcfiles.entries[var_s0], 0x6F);
+                                    passout = tempstr[3];
                                 }
-                                if (touch(sp118) < 0) {
+                                if ((srcsuf == 3) || (Kflag != 0)) {
+                                    lpi_st = mksuf(srcfiles.entries[var_s0], 4);
+                                } else {
+                                    lpi_st = tempstr[17];
+                                }
+                                addstr(&execlist, "-s");
+                                addstr(&execlist, lpi_st);
+                                addstr(&execlist, "-o");
+                                addstr(&execlist, passout);
+                                addstr(&execlist, "-t");
+                                addstr(&execlist, symtab);
+                                if (run(ulpi, execlist.entries, NULL, NULL, NULL) != 0) {
                                     runerror += 1;
-                                }
-                                if ((srcfiles.length != 1) || (cflag != 0)) {
-                                    goto block_1227;
-                                }
-                                goto block_2588;
-                            }
-block_1227:
-                            if (Fflag == 0) {
-                                if (retcode == 0xFF) {
-                                    c_inline = 1;
-                                    addstr(&umergeflags, "-c_inline");
-                                    goto block_1238;
-                                }
-                                if (retcode != 0) {
-                                    runerror += 1;
-                                    if ((oldcflag == 1) && (docpp != 0) && (srcsuf != 0x69) && (c_compiler_choice == 0)) {
+                                    if (srcsuf != 3) {
                                         unlink(passin);
                                     }
                                     if (Kflag == 0) {
                                         unlink(passout);
+                                        if (srcsuf != 3) {
+                                            unlink(lpi_st);
+                                        }
+                                    }
+                                    if (tmpst != 0) {
                                         unlink(symtab);
                                     }
                                 } else {
-block_1238:
-                                    if (((run_sopt != 0) && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) || (cmp_flag & 0x10000)) {
+                                    if ((srcsuf != 3) && (Kflag == 0)) {
                                         unlink(passin);
                                     }
-                                    if ((NoMoreOptions != 0) && (*passout == 0x2D)) {
-                                        passout = func_00433534(passout);
+                                    if ((Kflag == 0) && (srcsuf != 3)) {
+                                        unlink(lpi_st);
                                     }
                                     passin = passout;
-                                    if ((Hchar == 0x66) && (ucodeflag != 0)) {
+                                    if ((Hchar == 0x6B) && (ucodeflag != 0)) {
                                         execlist.length = 0;
                                         addstr(&execlist, "btou");
                                         addstr(&execlist, passin);
                                         passout = mksuf(srcfiles.entries[var_s0], 0x55);
-                                        if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                            exit(2);
-                                        }
                                         addstr(&execlist, passout);
                                         if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                                             runerror += 1;
@@ -2496,1216 +2890,534 @@ block_1238:
                                         } else if (Kflag == 0) {
                                             unlink(passin);
                                         }
+                                    } else if (Hchar == 0x6B) {
+
                                     } else {
-                                        passin = passout;
-                                        if (Hchar != 0x66) {
-                                            if ((compiler == 1) && (c_compiler_choice != 0) && ((Eflag != 0) || (nocode != 0) || (nocompileneeded != 0))) {
-                                                unlink(passout);
-                                            } else {
-                                                goto block_1729;
-                                            }
-                                        }
+                                        goto block_1729;
                                     }
                                 }
                             }
                             break;
-                        }
-                        execlist.length = 0;
-                        addstr(&execlist, ansichoice != 0 ? "accom" : "ccom");
-                        if (vflag != 0) {
-                            addstr(&execlist, "-Xv");
-                        }
-                        if (cmp_flag & 0x10000) {
-                            addstr(&execlist, "-XMP");
-                        }
-                        addlist(&execlist, &ccomflags);
-                        if (dollar_sign != 0) {
-                            addstr(&execlist, "-Xdollar");
-                        }
-                        if (use_real_fp != 0) {
-                            addstr(&execlist, "-Xreal_fp");
-                        }
-                        if ((prototype_checking_on != 0) || (ansichoice != 0)) {
-                            addstr(&execlist, "-Xprototypes");
-                        }
-                        if (ansichoice != 0) {
-                            if (ansichoice == 3) {
-                                addstr(&execlist, "-Xxansi");
-                            } else {
-                                addstr(&execlist, "-Xansi");
-                            }
-                            addlist(&execlist, &accomflags);
-                        }
-                        if (Hchar == 0x66) {
-                            if (ucodeflag != 0) {
-                                passout = tempstr[3];
-                            } else {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                            }
-                        } else if (Kflag != 0) {
-                            passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                        } else {
-                            passout = tempstr[3];
-                        }
-                        if (regular_not_writeable(passout) == 1) {
-                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                            exit(2);
-                        }
-                        addstr(&execlist, mkstr("-XS", symtab, NULL));
-                        if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-                            var_s1 = passin;
-                        } else {
-                            addstr(&execlist, passin);
-                            var_s1 = NULL;
-                        }
-                        retcode = run(ccom, execlist.entries, var_s1, passout, errout);
-                        if (retcode == 0xFF) {
-                            c_inline = 1;
-                            addstr(&umergeflags, "-c_inline");
-                            goto block_1317;
-                        }
-                        if (retcode != 0) {
-                            if (editflag != 0) {
-                                if (times_edited < edit_cnt_max) {
-                                    times_edited += 1;
-                                    if (edit_src(editor, srcfiles.entries[var_s0], 1) != 0) {
-                                        show_err(errout);
-                                        exit(1);
-                                    }
-                                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                                        unlink(passin);
-                                    }
-                                    unlink(passout);
-                                    unlink(errout);
-                                    unlink(symtab);
-                                    passin = srcfiles.entries[var_s0];
-                                    goto loop_484;
-                                }
-                                show_err(errout);
-                                goto block_1311;
-                            }
-block_1311:
-                            runerror += 1;
-                            if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-                                unlink(passin);
-                            }
-                            if (Kflag == 0) {
-                                unlink(passout);
-                                unlink(symtab);
-                            }
-                            break;
-                        }
-block_1317:
-                        if (editflag != 0) {
-                            unlink(errout);
-                        }
-                        if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-                            unlink(passin);
-                        }
-                        passin = passout;
-                        if ((Hchar == 0x66) && (ucodeflag != 0)) {
+                        case 0x2: /* switch 18 */
+                        block_1453:
                             execlist.length = 0;
-                            addstr(&execlist, "btou");
-                            addstr(&execlist, passin);
-                            passout = mksuf(srcfiles.entries[var_s0], 0x55);
-                            if (regular_not_writeable(passout) == 1) {
-                                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                exit(2);
-                            }
-                            addstr(&execlist, passout);
-                            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if (Kflag == 0) {
-                                    unlink(passin);
-                                    unlink(passout);
-                                }
-                                if (tmpst != 0) {
-                                    unlink(symtab);
-                                }
-                            } else if (Kflag == 0) {
-                                unlink(passin);
-                            }
-                            continue;
-                        } else if (
-                                Hchar == 0x66 ||
-                                (
-                                    (compiler == 1 && c_compiler_choice != 0) &&
-                                    (Eflag != 0 || nocode != 0 || nocompileneeded != 0)
-                                 )) {
-                            continue;
-                        } else {
-                            goto block_1729;
-                        }
-
-                    case 0x70:                  /* switch 18 */
-block_1341:
-                        execlist.length = 0;
-                        addstr(&execlist, "upas");
-                        if (vflag != 0) {
-                            addstr(&execlist, "-v");
-                        }
-                        addstr(&execlist, "-G");
-                        addstr(&execlist, Gnum);
-                        addlist(&execlist, &upasflags);
-                        addstr(&execlist, passin);
-                        if (((Hchar == 0x66) && (ucodeflag == 0)) || (Kflag != 0)) {
-                            passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                            if (regular_not_writeable(passout) == 1) {
-                                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                exit(2);
-                            }
-                        } else {
-                            passout = tempstr[3];
-                        }
-                        addstr(&execlist, passout);
-                        addstr(&execlist, "-t");
-                        addstr(&execlist, symtab);
-                        if (run(upas, execlist.entries, NULL, NULL, errout) != 0) {
-                            if (editflag != 0) {
-                                if (times_edited < edit_cnt_max) {
-                                    times_edited += 1;
-                                    if (edit_src(editor, srcfiles.entries[var_s0], 2) != 0) {
-                                        show_err(errout);
-                                        exit(1);
-                                    }
-                                    if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                        unlink(passin);
-                                    }
-                                    unlink(passout);
-                                    unlink(errout);
-                                    unlink(symtab);
-                                    passin = srcfiles.entries[var_s0];
-                                    goto loop_484;
-                                }
-                                show_err(errout);
-                                goto block_1361;
-                            }
-block_1361:
-                            runerror += 1;
-                            if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                unlink(passin);
-                            }
-                            if (Kflag == 0) {
-                                unlink(passout);
-                                unlink(symtab);
-                            }
-                            break;
-                        }
-                        if (editflag != 0) {
-                            unlink(errout);
-                        }
-                        if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                            unlink(passin);
-                        }
-                        passin = passout;
-                        if ((Hchar == 0x66) && (ucodeflag != 0)) {
-                            execlist.length = 0;
-                            addstr(&execlist, "btou");
-                            addstr(&execlist, passin);
-                            passout = mksuf(srcfiles.entries[var_s0], 0x55);
-                            if (regular_not_writeable(passout) == 1) {
-                                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                exit(2);
-                            }
-                            addstr(&execlist, passout);
-                            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if (Kflag == 0) {
-                                    unlink(passin);
-                                    unlink(passout);
-                                }
-                                if (tmpst != 0) {
-                                    unlink(symtab);
-                                }
-                            } else if (Kflag == 0) {
-                                unlink(passin);
-                            }
-                        } else if (Hchar == 0x66) {
-
-                        } else {
-                            goto block_1729;
-                        }
-                        break;
-                    case 0x1:                   /* switch 18 */
-block_1388:
-                        execlist.length = 0;
-                        addstr(&execlist, "pl1fe");
-                        if (vflag != 0) {
-                            addstr(&execlist, "-v");
-                        }
-                        addlist(&execlist, &upl1flags);
-                        addstr(&execlist, passin);
-                        if ((Hchar == 0x66) || (Kflag != 0)) {
-                            passout = mksuf(srcfiles.entries[var_s0], 3);
-                            lpi_st = mksuf(srcfiles.entries[var_s0], 4);
-                        } else {
-                            passout = tempstr[16];
-                            lpi_st = tempstr[17];
-                        }
-                        lpi_p1 = tempstr[18];
-                        addstr(&execlist, "-o");
-                        addstr(&execlist, passout);
-                        addstr(&execlist, "-s");
-                        addstr(&execlist, lpi_st);
-                        addstr(&execlist, "-p");
-                        addstr(&execlist, lpi_p1);
-                        addstr(&execlist, "-e");
-                        addstr(&execlist, pl1err);
-                        if (run(upl1, execlist.entries, NULL, errout, NULL) != 0) {
-                            if (editflag != 0) {
-                                if (times_edited < edit_cnt_max) {
-                                    times_edited += 1;
-                                    if (edit_src(editor, srcfiles.entries[var_s0], 5) != 0) {
-                                        show_err(errout);
-                                        exit(1);
-                                    }
-                                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                                        unlink(passin);
-                                    }
-                                    unlink(passout);
-                                    unlink(errout);
-                                    unlink(lpi_st);
-                                    unlink(lpi_p1);
-                                    passin = srcfiles.entries[var_s0];
-                                    goto loop_484;
-                                }
-                                show_err(errout);
-                                goto block_1404;
-                            }
-block_1404:
-                            runerror += 1;
-                            if ((docpp != 0) && (srcsuf != 0x69)) {
-                                unlink(passin);
-                            }
-                            if (Kflag == 0) {
-                                unlink(passout);
-                                unlink(lpi_st);
-                            }
-                            unlink(lpi_p1);
-                            goto block_2269;
-                        }
-                        if (editflag != 0) {
-                            unlink(errout);
-                        }
-                        unlink(lpi_p1);
-                        if ((docpp != 0) && (srcsuf != 0x69)) {
-                            unlink(passin);
-                        }
-                        if (Hchar != 0x66) {
-                            passin = passout;
-block_1417:
-                            execlist.length = 0;
-                            addstr(&execlist, "ulpi");
+                            addstr(&execlist, "cobfe");
                             if (vflag != 0) {
                                 addstr(&execlist, "-v");
                             }
-                            addlist(&execlist, &ulpiflags);
+                            addlist(&execlist, &ucobflags);
                             addstr(&execlist, passin);
-                            if (((Hchar == 0x6B) && (ucodeflag == 0)) || (Kflag != 0)) {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                            } else {
-                                passout = tempstr[3];
-                            }
-                            if ((srcsuf == 3) || (Kflag != 0)) {
+                            if ((Hchar == 0x66) || (Kflag != 0)) {
+                                passout = mksuf(srcfiles.entries[var_s0], 3);
                                 lpi_st = mksuf(srcfiles.entries[var_s0], 4);
                             } else {
+                                passout = tempstr[16];
                                 lpi_st = tempstr[17];
                             }
-                            addstr(&execlist, "-s");
-                            addstr(&execlist, lpi_st);
+                            lpi_p1 = tempstr[18];
+                            lpi_pd = tempstr[20];
+                            lpi_dd = tempstr[19];
                             addstr(&execlist, "-o");
                             addstr(&execlist, passout);
-                            addstr(&execlist, "-t");
-                            addstr(&execlist, symtab);
-                            if (run(ulpi, execlist.entries, NULL, NULL, NULL) != 0) {
+                            addstr(&execlist, "-s");
+                            addstr(&execlist, lpi_st);
+                            addstr(&execlist, "-p");
+                            addstr(&execlist, lpi_p1);
+                            addstr(&execlist, "-pd");
+                            addstr(&execlist, lpi_pd);
+                            addstr(&execlist, "-dd");
+                            addstr(&execlist, lpi_dd);
+                            addstr(&execlist, "-e");
+                            addstr(&execlist, pl1err);
+                            if (run(ucob, execlist.entries, NULL, errout, NULL) != 0) {
+                                if (editflag != 0) {
+                                    if (times_edited < edit_cnt_max) {
+                                        times_edited += 1;
+                                        if (edit_src(editor, srcfiles.entries[var_s0], 6) != 0) {
+                                            show_err(errout);
+                                            exit(1);
+                                        }
+                                        if ((docpp != 0) && (srcsuf != 0x69)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        unlink(errout);
+                                        unlink(lpi_st);
+                                        unlink(lpi_p1);
+                                        unlink(lpi_pd);
+                                        unlink(lpi_dd);
+                                        passin = srcfiles.entries[var_s0];
+                                        goto loop_484;
+                                    }
+                                    show_err(errout);
+                                    goto block_1469;
+                                }
+                            block_1469:
                                 runerror += 1;
-                                if (srcsuf != 3) {
+                                if ((docpp != 0) && (srcsuf != 0x69)) {
                                     unlink(passin);
                                 }
                                 if (Kflag == 0) {
                                     unlink(passout);
-                                    if (srcsuf != 3) {
-                                        unlink(lpi_st);
-                                    }
-                                }
-                                if (tmpst != 0) {
-                                    unlink(symtab);
-                                }
-                            } else {
-                                if ((srcsuf != 3) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                                if ((Kflag == 0) && (srcsuf != 3)) {
                                     unlink(lpi_st);
                                 }
-                                passin = passout;
-                                if ((Hchar == 0x6B) && (ucodeflag != 0)) {
-                                    execlist.length = 0;
-                                    addstr(&execlist, "btou");
-                                    addstr(&execlist, passin);
-                                    passout = mksuf(srcfiles.entries[var_s0], 0x55);
-                                    addstr(&execlist, passout);
-                                    if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                                        runerror += 1;
-                                        if (Kflag == 0) {
-                                            unlink(passin);
-                                            unlink(passout);
-                                        }
-                                        if (tmpst != 0) {
-                                            unlink(symtab);
-                                        }
-                                    } else if (Kflag == 0) {
-                                        unlink(passin);
-                                    }
-                                } else if (Hchar == 0x6B) {
-
-                                } else {
-                                    goto block_1729;
-                                }
+                                unlink(lpi_p1);
+                                unlink(lpi_pd);
+                                unlink(lpi_dd);
+                                goto block_2269;
                             }
-                        }
-                        break;
-                    case 0x2:                   /* switch 18 */
-block_1453:
-                        execlist.length = 0;
-                        addstr(&execlist, "cobfe");
-                        if (vflag != 0) {
-                            addstr(&execlist, "-v");
-                        }
-                        addlist(&execlist, &ucobflags);
-                        addstr(&execlist, passin);
-                        if ((Hchar == 0x66) || (Kflag != 0)) {
-                            passout = mksuf(srcfiles.entries[var_s0], 3);
-                            lpi_st = mksuf(srcfiles.entries[var_s0], 4);
-                        } else {
-                            passout = tempstr[16];
-                            lpi_st = tempstr[17];
-                        }
-                        lpi_p1 = tempstr[18];
-                        lpi_pd = tempstr[20];
-                        lpi_dd = tempstr[19];
-                        addstr(&execlist, "-o");
-                        addstr(&execlist, passout);
-                        addstr(&execlist, "-s");
-                        addstr(&execlist, lpi_st);
-                        addstr(&execlist, "-p");
-                        addstr(&execlist, lpi_p1);
-                        addstr(&execlist, "-pd");
-                        addstr(&execlist, lpi_pd);
-                        addstr(&execlist, "-dd");
-                        addstr(&execlist, lpi_dd);
-                        addstr(&execlist, "-e");
-                        addstr(&execlist, pl1err);
-                        if (run(ucob, execlist.entries, NULL, errout, NULL) != 0) {
                             if (editflag != 0) {
-                                if (times_edited < edit_cnt_max) {
-                                    times_edited += 1;
-                                    if (edit_src(editor, srcfiles.entries[var_s0], 6) != 0) {
-                                        show_err(errout);
-                                        exit(1);
-                                    }
-                                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                                        unlink(passin);
-                                    }
-                                    unlink(passout);
-                                    unlink(errout);
-                                    unlink(lpi_st);
-                                    unlink(lpi_p1);
-                                    unlink(lpi_pd);
-                                    unlink(lpi_dd);
-                                    passin = srcfiles.entries[var_s0];
-                                    goto loop_484;
-                                }
-                                show_err(errout);
-                                goto block_1469;
+                                unlink(errout);
                             }
-block_1469:
-                            runerror += 1;
                             if ((docpp != 0) && (srcsuf != 0x69)) {
                                 unlink(passin);
-                            }
-                            if (Kflag == 0) {
-                                unlink(passout);
-                                unlink(lpi_st);
                             }
                             unlink(lpi_p1);
                             unlink(lpi_pd);
                             unlink(lpi_dd);
-                            goto block_2269;
-                        }
-                        if (editflag != 0) {
-                            unlink(errout);
-                        }
-                        if ((docpp != 0) && (srcsuf != 0x69)) {
-                            unlink(passin);
-                        }
-                        unlink(lpi_p1);
-                        unlink(lpi_pd);
-                        unlink(lpi_dd);
-                        if (Hchar != 0x66) {
-                            passin = passout;
-                            goto block_1417;
-                        }
-                        break;
-block_A:
-                        if (mflag != 0) {
-                            execlist.length = 0;
-                            addstr(&execlist, "m4");
-                            addstr(&execlist, passin);
-                            if ((compiler == 4) || (srcsuf == 0x73)) {
-                                passout = tempstr[14];
-                            } else {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x70);
-                            }
-                            if (run(m4, execlist.entries, NULL, passout, NULL) != 0) {
-                                runerror += 1;
-                                if (Kflag == 0) {
-                                    unlink(passout);
-                                }
-                                continue;
-                            }
-                            passin = passout;
-                        }
-
-                        switch (srcsuf) {
-                        case 0x73:
-                            if (docpp == 0) {
-                                if (default_nocpp != 0) {
-                                    goto block_531;
-                                }
-                                goto block_2130;
-                            }
-                            goto block_531;
-                        case 0x65:
-                        default:
-                            error(1, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
-                            exit(2);
-                        case 0x72:
-                            execlist.length = 0;
-                            addstr(&execlist, "ratfor");
-                            addlist(&execlist, &ratforflags);
-                            addstr(&execlist, passin);
-                            passout = mksuf(srcfiles.entries[var_s0], 0x66);
-                            if (run(ratfor, execlist.entries, NULL, passout, NULL) != 0) {
-                                runerror += 1;
-                                if (Kflag == 0) {
-
-                                }
-                                break;
-                            }
-                            if (mflag != 0) {
-                                unlink(passin);
-                            }
-                            passin = passout;
-                            if (Fflag == 0) {
-                                if (docpp == 0) {
-                                    // TODO: pointless 'b'
-                                    goto block_1505;
-                                }
-                                goto block_531;
-                            }
-                            break;
-                        }
-                        break;
-
-                    case 0x46:                  /* switch 18 */
-                    case 0x65:                  /* switch 18 */
-                    case 0x66:                  /* switch 18 */
-                    case 0x72:                  /* switch 18 */
-block_1505:
-                        sp100 = 0;
-                        spFC = 0;
-                        spF0[0] = 0x31;
-                        spF0[1] = 0;
-                        if (run_sopt != 0) {
-                            if (mp_flag & 1) {
-                                error(2, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
-                                goto block_1566;
-                            }
-                            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                                addstr(&optflags, "-loopunroll");
-                                addstr(&optflags, "0");
-                            }
-                            if ((mp_i2flag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
-                            }
-                            if ((mp_66flag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
-                            }
-                            if ((mp_uflag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
-                            }
-                            if ((mp_backslashflag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
-                            }
-                            if (mp_caseflag != 0) {
-                                error(1, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
-                                exit(2);
-                            }
-                            execlist.length = 0;
-                            addstr(&execlist, "fopt");
-                            spF4 = mkstr(tempstr[31], "l", NULL);
-                            addstr(&execlist, mkstr("-L=", spF4, NULL));
-                            if ((Hchar == 0x4B) || (Kflag != 0)) {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x6D);
-                            } else {
-                                passout = mkstr(tempstr[31], "m", &spF0, NULL);
-                            }
-                            addstr(&execlist, mkstr("-F=", passout, NULL));
-                            addstr(&execlist, mkstr("-I=", passin, NULL));
-                            if (mp_col120flag != 0) {
-                                addstr(&execlist, "-scan=120");
-                            }
-                            if (mp_extendflag != 0) {
-                                addstr(&execlist, "-scan=132");
-                            }
-                            if (automaticflag == 0) {
-                                addstr(&execlist, "-save=all");
-                            }
-                            if (mp_onetripflag != 0) {
-                                addstr(&execlist, "-onetrip");
-                            }
-                            if (mp_dlinesflag != 0) {
-                                addstr(&execlist, "-dlines");
-                            }
-                            if (w1flag == 2) {
-                                addstr(&execlist, "-suppress=w");
-                            }
-                            if (vflag != 0) {
-                                addstr(&execlist, "-lo=lno");
-                            }
-                            if (irix4 != 0) {
-                                addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
-                            } else {
-                                addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
-                            }
-                            addstr(&execlist, "-include=/usr/include", 0);
-                            addstr(&execlist, "-cp=i");
-                            addlist(&execlist, &soptflags);
-                            if (run(fopt, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                                if ((Hchar != 0x4B) || (Kflag != 0)) {
-                                    unlink(passout);
-                                }
-                                unlink(spF4);
-                                goto block_2269;
-                            }
-                            if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                unlink(passin);
-                            }
-                            unlink(spF4);
-                            passin = passout;
-                            if (Hchar == 0x4B) {
-                                break;
-                            }
-                            goto block_1660;
-                        }
-block_1566:
-                        if ((Hchar == 0x4B) || (Kflag != 0)) {
-                            mp_flag |= 6;
-                        }
-                        if (mp_flag & 1) {
-                            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                                addstr(&optflags, "-loopunroll");
-                                addstr(&optflags, "0");
-                            }
-                            if ((mp_i2flag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
-                            }
-                            if ((mp_66flag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
-                            }
-                            if ((mp_uflag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
-                            }
-                            if ((mp_backslashflag != 0) && (w1flag != 2)) {
-                                error(2, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
-                            }
-                            if (mp_caseflag != 0) {
-                                error(1, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
-                                exit(2);
-                            }
-loop_1587:
-                            execlist.length = 0;
-                            addstr(&execlist, "pfa");
-                            spF0[0] = spFC + 0x31;
-                            if (mp_flag & 2) {
-                                spF8 = mksuf(srcfiles.entries[var_s0], 0x6C);
-                                if (spFC < mp_prepass_count) {
-                                    spF8 = mkstr(spF8, spF0, NULL);
-                                }
-                            } else {
-                                spF8 = mkstr(tempstr[31], "l", spF0, NULL);
-                            }
-                            addstr(&execlist, mkstr("-L=", spF8, NULL));
-                            if (mp_flag & 4) {
-                                passout = mksuf(srcfiles.entries[var_s0], 0x6D);
-                                if (spFC < mp_prepass_count) {
-                                    passout = mkstr(passout, spF0, NULL);
-                                }
-                            } else {
-                                passout = mkstr(tempstr[31], "m", spF0, NULL);
-                            }
-                            addstr(&execlist, mkstr("-F=", passout, NULL));
-                            addstr(&execlist, mkstr("-I=", passin, NULL));
-                            if (mp_col120flag != 0) {
-                                addstr(&execlist, "-scan=120");
-                            }
-                            if (mp_extendflag != 0) {
-                                addstr(&execlist, "-scan=132");
-                            }
-                            if (automaticflag == 0) {
-                                addstr(&execlist, "-save=all");
-                            }
-                            if (mp_onetripflag != 0) {
-                                addstr(&execlist, "-onetrip");
-                            }
-                            if (mp_dlinesflag != 0) {
-                                addstr(&execlist, "-dlines");
-                            }
-                            if (w1flag == 2) {
-                                addstr(&execlist, "-suppress=w");
-                            }
-                            if (vflag != 0) {
-                                addstr(&execlist, "-lo=lno");
-                            } else {
-                                addstr(&execlist, "-lo=lo");
-                            }
-                            if (mp_flag & 2) {
-                                addstr(&execlist, mkstr("-analysis=", mksuf(srcfiles.entries[var_s0], 5), NULL));
-                            } else if (irix4 == 0) {
-                                addstr(&execlist, "-noanalysis");
-                            }
-                            if (irix4 != 0) {
-                                addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
-                            } else {
-                                addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
-                            }
-                            addstr(&execlist, "-include=/usr/include", 0);
-                            addstr(&execlist, "-cp=i");
-                            if (spFC >= mp_prepass_count) {
-                                addlist(&execlist, &pfaflags);
-                            } else {
-                                addstr(&execlist, "-p=1");
-                                addstr(&execlist, "-ur=1");
-
-                                sp100++;
-                                if (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
-                                    do {
-                                        sp100++;
-                                        if (argv[sp100] == NULL) {
-                                            error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
-                                            exit(2);
-                                        }
-                                    } while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0);
-                                }
-
-                                spE8 = argv[sp100] + strlen("-pfaprepass");
-                                for (;;) {
-                                    spEC = spE8 + 1;
-                                    if (*spEC == 0) {
-                                        error(1, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
-                                        exit(2);
-                                    }
-                                    spE8 = spEC + 1;
-                                    while (*spE8 != ',' && *spE8 != '\0') spE8++;
-                                    spE7 = spE8[0];
-                                    spE8[0] = 0;
-                                    addstr(&execlist, mkstr(spEC, NULL));
-                                    if (spE7 == 0) break;
-                                    spE8[0] = spE7;
-                                }
-                            }
-                            if (run(pfa, execlist.entries, NULL, NULL, NULL) != 0) {
-                                runerror += 1;
-                                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                                if (!(mp_flag & 4)) {
-                                    unlink(passout);
-                                }
-                                break;
-                            }
-                            if (!(mp_flag & 2)) {
-                                unlink(spF8);
-                            }
-                            if (spFC == 0) {
-                                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) && (srcsuf != 0x69) && (Kflag == 0)) {
-                                    unlink(passin);
-                                }
-                            } else if (!(mp_flag & 4)) {
-                                unlink(passin);
-                            }
-                            spFC++;
-                            if (mp_prepass_count >= spFC) {
+                            if (Hchar != 0x66) {
                                 passin = passout;
-                                goto loop_1587;
-                            }
-                            passin = passout;
-                            if (Hchar != 0x4B) {
-                                goto block_1660;
+                                goto block_1417;
                             }
                             break;
-                        }
-block_1660:
-                        execlist.length = 0;
-                        addstr(&execlist, "fcom");
-                        if (alignarg != NULL) {
-                            addstr(&execlist, alignarg);
-                        }
-                        if (align_common > 0) {
-                            addstr(&execlist, "-align_common");
-                        }
-                        if (mp_flag & 0x10000) {
-                            addstr(&execlist, "-MP");
-                        }
-                        if (showdirt_flag != 0) {
-                            addstr(&execlist, "-showdirt");
-                        }
-                        if (vflag != 0) {
-                            addstr(&execlist, "-v");
-                        }
-                        addlist(&execlist, &fcomflags);
-                        if (nocode == 0) {
-                            addstr(&execlist, mkstr("-XS", symtab, NULL));
-                        }
-                        var_s2 = NULL;
-                        if (nocode != 0) {
-                            addstr(&execlist, "-nocode");
-                            passout = NULL;
-                        } else if (Hchar == 0x66) {
-                            passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                            if (ucodeflag != 0) {
-                                addstr(&execlist, "-Xu");
-                                var_s2 = mksuf(srcfiles.entries[var_s0], 0x55);
-                            }
-                        } else if (Kflag != 0) {
-                            passout = mksuf(srcfiles.entries[var_s0], 0x42);
-                            if (regular_not_writeable(passout) == 1) {
-                                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                exit(2);
-                            }
-                        } else {
-                            passout = tempstr[3];
-                        }
-                        if (passout != NULL) {
-                            addstr(&execlist, "-t");
-                            addstr(&execlist, passout);
-                        }
-                        if ((docpp != 0) && (srcsuf != 0x69) && (srcsuf != 0x6D)) {
-                            var_s1 = passin;
-                        } else {
-                            addstr(&execlist, passin);
-                            var_s1 = NULL;
-                        }
-                        if (run(fcom, execlist.entries, var_s1, var_s2, errout) != 0) {
-                            if (editflag != 0) {
-                                if (times_edited < edit_cnt_max) {
-                                    times_edited += 1;
-                                    if (edit_src(editor, srcfiles.entries[var_s0], 3) != 0) {
-                                        show_err(errout);
-                                        exit(1);
+                        block_A:
+                            if (mflag != 0) {
+                                execlist.length = 0;
+                                addstr(&execlist, "m4");
+                                addstr(&execlist, passin);
+                                if ((compiler == 4) || (srcsuf == 0x73)) {
+                                    passout = tempstr[14];
+                                } else {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x70);
+                                }
+                                if (run(m4, execlist.entries, NULL, passout, NULL) != 0) {
+                                    runerror += 1;
+                                    if (Kflag == 0) {
+                                        unlink(passout);
                                     }
-                                    if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) && (srcsuf != 0x66)) {
+                                    continue;
+                                }
+                                passin = passout;
+                            }
+
+                            switch (srcsuf) {
+                                case 0x73:
+                                    if (docpp == 0) {
+                                        if (default_nocpp != 0) {
+                                            goto block_531;
+                                        }
+                                        goto block_2130;
+                                    }
+                                    goto block_531;
+                                case 0x65:
+                                default:
+                                    error(1, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
+                                    exit(2);
+                                case 0x72:
+                                    execlist.length = 0;
+                                    addstr(&execlist, "ratfor");
+                                    addlist(&execlist, &ratforflags);
+                                    addstr(&execlist, passin);
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x66);
+                                    if (run(ratfor, execlist.entries, NULL, passout, NULL) != 0) {
+                                        runerror += 1;
+                                        if (Kflag == 0) {}
+                                        break;
+                                    }
+                                    if (mflag != 0) {
                                         unlink(passin);
                                     }
-                                    unlink(passout);
-                                    unlink(errout);
-                                    unlink(symtab);
-                                    passin = srcfiles.entries[var_s0];
-                                    goto loop_484;
-                                }
-                                show_err(errout);
-                                goto block_1701;
-                            }
-block_1701:
-                            runerror += 1;
-                            if (((docpp != 0) || (mp_flag & 1) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
-                                unlink(passin);
-                            }
-                            if (Kflag == 0) {
-                                unlink(passout);
-                                unlink(symtab);
-                            }
-                            break;
-                        }
-                        if (editflag != 0) {
-                            unlink(errout);
-                        }
-                        if (nocode != 0) {
-                            if (docpp != 0) {
-                                unlink(passin);
-                            }
-                        } else {
-                            if (((docpp != 0) || (mp_flag & 1) || (run_sopt != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) && (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
-                                unlink(passin);
-                            }
-                            passin = passout;
-                            if (Hchar != 0x66) {
-
-block_1729:
-                                if ((Oflag != 3) && (Oflag != 4) && (jflag == 0)) {
-                                    if (c_inline == 0) {
-                                        goto block_1933;
-                                    } else {
-                                        goto block_1913;
-                                    }
-                                } else {
-                                    execlist.length = 0;
-                                    addstr(&execlist, "ujoin");
-                                    if (vflag != 0) {
-                                        addstr(&execlist, "-v");
-                                    }
-                                    addlist(&execlist, &ujoinflags);
-                                    if ((outfile != NULL) && (jflag != 0) && (srcfiles.length == 1)) {
-                                        passout = outfile;
-                                    } else {
-                                        passout = mksuf(srcfiles.entries[var_s0], 0x75);
-                                    }
-                                    addstr(&execlist, "-o");
-                                    addstr(&execlist, passout);
-                                    addstr(&execlist, passin);
-                                    addstr(&execlist, symtab);
-                                    if (run(ujoin, execlist.entries, NULL, NULL, NULL) != 0) {
-                                        runerror += 1; 
-                                        if (Kflag == 0) {
-                                            if (srcsuf != 0x42) {
-                                                unlink(passin);
-                                            }
-                                            unlink(passout);
-                                            if (tmpst != 0) {
-                                                unlink(symtab);
-                                            }
-                                        }
-                                        continue;
-                                    } else if ((cflag == 0) || (Oflag == 3) || (Oflag == 4)) {
-                                        if (Kflag == 0) {
-                                            if (srcsuf != 0x42) {
-                                                unlink(passin);
-                                            }
-                                            if (tmpst != 0) {
-                                                unlink(symtab);
-                                            }
-                                        }
-                                        passin = passout;
-                                        continue;
-                                    } else {
-                                        goto block_1933;
-                                    }
-c8d8:
-                                    if ((non_shared != 0) && (non_shared_emitted == 0)) {
-                                        addstr(&ldflags, "-non_shared");
-                                        non_shared_emitted = 1;
-                                    }
-
-                                    execlist.length = 0;
-                                    addstr(&execlist, "uld");
-                                    if ((mips2flag != 0) && (sp148 == 0)) {
-                                        if (strcmp("/", comp_target_root) != 0) {
-                                            if (non_shared != 0) {
-                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                                            } else {
-                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                                            }
-                                        } else if (non_shared != 0) {
-                                            addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                                        } else {
-                                            addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-                                        }
-                                    }
-                                    if ((mips1flag != 0) && (sp148 == 0)) {
-                                        if (strcmp("/", comp_target_root) != 0) {
-                                            if (non_shared != 0) {
-                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                                            } else {
-                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                                            }
-                                        } else if (non_shared != 0) {
-                                            addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                                        } else {
-                                            addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-                                        }
-                                    }
-                                    if (((fiveflag != 0) || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) && (strcmp("/", comp_target_root) != 0)) {
-                                        if (non_shared != 0) {
-                                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
-                                        } else {
-                                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
-                                        }
-                                    }
-                                    if (svr4_systype != 0) {
-                                        if (compchoice == 1) {
-                                            addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
-                                        }
-                                        addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-                                        if (call_shared != 0) {
-                                            addstr(&execlist, "-require_dynamic_link");
-                                            addstr(&execlist, "_rld_new_interface");
-                                        }
-                                    }
-                                    if ((allBstring != NULL) && (*allBstring != 0)) {
-                                        addstr(&execlist, mkstr("-kB", allBstring, NULL));
-                                    }
-                                    addlist(&execlist, &uldflags);
-                                    addlist(&execlist, &ldflags);
-                                    if (irix4 != 0) {
-                                        addstr(&execlist, mkstr("-L", NULL));
-                                        if (non_shared != 0) {
-                                            addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
-                                            crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
-                                            crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
-                                        } else {
-                                            addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
-                                            crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
-                                            crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
-                                        }
-                                    }
-                                    if (cflag == 0) {
-                                        addstr(&execlist, crtx);
-                                    } else {
-                                        addstr(&execlist, "-no_AutoGnum");
-                                        if (force_rm_dead_code == 0) {
-                                            addstr(&execlist, "-preserve_dead_code");
-                                        }
-                                    }
-                                    adduldlist(&execlist, &ufiles, &objfiles);
-                                    if (cflag == 0) {
-                                        addlist(&execlist, &uldlibflags);
-                                        if (((compiler == 2) || (haspascal != 0)) && ((addspacedstr(&execlist, newstr(libp)), addspacedstr(&execlist, newstr(libxmalloc)), addspacedstr(&execlist, newstr(libexc)), addspacedstr(&execlist, newstr(libmld)), (default_call_shared != 0)) || (call_shared != 0)) && (systype != NULL) && (strcmp(systype, "svr3") == 0)) {
-                                            addspacedstr(&execlist, "-lbsd");
-                                        }
-                                        if ((compiler == 3) || (hasfortran != 0)) {
-                                            if (mp_flag != 0) {
-                                                addstr(&execlist, libI77_mp);
-                                            }
-                                            if ((non_shared != 0) || (irix4 != 0)) {
-                                                addspacedstr(&execlist, newstr(libF77));
-                                            } else {
-                                                addspacedstr(&execlist, libftn);
-                                            }
-                                            if ((non_shared != 0) || (irix4 != 0)) {
-                                                addspacedstr(&execlist, newstr(libI77));
-                                            }
-                                            if ((non_shared != 0) || (irix4 != 0)) {
-                                                addspacedstr(&execlist, newstr(libU77));
-                                            }
-                                            if ((non_shared != 0) || (irix4 != 0)) {
-                                                addspacedstr(&execlist, newstr(libisam));
-                                            }
-                                        }
-                                        if (compiler == 5) {
-                                            addstr(&execlist, libpl1);
-                                            addstr(&execlist, libxmalloc);
-                                            addstr(&execlist, "-ltermcap");
-                                            addstr(&execlist, libexc);
-                                            addstr(&execlist, libmld);
-                                        }
-                                        if (((compiler == 2) || (compiler == 3) || (haspascal != 0) || (hasfortran != 0) || (haspl1 != 0) || (compiler == 5) || (compiler == 6)) && (nonshared != 0)) {
-                                            addspacedstr(&execlist, newstr(libm));
-                                        }
-                                        if (pgflag != 0) {
-                                            addspacedstr(&execlist, newstr(libgprof));
-                                        } else if (pflag != 0) {
-                                            addspacedstr(&execlist, newstr(libprof));
-                                        }
-                                        if (cmp_flag & 0x10000) {
-                                            addstr(&execlist, libc_mp);
-                                            if (compiler == 1) {
-                                                addstr(&execlist, "-lkapio");
-                                            }
-                                        }
-                                        if ((run_sopt != 0) && (compiler == 1)) {
-                                            addstr(&execlist, "-lkapio");
-                                        }
-                                        if (compiler == 3) {
-                                            if (D_1000C130 == 2) {
-                                                addstr(&execlist, "-lc_s");
-                                                if (xpg_flag != 0) {
-                                                    addstr(&execlist, "-dont_warn_unused");
-                                                    addstr(&execlist, "-lgen");
-                                                    addstr(&execlist, "-warn_unused");
-                                                }
-                                                addstr(&execlist, "-lc");
-                                            } else {
-                                                if ((irix4 != 0) && (B_1000ED74 == 0)) {
-                                                    addstr(&execlist, "-lmpc");
-                                                }
-                                                if (B_1000ED2C != 0) {
-                                                    addstr(&execlist, "-lc_s");
-                                                } else if (B_1000ED30 != 0) {
-                                                    addstr(&execlist, "-lc_s");
-                                                }
-                                            }
-                                        } else if (B_1000ED2C != 0) {
-                                            addstr(&execlist, "-lc_s");
-                                        }
-                                        if (sixty4bitflag == 0) {
-                                            ldw_file = fopen(libdw_path, "r");
-                                            if (ldw_file != NULL) {
-                                                addspacedstr(&execlist, newstr(libdw));
-                                            }
-                                        }
-                                        if (xpg_flag != 0) {
-                                            addstr(&execlist, "-dont_warn_unused");
-                                            addstr(&execlist, "-lgen");
-                                            addstr(&execlist, "-warn_unused");
-                                        }
-                                        addstr(&execlist, "-lc");
-                                        if (libm_spec != 0) {
-                                            addstr(&execlist, "-lm");
-                                        }
-                                        if (libfastm_spec != 0) {
-                                            addstr(&execlist, "-lfastm");
-                                        }
-                                    }
-                                    if ((cflag == 0) && (crtn_required != 0)) {
-                                        addstr(&execlist, crtn);
-                                    }
-                                    if (rls_id_object != NULL) {
-                                        addstr(&execlist, rls_id_object);
-                                    }
-                                    addstr(&execlist, "-ko");
-                                    if (uoutfile != NULL) {
-                                        passout = uoutfile;
-                                    } else if ((Hchar == 0x75) || (Kflag != 0)) {
-                                        passout = mksuf(srcfiles.entries[var_s0], 0x75);
-                                    } else {
-                                        passout = tempstr[4];
-                                    }
-                                    addstr(&execlist, passout);
-                                    if (run(uld, execlist.entries, NULL, NULL, NULL) != 0) {
-                                        runerror += 1;
-                                        if (Kflag == 0) {
-                                            unlink(passout);
-                                        }
-                                        continue;
-                                    }
                                     passin = passout;
-                                    if ((ufiles.length == 1) && (srcfiles.length == 2) && ((Oflag == 3) || (Oflag == 4))) {
-                                        unlink(*ufiles.entries);
-                                    }
-                                    if (Hchar == 0x75) {
-                                        continue;
-                                    }
-block_1896:
-                                    execlist.length = 0;
-                                    addstr(&execlist, "usplit");
-                                    if (vflag != 0) {
-                                        addstr(&execlist, "-v");
-                                    }
-                                    addlist(&execlist, &usplitflags);
-                                    if ((Hchar == 0x73) || (Kflag != 0)) {
-                                        passout = mksuf(srcfiles.entries[var_s0], 0x53);
-                                        if (regular_not_writeable(passout) == 1) {
-                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                            exit(2);
+                                    if (Fflag == 0) {
+                                        if (docpp == 0) {
+                                            // TODO: pointless 'b'
+                                            goto block_1505;
                                         }
-                                    } else {
-                                        passout = tempstr[5];
-                                    }
-                                    addstr(&execlist, "-o");
-                                    addstr(&execlist, passout);
-                                    addstr(&execlist, "-t");
-                                    addstr(&execlist, symtab);
-                                    addstr(&execlist, passin);
-                                    if (run(usplit, execlist.entries, NULL, NULL, NULL) != 0) {
-                                        runerror += 1;
-                                        if (Kflag == 0) {
-                                            unlink(passin);
-                                            unlink(passout);
-                                        }
-                                        if (tmpst != 0) {
-                                            unlink(symtab);
-                                        }
-                                    } else {
-                                        if ((Kflag == 0) && (srcsuf != 0x75) && (uoutfile == NULL)) {
-                                            unlink(passin);
-                                        }
-                                        passin = passout;
-                                        if (Hchar != 0x73) {
-                                            block_1913:
-                                            if ((Oflag == 3) || (Oflag == 4) || (c_inline != 0)) {
-                                                execlist.length = 0;
-                                                addstr(&execlist, "umerge");
-                                                if (vflag != 0) {
-                                                    addstr(&execlist, "-v");
-                                                }
-                                                addlist(&execlist, &umergeflags);
-                                                addstr(&execlist, passin);
-                                                addstr(&execlist, "-o");
-                                                if ((Hchar == 0x6D) || (Kflag != 0)) {
-                                                    passout = mksuf(srcfiles.entries[var_s0], 0x4D);
-                                                    if (regular_not_writeable(passout) == 1) {
-                                                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                        exit(2);
-                                                    }
-                                                } else {
-                                                    passout = tempstr[6];
-                                                }
-                                                addstr(&execlist, passout);
-                                                addstr(&execlist, "-t");
-                                                addstr(&execlist, symtab);
-                                                if (run(umerge, execlist.entries, NULL, NULL, NULL) != 0) {
-                                                    runerror += 1;
-                                                    if (Kflag == 0) {
-                                                        if (srcsuf != 0x53) {
-                                                            unlink(passin);
-                                                        }
-                                                        unlink(passout);
-                                                        if (tmpst != 0) {
-                                                            unlink(symtab);
-                                                        }
-                                                    }
-                                                } else {
-                                                    if ((Kflag == 0) && (srcsuf != 0x53)) {
-                                                        unlink(passin);
-                                                    }
-                                                    passin = passout;
-                                                    if (Hchar != 0x6D) {
-                                                        // TODO: pointless 'b'
-                                                        goto block_1933;
-                                                    }
-                                                }
-                                            } else {
-                                                goto block_1933;
-                                            }
-
-                                        }
+                                        goto block_531;
                                     }
                                     break;
+                            }
+                            break;
 
-                                    // case 0x4D:              /* switch 19 */
-block_1933:
-                                    if (unrollflag != 0) {
+                        case 0x46: /* switch 18 */
+                        case 0x65: /* switch 18 */
+                        case 0x66: /* switch 18 */
+                        case 0x72: /* switch 18 */
+                        block_1505:
+                            sp100 = 0;
+                            spFC = 0;
+                            spF0[0] = 0x31;
+                            spF0[1] = 0;
+                            if (run_sopt != 0) {
+                                if (mp_flag & 1) {
+                                    error(2, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
+                                    goto block_1566;
+                                }
+                                if ((Oflag >= 2) && (set_loop_unroll == 0)) {
+                                    addstr(&optflags, "-loopunroll");
+                                    addstr(&optflags, "0");
+                                }
+                                if ((mp_i2flag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
+                                }
+                                if ((mp_66flag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
+                                }
+                                if ((mp_uflag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
+                                }
+                                if ((mp_backslashflag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
+                                }
+                                if (mp_caseflag != 0) {
+                                    error(1, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
+                                    exit(2);
+                                }
+                                execlist.length = 0;
+                                addstr(&execlist, "fopt");
+                                spF4 = mkstr(tempstr[31], "l", NULL);
+                                addstr(&execlist, mkstr("-L=", spF4, NULL));
+                                if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x6D);
+                                } else {
+                                    passout = mkstr(tempstr[31], "m", &spF0, NULL);
+                                }
+                                addstr(&execlist, mkstr("-F=", passout, NULL));
+                                addstr(&execlist, mkstr("-I=", passin, NULL));
+                                if (mp_col120flag != 0) {
+                                    addstr(&execlist, "-scan=120");
+                                }
+                                if (mp_extendflag != 0) {
+                                    addstr(&execlist, "-scan=132");
+                                }
+                                if (automaticflag == 0) {
+                                    addstr(&execlist, "-save=all");
+                                }
+                                if (mp_onetripflag != 0) {
+                                    addstr(&execlist, "-onetrip");
+                                }
+                                if (mp_dlinesflag != 0) {
+                                    addstr(&execlist, "-dlines");
+                                }
+                                if (w1flag == 2) {
+                                    addstr(&execlist, "-suppress=w");
+                                }
+                                if (vflag != 0) {
+                                    addstr(&execlist, "-lo=lno");
+                                }
+                                if (irix4 != 0) {
+                                    addstr(&execlist,
+                                           mkstr("-customer=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
+                                } else {
+                                    addstr(&execlist,
+                                           mkstr("-original_filename=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
+                                }
+                                addstr(&execlist, "-include=/usr/include", 0);
+                                addstr(&execlist, "-cp=i");
+                                addlist(&execlist, &soptflags);
+                                if (run(fopt, execlist.entries, NULL, NULL, NULL) != 0) {
+                                    runerror += 1;
+                                    if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) &&
+                                        (Kflag == 0)) {
+                                        unlink(passin);
+                                    }
+                                    if ((Hchar != 0x4B) || (Kflag != 0)) {
+                                        unlink(passout);
+                                    }
+                                    unlink(spF4);
+                                    goto block_2269;
+                                }
+                                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) &&
+                                    (srcsuf != 0x69) && (Kflag == 0)) {
+                                    unlink(passin);
+                                }
+                                unlink(spF4);
+                                passin = passout;
+                                if (Hchar == 0x4B) {
+                                    break;
+                                }
+                                goto block_1660;
+                            }
+                        block_1566:
+                            if ((Hchar == 0x4B) || (Kflag != 0)) {
+                                mp_flag |= 6;
+                            }
+                            if (mp_flag & 1) {
+                                if ((Oflag >= 2) && (set_loop_unroll == 0)) {
+                                    addstr(&optflags, "-loopunroll");
+                                    addstr(&optflags, "0");
+                                }
+                                if ((mp_i2flag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
+                                }
+                                if ((mp_66flag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
+                                }
+                                if ((mp_uflag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
+                                }
+                                if ((mp_backslashflag != 0) && (w1flag != 2)) {
+                                    error(2, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
+                                }
+                                if (mp_caseflag != 0) {
+                                    error(1, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
+                                    exit(2);
+                                }
+                            loop_1587:
+                                execlist.length = 0;
+                                addstr(&execlist, "pfa");
+                                spF0[0] = spFC + 0x31;
+                                if (mp_flag & 2) {
+                                    spF8 = mksuf(srcfiles.entries[var_s0], 0x6C);
+                                    if (mp_prepass_count > spFC) {
+                                        spF8 = mkstr(spF8, spF0, NULL);
+                                    }
+                                } else {
+                                    spF8 = mkstr(tempstr[31], "l", spF0, NULL);
+                                }
+                                addstr(&execlist, mkstr("-L=", spF8, NULL));
+                                if (mp_flag & 4) {
+                                    passout = mksuf(srcfiles.entries[var_s0], 0x6D);
+                                    if (mp_prepass_count > spFC) {
+                                        passout = mkstr(passout, spF0, NULL);
+                                    }
+                                } else {
+                                    passout = mkstr(tempstr[31], "m", spF0, NULL);
+                                }
+                                addstr(&execlist, mkstr("-F=", passout, NULL));
+                                addstr(&execlist, mkstr("-I=", passin, NULL));
+                                if (mp_col120flag != 0) {
+                                    addstr(&execlist, "-scan=120");
+                                }
+                                if (mp_extendflag != 0) {
+                                    addstr(&execlist, "-scan=132");
+                                }
+                                if (automaticflag == 0) {
+                                    addstr(&execlist, "-save=all");
+                                }
+                                if (mp_onetripflag != 0) {
+                                    addstr(&execlist, "-onetrip");
+                                }
+                                if (mp_dlinesflag != 0) {
+                                    addstr(&execlist, "-dlines");
+                                }
+                                if (w1flag == 2) {
+                                    addstr(&execlist, "-suppress=w");
+                                }
+                                if (vflag != 0) {
+                                    addstr(&execlist, "-lo=lno");
+                                } else {
+                                    addstr(&execlist, "-lo=lo");
+                                }
+                                if (mp_flag & 2) {
+                                    addstr(&execlist, mkstr("-analysis=", mksuf(srcfiles.entries[var_s0], 5), NULL));
+                                } else if (irix4 == 0) {
+                                    addstr(&execlist, "-noanalysis");
+                                }
+                                if (irix4 != 0) {
+                                    addstr(&execlist,
+                                           mkstr("-customer=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
+                                } else {
+                                    addstr(&execlist,
+                                           mkstr("-original_filename=", mksuf(srcfiles.entries[var_s0], srcsuf), NULL));
+                                }
+                                addstr(&execlist, "-include=/usr/include", 0);
+                                addstr(&execlist, "-cp=i");
+                                if (mp_prepass_count <= spFC) {
+                                    addlist(&execlist, &pfaflags);
+                                } else {
+                                    addstr(&execlist, "-p=1");
+                                    addstr(&execlist, "-ur=1");
+
+                                    sp100++;
+                                    if (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
+                                        do {
+                                            sp100++;
+                                            if (argv[sp100] == NULL) {
+                                                error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
+                                                exit(2);
+                                            }
+                                        } while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0);
+                                    }
+
+                                    spE8 = argv[sp100] + strlen("-pfaprepass");
+                                    for (;;) {
+                                        spEC = spE8 + 1;
+                                        if (*spEC == 0) {
+                                            error(1, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
+                                            exit(2);
+                                        }
+                                        spE8 = spEC + 1;
+                                        while (*spE8 != ',' && *spE8 != '\0')
+                                            spE8++;
+                                        spE7 = spE8[0];
+                                        spE8[0] = 0;
+                                        addstr(&execlist, mkstr(spEC, NULL));
+                                        if (spE7 == 0)
+                                            break;
+                                        spE8[0] = spE7;
+                                    }
+                                }
+                                if (run(pfa, execlist.entries, NULL, NULL, NULL) != 0) {
+                                    runerror += 1;
+                                    if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) &&
+                                        (Kflag == 0)) {
+                                        unlink(passin);
+                                    }
+                                    if (!(mp_flag & 4)) {
+                                        unlink(passout);
+                                    }
+                                    break;
+                                }
+                                if (!(mp_flag & 2)) {
+                                    unlink(spF8);
+                                }
+                                if (spFC == 0) {
+                                    if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) &&
+                                        (srcsuf != 0x69) && (Kflag == 0)) {
+                                        unlink(passin);
+                                    }
+                                } else if (!(mp_flag & 4)) {
+                                    unlink(passin);
+                                }
+                                spFC++;
+                                if (mp_prepass_count >= spFC) {
+                                    passin = passout;
+                                    goto loop_1587;
+                                }
+                                passin = passout;
+                                if (Hchar != 0x4B) {
+                                    goto block_1660;
+                                }
+                                break;
+                            }
+                        block_1660:
+                            execlist.length = 0;
+                            addstr(&execlist, "fcom");
+                            if (alignarg != NULL) {
+                                addstr(&execlist, alignarg);
+                            }
+                            if (align_common > 0) {
+                                addstr(&execlist, "-align_common");
+                            }
+                            if (mp_flag & 0x10000) {
+                                addstr(&execlist, "-MP");
+                            }
+                            if (showdirt_flag != 0) {
+                                addstr(&execlist, "-showdirt");
+                            }
+                            if (vflag != 0) {
+                                addstr(&execlist, "-v");
+                            }
+                            addlist(&execlist, &fcomflags);
+                            if (nocode == 0) {
+                                addstr(&execlist, mkstr("-XS", symtab, NULL));
+                            }
+                            var_s2 = NULL;
+                            if (nocode != 0) {
+                                addstr(&execlist, "-nocode");
+                                passout = NULL;
+                            } else if (Hchar == 0x66) {
+                                passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                                if (ucodeflag != 0) {
+                                    addstr(&execlist, "-Xu");
+                                    var_s2 = mksuf(srcfiles.entries[var_s0], 0x55);
+                                }
+                            } else if (Kflag != 0) {
+                                passout = mksuf(srcfiles.entries[var_s0], 0x42);
+                                if (regular_not_writeable(passout) == 1) {
+                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                    exit(2);
+                                }
+                            } else {
+                                passout = tempstr[3];
+                            }
+                            if (passout != NULL) {
+                                addstr(&execlist, "-t");
+                                addstr(&execlist, passout);
+                            }
+                            if ((docpp != 0) && (srcsuf != 0x69) && (srcsuf != 0x6D)) {
+                                var_s1 = passin;
+                            } else {
+                                addstr(&execlist, passin);
+                                var_s1 = NULL;
+                            }
+                            if (run(fcom, execlist.entries, var_s1, var_s2, errout) != 0) {
+                                if (editflag != 0) {
+                                    if (times_edited < edit_cnt_max) {
+                                        times_edited += 1;
+                                        if (edit_src(editor, srcfiles.entries[var_s0], 3) != 0) {
+                                            show_err(errout);
+                                            exit(1);
+                                        }
+                                        if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) &&
+                                            (srcsuf != 0x69) && (srcsuf != 0x66)) {
+                                            unlink(passin);
+                                        }
+                                        unlink(passout);
+                                        unlink(errout);
+                                        unlink(symtab);
+                                        passin = srcfiles.entries[var_s0];
+                                        goto loop_484;
+                                    }
+                                    show_err(errout);
+                                    goto block_1701;
+                                }
+                            block_1701:
+                                runerror += 1;
+                                if (((docpp != 0) || (mp_flag & 1) || (srcsuf == 0x65) || (srcsuf == 0x72)) &&
+                                    (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
+                                    unlink(passin);
+                                }
+                                if (Kflag == 0) {
+                                    unlink(passout);
+                                    unlink(symtab);
+                                }
+                                break;
+                            }
+                            if (editflag != 0) {
+                                unlink(errout);
+                            }
+                            if (nocode != 0) {
+                                if (docpp != 0) {
+                                    unlink(passin);
+                                }
+                            } else {
+                                if (((docpp != 0) || (mp_flag & 1) || (run_sopt != 0) || (srcsuf == 0x65) ||
+                                     (srcsuf == 0x72) || (srcsuf == 0x46)) &&
+                                    (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
+                                    unlink(passin);
+                                }
+                                passin = passout;
+                                if (Hchar != 0x66) {
+
+                                block_1729:
+                                    if ((Oflag != 3) && (Oflag != 4) && (jflag == 0)) {
+                                        if (c_inline == 0) {
+                                            goto block_1933;
+                                        } else {
+                                            goto block_1913;
+                                        }
+                                    } else {
                                         execlist.length = 0;
-                                        addstr(&execlist, "uloop");
+                                        addstr(&execlist, "ujoin");
                                         if (vflag != 0) {
                                             addstr(&execlist, "-v");
                                         }
-                                        addlist(&execlist, &uloopflags);
-                                        addstr(&execlist, passin);
-                                        addstr(&execlist, "-o");
-                                        if ((Hchar == 0x76) || (Kflag != 0)) {
-                                            if ((Hchar == 0x76) || (Kflag != 0)) {
-                                                passout = mksuf(srcfiles.entries[var_s0], 0x56);
-                                                if (regular_not_writeable(passout) == 1) {
-                                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                    exit(2);
-                                                }
-                                            } else {
-                                                passout = tempstr[23];
-                                            }
+                                        addlist(&execlist, &ujoinflags);
+                                        if ((outfile != NULL) && (jflag != 0) && (srcfiles.length == 1)) {
+                                            passout = outfile;
+                                        } else {
+                                            passout = mksuf(srcfiles.entries[var_s0], 0x75);
                                         }
+                                        addstr(&execlist, "-o");
                                         addstr(&execlist, passout);
-                                        addstr(&execlist, "-t");
+                                        addstr(&execlist, passin);
                                         addstr(&execlist, symtab);
-                                        if (run(uloop, execlist.entries, NULL, NULL, NULL) != 0) {
+                                        if (run(ujoin, execlist.entries, NULL, NULL, NULL) != 0) {
                                             runerror += 1;
                                             if (Kflag == 0) {
-                                                if (srcsuf != 0x4D) {
+                                                if (srcsuf != 0x42) {
                                                     unlink(passin);
                                                 }
                                                 unlink(passout);
@@ -3713,46 +3425,356 @@ block_1933:
                                                     unlink(symtab);
                                                 }
                                             }
+                                            continue;
+                                        } else if ((cflag == 0) || (Oflag == 3) || (Oflag == 4)) {
+                                            if (Kflag == 0) {
+                                                if (srcsuf != 0x42) {
+                                                    unlink(passin);
+                                                }
+                                                if (tmpst != 0) {
+                                                    unlink(symtab);
+                                                }
+                                            }
+                                            passin = passout;
+                                            continue;
                                         } else {
-                                            if ((Kflag == 0) && (srcsuf != 0x4D)) {
+                                            goto block_1933;
+                                        }
+                                    c8d8:
+                                        if ((non_shared != 0) && (non_shared_emitted == 0)) {
+                                            addstr(&ldflags, "-non_shared");
+                                            non_shared_emitted = 1;
+                                        }
+
+                                        execlist.length = 0;
+                                        addstr(&execlist, "uld");
+                                        if ((mips2flag != 0) && (sp148 == 0)) {
+                                            if (strcmp("/", comp_target_root) != 0) {
+                                                if (non_shared != 0) {
+                                                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
+                                                                            currcomp, "nonshared", NULL));
+                                                } else {
+                                                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
+                                                                            currcomp, "", NULL));
+                                                }
+                                            } else if (non_shared != 0) {
+                                                addstr(&execlist,
+                                                       mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                                            } else {
+                                                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                                            }
+                                        }
+                                        if ((mips1flag != 0) && (sp148 == 0)) {
+                                            if (strcmp("/", comp_target_root) != 0) {
+                                                if (non_shared != 0) {
+                                                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
+                                                                            currcomp, "nonshared", NULL));
+                                                } else {
+                                                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
+                                                                            currcomp, "", NULL));
+                                                }
+                                            } else if (non_shared != 0) {
+                                                addstr(&execlist,
+                                                       mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                                            } else {
+                                                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                                            }
+                                        }
+                                        if (((fiveflag != 0) || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) &&
+                                            (strcmp("/", comp_target_root) != 0)) {
+                                            if (non_shared != 0) {
+                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib,
+                                                                        "usr/lib/nonshared/", currcomp, NULL));
+                                            } else {
+                                                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
+                                                                        currcomp, NULL));
+                                            }
+                                        }
+                                        if (svr4_systype != 0) {
+                                            if (compchoice == 1) {
+                                                addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
+                                            }
+                                            addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
+                                            if (call_shared != 0) {
+                                                addstr(&execlist, "-require_dynamic_link");
+                                                addstr(&execlist, "_rld_new_interface");
+                                            }
+                                        }
+                                        if ((allBstring != NULL) && (*allBstring != 0)) {
+                                            addstr(&execlist, mkstr("-kB", allBstring, NULL));
+                                        }
+                                        addlist(&execlist, &uldflags);
+                                        addlist(&execlist, &ldflags);
+                                        if (irix4 != 0) {
+                                            addstr(&execlist, mkstr("-L", NULL));
+                                            if (non_shared != 0) {
+                                                addstr(&execlist,
+                                                       mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
+                                                crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
+                                                crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
+                                            } else {
+                                                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
+                                                crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
+                                                crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
+                                            }
+                                        }
+                                        if (cflag == 0) {
+                                            addstr(&execlist, crtx);
+                                        } else {
+                                            addstr(&execlist, "-no_AutoGnum");
+                                            if (force_rm_dead_code == 0) {
+                                                addstr(&execlist, "-preserve_dead_code");
+                                            }
+                                        }
+                                        adduldlist(&execlist, &ufiles, &objfiles);
+                                        if (cflag == 0) {
+                                            addlist(&execlist, &uldlibflags);
+                                            if ((compiler == 2) || (haspascal != 0)) {
+                                                addspacedstr(&execlist, newstr(libp));
+                                                addspacedstr(&execlist, newstr(libxmalloc));
+                                                addspacedstr(&execlist, newstr(libexc));
+                                                addspacedstr(&execlist, newstr(libmld));
+                                                if (((default_call_shared != 0) || (call_shared != 0)) &&
+                                                    (systype != NULL) && (strcmp(systype, "svr3") == 0)) {
+                                                    addspacedstr(&execlist, "-lbsd");
+                                                }
+                                            }
+                                            if ((compiler == 3) || (hasfortran != 0)) {
+                                                if (mp_flag != 0) {
+                                                    addstr(&execlist, libI77_mp);
+                                                }
+                                                if ((non_shared != 0) || (irix4 != 0)) {
+                                                    addspacedstr(&execlist, newstr(libF77));
+                                                } else {
+                                                    addspacedstr(&execlist, libftn);
+                                                }
+                                                if ((non_shared != 0) || (irix4 != 0)) {
+                                                    addspacedstr(&execlist, newstr(libI77));
+                                                }
+                                                if ((non_shared != 0) || (irix4 != 0)) {
+                                                    addspacedstr(&execlist, newstr(libU77));
+                                                }
+                                                if ((non_shared != 0) || (irix4 != 0)) {
+                                                    addspacedstr(&execlist, newstr(libisam));
+                                                }
+                                            }
+                                            if (compiler == 5) {
+                                                addstr(&execlist, libpl1);
+                                                addstr(&execlist, libxmalloc);
+                                                addstr(&execlist, "-ltermcap");
+                                                addstr(&execlist, libexc);
+                                                addstr(&execlist, libmld);
+                                            }
+                                            if (((compiler == 2) || (compiler == 3) || (haspascal != 0) ||
+                                                 (hasfortran != 0) || (haspl1 != 0) || (compiler == 5) ||
+                                                 (compiler == 6)) &&
+                                                (nonshared != 0)) {
+                                                addspacedstr(&execlist, newstr(libm));
+                                            }
+                                            if (pgflag != 0) {
+                                                addspacedstr(&execlist, newstr(libgprof));
+                                            } else if (pflag != 0) {
+                                                addspacedstr(&execlist, newstr(libprof));
+                                            }
+                                            if (cmp_flag & 0x10000) {
+                                                addstr(&execlist, libc_mp);
+                                                if (compiler == 1) {
+                                                    addstr(&execlist, "-lkapio");
+                                                }
+                                            }
+                                            if ((run_sopt != 0) && (compiler == 1)) {
+                                                addstr(&execlist, "-lkapio");
+                                            }
+                                            if (compiler == 3) {
+                                                if (D_1000C130 == 2) {
+                                                    addstr(&execlist, "-lc_s");
+                                                    if (xpg_flag != 0) {
+                                                        addstr(&execlist, "-dont_warn_unused");
+                                                        addstr(&execlist, "-lgen");
+                                                        addstr(&execlist, "-warn_unused");
+                                                    }
+                                                    addstr(&execlist, "-lc");
+                                                } else {
+                                                    if ((irix4 != 0) && (B_1000ED74 == 0)) {
+                                                        addstr(&execlist, "-lmpc");
+                                                    }
+                                                    if (B_1000ED2C != 0) {
+                                                        addstr(&execlist, "-lc_s");
+                                                    } else if (B_1000ED30 != 0) {
+                                                        addstr(&execlist, "-lc_s");
+                                                    }
+                                                }
+                                            } else if (B_1000ED2C != 0) {
+                                                addstr(&execlist, "-lc_s");
+                                            }
+                                            if (sixty4bitflag == 0) {
+                                                ldw_file = fopen(libdw_path, "r");
+                                                if (ldw_file != NULL) {
+                                                    addspacedstr(&execlist, newstr(libdw));
+                                                }
+                                            }
+                                            if (xpg_flag != 0) {
+                                                addstr(&execlist, "-dont_warn_unused");
+                                                addstr(&execlist, "-lgen");
+                                                addstr(&execlist, "-warn_unused");
+                                            }
+                                            addstr(&execlist, "-lc");
+                                            if (libm_spec != 0) {
+                                                addstr(&execlist, "-lm");
+                                            }
+                                            if (libfastm_spec != 0) {
+                                                addstr(&execlist, "-lfastm");
+                                            }
+                                        }
+                                        if ((cflag == 0) && (crtn_required != 0)) {
+                                            addstr(&execlist, crtn);
+                                        }
+                                        if (rls_id_object != NULL) {
+                                            addstr(&execlist, rls_id_object);
+                                        }
+                                        addstr(&execlist, "-ko");
+                                        if (uoutfile != NULL) {
+                                            passout = uoutfile;
+                                        } else if ((Hchar == 0x75) || (Kflag != 0)) {
+                                            passout = mksuf(srcfiles.entries[var_s0], 0x75);
+                                        } else {
+                                            passout = tempstr[4];
+                                        }
+                                        addstr(&execlist, passout);
+                                        if (run(uld, execlist.entries, NULL, NULL, NULL) != 0) {
+                                            runerror += 1;
+                                            if (Kflag == 0) {
+                                                unlink(passout);
+                                            }
+                                            continue;
+                                        }
+                                        passin = passout;
+                                        if ((ufiles.length == 1) && (srcfiles.length == 2) &&
+                                            ((Oflag == 3) || (Oflag == 4))) {
+                                            unlink(*ufiles.entries);
+                                        }
+                                        if (Hchar == 0x75) {
+                                            continue;
+                                        }
+                                    block_1896:
+                                        execlist.length = 0;
+                                        addstr(&execlist, "usplit");
+                                        if (vflag != 0) {
+                                            addstr(&execlist, "-v");
+                                        }
+                                        addlist(&execlist, &usplitflags);
+                                        if ((Hchar == 0x73) || (Kflag != 0)) {
+                                            passout = mksuf(srcfiles.entries[var_s0], 0x53);
+                                            if (regular_not_writeable(passout) == 1) {
+                                                error(1, NULL, 0, NULL, 0,
+                                                      "can't overwrite a write-protected file %s \n", passout);
+                                                exit(2);
+                                            }
+                                        } else {
+                                            passout = tempstr[5];
+                                        }
+                                        addstr(&execlist, "-o");
+                                        addstr(&execlist, passout);
+                                        addstr(&execlist, "-t");
+                                        addstr(&execlist, symtab);
+                                        addstr(&execlist, passin);
+                                        if (run(usplit, execlist.entries, NULL, NULL, NULL) != 0) {
+                                            runerror += 1;
+                                            if (Kflag == 0) {
+                                                unlink(passin);
+                                                unlink(passout);
+                                            }
+                                            if (tmpst != 0) {
+                                                unlink(symtab);
+                                            }
+                                        } else {
+                                            if ((Kflag == 0) && (srcsuf != 0x75) && (uoutfile == NULL)) {
                                                 unlink(passin);
                                             }
                                             passin = passout;
-                                            if (Hchar != 0x76) {
-                                                // TODO: pointless 'b'
-                                                goto block_1953;
+                                            if (Hchar != 0x73) {
+                                            block_1913:
+                                                if ((Oflag == 3) || (Oflag == 4) || (c_inline != 0)) {
+                                                    execlist.length = 0;
+                                                    addstr(&execlist, "umerge");
+                                                    if (vflag != 0) {
+                                                        addstr(&execlist, "-v");
+                                                    }
+                                                    addlist(&execlist, &umergeflags);
+                                                    addstr(&execlist, passin);
+                                                    addstr(&execlist, "-o");
+                                                    if ((Hchar == 0x6D) || (Kflag != 0)) {
+                                                        passout = mksuf(srcfiles.entries[var_s0], 0x4D);
+                                                        if (regular_not_writeable(passout) == 1) {
+                                                            error(1, NULL, 0, NULL, 0,
+                                                                  "can't overwrite a write-protected file %s \n",
+                                                                  passout);
+                                                            exit(2);
+                                                        }
+                                                    } else {
+                                                        passout = tempstr[6];
+                                                    }
+                                                    addstr(&execlist, passout);
+                                                    addstr(&execlist, "-t");
+                                                    addstr(&execlist, symtab);
+                                                    if (run(umerge, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                        runerror += 1;
+                                                        if (Kflag == 0) {
+                                                            if (srcsuf != 0x53) {
+                                                                unlink(passin);
+                                                            }
+                                                            unlink(passout);
+                                                            if (tmpst != 0) {
+                                                                unlink(symtab);
+                                                            }
+                                                        }
+                                                    } else {
+                                                        if ((Kflag == 0) && (srcsuf != 0x53)) {
+                                                            unlink(passin);
+                                                        }
+                                                        passin = passout;
+                                                        if (Hchar != 0x6D) {
+                                                            // TODO: pointless 'b'
+                                                            goto block_1933;
+                                                        }
+                                                    }
+                                                } else {
+                                                    goto block_1933;
+                                                }
                                             }
                                         }
-                                    } else {
-block_1953:
-                                        if ((uopt0flag == 1) && (compiler == 3) && (Oflag >= 2)) {
+                                        break;
+
+                                        // case 0x4D:              /* switch 19 */
+                                    block_1933:
+                                        if (unrollflag != 0) {
                                             execlist.length = 0;
-                                            addstr(&execlist, "uopt0");
+                                            addstr(&execlist, "uloop");
                                             if (vflag != 0) {
                                                 addstr(&execlist, "-v");
                                             }
-                                            addstr(&execlist, "-G");
-                                            addstr(&execlist, Gnum);
-                                            addlist(&execlist, &uopt0flags);
+                                            addlist(&execlist, &uloopflags);
                                             addstr(&execlist, passin);
-                                            if ((Hchar == 0x71) || (Kflag != 0)) {
-                                                passout = mksuf(srcfiles.entries[var_s0], 0x51);
-                                                if (regular_not_writeable(passout) == 1) {
-                                                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                    exit(2);
+                                            addstr(&execlist, "-o");
+                                            if ((Hchar == 0x76) || (Kflag != 0)) {
+                                                if ((Hchar == 0x76) || (Kflag != 0)) {
+                                                    passout = mksuf(srcfiles.entries[var_s0], 0x56);
+                                                    if (regular_not_writeable(passout) == 1) {
+                                                        error(1, NULL, 0, NULL, 0,
+                                                              "can't overwrite a write-protected file %s \n", passout);
+                                                        exit(2);
+                                                    }
+                                                } else {
+                                                    passout = tempstr[23];
                                                 }
-                                            } else {
-                                                passout = tempstr[28];
                                             }
                                             addstr(&execlist, passout);
                                             addstr(&execlist, "-t");
                                             addstr(&execlist, symtab);
-                                            uopt0str = tempstr[29];
-                                            addstr(&execlist, uopt0str);
-                                            if (run(uopt0, execlist.entries, NULL, NULL, NULL) != 0) {
+                                            if (run(uloop, execlist.entries, NULL, NULL, NULL) != 0) {
                                                 runerror += 1;
                                                 if (Kflag == 0) {
-                                                    if ((srcsuf != 0x4D) && (srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x51)) {
+                                                    if (srcsuf != 0x4D) {
                                                         unlink(passin);
                                                     }
                                                     unlink(passout);
@@ -3760,51 +3782,48 @@ block_1953:
                                                         unlink(symtab);
                                                     }
                                                 }
-                                                unlink(uopt0str);
                                             } else {
-                                                if ((Kflag == 0) && (srcsuf != 0x4D) && (srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x51)) {
+                                                if ((Kflag == 0) && (srcsuf != 0x4D)) {
                                                     unlink(passin);
                                                 }
-                                                unlink(uopt0str);
                                                 passin = passout;
-                                                if (Hchar != 0x71) {
-                                                    goto block_1980;
+                                                if (Hchar != 0x76) {
+                                                    // TODO: pointless 'b'
+                                                    goto block_1953;
                                                 }
                                             }
                                         } else {
-block_1980:
-                                            if ((ddoptflag == 1) && (compiler == 3) && (Oflag >= 2)) {
+                                        block_1953:
+                                            if ((uopt0flag == 1) && (compiler == 3) && (Oflag >= 2)) {
                                                 execlist.length = 0;
-                                                addstr(&execlist, "ddopt");
+                                                addstr(&execlist, "uopt0");
                                                 if (vflag != 0) {
                                                     addstr(&execlist, "-v");
                                                 }
                                                 addstr(&execlist, "-G");
                                                 addstr(&execlist, Gnum);
-                                                addlist(&execlist, &ddoptflags);
+                                                addlist(&execlist, &uopt0flags);
                                                 addstr(&execlist, passin);
-                                                if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
-                                                    passout = mksuf(srcfiles.entries[var_s0], 0x44);
+                                                if ((Hchar == 0x71) || (Kflag != 0)) {
+                                                    passout = mksuf(srcfiles.entries[var_s0], 0x51);
                                                     if (regular_not_writeable(passout) == 1) {
-                                                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                                        error(1, NULL, 0, NULL, 0,
+                                                              "can't overwrite a write-protected file %s \n", passout);
                                                         exit(2);
                                                     }
                                                 } else {
-                                                    passout = tempstr[27];
-                                                }
-                                                if (ddoptinfo != 0) {
-                                                    addstr(&execlist, "-e");
-                                                    if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
-                                                        addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x45));
-                                                    } else {
-                                                        addstr(&execlist, tempstr[26]);
-                                                    }
+                                                    passout = tempstr[28];
                                                 }
                                                 addstr(&execlist, passout);
-                                                if (run(ddopt, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                addstr(&execlist, "-t");
+                                                addstr(&execlist, symtab);
+                                                uopt0str = tempstr[29];
+                                                addstr(&execlist, uopt0str);
+                                                if (run(uopt0, execlist.entries, NULL, NULL, NULL) != 0) {
                                                     runerror += 1;
                                                     if (Kflag == 0) {
-                                                        if ((srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x4D) && (srcsuf != 0x51)) {
+                                                        if ((srcsuf != 0x4D) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                            (srcsuf != 0x51)) {
                                                             unlink(passin);
                                                         }
                                                         unlink(passout);
@@ -3812,67 +3831,55 @@ block_1980:
                                                             unlink(symtab);
                                                         }
                                                     }
-                                                    unlink(ddoptstr);
+                                                    unlink(uopt0str);
                                                 } else {
-                                                    if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x4D) && (srcsuf != 0x51)) {
+                                                    if ((Kflag == 0) && (srcsuf != 0x4D) && (srcsuf != 0x42) &&
+                                                        (srcsuf != 0x53) && (srcsuf != 0x51)) {
                                                         unlink(passin);
                                                     }
-                                                    unlink(ddoptstr);
+                                                    unlink(uopt0str);
                                                     passin = passout;
-                                                    if (Hchar != 0x64) {
-                                                        goto block_2015;
+                                                    if (Hchar != 0x71) {
+                                                        goto block_1980;
                                                     }
                                                 }
                                             } else {
-                                                // case 0x44:  /* switch 19 */
-                                                // case 0x51:  /* switch 19 */
-                                                // case 0x56:  /* switch 19 */
-block_2015:
-                                                if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
+                                            block_1980:
+                                                if ((ddoptflag == 1) && (compiler == 3) && (Oflag >= 2)) {
                                                     execlist.length = 0;
-                                                    addstr(&execlist, "uopt");
+                                                    addstr(&execlist, "ddopt");
                                                     if (vflag != 0) {
                                                         addstr(&execlist, "-v");
                                                     }
                                                     addstr(&execlist, "-G");
                                                     addstr(&execlist, Gnum);
-                                                    if ((mp_flag & 0x10000) && ((srcsuf == 0x66) || (srcsuf == 0x46))) {
-                                                        addstr(&execlist, "-noPalias");
-                                                    }
-                                                    if (irix4 == 0) {
-                                                        if (kpicopt_flag != 0) {
-                                                            addstr(&execlist, "-kpicopt");
-                                                        }
-                                                        if (nokpicopt_flag != 0) {
-                                                            addstr(&execlist, "-nokpicopt");
-                                                        }
-                                                    }
-                                                    addlist(&execlist, &optflags);
+                                                    addlist(&execlist, &ddoptflags);
                                                     addstr(&execlist, passin);
-                                                    if (((Hchar == 0x6F) && (ucodeflag == 0)) || (Kflag != 0)) {
-                                                        passout = mksuf(srcfiles.entries[var_s0], 0x4F);
+                                                    if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
+                                                        passout = mksuf(srcfiles.entries[var_s0], 0x44);
                                                         if (regular_not_writeable(passout) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                                                            error(1, NULL, 0, NULL, 0,
+                                                                  "can't overwrite a write-protected file %s \n",
+                                                                  passout);
                                                             exit(2);
                                                         }
-                                                        if (NoMoreOptions != 0) {
-                                                            *passout = 0x2D;
-                                                            if (*passout != 0) {
-                                                                passout = func_00433534(passout);
-                                                            }
-                                                        }
                                                     } else {
-                                                        passout = tempstr[7];
+                                                        passout = tempstr[27];
+                                                    }
+                                                    if (ddoptinfo != 0) {
+                                                        addstr(&execlist, "-e");
+                                                        if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
+                                                            addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x45));
+                                                        } else {
+                                                            addstr(&execlist, tempstr[26]);
+                                                        }
                                                     }
                                                     addstr(&execlist, passout);
-                                                    addstr(&execlist, "-t");
-                                                    addstr(&execlist, symtab);
-                                                    optstr = tempstr[8];
-                                                    addstr(&execlist, optstr);
-                                                    if (run(opt, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                    if (run(ddopt, execlist.entries, NULL, NULL, NULL) != 0) {
                                                         runerror += 1;
                                                         if (Kflag == 0) {
-                                                            if ((srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x51) && (srcsuf != 0x44) && (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+                                                            if ((srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                                (srcsuf != 0x4D) && (srcsuf != 0x51)) {
                                                                 unlink(passin);
                                                             }
                                                             unlink(passout);
@@ -3880,342 +3887,477 @@ block_2015:
                                                                 unlink(symtab);
                                                             }
                                                         }
-                                                        unlink(optstr);
+                                                        unlink(ddoptstr);
                                                     } else {
-                                                        if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x51) && (srcsuf != 0x44) && (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+                                                        if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                            (srcsuf != 0x4D) && (srcsuf != 0x51)) {
                                                             unlink(passin);
                                                         }
-                                                        unlink(optstr);
+                                                        unlink(ddoptstr);
                                                         passin = passout;
-                                                        if ((Hchar == 0x6F) && (ucodeflag != 0)) {
-                                                            execlist.length = 0;
-                                                            addstr(&execlist, "btou");
-                                                            addstr(&execlist, passin);
-                                                            passout = mksuf(srcfiles.entries[var_s0], 0x55);
-                                                            addstr(&execlist, passout);
-                                                            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                                                                runerror += 1;
-                                                                if (Kflag == 0) {
-                                                                    unlink(passin);
-                                                                    unlink(passout);
-                                                                    if (tmpst != 0) {
-                                                                        unlink(symtab);
-                                                                    }
-                                                                }
-                                                            } else if (Kflag == 0) {
-                                                                unlink(passin);
-                                                                if (tmpst != 0) {
-                                                                    unlink(symtab);
-                                                                }
-                                                            }
-                                                        } else if (Hchar != 0x6F) {
-                                                            // TODO: pointless 'b'
-                                                            goto block_2068;
+                                                        if (Hchar != 0x64) {
+                                                            goto block_2015;
                                                         }
                                                     }
                                                 } else {
-                                                    // case 0x4F: /* switch 19 */
-block_2068:
-                                                    execlist.length = 0;
-                                                    addstr(&execlist, "ugen");
-                                                    if (vflag != 0) {
-                                                        addstr(&execlist, "-v");
-                                                    }
-                                                    addstr(&execlist, "-G");
-                                                    addstr(&execlist, Gnum);
-                                                    if ((kpic_flag != 0) && (coff_spec == 0) && (irix4 == 0)) {
-                                                        if (Oflag >= 3) {
-                                                            addstr(&execlist, "-pic1");
-                                                        } else {
-                                                            addstr(&execlist, "-pic2");
+                                                    // case 0x44:  /* switch 19 */
+                                                    // case 0x51:  /* switch 19 */
+                                                    // case 0x56:  /* switch 19 */
+                                                block_2015:
+                                                    if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
+                                                        execlist.length = 0;
+                                                        addstr(&execlist, "uopt");
+                                                        if (vflag != 0) {
+                                                            addstr(&execlist, "-v");
                                                         }
-                                                    }
-                                                    addlist(&execlist, &genflags);
-                                                    addstr(&execlist, passin);
-                                                    if (Sflag != 0) {
-                                                        addstr(&execlist, "-o");
-                                                        if (Kflag != 0) {
-                                                            addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x47));
-                                                        } else {
-                                                            binasm = tempstr[9];
-                                                            addstr(&execlist, binasm);
+                                                        addstr(&execlist, "-G");
+                                                        addstr(&execlist, Gnum);
+                                                        if ((mp_flag & 0x10000) &&
+                                                            ((srcsuf == 0x66) || (srcsuf == 0x46))) {
+                                                            addstr(&execlist, "-noPalias");
                                                         }
-                                                        addstr(&execlist, "-l");
-                                                        passout = mksuf(srcfiles.entries[var_s0], 0x73);
-                                                        if (regular_not_writeable(passout) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                            exit(2);
-                                                        }
-                                                        addstr(&execlist, passout);
-                                                    } else if (Hchar == 0x63) {
-                                                        addstr(&execlist, "-o");
-                                                        passout = mksuf(srcfiles.entries[var_s0], 0x47);
-                                                        if (regular_not_writeable(passout) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                            exit(2);
-                                                        }
-                                                        addstr(&execlist, passout);
-                                                    } else if (Kflag != 0) {
-                                                        addstr(&execlist, "-o");
-                                                        passout = mksuf(srcfiles.entries[var_s0], 0x47);
-                                                        if (regular_not_writeable(passout) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                            exit(2);
-                                                        }
-                                                        addstr(&execlist, passout);
-                                                        if (regular_not_writeable(mksuf(srcfiles.entries[var_s0], 0x73)) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", mksuf(srcfiles.entries[var_s0], 0x73));
-                                                            exit(2);
-                                                        }
-                                                        addstr(&execlist, "-l");
-                                                        addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x73));
-                                                    } else {
-                                                        addstr(&execlist, "-o");
-                                                        passout = tempstr[10];
-                                                        if (regular_not_writeable(passout) == 1) {
-                                                            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                            exit(2);
-                                                        }
-                                                        addstr(&execlist, passout);
-                                                    }
-                                                    addstr(&execlist, "-t");
-                                                    addstr(&execlist, symtab);
-                                                    addstr(&execlist, "-temp");
-                                                    gentmp = tempstr[15];
-                                                    addstr(&execlist, gentmp);
-                                                    if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
-                                                        runerror += 1;
-                                                        if (Kflag == 0) {
-                                                            if ((srcsuf != 0x42) && (srcsuf != 0x4F) && (srcsuf != 0x51) && (srcsuf != 0x44) && (srcsuf != 0x4D) && (srcsuf != 0x53) && (srcsuf != 0x56)) {
-                                                                unlink(passin);
+                                                        if (irix4 == 0) {
+                                                            if (kpicopt_flag != 0) {
+                                                                addstr(&execlist, "-kpicopt");
                                                             }
-                                                            unlink(passout);
-                                                            if (tmpst != 0) {
-                                                                unlink(symtab);
+                                                            if (nokpicopt_flag != 0) {
+                                                                addstr(&execlist, "-nokpicopt");
                                                             }
-                                                        } else if (Sflag != 0) {
-                                                            unlink(binasm);
                                                         }
-                                                        unlink(gentmp);
-                                                    } else {
-                                                        unlink(gentmp);
-                                                        if ((((srcsuf != 0x42) && (srcsuf != 0x53) && (srcsuf != 0x51) && (srcsuf != 0x44) && (srcsuf != 0x4D) && (srcsuf != 0x56)) || (Oflag >= 2)) && (srcsuf != 0x4F) && (Kflag == 0)) {
-                                                            unlink(passin);
+                                                        addlist(&execlist, &optflags);
+                                                        addstr(&execlist, passin);
+                                                        if (((Hchar == 0x6F) && (ucodeflag == 0)) || (Kflag != 0)) {
+                                                            passout = mksuf(srcfiles.entries[var_s0], 0x4F);
+                                                            if (regular_not_writeable(passout) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      passout);
+                                                                exit(2);
+                                                            }
+                                                            if (NoMoreOptions != 0) {
+                                                                *passout = 0x2D;
+                                                                if (*passout != 0) {
+                                                                    passout = func_00433534(passout);
+                                                                }
+                                                            }
+                                                        } else {
+                                                            passout = tempstr[7];
                                                         }
-                                                        if (Sflag != 0) {
+                                                        addstr(&execlist, passout);
+                                                        addstr(&execlist, "-t");
+                                                        addstr(&execlist, symtab);
+                                                        optstr = tempstr[8];
+                                                        addstr(&execlist, optstr);
+                                                        if (run(opt, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                            runerror += 1;
                                                             if (Kflag == 0) {
+                                                                if ((srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                                    (srcsuf != 0x51) && (srcsuf != 0x44) &&
+                                                                    (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+                                                                    unlink(passin);
+                                                                }
+                                                                unlink(passout);
                                                                 if (tmpst != 0) {
                                                                     unlink(symtab);
                                                                 }
-                                                                unlink(binasm);
                                                             }
-                                                        } else if (Hchar != 0x63) {
+                                                            unlink(optstr);
+                                                        } else {
+                                                            if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                                (srcsuf != 0x51) && (srcsuf != 0x44) &&
+                                                                (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+                                                                unlink(passin);
+                                                            }
+                                                            unlink(optstr);
                                                             passin = passout;
-                                                            // case 0x73: /* switch 18 */
-block_2130:
-                                                            if (srcsuf == 0x73) {
+                                                            if ((Hchar == 0x6F) && (ucodeflag != 0)) {
                                                                 execlist.length = 0;
-                                                                addstr(&execlist, "as0");
-                                                                if (vflag != 0) {
-                                                                    addstr(&execlist, "-v");
-                                                                }
-                                                                addstr(&execlist, "-G");
-                                                                addstr(&execlist, Gnum);
-                                                                addlist(&execlist, &asflags);
-                                                                if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
-                                                                    passin = func_00433534(passin);
-                                                                }
+                                                                addstr(&execlist, "btou");
                                                                 addstr(&execlist, passin);
-                                                                addstr(&execlist, "-o");
-                                                                if ((Hchar == 0x61) || (Kflag != 0)) {
-                                                                    if ((compiler == 4) && (getsuf(srcfiles.entries[var_s0]) == 0)) {
-                                                                        passout = mkstr(srcfiles.entries[var_s0], ".G", NULL);
-                                                                    } else {
-                                                                        passout = mksuf(srcfiles.entries[var_s0], 0x47);
-                                                                    }
-                                                                    if (regular_not_writeable(passout) == 1) {
-                                                                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                                        exit(2);
-                                                                    }
-                                                                } else {
-                                                                    passout = tempstr[11];
-                                                                    if (regular_not_writeable(passout) == 1) {
-                                                                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                                                                        exit(2);
-                                                                    }
-                                                                }
+                                                                passout = mksuf(srcfiles.entries[var_s0], 0x55);
                                                                 addstr(&execlist, passout);
-                                                                addstr(&execlist, "-t");
-                                                                addstr(&execlist, symtab);
-                                                                if (run(as0, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                                if (run(btou, execlist.entries, NULL, NULL, NULL) !=
+                                                                    0) {
                                                                     runerror += 1;
-                                                                    if ((docpp != 0) || (mflag != 0)) {
-                                                                        unlink(passin);
-                                                                    }
                                                                     if (Kflag == 0) {
+                                                                        unlink(passin);
                                                                         unlink(passout);
                                                                         if (tmpst != 0) {
                                                                             unlink(symtab);
                                                                         }
                                                                     }
-                                                                } else {
-                                                                    if ((docpp != 0) || (mflag != 0)) {
-                                                                        unlink(passin);
-                                                                    }
-                                                                    if (Hchar != 0x61) {
-                                                                        passin = passout;
-                                                                        goto block_2159;
-                                                                    }
-                                                                }
-                                                            } else {
-                                                                // case 0x47: /* switch 19 */
-block_2159:
-                                                                execlist.length = 0;
-                                                                addstr(&execlist, "as1");
-                                                                addstr(&execlist, "-t5_ll_sc_bug");
-                                                                if (tfp_flag != 0) {
-                                                                    addstr(&execlist, "-tfp");
-                                                                }
-                                                                if (noaliasokflag != 0) {
-                                                                    addstr(&execlist, "-noaliasok");
-                                                                }
-                                                                if (alignarg != NULL) {
-                                                                    addstr(&execlist, alignarg);
-                                                                }
-                                                                if (align_common > 0) {
-                                                                    addstr(&execlist, "-align_common");
-                                                                }
-                                                                if (((compiler == 4) || (srcsuf == 0x73)) && (kpic_spec == 0) && (irix4 == 0)) {
-                                                                    addstr(&execlist, "-pic0");
-                                                                }
-                                                                if (coff_spec != 0) {
-                                                                    addstr(&execlist, "-coff");
-                                                                    kpic_flag = 0;
-                                                                } else if (kpic_flag != 0) {
-                                                                    if (irix4 == 0) {
-                                                                        if (coff_spec == 0) {
-                                                                            addstr(&execlist, "-elf");
-                                                                            if (Oflag >= 3) {
-                                                                                addstr(&execlist, "-pic1");
-                                                                            } else {
-                                                                                addstr(&execlist, "-pic2");
-                                                                            }
-                                                                        } else {
-                                                                            addstr(&execlist, "-coff");
-                                                                            kpic_flag = 0;
-                                                                        }
-                                                                    }
-                                                                } else if (irix4 == 0) {
-                                                                    if (coff_spec != 0) {
-                                                                        addstr(&execlist, "-coff");
-                                                                    } else {
-                                                                        addstr(&execlist, "-elf");
-                                                                    }
-                                                                }
-                                                                if (vflag != 0) {
-                                                                    addstr(&execlist, "-v");
-                                                                }
-                                                                if ((fullasoptflag == 0) && (srcsuf == 0x73) && (Oflag >= 2)) {
-                                                                    addstr(&execlist, "-noglobal");
-                                                                }
-                                                                addstr(&execlist, "-G");
-                                                                addstr(&execlist, Gnum);
-                                                                switch (pflag) { /* switch 15; irregular */
-                                                                case 0: /* switch 15 */
-                                                                    addstr(&execlist, "-p0");
-                                                                    break;
-                                                                case 1: /* switch 15 */
-                                                                    addstr(&execlist, "-p1");
-                                                                    break;
-                                                                }
-                                                                addlist(&execlist, &asflags);
-                                                                addlist(&execlist, &as1flags);
-                                                                if (irix4 == 0) {
-                                                                    addlist(&execlist, &olimitflags);
-                                                                }
-                                                                if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
-                                                                    passin = func_00433534(passin);
-                                                                }
-                                                                addstr(&execlist, passin);
-                                                                addstr(&execlist, "-o");
-                                                                if (compiler == 4) {
-                                                                    if (outfile != NULL) {
-                                                                        passout = outfile;
-                                                                    } else {
-                                                                        passout = "a.out";
-                                                                    }
-                                                                } else if ((outfile != NULL) && (cflag != 0) && ((Oflag == 3) || (srcfiles.length == 1))) {
-                                                                    passout = outfile;
-                                                                } else {
-                                                                    if ((srcsuf == 0x3F) && (Hchar != 0x62) && (Kflag == 0)) {
-                                                                        if (cflag == 0) {
-                                                                            tmp_uldobj = passout = tempstr[12];
-                                                                        } else if (srcfiles.length == 2) {
-                                                                            passout = mksuf(*srcfiles.entries, 0x6F);
-                                                                            tmp_uldobj = NULL;
-                                                                        } else {
-                                                                            passout = mksuf(srcfiles.entries[var_s0], 0x6F);
-                                                                            tmp_uldobj = NULL;
-                                                                        }
-                                                                    } else {
-                                                                        passout = mksuf(srcfiles.entries[var_s0], 0x6F);
-                                                                    }
-                                                                    if (uldobj_place != -1) {
-                                                                        set_place(&objfiles, passout, uldobj_place);
-                                                                    }
-                                                                }
-                                                                addstr(&execlist, passout);
-                                                                addstr(&execlist, "-t");
-                                                                addstr(&execlist, symtab);
-                                                                if ((ddoptflag == 1) && (compiler == 3) && (ddoptinfo != 0) && (Oflag >= 2)) {
-                                                                    addstr(&execlist, "-e");
-                                                                    if (((Hchar == 0x62) && (ucodeflag == 0)) || (Kflag != 0)) {
-                                                                        addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x45));
-                                                                    } else {
-                                                                        addstr(&execlist, tempstr[26]);
-                                                                    }
-                                                                }
-                                                                if (regular_not_writeable(passout) != 0) {
-                                                                    unlink(passout);
-                                                                }
-                                                                if (run(as1, execlist.entries, NULL, NULL, NULL) != 0) {
-                                                                    runerror += 1;
-                                                                    if (Kflag == 0) {
-                                                                        if (srcsuf != 0x47) {
-                                                                            unlink(passin);
-                                                                        }
-                                                                        spE0 = regular_file(passout);
-                                                                        if (spE0 == 1) {
-                                                                            unlink(passout);
-                                                                        } else if (spE0 != 0) {
-                                                                            error(2, NULL, 0, NULL, 0, "%s does not exist or is not stat(2)-able. Not deleted (if it exists) even though as1 failed.\n", passout);
-                                                                        } else {
-                                                                            error(2, NULL, 0, NULL, 0, "%s is not a regular file, not deleted even though as1 failed.\n", passout);
-                                                                        }
-                                                                        if (tmpst != 0) {
-                                                                            unlink(symtab);
-                                                                        }
-                                                                    }
-                                                                    if (tmp_uldobj != NULL) {
-                                                                        unlink(tmp_uldobj);
-                                                                    }
-                                                                } else {
-                                                                    if ((ddoptflag == 1) && (compiler == 3) && (ddoptinfo != 0) && (Oflag >= 2)) {
-                                                                        unlink(tempstr[26]);
-                                                                    }
-                                                                    if ((srcsuf != 0x47) && (Kflag == 0)) {
-                                                                        unlink(passin);
-                                                                    }
-                                                                    if ((tmpst != 0) && (Kflag == 0)) {
+                                                                } else if (Kflag == 0) {
+                                                                    unlink(passin);
+                                                                    if (tmpst != 0) {
                                                                         unlink(symtab);
                                                                     }
-                                                                    if ((compiler == 3) && (sp11C != 0) && (srcsuf != 0x66) && (srcsuf != 0x46)) {
-                                                                        D_1000BF74 = sp11C;
-                                                                        relocate_passes("f", NULL, NULL);
+                                                                }
+                                                            } else if (Hchar != 0x6F) {
+                                                                // TODO: pointless 'b'
+                                                                goto block_2068;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        // case 0x4F: /* switch 19 */
+                                                    block_2068:
+                                                        execlist.length = 0;
+                                                        addstr(&execlist, "ugen");
+                                                        if (vflag != 0) {
+                                                            addstr(&execlist, "-v");
+                                                        }
+                                                        addstr(&execlist, "-G");
+                                                        addstr(&execlist, Gnum);
+                                                        if ((kpic_flag != 0) && (coff_spec == 0) && (irix4 == 0)) {
+                                                            if (Oflag >= 3) {
+                                                                addstr(&execlist, "-pic1");
+                                                            } else {
+                                                                addstr(&execlist, "-pic2");
+                                                            }
+                                                        }
+                                                        addlist(&execlist, &genflags);
+                                                        addstr(&execlist, passin);
+                                                        if (Sflag != 0) {
+                                                            addstr(&execlist, "-o");
+                                                            if (Kflag != 0) {
+                                                                addstr(&execlist,
+                                                                       mksuf(srcfiles.entries[var_s0], 0x47));
+                                                            } else {
+                                                                binasm = tempstr[9];
+                                                                addstr(&execlist, binasm);
+                                                            }
+                                                            addstr(&execlist, "-l");
+                                                            passout = mksuf(srcfiles.entries[var_s0], 0x73);
+                                                            if (regular_not_writeable(passout) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      passout);
+                                                                exit(2);
+                                                            }
+                                                            addstr(&execlist, passout);
+                                                        } else if (Hchar == 0x63) {
+                                                            addstr(&execlist, "-o");
+                                                            passout = mksuf(srcfiles.entries[var_s0], 0x47);
+                                                            if (regular_not_writeable(passout) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      passout);
+                                                                exit(2);
+                                                            }
+                                                            addstr(&execlist, passout);
+                                                        } else if (Kflag != 0) {
+                                                            addstr(&execlist, "-o");
+                                                            passout = mksuf(srcfiles.entries[var_s0], 0x47);
+                                                            if (regular_not_writeable(passout) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      passout);
+                                                                exit(2);
+                                                            }
+                                                            addstr(&execlist, passout);
+                                                            if (regular_not_writeable(
+                                                                    mksuf(srcfiles.entries[var_s0], 0x73)) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      mksuf(srcfiles.entries[var_s0], 0x73));
+                                                                exit(2);
+                                                            }
+                                                            addstr(&execlist, "-l");
+                                                            addstr(&execlist, mksuf(srcfiles.entries[var_s0], 0x73));
+                                                        } else {
+                                                            addstr(&execlist, "-o");
+                                                            passout = tempstr[10];
+                                                            if (regular_not_writeable(passout) == 1) {
+                                                                error(1, NULL, 0, NULL, 0,
+                                                                      "can't overwrite a write-protected file %s \n",
+                                                                      passout);
+                                                                exit(2);
+                                                            }
+                                                            addstr(&execlist, passout);
+                                                        }
+                                                        addstr(&execlist, "-t");
+                                                        addstr(&execlist, symtab);
+                                                        addstr(&execlist, "-temp");
+                                                        gentmp = tempstr[15];
+                                                        addstr(&execlist, gentmp);
+                                                        if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
+                                                            runerror += 1;
+                                                            if (Kflag == 0) {
+                                                                if ((srcsuf != 0x42) && (srcsuf != 0x4F) &&
+                                                                    (srcsuf != 0x51) && (srcsuf != 0x44) &&
+                                                                    (srcsuf != 0x4D) && (srcsuf != 0x53) &&
+                                                                    (srcsuf != 0x56)) {
+                                                                    unlink(passin);
+                                                                }
+                                                                unlink(passout);
+                                                                if (tmpst != 0) {
+                                                                    unlink(symtab);
+                                                                }
+                                                            } else if (Sflag != 0) {
+                                                                unlink(binasm);
+                                                            }
+                                                            unlink(gentmp);
+                                                        } else {
+                                                            unlink(gentmp);
+                                                            if ((((srcsuf != 0x42) && (srcsuf != 0x53) &&
+                                                                  (srcsuf != 0x51) && (srcsuf != 0x44) &&
+                                                                  (srcsuf != 0x4D) && (srcsuf != 0x56)) ||
+                                                                 (Oflag >= 2)) &&
+                                                                (srcsuf != 0x4F) && (Kflag == 0)) {
+                                                                unlink(passin);
+                                                            }
+                                                            if (Sflag != 0) {
+                                                                if (Kflag == 0) {
+                                                                    if (tmpst != 0) {
+                                                                        unlink(symtab);
                                                                     }
-                                                                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
-                                                                        update_instantiation_info_file(srcfiles.entries[var_s0], passout);
-block_2269:;
+                                                                    unlink(binasm);
+                                                                }
+                                                            } else if (Hchar != 0x63) {
+                                                                passin = passout;
+                                                                // case 0x73: /* switch 18 */
+                                                            block_2130:
+                                                                if (srcsuf == 0x73) {
+                                                                    execlist.length = 0;
+                                                                    addstr(&execlist, "as0");
+                                                                    if (vflag != 0) {
+                                                                        addstr(&execlist, "-v");
+                                                                    }
+                                                                    addstr(&execlist, "-G");
+                                                                    addstr(&execlist, Gnum);
+                                                                    addlist(&execlist, &asflags);
+                                                                    if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
+                                                                        passin = func_00433534(passin);
+                                                                    }
+                                                                    addstr(&execlist, passin);
+                                                                    addstr(&execlist, "-o");
+                                                                    if ((Hchar == 0x61) || (Kflag != 0)) {
+                                                                        if ((compiler == 4) &&
+                                                                            (getsuf(srcfiles.entries[var_s0]) == 0)) {
+                                                                            passout = mkstr(srcfiles.entries[var_s0],
+                                                                                            ".G", NULL);
+                                                                        } else {
+                                                                            passout =
+                                                                                mksuf(srcfiles.entries[var_s0], 0x47);
+                                                                        }
+                                                                        if (regular_not_writeable(passout) == 1) {
+                                                                            error(1, NULL, 0, NULL, 0,
+                                                                                  "can't overwrite a write-protected "
+                                                                                  "file %s \n",
+                                                                                  passout);
+                                                                            exit(2);
+                                                                        }
+                                                                    } else {
+                                                                        passout = tempstr[11];
+                                                                        if (regular_not_writeable(passout) == 1) {
+                                                                            error(1, NULL, 0, NULL, 0,
+                                                                                  "can't overwrite a write-protected "
+                                                                                  "file %s \n",
+                                                                                  passout);
+                                                                            exit(2);
+                                                                        }
+                                                                    }
+                                                                    addstr(&execlist, passout);
+                                                                    addstr(&execlist, "-t");
+                                                                    addstr(&execlist, symtab);
+                                                                    if (run(as0, execlist.entries, NULL, NULL, NULL) !=
+                                                                        0) {
+                                                                        runerror += 1;
+                                                                        if ((docpp != 0) || (mflag != 0)) {
+                                                                            unlink(passin);
+                                                                        }
+                                                                        if (Kflag == 0) {
+                                                                            unlink(passout);
+                                                                            if (tmpst != 0) {
+                                                                                unlink(symtab);
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        if ((docpp != 0) || (mflag != 0)) {
+                                                                            unlink(passin);
+                                                                        }
+                                                                        if (Hchar != 0x61) {
+                                                                            passin = passout;
+                                                                            goto block_2159;
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    // case 0x47: /* switch 19 */
+                                                                block_2159:
+                                                                    execlist.length = 0;
+                                                                    addstr(&execlist, "as1");
+                                                                    addstr(&execlist, "-t5_ll_sc_bug");
+                                                                    if (tfp_flag != 0) {
+                                                                        addstr(&execlist, "-tfp");
+                                                                    }
+                                                                    if (noaliasokflag != 0) {
+                                                                        addstr(&execlist, "-noaliasok");
+                                                                    }
+                                                                    if (alignarg != NULL) {
+                                                                        addstr(&execlist, alignarg);
+                                                                    }
+                                                                    if (align_common > 0) {
+                                                                        addstr(&execlist, "-align_common");
+                                                                    }
+                                                                    if (((compiler == 4) || (srcsuf == 0x73)) &&
+                                                                        (kpic_spec == 0) && (irix4 == 0)) {
+                                                                        addstr(&execlist, "-pic0");
+                                                                    }
+                                                                    if (coff_spec != 0) {
+                                                                        addstr(&execlist, "-coff");
+                                                                        kpic_flag = 0;
+                                                                    } else if (kpic_flag != 0) {
+                                                                        if (irix4 == 0) {
+                                                                            if (coff_spec == 0) {
+                                                                                addstr(&execlist, "-elf");
+                                                                                if (Oflag >= 3) {
+                                                                                    addstr(&execlist, "-pic1");
+                                                                                } else {
+                                                                                    addstr(&execlist, "-pic2");
+                                                                                }
+                                                                            } else {
+                                                                                addstr(&execlist, "-coff");
+                                                                                kpic_flag = 0;
+                                                                            }
+                                                                        }
+                                                                    } else if (irix4 == 0) {
+                                                                        if (coff_spec != 0) {
+                                                                            addstr(&execlist, "-coff");
+                                                                        } else {
+                                                                            addstr(&execlist, "-elf");
+                                                                        }
+                                                                    }
+                                                                    if (vflag != 0) {
+                                                                        addstr(&execlist, "-v");
+                                                                    }
+                                                                    if ((fullasoptflag == 0) && (srcsuf == 0x73) &&
+                                                                        (Oflag >= 2)) {
+                                                                        addstr(&execlist, "-noglobal");
+                                                                    }
+                                                                    addstr(&execlist, "-G");
+                                                                    addstr(&execlist, Gnum);
+                                                                    switch (pflag) { /* switch 15; irregular */
+                                                                        case 0:      /* switch 15 */
+                                                                            addstr(&execlist, "-p0");
+                                                                            break;
+                                                                        case 1: /* switch 15 */
+                                                                            addstr(&execlist, "-p1");
+                                                                            break;
+                                                                    }
+                                                                    addlist(&execlist, &asflags);
+                                                                    addlist(&execlist, &as1flags);
+                                                                    if (irix4 == 0) {
+                                                                        addlist(&execlist, &olimitflags);
+                                                                    }
+                                                                    if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
+                                                                        passin = func_00433534(passin);
+                                                                    }
+                                                                    addstr(&execlist, passin);
+                                                                    addstr(&execlist, "-o");
+                                                                    if (compiler == 4) {
+                                                                        if (outfile != NULL) {
+                                                                            passout = outfile;
+                                                                        } else {
+                                                                            passout = "a.out";
+                                                                        }
+                                                                    } else if ((outfile != NULL) && (cflag != 0) &&
+                                                                               ((Oflag == 3) ||
+                                                                                (srcfiles.length == 1))) {
+                                                                        passout = outfile;
+                                                                    } else {
+                                                                        if ((srcsuf == 0x3F) && (Hchar != 0x62) &&
+                                                                            (Kflag == 0)) {
+                                                                            if (cflag == 0) {
+                                                                                tmp_uldobj = passout = tempstr[12];
+                                                                            } else if (srcfiles.length == 2) {
+                                                                                passout =
+                                                                                    mksuf(*srcfiles.entries, 0x6F);
+                                                                                tmp_uldobj = NULL;
+                                                                            } else {
+                                                                                passout = mksuf(
+                                                                                    srcfiles.entries[var_s0], 0x6F);
+                                                                                tmp_uldobj = NULL;
+                                                                            }
+                                                                        } else {
+                                                                            passout =
+                                                                                mksuf(srcfiles.entries[var_s0], 0x6F);
+                                                                        }
+                                                                        if (uldobj_place != -1) {
+                                                                            set_place(&objfiles, passout, uldobj_place);
+                                                                        }
+                                                                    }
+                                                                    addstr(&execlist, passout);
+                                                                    addstr(&execlist, "-t");
+                                                                    addstr(&execlist, symtab);
+                                                                    if ((ddoptflag == 1) && (compiler == 3) &&
+                                                                        (ddoptinfo != 0) && (Oflag >= 2)) {
+                                                                        addstr(&execlist, "-e");
+                                                                        if (((Hchar == 0x62) && (ucodeflag == 0)) ||
+                                                                            (Kflag != 0)) {
+                                                                            addstr(
+                                                                                &execlist,
+                                                                                mksuf(srcfiles.entries[var_s0], 0x45));
+                                                                        } else {
+                                                                            addstr(&execlist, tempstr[26]);
+                                                                        }
+                                                                    }
+                                                                    if (regular_not_writeable(passout) != 0) {
+                                                                        unlink(passout);
+                                                                    }
+                                                                    if (run(as1, execlist.entries, NULL, NULL, NULL) !=
+                                                                        0) {
+                                                                        runerror += 1;
+                                                                        if (Kflag == 0) {
+                                                                            if (srcsuf != 0x47) {
+                                                                                unlink(passin);
+                                                                            }
+                                                                            spE0 = regular_file(passout);
+                                                                            if (spE0 == 1) {
+                                                                                unlink(passout);
+                                                                            } else if (spE0 != 0) {
+                                                                                error(
+                                                                                    2, NULL, 0, NULL, 0,
+                                                                                    "%s does not exist or is not "
+                                                                                    "stat(2)-able. Not deleted (if it "
+                                                                                    "exists) even though as1 failed.\n",
+                                                                                    passout);
+                                                                            } else {
+                                                                                error(
+                                                                                    2, NULL, 0, NULL, 0,
+                                                                                    "%s is not a regular file, not "
+                                                                                    "deleted even though as1 failed.\n",
+                                                                                    passout);
+                                                                            }
+                                                                            if (tmpst != 0) {
+                                                                                unlink(symtab);
+                                                                            }
+                                                                        }
+                                                                        if (tmp_uldobj != NULL) {
+                                                                            unlink(tmp_uldobj);
+                                                                        }
+                                                                    } else {
+                                                                        if ((ddoptflag == 1) && (compiler == 3) &&
+                                                                            (ddoptinfo != 0) && (Oflag >= 2)) {
+                                                                            unlink(tempstr[26]);
+                                                                        }
+                                                                        if ((srcsuf != 0x47) && (Kflag == 0)) {
+                                                                            unlink(passin);
+                                                                        }
+                                                                        if ((tmpst != 0) && (Kflag == 0)) {
+                                                                            unlink(symtab);
+                                                                        }
+                                                                        if ((compiler == 3) && (sp11C != 0) &&
+                                                                            (srcsuf != 0x66) && (srcsuf != 0x46)) {
+                                                                            D_1000BF74 = sp11C;
+                                                                            relocate_passes("f", NULL, NULL);
+                                                                        }
+                                                                        if ((compiler == 1) &&
+                                                                            ((c_compiler_choice == 2) ||
+                                                                             (c_compiler_choice == 3)) &&
+                                                                            (no_prelink == 0)) {
+                                                                            update_instantiation_info_file(
+                                                                                srcfiles.entries[var_s0], passout);
+                                                                        block_2269:;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -4227,503 +4369,506 @@ block_2269:;
                                     }
                                 }
                             }
-                        }
                     }
                 }
             } else {
                 goto block_1042;
             }
         }
-	}
+    }
 
-
-
-	{
-block_2272:
-		srcsuf = 0;
-		if (compiler == 4) {
-			if (runerror != 0) {
-				exit(1);
-			} else {
-				exit(0);
-			}
-		}
-		if (NoMoreOptions != 0) {
-			for (var_s0 = 0; var_s0 < objfiles.length; var_s0++) {
-				if ((*objfiles.entries[var_s0] == 0x2D) && (strchr(objfiles.entries[var_s0], 0x2E) != NULL)) {
-					objfiles.entries[var_s0] = func_00433534(objfiles.entries[var_s0]);
-				}
-			}
-		}
-		if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) && (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
-			if ((old_non_shared != 0) && (mips2flag != 0) && (kpic_flag == 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
-				default_call_shared = 0;
-				call_shared = 0;
-			}
-			if ((old_non_shared != 0) && (mips3flag != 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
-				default_call_shared = 0;
-				call_shared = 0;
-				exit(2);
-			}
-			if ((old_non_shared != 0) && (coff_spec != 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
-				default_call_shared = 0;
-				call_shared = 0;
-				exit(2);
-			}
-			if ((old_non_shared != 0) && (excpt_flag != 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
-				default_call_shared = 0;
-				call_shared = 0;
-				exit(2);
-			}
-			if (((old_non_shared != 0) || (non_shared != 0)) && (make_edison_shlib != 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
-				exit(2);
-			}
-			if ((cordflag != 0) && (make_edison_shlib != 0)) {
-				error(1, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
-				exit(2);
-			}
-			if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
-				execlist.length = 0;
-				addstr(&execlist, "edg_prelink");
-				addstr(&execlist, "-fSGI");
-				addlist(&execlist, &prelinkerflags);
-				if ((vflag != 0) || (verbose_prelink != 0)) {
-					addstr(&execlist, "-v");
-				}
-				add_prelinker_objects(&execlist, &objfiles);
-				if (xpg_flag != 0) {
-					add_prelinker_objects(&execlist, &dashlfiles);
-				}
-				if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
-					runerror += 1;
-				} else {
-					goto block_2323;
-				}
-			} else {
-block_2323:
-				execlist.length = 0;
-				addstr(&execlist, LD);
-				if ((kpic_flag != 0) && (irix4 == 0) && (coff_spec == 0)) {
-					addstr(&ldflags, "-KPIC");
-				}
-				if ((non_shared != 0) && (non_shared_emitted == 0)) {
-					if ((mips2flag == 0) && (mips3flag == 0)) {
-						addstr(&ldflags, "-non_shared");
-						non_shared_emitted = 1;
-					}
-				} else if ((call_shared != 0) || (make_edison_shlib != 0)) {
-					if (transitive_link != 0) {
-						addstr(&ldflags, "-transitive_link");
-					} else if (full_transitive_link != 0) {
-						addstr(&ldflags, "-full_transitive_link");
-					} else if (no_transitive_link != 0) {
-						addstr(&ldflags, "-no_transitive_link");
-					}
-				}
-				if (quickstart_info != 0) {
-					addstr(&ldflags, "-quickstart_info");
-				}
-				if ((elfflag != 0) && (coff_spec == 0)) {
-					addstr(&execlist, "-elf");
-				}
-				if (tfp_flag != 0) {
-					addstr(&execlist, "-allow_jump_at_eop");
-				}
-				if ((compiler == 1) && (c_compiler_choice == 3)) {
-					addstr(&execlist, "-delta");
-				}
-				if (cordflag != 0) {
-					addstr(&execlist, "-o");
-					passout = tempstr[22];
-					addstr(&execlist, passout);
-				} else if (outfile != NULL) {
-					addstr(&execlist, "-o");
-					addstr(&execlist, outfile);
-				}
-				if (gethostsex() != targetsex) {
-					if (targetsex == 0) {
-						addstr(&execlist, "-EB");
-					} else {
-						addstr(&execlist, "-EL");
-					}
-				}
-				if (make_edison_shlib != 0) {
-					addstr(&execlist, "-shared");
-				}
-				if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-					add_cxx_symbol_options();
-				}
-				if (irix4 != 0) {
-					addstr(&execlist, mkstr("-L", NULL));
-					if (non_shared != 0) {
-						addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
-						crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
-						crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
-					} else {
-						addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
-						crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
-						crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
-					}
-				}
-				if (svr4_systype != 0) {
-					if (compchoice == 1) {
-						addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
-					}
-					addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-					if ((call_shared != 0) || (make_edison_shlib != 0)) {
-						addstr(&execlist, "-require_dynamic_link");
-						addstr(&execlist, "_rld_new_interface");
-						if (ignore_unresolved_flag != 0) {
-							addstr(&execlist, "-ignore_unresolved");
-						} else if (no_unresolved_flag != 0) {
-							addstr(&execlist, "-no_unresolved");
-						} else if ((default_svr4 != 0) || (make_edison_shlib != 0)) {
-							addstr(&execlist, "-ignore_unresolved");
-						} else {
-							addstr(&execlist, "-no_unresolved");
-						}
-					}
-				}
-				if (fiveflag != 0) {
-					addstr(&execlist, mkstr("-L", runlib, NULL));
-				}
-				if ((allBstring != NULL) && (*allBstring != 0)) {
-					addstr(&execlist, mkstr("-B", allBstring, NULL));
-				}
-				if (cordflag != 0) {
-					addstr(&execlist, "-r");
-					addstr(&execlist, "-d");
-					addstr(&execlist, "-z");
-				}
-				if (irix4 != 0) {
-					addstr(&execlist, "-G");
-				} else {
-					addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
-				}
-				addstr(&execlist, Gnum);
-				addlist(&execlist, &ldflags);
-				addlist(&execlist, &nldflags);
-				if ((mips2flag != 0) && (sp148 == 0)) {
-					if (strcmp("/", comp_target_root) != 0) {
-						if (non_shared != 0) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-						} else {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-						}
-					} else if (non_shared != 0) {
-						addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-					} else {
-						addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-					}
-				}
-				if ((mips1flag != 0) && (sp148 == 0)) {
-					if (strcmp("/", comp_target_root) != 0) {
-						if (non_shared != 0) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-						} else if (abi_flag == 0) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-						}
-					} else if (non_shared != 0) {
-						addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-					} else if (abi_flag == 0) {
-						addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-					}
-				}
-				if (strcmp("/", comp_target_root) != 0) {
-					if (Lflag == 0) {
-						if ((compiler == 1) && (c_compiler_choice == 3)) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
-						}
-						if (non_shared != 0) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
-						} else if (abi_flag == 0) {
-							addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
-						}
-					}
-				} else if ((Lflag == 0) && (compiler == 1) && (c_compiler_choice == 3)) {
-					addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
-				}
-				if (make_edison_shlib != 0) {
-					if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-						addstr(&execlist, cxx_init);
-					}
-					if ((compiler == 1) && (c_compiler_choice == 3)) {
-						addstr(&execlist, delta_init);
-					}
-					addlist(&execlist, &objfiles);
-					if (xpg_flag != 0) {
-						addlist(&execlist, &dashlfiles);
-					}
-					if (nodeflib == 0) {
-						if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-							spDC = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
-							if (spDC != 0) {
-								addstr(&execlist, "-dont_warn_unused");
-							}
-							if (exception_handling != 0) {
-								addstr(&execlist, "-lCsup");
-							}
-							addstr(&execlist, "-lC");
-							if (spDC != 0) {
-								addstr(&execlist, "-warn_unused");
-							}
-						}
-						if (xpg_flag != 0) {
-							addstr(&execlist, "-dont_warn_unused");
-							addstr(&execlist, "-lgen");
-							addstr(&execlist, "-warn_unused");
-						}
-						addstr(&execlist, "-lc");
-					}
-				} else {
-					addstr(&execlist, "-nocount");
-					addstr(&execlist, crtx);
-					if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-						addstr(&execlist, cxx_init);
-					}
-					if ((compiler == 1) && (c_compiler_choice == 3)) {
-						addstr(&execlist, delta_init);
-					}
-					addstr(&execlist, "-count");
-					addlist(&execlist, &objfiles);
-					if (xpg_flag != 0) {
-						addlist(&execlist, &dashlfiles);
-					}
-					addlist(&execlist, &ldZflags);
-					if ((ansichoice == 0) && (compiler == 1) && (irix4 == 0)) {
-						addstr(&execlist, "-cckr");
-					}
-					addstr(&execlist, "-nocount");
-					if (nodeflib == 0) {
-						if ((compiler == 2) || (haspascal != 0)) {
-							addspacedstr(&execlist, libp);
-							addspacedstr(&execlist, libxmalloc);
-							addspacedstr(&execlist, libexc);
-							addspacedstr(&execlist, libmld);
-						}
-						if ((compiler == 3) || (hasfortran != 0)) {
-							if (mp_flag != 0) {
-								addspacedstr(&execlist, libI77_mp);
-							}
-							if ((non_shared != 0) || (irix4 != 0)) {
-								addspacedstr(&execlist, libF77);
-								addspacedstr(&execlist, libm);
-								addspacedstr(&execlist, libU77);
-								if (D_1000C130 != 0) {
-									spD8 = strlen(libI77);
-									spD4 = malloc(spD8 + 2);
-									memcpy(spD4, libI77, spD8);
-									spD4[spD8] = 0x5F;
-									spD4[spD8+1] = 0x73;
-									spD4[spD8+2] = 0;
-									libI77 = spD4;
-								}
-								addspacedstr(&execlist, libI77);
-								addspacedstr(&execlist, libisam);
-							} else {
-								addspacedstr(&execlist, libftn);
-								addspacedstr(&execlist, libm);
-							}
-						}
-						if (compiler == 5) {
-							addstr(&execlist, libpl1);
-							addspacedstr(&execlist, libxmalloc);
-							addstr(&execlist, "-ltermcap");
-							addspacedstr(&execlist, libexc);
-							addspacedstr(&execlist, libmld);
-						}
-						if ((compiler == 2) || ((hasfortran != 0) && (compiler != 3)) || (haspascal != 0) || (haspl1 != 0) || (compiler == 5) || (compiler == 6)) {
-							addspacedstr(&execlist, libm);
-						}
-						if (pgflag != 0) {
-							addspacedstr(&execlist, libgprof);
-						} else if (pflag != 0) {
-							addspacedstr(&execlist, libprof);
-						}
-						if (sixty4bitflag == 0) {
-							ldw_file = fopen(libdw_path, "r");
-							if (ldw_file != NULL) {
-								addspacedstr(&execlist, libdw);
-							}
-						}
-						if (cmp_flag & 0x10000) {
-							addstr(&execlist, libc_mp);
-							if (compiler == 1) {
-								addstr(&execlist, "-lkapio");
-							}
-						}
-						if ((run_sopt != 0) && (compiler == 1)) {
-							addstr(&execlist, "-lkapio");
-						}
-						if (compiler == 3) {
-							if (D_1000C130 == 2) {
-								addstr(&execlist, "-lc_s");
-								if (xpg_flag != 0) {
-									addstr(&execlist, "-dont_warn_unused");
-									addstr(&execlist, "-lgen");
-									addstr(&execlist, "-warn_unused");
-								}
-								addstr(&execlist, "-lc");
-							} else {
-								if ((irix4 != 0) && (B_1000ED74 == 0)) {
-									addstr(&execlist, "-lmpc");
-								}
-								if (B_1000ED2C != 0) {
-									addstr(&execlist, "-lc_s");
-								} else if (B_1000ED30 != 0) {
-									addstr(&execlist, "-lc_s");
-								}
-								if (xpg_flag != 0) {
-									addstr(&execlist, "-dont_warn_unused");
-									addstr(&execlist, "-lgen");
-									addstr(&execlist, "-warn_unused");
-								}
-								addstr(&execlist, "-lc");
-							}
-						} else {
-							if ((irix4 != 0) && (cmp_flag & 0x10000)) {
-								addstr(&execlist, "-lmpc");
-							}
-							if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-								spD0 = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
-								if (spD0 != 0) {
-									addstr(&execlist, "-dont_warn_unused");
-								}
-								if (exception_handling != 0) {
-									addstr(&execlist, "-lCsup");
-								}
-								addstr(&execlist, "-lC");
-								if (spD0 != 0) {
-									addstr(&execlist, "-warn_unused");
-								}
-							}
-							if (B_1000ED2C != 0) {
-								addstr(&execlist, "-lc_s");
-							} else if (B_1000ED30 != 0) {
-								addstr(&execlist, "-lc_s");
-							}
-							if (xpg_flag != 0) {
-								addstr(&execlist, "-dont_warn_unused");
-								addstr(&execlist, "-lgen");
-								addstr(&execlist, "-warn_unused");
-							}
-							addstr(&execlist, "-lc");
-						}
-					}
-					if (crtn_required != 0) {
-						addstr(&execlist, crtn);
-					}
-					if (rls_id_object != NULL) {
-						addstr(&execlist, rls_id_object);
-					}
-				}
-				passin = NULL;
-				if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
-					runerror += 1;
-					if (Kflag == 0) {
-						if ((strcmp(LD, "old_ld") == 0) || ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)))) {
-							if (outfile != NULL) {
-								unlink(outfile);
-							} else {
-								unlink("a.out");
-							}
-						}
-						if (tmp_uldobj != NULL) {
-							unlink(tmp_uldobj);
-						}
-					}
-				}
-				if (tempstr[32] != NULL) {
-					if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
-						execlist.length = 0;
-						addstr(&execlist, "c++filt");
-						run(filter, execlist.entries, tempstr[32], NULL, NULL);
-					}
-					unlink(tempstr[32]);
-				}
-				if ((runerror == 0) && (compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-					execlist.length = 0;
-					addstr(&execlist, patch);
-					if (vflag != 0) {
-						addstr(&execlist, "-d");
-					}
-					if (outfile != NULL) {
-						addstr(&execlist, outfile);
-					} else {
-						addstr(&execlist, "a.out");
-					}
-					if (run(patch, execlist.entries, NULL, NULL, NULL) != 0) {
-						runerror += 1;
-					}
-				}
-				if ((runerror == 0) && (do_strip != 0)) {
-					execlist.length = 0;
-					addstr(&execlist, strip);
-					if (outfile != NULL) {
-						addstr(&execlist, outfile);
-					} else {
-						addstr(&execlist, "a.out");
-					}
-					if (run(strip, execlist.entries, NULL, NULL, NULL) != 0) {
-						runerror += 1;
-					}
-				}
-			}
-block_2588:
-			if ((cordflag != 0) && (runerror == 0)) {
-				execlist.length = 0;
-				addstr(&execlist, "cord");
-				if (vflag != 0) {
-					addstr(&execlist, "-v");
-				}
-				addlist(&execlist, &cordflags);
-				if (outfile != NULL) {
-					passout = outfile;
-				} else {
-					passout = "a.out";
-				}
-				addstr(&execlist, "-o");
-				addstr(&execlist, passout);
-				addstr(&execlist, tempstr[22]);
-				if (feedlist.length != 0) {
-					addlist(&execlist, &feedlist);
-				} else {
-					addstr(&execlist, mkstr(passout, ".fb", NULL));
-				}
-				if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
-					runerror += 1;
-					unlink(passout);
-					unlink(tempstr[22]);
-				} else {
-					unlink(tempstr[22]);
-				}
-			}
-			if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && (Kflag == 0)) {
-				unlink(mksuf(*srcfiles.entries, 0x6F));
-			}
-		}
-	}
-	if (tmp_uldobj != NULL) {
-		unlink(tmp_uldobj);
-	}
-	if (editflag != 0) {
-		unlink(errout);
-		if (editflag == 2) {
-			unlink(tempstr[25]);
-		}
-	}
-	if ((compiler == 1) && (gflag >= 2)) {
-		unlink(tempstr[33]);
-	}
-	if (runerror != 0) {
-		exit(1);
-	}
-	return 0;
+    {
+    block_2272:
+        srcsuf = 0;
+        if (compiler == 4) {
+            if (runerror != 0) {
+                exit(1);
+            } else {
+                exit(0);
+            }
+        }
+        if (NoMoreOptions != 0) {
+            for (var_s0 = 0; var_s0 < objfiles.length; var_s0++) {
+                if ((*objfiles.entries[var_s0] == 0x2D) && (strchr(objfiles.entries[var_s0], 0x2E) != NULL)) {
+                    objfiles.entries[var_s0] = func_00433534(objfiles.entries[var_s0]);
+                }
+            }
+        }
+        if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
+            (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
+            if ((old_non_shared != 0) && (mips2flag != 0) && (kpic_flag == 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
+                default_call_shared = 0;
+                call_shared = 0;
+            }
+            if ((old_non_shared != 0) && (mips3flag != 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
+                default_call_shared = 0;
+                call_shared = 0;
+                exit(2);
+            }
+            if ((old_non_shared != 0) && (coff_spec != 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
+                default_call_shared = 0;
+                call_shared = 0;
+                exit(2);
+            }
+            if ((old_non_shared != 0) && (excpt_flag != 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
+                default_call_shared = 0;
+                call_shared = 0;
+                exit(2);
+            }
+            if (((old_non_shared != 0) || (non_shared != 0)) && (make_edison_shlib != 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
+                exit(2);
+            }
+            if ((cordflag != 0) && (make_edison_shlib != 0)) {
+                error(1, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
+                exit(2);
+            }
+            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
+                execlist.length = 0;
+                addstr(&execlist, "edg_prelink");
+                addstr(&execlist, "-fSGI");
+                addlist(&execlist, &prelinkerflags);
+                if ((vflag != 0) || (verbose_prelink != 0)) {
+                    addstr(&execlist, "-v");
+                }
+                add_prelinker_objects(&execlist, &objfiles);
+                if (xpg_flag != 0) {
+                    add_prelinker_objects(&execlist, &dashlfiles);
+                }
+                if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror += 1;
+                } else {
+                    goto block_2323;
+                }
+            } else {
+            block_2323:
+                execlist.length = 0;
+                addstr(&execlist, LD);
+                if ((kpic_flag != 0) && (irix4 == 0) && (coff_spec == 0)) {
+                    addstr(&ldflags, "-KPIC");
+                }
+                if ((non_shared != 0) && (non_shared_emitted == 0)) {
+                    if ((mips2flag == 0) && (mips3flag == 0)) {
+                        addstr(&ldflags, "-non_shared");
+                        non_shared_emitted = 1;
+                    }
+                } else if ((call_shared != 0) || (make_edison_shlib != 0)) {
+                    if (transitive_link != 0) {
+                        addstr(&ldflags, "-transitive_link");
+                    } else if (full_transitive_link != 0) {
+                        addstr(&ldflags, "-full_transitive_link");
+                    } else if (no_transitive_link != 0) {
+                        addstr(&ldflags, "-no_transitive_link");
+                    }
+                }
+                if (quickstart_info != 0) {
+                    addstr(&ldflags, "-quickstart_info");
+                }
+                if ((elfflag != 0) && (coff_spec == 0)) {
+                    addstr(&execlist, "-elf");
+                }
+                if (tfp_flag != 0) {
+                    addstr(&execlist, "-allow_jump_at_eop");
+                }
+                if ((compiler == 1) && (c_compiler_choice == 3)) {
+                    addstr(&execlist, "-delta");
+                }
+                if (cordflag != 0) {
+                    addstr(&execlist, "-o");
+                    passout = tempstr[22];
+                    addstr(&execlist, passout);
+                } else if (outfile != NULL) {
+                    addstr(&execlist, "-o");
+                    addstr(&execlist, outfile);
+                }
+                if (gethostsex() != targetsex) {
+                    if (targetsex == 0) {
+                        addstr(&execlist, "-EB");
+                    } else {
+                        addstr(&execlist, "-EL");
+                    }
+                }
+                if (make_edison_shlib != 0) {
+                    addstr(&execlist, "-shared");
+                }
+                if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    add_cxx_symbol_options();
+                }
+                if (irix4 != 0) {
+                    addstr(&execlist, mkstr("-L", NULL));
+                    if (non_shared != 0) {
+                        addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
+                        crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
+                        crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
+                    } else {
+                        addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
+                        crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
+                        crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
+                    }
+                }
+                if (svr4_systype != 0) {
+                    if (compchoice == 1) {
+                        addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
+                    }
+                    addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
+                    if ((call_shared != 0) || (make_edison_shlib != 0)) {
+                        addstr(&execlist, "-require_dynamic_link");
+                        addstr(&execlist, "_rld_new_interface");
+                        if (ignore_unresolved_flag != 0) {
+                            addstr(&execlist, "-ignore_unresolved");
+                        } else if (no_unresolved_flag != 0) {
+                            addstr(&execlist, "-no_unresolved");
+                        } else if ((default_svr4 != 0) || (make_edison_shlib != 0)) {
+                            addstr(&execlist, "-ignore_unresolved");
+                        } else {
+                            addstr(&execlist, "-no_unresolved");
+                        }
+                    }
+                }
+                if (fiveflag != 0) {
+                    addstr(&execlist, mkstr("-L", runlib, NULL));
+                }
+                if ((allBstring != NULL) && (*allBstring != 0)) {
+                    addstr(&execlist, mkstr("-B", allBstring, NULL));
+                }
+                if (cordflag != 0) {
+                    addstr(&execlist, "-r");
+                    addstr(&execlist, "-d");
+                    addstr(&execlist, "-z");
+                }
+                if (irix4 != 0) {
+                    addstr(&execlist, "-G");
+                } else {
+                    addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
+                }
+                addstr(&execlist, Gnum);
+                addlist(&execlist, &ldflags);
+                addlist(&execlist, &nldflags);
+                if ((mips2flag != 0) && (sp148 == 0)) {
+                    if (strcmp("/", comp_target_root) != 0) {
+                        if (non_shared != 0) {
+                            addstr(&execlist,
+                                   mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                        } else {
+                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                        }
+                    } else if (non_shared != 0) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+                if ((mips1flag != 0) && (sp148 == 0)) {
+                    if (strcmp("/", comp_target_root) != 0) {
+                        if (non_shared != 0) {
+                            addstr(&execlist,
+                                   mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                        } else if (abi_flag == 0) {
+                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                        }
+                    } else if (non_shared != 0) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (Lflag == 0) {
+                        if ((compiler == 1) && (c_compiler_choice == 3)) {
+                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
+                        }
+                        if (non_shared != 0) {
+                            addstr(&execlist,
+                                   mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
+                        } else if (abi_flag == 0) {
+                            addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
+                        }
+                    }
+                } else if ((Lflag == 0) && (compiler == 1) && (c_compiler_choice == 3)) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
+                }
+                if (make_edison_shlib != 0) {
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                        addstr(&execlist, cxx_init);
+                    }
+                    if ((compiler == 1) && (c_compiler_choice == 3)) {
+                        addstr(&execlist, delta_init);
+                    }
+                    addlist(&execlist, &objfiles);
+                    if (xpg_flag != 0) {
+                        addlist(&execlist, &dashlfiles);
+                    }
+                    if (nodeflib == 0) {
+                        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                            spDC = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
+                            if (spDC != 0) {
+                                addstr(&execlist, "-dont_warn_unused");
+                            }
+                            if (exception_handling != 0) {
+                                addstr(&execlist, "-lCsup");
+                            }
+                            addstr(&execlist, "-lC");
+                            if (spDC != 0) {
+                                addstr(&execlist, "-warn_unused");
+                            }
+                        }
+                        if (xpg_flag != 0) {
+                            addstr(&execlist, "-dont_warn_unused");
+                            addstr(&execlist, "-lgen");
+                            addstr(&execlist, "-warn_unused");
+                        }
+                        addstr(&execlist, "-lc");
+                    }
+                } else {
+                    addstr(&execlist, "-nocount");
+                    addstr(&execlist, crtx);
+                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                        addstr(&execlist, cxx_init);
+                    }
+                    if ((compiler == 1) && (c_compiler_choice == 3)) {
+                        addstr(&execlist, delta_init);
+                    }
+                    addstr(&execlist, "-count");
+                    addlist(&execlist, &objfiles);
+                    if (xpg_flag != 0) {
+                        addlist(&execlist, &dashlfiles);
+                    }
+                    addlist(&execlist, &ldZflags);
+                    if ((ansichoice == 0) && (compiler == 1) && (irix4 == 0)) {
+                        addstr(&execlist, "-cckr");
+                    }
+                    addstr(&execlist, "-nocount");
+                    if (nodeflib == 0) {
+                        if ((compiler == 2) || (haspascal != 0)) {
+                            addspacedstr(&execlist, libp);
+                            addspacedstr(&execlist, libxmalloc);
+                            addspacedstr(&execlist, libexc);
+                            addspacedstr(&execlist, libmld);
+                        }
+                        if ((compiler == 3) || (hasfortran != 0)) {
+                            if (mp_flag != 0) {
+                                addspacedstr(&execlist, libI77_mp);
+                            }
+                            if ((non_shared != 0) || (irix4 != 0)) {
+                                addspacedstr(&execlist, libF77);
+                                addspacedstr(&execlist, libm);
+                                addspacedstr(&execlist, libU77);
+                                if (D_1000C130 != 0) {
+                                    spD8 = strlen(libI77);
+                                    spD4 = malloc(spD8 + 2);
+                                    memcpy(spD4, libI77, spD8);
+                                    spD4[spD8] = 0x5F;
+                                    spD4[spD8 + 1] = 0x73;
+                                    spD4[spD8 + 2] = 0;
+                                    libI77 = spD4;
+                                }
+                                addspacedstr(&execlist, libI77);
+                                addspacedstr(&execlist, libisam);
+                            } else {
+                                addspacedstr(&execlist, libftn);
+                                addspacedstr(&execlist, libm);
+                            }
+                        }
+                        if (compiler == 5) {
+                            addstr(&execlist, libpl1);
+                            addspacedstr(&execlist, libxmalloc);
+                            addstr(&execlist, "-ltermcap");
+                            addspacedstr(&execlist, libexc);
+                            addspacedstr(&execlist, libmld);
+                        }
+                        if ((compiler == 2) || ((hasfortran != 0) && (compiler != 3)) || (haspascal != 0) ||
+                            (haspl1 != 0) || (compiler == 5) || (compiler == 6)) {
+                            addspacedstr(&execlist, libm);
+                        }
+                        if (pgflag != 0) {
+                            addspacedstr(&execlist, libgprof);
+                        } else if (pflag != 0) {
+                            addspacedstr(&execlist, libprof);
+                        }
+                        if (sixty4bitflag == 0) {
+                            ldw_file = fopen(libdw_path, "r");
+                            if (ldw_file != NULL) {
+                                addspacedstr(&execlist, libdw);
+                            }
+                        }
+                        if (cmp_flag & 0x10000) {
+                            addstr(&execlist, libc_mp);
+                            if (compiler == 1) {
+                                addstr(&execlist, "-lkapio");
+                            }
+                        }
+                        if ((run_sopt != 0) && (compiler == 1)) {
+                            addstr(&execlist, "-lkapio");
+                        }
+                        if (compiler == 3) {
+                            if (D_1000C130 == 2) {
+                                addstr(&execlist, "-lc_s");
+                                if (xpg_flag != 0) {
+                                    addstr(&execlist, "-dont_warn_unused");
+                                    addstr(&execlist, "-lgen");
+                                    addstr(&execlist, "-warn_unused");
+                                }
+                                addstr(&execlist, "-lc");
+                            } else {
+                                if ((irix4 != 0) && (B_1000ED74 == 0)) {
+                                    addstr(&execlist, "-lmpc");
+                                }
+                                if (B_1000ED2C != 0) {
+                                    addstr(&execlist, "-lc_s");
+                                } else if (B_1000ED30 != 0) {
+                                    addstr(&execlist, "-lc_s");
+                                }
+                                if (xpg_flag != 0) {
+                                    addstr(&execlist, "-dont_warn_unused");
+                                    addstr(&execlist, "-lgen");
+                                    addstr(&execlist, "-warn_unused");
+                                }
+                                addstr(&execlist, "-lc");
+                            }
+                        } else {
+                            if ((irix4 != 0) && (cmp_flag & 0x10000)) {
+                                addstr(&execlist, "-lmpc");
+                            }
+                            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                                spD0 = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
+                                if (spD0 != 0) {
+                                    addstr(&execlist, "-dont_warn_unused");
+                                }
+                                if (exception_handling != 0) {
+                                    addstr(&execlist, "-lCsup");
+                                }
+                                addstr(&execlist, "-lC");
+                                if (spD0 != 0) {
+                                    addstr(&execlist, "-warn_unused");
+                                }
+                            }
+                            if (B_1000ED2C != 0) {
+                                addstr(&execlist, "-lc_s");
+                            } else if (B_1000ED30 != 0) {
+                                addstr(&execlist, "-lc_s");
+                            }
+                            if (xpg_flag != 0) {
+                                addstr(&execlist, "-dont_warn_unused");
+                                addstr(&execlist, "-lgen");
+                                addstr(&execlist, "-warn_unused");
+                            }
+                            addstr(&execlist, "-lc");
+                        }
+                    }
+                    if (crtn_required != 0) {
+                        addstr(&execlist, crtn);
+                    }
+                    if (rls_id_object != NULL) {
+                        addstr(&execlist, rls_id_object);
+                    }
+                }
+                passin = NULL;
+                if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
+                    runerror += 1;
+                    if (Kflag == 0) {
+                        if ((strcmp(LD, "old_ld") == 0) ||
+                            ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)))) {
+                            if (outfile != NULL) {
+                                unlink(outfile);
+                            } else {
+                                unlink("a.out");
+                            }
+                        }
+                        if (tmp_uldobj != NULL) {
+                            unlink(tmp_uldobj);
+                        }
+                    }
+                }
+                if (tempstr[32] != NULL) {
+                    if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
+                        execlist.length = 0;
+                        addstr(&execlist, "c++filt");
+                        run(filter, execlist.entries, tempstr[32], NULL, NULL);
+                    }
+                    unlink(tempstr[32]);
+                }
+                if ((runerror == 0) && (compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    execlist.length = 0;
+                    addstr(&execlist, patch);
+                    if (vflag != 0) {
+                        addstr(&execlist, "-d");
+                    }
+                    if (outfile != NULL) {
+                        addstr(&execlist, outfile);
+                    } else {
+                        addstr(&execlist, "a.out");
+                    }
+                    if (run(patch, execlist.entries, NULL, NULL, NULL) != 0) {
+                        runerror += 1;
+                    }
+                }
+                if ((runerror == 0) && (do_strip != 0)) {
+                    execlist.length = 0;
+                    addstr(&execlist, strip);
+                    if (outfile != NULL) {
+                        addstr(&execlist, outfile);
+                    } else {
+                        addstr(&execlist, "a.out");
+                    }
+                    if (run(strip, execlist.entries, NULL, NULL, NULL) != 0) {
+                        runerror += 1;
+                    }
+                }
+            }
+        block_2588:
+            if ((cordflag != 0) && (runerror == 0)) {
+                execlist.length = 0;
+                addstr(&execlist, "cord");
+                if (vflag != 0) {
+                    addstr(&execlist, "-v");
+                }
+                addlist(&execlist, &cordflags);
+                if (outfile != NULL) {
+                    passout = outfile;
+                } else {
+                    passout = "a.out";
+                }
+                addstr(&execlist, "-o");
+                addstr(&execlist, passout);
+                addstr(&execlist, tempstr[22]);
+                if (feedlist.length != 0) {
+                    addlist(&execlist, &feedlist);
+                } else {
+                    addstr(&execlist, mkstr(passout, ".fb", NULL));
+                }
+                if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror += 1;
+                    unlink(passout);
+                    unlink(tempstr[22]);
+                } else {
+                    unlink(tempstr[22]);
+                }
+            }
+            if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && (Kflag == 0)) {
+                unlink(mksuf(*srcfiles.entries, 0x6F));
+            }
+        }
+    }
+    if (tmp_uldobj != NULL) {
+        unlink(tmp_uldobj);
+    }
+    if (editflag != 0) {
+        unlink(errout);
+        if (editflag == 2) {
+            unlink(tempstr[25]);
+        }
+    }
+    if ((compiler == 1) && (gflag >= 2)) {
+        unlink(tempstr[33]);
+    }
+    if (runerror != 0) {
+        exit(1);
+    }
+    return 0;
 }
 
 #endif
