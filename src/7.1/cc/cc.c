@@ -50,7 +50,7 @@ void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, con
 
 char* mkstr();
 void mklist(list* arg0);
-void addstr(); // (list* arg0, char* str), but sometimes called incorrectly
+void addstr(); // (list* arg0, char* str), but sometimes called incorrectly, have to use K&R
 void addspacedstr(list* arg0, char* str);
 char* newstr(const char* src);
 int save_place(list* arg0);
@@ -3132,6 +3132,7 @@ repeat_after_edit:
                 addstr(&execlist,
                         mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
             }
+            //! @bug addstr called with extra argument
             addstr(&execlist, "-include=/usr/include", 0);
             addstr(&execlist, "-cp=i");
             addlist(&execlist, &soptflags);
@@ -3242,6 +3243,7 @@ repeat_after_edit:
                 addstr(&execlist,
                         mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
             }
+            //! @bug addstr called with extra argument
             addstr(&execlist, "-include=/usr/include", 0);
             addstr(&execlist, "-cp=i");
             if (mp_prepass_count <= spFC) {
@@ -8842,7 +8844,11 @@ void mklist(list* arg0) {
 
 // function addstr # 14
 // Add a single string entry to a list.
-void addstr(list* arg0, char* str) {
+void addstr (arg0, str)
+    list* arg0;
+    char* str;
+{
+// void addstr(list* arg0, char* str) {
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
