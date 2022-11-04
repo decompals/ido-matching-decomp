@@ -17,7 +17,7 @@ ifeq ($(VERSION),7.1)
 # else ifeq ($(VERSION),5.3)
 # 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
 else
-	$(error Unknown or unsupported IDO version - $(VERSION))
+$(error Unknown or unsupported IDO version - $(VERSION))
 endif
 
 

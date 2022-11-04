@@ -1,10 +1,10 @@
 /* Handwritten */
 
 // function __start # 0
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/__start.s")
+// #pragma GLOBAL_ASM("asm/7.1/functions/cc/__start.s")
 
 // function _mcount # 1
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/_mcount.s")
+// #pragma GLOBAL_ASM("asm/7.1/functions/cc/_mcount.s")
 
 #include "signal.h"
 #include "wait.h"
@@ -18,6 +18,8 @@
 #include "ctype.h"
 #include "sys/stat.h"
 #include "sys/fcntl.h"
+#include "ucontext.h"
+#include "sys/procfs.h"
 
 /* File, -O1 */
 typedef struct {
@@ -10660,4 +10662,4 @@ static char* func_00433534(const char* arg0) {
 
 // gethostsex
 
-#pragma GLOBAL_ASM("asm/7.1/functions/cc/__Release_ID.s")
+//#pragma GLOBAL_ASM("asm/7.1/functions/cc/__Release_ID.s")
