@@ -8,7 +8,6 @@
 
 #include "signal.h"
 #include "wait.h"
-#include "cc.h"
 #include "sex.h"
 #include "sys/times.h"
 #include "utime.h"
@@ -20,6 +19,22 @@
 #include "sys/fcntl.h"
 #include "ucontext.h"
 #include "sys/procfs.h"
+#include "string.h"
+#include "malloc.h"
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
+
+#ifndef _UINTPTR_T
+typedef unsigned long int	uintptr_t;
+#define _UINTPTR_T
+#endif
 
 /* File, -O1 */
 typedef struct {
@@ -88,7 +103,7 @@ int add_cxx_symbol_options(void);
 char* full_path(const char* relative_path);
 void add_static_opt(char* opt);
 
-void record_static_fileset(s32 arg0);
+void record_static_fileset(int arg0);
 int touch(const char* arg0);
 void add_prelinker_objects(list* arg0, list* arg1);
 
@@ -132,7 +147,7 @@ int fullwarn;
 char* aligndir;
 int docpp;
 int default_nocpp;
-u32 j; // ?
+unsigned int j; // ?
 char* tstring;
 char* hstring;
 char* Bstring;
@@ -518,7 +533,7 @@ int mp_prepass_count = 0;
 // not sure about this struct
 typedef struct {
     const char* unk_0;
-    u32 unk_4;
+    unsigned int unk_4;
 } struct_mpflags;
 
 struct_mpflags mpflags[] = {
@@ -598,7 +613,7 @@ int main(int argc, char** argv) {
     char spE7;
     int spE0;
     int spDC;
-    u32 spD8;
+    unsigned int spD8;
     char* spD4;
     int spD0;
     struct stat sp48;
@@ -4889,7 +4904,7 @@ void process_config(int argc, char** argv) {
     char* sp1140;
     FILE* sp113C;
     char sp13C[0x1000];
-    s32 sp138;
+    int sp138;
     char* sp38[0x40];
 
     for (i = 1; i < argc; i++) {
@@ -8981,8 +8996,8 @@ void addlist(list* arg0, list* arg1) {
 // - then everything from arg1,
 // - then the rest of arg2.
 void adduldlist(list* arg0, list* arg1, list* arg2) {
-    s32 sp3C;
-    s32 sp38;
+    int sp3C;
+    int sp38;
 
     if ((arg0->length + arg1->length + arg2->length + 1) >= arg0->capacity) {
 
@@ -9022,8 +9037,8 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 
 // function nodup # 21
 // Search for a string in a list. If found, return 0, else return 1.
-s32 nodup(list* arg0, const char* str) {
-    register s32 i;
+int nodup(list* arg0, const char* str) {
+    register int i;
     register char* entry;
 
     for (i = 0; i < arg0->length; i++) {
@@ -9091,8 +9106,8 @@ char getsuf(const char* path) {
 
 // function mksuf # 23
 char* mksuf(const char* path, char value) {
-    s32 i; // sp54
-    s32 k; // sp50, also suffix length
+    int i; // sp54
+    int k; // sp50, also suffix length
     size_t sp4C;
     char* sp48;
     char* sp44;
@@ -9427,15 +9442,15 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 }
 
 // function edit_src # 27
-s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
-    s32 pad[3];
+int edit_src(const char* arg0, char* arg1, int arg2) {
+    int pad[3];
     char* sp58;
     pid_t forkPid;
     pid_t sp50;
-    s32 temp_t7; // sp4C
+    int temp_t7; // sp4C
     SIG_PF sp48;
     SIG_PF sp44;
-    s32 stat_loc;
+    int stat_loc;
 
     forkPid = fork();
     if (forkPid == (pid_t)-1) { // fork failed
@@ -9500,7 +9515,7 @@ s32 edit_src(const char* arg0, char* arg1, s32 arg2) {
 // function get_lino # 28
 #define GET_LINO_BUF_SIZE 0x800
 // arg2 is probably a size_t
-void get_lino(char* arg0, const char* arg1, s32 arg2) {
+void get_lino(char* arg0, const char* arg1, int arg2) {
     char* sp83C;
     int sp838;
     char* sp834 = arg0;
@@ -9674,7 +9689,7 @@ void cleanup(void) {
 
 // function whats # 32
 void whats(void) {
-    s32 sp24 = runerror;
+    int sp24 = runerror;
 
     if (compiler == 2) {
         printf("%s  (%s)\n", progname, "pc");
@@ -9703,23 +9718,23 @@ void settimes(void) {
 void dotime(const char* programName) {
     clock_t time1; // sp6C;
     clock_t clockTimeDiff;
-    f64 milis;      // sp60
-    f64 seconds;    // sp58
+    double milis;      // sp60
+    double seconds;    // sp58
     struct tms tm1; // sp48;
 
     time1 = times(&tm1);
-    milis = (f64)(tm1.tms_utime + tm1.tms_cutime - tm0.tms_utime - tm0.tms_cutime) / CLOCK_TICKS;
-    seconds = (f64)(tm1.tms_stime + tm1.tms_cstime - tm0.tms_stime - tm0.tms_cstime) / CLOCK_TICKS;
+    milis = (double)(tm1.tms_utime + tm1.tms_cutime - tm0.tms_utime - tm0.tms_cutime) / CLOCK_TICKS;
+    seconds = (double)(tm1.tms_stime + tm1.tms_cstime - tm0.tms_stime - tm0.tms_cstime) / CLOCK_TICKS;
     clockTimeDiff = time1 - time0;
     fprintf(stderr, "%s phase time: %.2fu %.2fs %u:%04.1f %.0f%%\n", programName, milis, seconds,
-            clockTimeDiff / (60 * CLOCK_TICKS), (f64)(clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS,
-            ((milis + seconds) / ((f64)clockTimeDiff / CLOCK_TICKS)) * 100.0);
+            clockTimeDiff / (60 * CLOCK_TICKS), (double)(clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS,
+            ((milis + seconds) / ((double)clockTimeDiff / CLOCK_TICKS)) * 100.0);
 }
 
 // function func_0042FD7C # 35
 // Search for a lib in directories (?)
 static char* func_0042FD7C(const char* name, char** dirs) {
-    s32 fildes;
+    int fildes;
     char* path;
 
     for (; *dirs != NULL; dirs++) {
@@ -9750,7 +9765,7 @@ static char* func_0042FD7C(const char* name, char** dirs) {
 
 // function isdir # 36
 int isdir(const char* path) {
-    s32 spAC;
+    int spAC;
     struct stat statbuf;
 
     spAC = stat(path, &statbuf);
@@ -9765,7 +9780,7 @@ int isdir(const char* path) {
 
 // function regular_not_writeable # 37
 int regular_not_writeable(const char* arg0) {
-    s32 sp24;
+    int sp24;
 
     if (regular_file(arg0) != 1) {
         return 0;
@@ -9781,7 +9796,7 @@ int regular_not_writeable(const char* arg0) {
 // function regular_file # 38
 // Needs stat.h
 int regular_file(const char* path) {
-    s32 spAC;
+    int spAC;
     struct stat statbuf;
 
     spAC = stat(path, &statbuf);
@@ -10038,11 +10053,11 @@ static char* D_1000C2E8;
 static char* D_1000C2EC;
 char* tmpdir;
 
-void record_static_fileset(s32 arg0) {
-    s32 sp28E4;
+void record_static_fileset(int arg0) {
+    int sp28E4;
     FILE* sp28E0;
     FILE* sp28DC;
-    s32 sp28D8;
+    int sp28D8;
     char spD8[0x2800];
     char* spD4;
     size_t spD0;
@@ -10209,8 +10224,8 @@ void add_prelinker_objects(list* arg0, list* arg1) {
 
 // function quoted_length # 51
 size_t quoted_length(const char* arg0, int* arg1) {
-    u32 len = 0;
-    u8 ch;
+    unsigned int len = 0;
+    unsigned char ch;
 
     *arg1 = 0;
     while (ch = *arg0++) { // != 0 does not match
@@ -10289,7 +10304,7 @@ static void func_00431B38(int first, int count) {
 // function func_00431B88 # 55
 
 // arg2 is verbosity?
-static void func_00431B88(FILE* arg0, const char* arg1, s32 arg2) {
+static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
     if (arg2) {
         fputs("CMDLINE=", arg0);
     }
@@ -10360,8 +10375,8 @@ static void func_00431DD8(void) {
 
 // Search file for the first "----" and move position to the line after it
 void skip_old_ii_controls(FILE* arg0) {
-    s32 ch;
-    s32 sp50 = FALSE;
+    int ch;
+    int sp50 = FALSE;
 
     ch = getc_locked(arg0);
     while (ch != EOF) {
@@ -10530,11 +10545,11 @@ static void func_00432C94(void) {
 }
 
 // function func_00432D3C # 64
-static void func_00432D3C(const char* arg0, s32 count) {
+static void func_00432D3C(const char* arg0, int count) {
     int i;
-    s32 identified_segment;
-    u32 flags;
-    s32 pagesize;
+    int identified_segment;
+    unsigned int flags;
+    int pagesize;
     size_t text_size;
     size_t data_size;
     size_t brk_size;
