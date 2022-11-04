@@ -33,6 +33,9 @@ static const char STR_1000061C[] = "/";
 
 /**
  * _ftext
+ *
+ * Not clear what this is, but it's a separate section if not a separate file
+ *
  * Address: 0x00405550
  * VROM: 0x005550
  * Size: 0x10
@@ -42,12 +45,15 @@ static const char STR_1000061C[] = "/";
 
 /**
  * func_00405560
+ *
+ * This should be mips.STUBS
+ *
  * Address: 0x00405560
  * VROM: 0x005560
  * Size: 0x400
  */
 // /* static */ int func_00405560();
-// #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
+#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
 
 /**
  * __start
@@ -647,4 +653,3 @@ static const char STR_10006A18[] = "Delta C++";
  */
 // /* static */ int func_0043673C();
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_0043673C.s")
-
