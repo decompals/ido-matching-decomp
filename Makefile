@@ -13,8 +13,9 @@ CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
-	IDO_TC      := cc cfe
-# else ifeq ($(VERSION),5.3)
+	IDO_TC      := cc cfe libc.so.1
+else ifeq ($(VERSION),5.3)
+	IDO_TC      := cc
 # 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
@@ -73,6 +74,13 @@ OPTFLAGS := -O1
 MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
+ifeq ($(VERSION),5.3)
+  CC := $(CC_OLD)
+  OPTFLAGS := -O1
+  MIPS_VERSION := -mips1
+  ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
+endif
+
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
 CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS)
 
@@ -106,6 +114,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
+build/src/5.3/mld/%.o: OPTFLAGS := -O2
 
 # Targets
 

@@ -11587,7 +11587,7 @@ static void func_00432D3C(const char* arg0, int count) {
     for (i = 0; i < count; i++) {
         identified_segment = FALSE;
         flags = B_1000CAC0[i].pr_mflags & 0xFFFF;
-        if (flags == (MA_PRIMARY | 0xD)) {
+        if (flags == (MA_READ | MA_EXEC | MA_SHARED | MA_PRIMARY)) {
             text_size += B_1000CAC0[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
