@@ -5730,8 +5730,8 @@ void parse_command(int argc, char** argv) {
                                         }
                                         break;
 
-                                    case '0':               /* switch 2 */
-                                    case 'f':               /* switch 2 */
+                                    case '0': /* switch 2 */
+                                    case 'f': /* switch 2 */
                                         switch (compiler) {
                                             case COMPILER_2:
                                                 addstr(&upasflags, Warg);
