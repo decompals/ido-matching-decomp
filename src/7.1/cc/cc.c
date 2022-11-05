@@ -17,6 +17,7 @@
 #include "ctype.h"
 #include "sys/stat.h"
 #include "sys/fcntl.h"
+#include "sys/ioctl.h"
 #include "ucontext.h"
 #include "sys/procfs.h"
 #include "string.h"
