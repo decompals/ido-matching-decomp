@@ -10,6 +10,7 @@
 #include "wait.h"
 #include "sex.h"
 #include "sys/times.h"
+#include "stdlib.h"
 #include "utime.h"
 #include "varargs.h"
 #include "errno.h"
@@ -108,7 +109,7 @@ int add_cxx_symbol_options(void);
 char* full_path(const char* relative_path);
 void add_static_opt(char* opt);
 
-void record_static_fileset(int arg0);
+void record_static_fileset(const char* arg0);
 int touch(const char* arg0);
 void add_prelinker_objects(list* arg0, list* arg1);
 
@@ -196,7 +197,7 @@ FILE* tmpsfile;
 list undefineflags;
 char* editor;
 list cppflags;
-int xserver;
+char* xserver;
 list olimitflags;
 int times_edited;
 list acppflags;
@@ -9901,7 +9902,7 @@ int edit_src(const char* arg0, char* arg1, int arg2) {
 #define GET_LINO_BUF_SIZE 0x800
 // arg2 is probably a size_t
 void get_lino(char* arg0, const char* arg1, int arg2) {
-    char* sp83C;
+    int sp83C;
     int sp838;
     char* sp834 = arg0;
     char* sp830;
@@ -10438,7 +10439,7 @@ static char* D_1000C2E8;
 static char* D_1000C2EC;
 char* tmpdir;
 
-void record_static_fileset(int arg0) {
+void record_static_fileset(const char* arg0) {
     int sp28E4;
     FILE* sp28E0;
     FILE* sp28DC;
