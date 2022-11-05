@@ -160,13 +160,13 @@ int fullwarn;                 //!< flag, boolean. Set by "-fullwarn"
 char* aligndir;               //!< Set to comp_host_root + "lib/align" and not used
 int docpp;                    //!< flag, boolean. Whether to use the preprocessor?
 int default_nocpp;            //!< flag, boolean
-unsigned int j;               // ?
-char* tstring;
-char* hstring;
-char* Bstring;
-const char* allBstring;
-static UNK_TYPE B_1000E55C; // Unused
-char alltstring[20];
+unsigned int j;               // Looks like a normal index variable, but is global bss for some reason
+char* tstring;                //!< Used as the first argument of relocate_passes()
+char* hstring;                //!< Used as the second argument of relocate_passes()
+char* Bstring;                //!< Used as the third argument of relocate_passes()
+const char* allBstring;       //!< Sometimes set in relocate_passes()
+static UNK_TYPE B_1000E55C;   // Unused
+char alltstring[20];          //!< Used in relocate_passes()
 char* Warg;
 char* Wpass;
 char* Kpass;  // Start of current "-K" argument
@@ -322,10 +322,16 @@ UNK_TYPE __rld_obj_head;    // Unused
 int __Argc;                 // Unused
 
 // data
-
-// data
 char* LD = "ld";
-int ansichoice = 3;
+
+typedef enum AnsiChoice {
+    /* 0 */ ANSICHOICE_KR,
+    /* 1 */ ANSICHOICE_ANSI,
+    /* 2 */ ANSICHOICE_ANSIPOSIX,
+    /* 3 */ ANSICHOICE_XANSI
+} AnsiChoice;
+
+int ansichoice = ANSICHOICE_XANSI;
 int c_compiler_choice = 0;
 
 struct _struct_suffixes_0x8 {
@@ -587,7 +593,7 @@ int acpp_traditional = 0;
 int G_flag = 0;
 int dn_flag = 0;
 int edison_cpp = 1;
-char* edison_type = (char*)1;
+int edison_type = 1;
 int exception_handling = 0;
 char* Gnum = "0";
 int runerror = 0;
@@ -653,8 +659,10 @@ int main(int argc, char** argv) {
     sp148 = 0;
     sp144 = NULL;
     sp140 = NULL;
-    progname = *argv;
-    if ((ansichoice == 1) || (ansichoice == 2)) {
+
+    progname = argv[0];
+
+    if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
         CRTX = "acrt1.o";
     } else {
         CRTX = "crt1.o";
@@ -662,10 +670,12 @@ int main(int argc, char** argv) {
     MCRTX = "mcrt1.o";
     m4 = "/usr/bin/m4";
     ratfor = "/usr/bin/ratfor";
+
     xpg_env = getenv("_XPG");
     if (xpg_env != NULL) {
         xpg_flag = 1;
     }
+
     mklist(&undefineflags);
     mklist(&cppflags);
     mklist(&ccomflags);
@@ -719,10 +729,12 @@ int main(int argc, char** argv) {
     compdirs[6] = mkstr("cobol", "/", NULL);
 
     call_shared = default_call_shared;
+
     sp13C = getenv("SGI_SVR4");
     if (sp13C != NULL) {
         default_svr4 = 1;
     }
+
     sp138 = getenv("SGI_CC");
     if (sp138 != NULL) {
         while (isspace(*sp138)) {
@@ -737,21 +749,21 @@ int main(int argc, char** argv) {
                 sp134--;
             }
             sp134++;
-            sp134[0] = 0;
+            *sp134 = '\0';
             if (strcmp(sp138, "-cckr") == 0) {
-                ansichoice = 0;
+                ansichoice = ANSICHOICE_KR;
                 cppchoice = 2;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-ansi") == 0) {
-                ansichoice = 1;
+                ansichoice = ANSICHOICE_ANSI;
                 cppchoice = 3;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-xansi") == 0) {
-                ansichoice = 3;
+                ansichoice = ANSICHOICE_XANSI;
                 cppchoice = 3;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-ansiposix") == 0) {
-                ansichoice = 2;
+                ansichoice = ANSICHOICE_ANSIPOSIX;
                 cppchoice = 3;
                 relocate_passes("p", NULL, NULL);
             } else {
@@ -765,10 +777,14 @@ int main(int argc, char** argv) {
     }
     compiler = 1;
 
+    // Find the basename of the executable (look for the last '/' in the program name. If there is no '/', progname is
+    // the basename, otherwise basename starts 1 char past the found '/'.
     var_s1 = strrchr(progname, '/');
     var_s1 = (var_s1 == NULL) ? progname : var_s1 + 1;
+
     compdirs[0] = mkstr(var_s1, "/", NULL);
 
+    // Determine compiler based on basename of executable
     if (strncmp(var_s1, "cc", strlen("cc")) == 0) {
         compiler = 1;
         Bstring = var_s1 + strlen("cc");
@@ -837,15 +853,19 @@ int main(int argc, char** argv) {
         comp_host_root = mkstr(comp_host_root, "/", NULL);
     }
     aligndir = mkstr(comp_host_root, "lib/align", NULL);
+
     sp12C = getenv("DCC_STD_PATHS");
-    D_1000BF8C = sp12C == NULL || *sp12C == 0 || *sp12C == '0';
+    D_1000BF8C = (sp12C == NULL) || (*sp12C == '\0') || *sp12C == '0';
     if (D_1000BF8C == 0) {
         D_1000BF90 = D_1000BF8C;
     }
+
     if (force_use_cfront(argc, argv)) {
         exec_OCC(argc, argv);
     }
+
     func_00431A3C(argc, argv);
+
     tmpdir = getenv("TMPDIR");
     if (tmpdir == NULL) {
         tmpdir = "/tmp/";
@@ -862,6 +882,7 @@ int main(int argc, char** argv) {
         fclose(tmpsfile);
         unlink(passout);
     }
+
     rls_id_object = getenv("RLS_ID_OBJECT");
 
     for (i = 1; i < argc; i++) {
@@ -1059,12 +1080,12 @@ int main(int argc, char** argv) {
     if ((cmp_flag != 0) && (gflag != 0) && (cmp_flag & 1)) {
         cmp_flag |= 4;
     }
-    if ((ansichoice == 1) || (ansichoice == 2)) {
+    if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
         CRTX = "acrt1.o";
         crtn_required = 1;
     }
     relocate_passes("r", NULL, NULL);
-    if ((B_1000ED30 != 0) && (compiler == 1) && ((ansichoice == 1) || (ansichoice == 2))) {
+    if ((B_1000ED30 != 0) && (compiler == 1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX))) {
         error(2, NULL, 0, NULL, 0,
               "'-lc_s' specified. Shared version of C library does not conform to ANSI X3.159-1989.\n");
     }
@@ -1090,13 +1111,13 @@ int main(int argc, char** argv) {
     get_host_chiptype();
     if (targetsex == 0) {
         addstr(&cppflags, "-D_MIPSEB");
-        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+        if ((compiler != 1) || (ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&cppflags, "-DMIPSEB");
         }
-        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+        if ((compiler == 1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) || ((ansichoice == ANSICHOICE_XANSI) && (irix4 == 0)))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
-        if ((compiler == 1) && (ansichoice == 2)) {
+        if ((compiler == 1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
             addstr(&cppflags, "-D_POSIX_SOURCE=1");
         }
         addstr(&ccomflags, "-EB");
@@ -1112,13 +1133,13 @@ int main(int argc, char** argv) {
     } else {
         addstr(&cppflags, "-D_MIPSEL");
         addstr(&cppflags, "-D_MIPSEL");
-        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+        if ((compiler != 1) || (ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&cppflags, "-DMIPSEL");
         }
-        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+        if ((compiler == 1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) || ((ansichoice == ANSICHOICE_XANSI) && (irix4 == 0)))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
-        if ((compiler == 1) && (ansichoice == 2)) {
+        if ((compiler == 1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
             addstr(&cppflags, "-D_POSIX_SOURCE=1");
         }
         addstr(&ccomflags, "-EL");
@@ -1476,14 +1497,14 @@ int main(int argc, char** argv) {
             switch (ansichoice) {
                 case 1:
                 case 2:
-                    edison_type = (char*)2;
+                    edison_type = 2;
                     break;
                 case 3:
-                    edison_type = (char*)1;
+                    edison_type = 1;
                     break;
                 default:
                 case 0:
-                    edison_type = (char*)3;
+                    edison_type = 3;
                     break;
             }
         }
@@ -1491,12 +1512,12 @@ int main(int argc, char** argv) {
     repeat_after_edit:
         if (compchoice == 0) {
             if (irix4 != 0) {
-                if (ansichoice == 0) {
+                if (ansichoice == ANSICHOICE_KR) {
                     compchoice = 1;
                 } else {
                     compchoice = 2;
                 }
-            } else if (ansichoice == 0) {
+            } else if (ansichoice == ANSICHOICE_KR) {
                 compchoice = 3;
             } else {
                 compchoice = 3;
@@ -1616,7 +1637,7 @@ int main(int argc, char** argv) {
         }
         if ((srcsuf == 0x63) || (srcsuf == 6) ||
             ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 0x68))) {
-            if ((cppchoice != 2) || ((oldcppflag != 0) && (ansichoice != 0))) {
+            if ((cppchoice != 2) || ((oldcppflag != 0) && (ansichoice != ANSICHOICE_KR))) {
                 cppchoice = 1;
                 relocate_passes("p", NULL, NULL);
             }
@@ -1676,7 +1697,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-nostdinc");
             }
             if (cppchoice == 1) {
-                if ((ansichoice == 0) || (ansichoice == 3)) {
+                if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                     addstr(&execlist, "-D__EXTENSIONS__");
                 }
                 if (compchoice != 3) {
@@ -1687,7 +1708,7 @@ int main(int argc, char** argv) {
                         addstr(&execlist, "-traditional");
                     }
                     addstr(&execlist, "-trigraphs");
-                    if (ansichoice != 0) {
+                    if (ansichoice != ANSICHOICE_KR) {
                         addstr(&execlist, "-undef");
                         addstr(&execlist, "-p");
                     }
@@ -1698,10 +1719,10 @@ int main(int argc, char** argv) {
             }
         } else {
             addstr(&execlist, "-YE");
-            if (edison_type == (char*)2) {
+            if (edison_type == 2) {
                 addstr(&execlist, "-a");
             }
-            if ((edison_type == (char*)1) || (edison_type == (char*)3)) {
+            if ((edison_type == 1) || (edison_type == 3)) {
                 addstr(&execlist, "-D__EXTENSIONS__");
             }
         }
@@ -1719,7 +1740,7 @@ int main(int argc, char** argv) {
                             addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
                         }
                     } else {
-                        if ((ansichoice == 0) || (ansichoice == 3)) {
+                        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                             addstr(&execlist, "-DLANGUAGE_C");
                         }
                         addstr(&execlist, "-D_LANGUAGE_C");
@@ -1758,7 +1779,7 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        if ((ansichoice == 0) || (ansichoice == 3)) {
+        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&execlist, "-D__INLINE_INTRINSICS");
             addstr(&execlist, "-Dsgi");
             if (svr4_systype == 0) {
@@ -1779,14 +1800,14 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-dollar");
             }
         }
-        if ((ansichoice == 0) || (ansichoice == 3)) {
+        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&execlist, "-Dunix");
             addstr(&execlist, "-Dmips");
             addstr(&execlist, "-Dhost_mips");
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
             if (irix4 == 0) {
-                if ((svr4_systype != 0) && (ansichoice != 1) && (ansichoice != 2)) {
+                if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
@@ -1800,7 +1821,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
             if (irix4 == 0) {
-                if ((svr4_systype != 0) && (ansichoice != 1) && (ansichoice != 2)) {
+                if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
@@ -1815,13 +1836,13 @@ int main(int argc, char** argv) {
             while (*var_s1 != '\0') {
                 *var_s1++ = toupper(*var_s1);
             }
-            if ((ansichoice == 0) || (ansichoice == 3)) {
+            if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, mkstr("-DSYSTYPE_", systype, NULL));
             }
             addstr(&execlist, mkstr("-D_SYSTYPE_", systype, NULL));
         }
         if (svr4_systype == 0) {
-            if ((ansichoice == 0) || (ansichoice == 3)) {
+            if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, "-DSYSTYPE_SYSV");
             }
             addstr(&execlist, "-D_SYSTYPE_SYSV");
@@ -1829,7 +1850,7 @@ int main(int argc, char** argv) {
         if (sixty4bitflag != 0) {
             addstr(&execlist, "-D__64BIT");
         }
-        if (((ansichoice == 0) || (ansichoice == 3)) && (longlong_emitted == 0)) {
+        if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && (longlong_emitted == 0)) {
             addstr(&execlist, "-D_LONGLONG");
             longlong_emitted = 1;
         }
@@ -1965,7 +1986,7 @@ int main(int argc, char** argv) {
             if (sixty4bitflag != 0) {
                 addstr(&execlist, "-D__64BIT");
             }
-            if (((ansichoice == 0) || (ansichoice == 3)) && (longlong_emitted == 0)) {
+            if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && (longlong_emitted == 0)) {
                 addstr(&execlist, "-D_LONGLONG");
                 longlong_emitted = 1;
             }
@@ -2020,11 +2041,11 @@ int main(int argc, char** argv) {
             }
         }
         if (((Pflag != 0) || (Eflag != 0)) && (c_compiler_choice == 0)) {
-            if ((ansichoice == 1) || (ansichoice == 2)) {
+            if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                 addstr(&execlist, "-std1");
-            } else if (ansichoice == 3) {
+            } else if (ansichoice == ANSICHOICE_XANSI) {
                 addstr(&execlist, "-std");
-            } else if (ansichoice == 0) {
+            } else if (ansichoice == ANSICHOICE_KR) {
                 addstr(&execlist, "-std0");
             }
         }
@@ -2051,7 +2072,7 @@ int main(int argc, char** argv) {
 
             } else if (c_compiler_choice == 3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == (char*)3) {
+            } else if (edison_type == 3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
@@ -2172,7 +2193,7 @@ int main(int argc, char** argv) {
             }
             addstr(&execlist, mkstr("-CMP=", passout, NULL));
             addstr(&execlist, "-cp=i");
-            if (ansichoice == 0) {
+            if (ansichoice == ANSICHOICE_KR) {
                 addstr(&execlist, "-sy=k");
             }
             addlist(&execlist, &soptflags);
@@ -2258,7 +2279,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, mkstr("-L=", sp110, NULL));
             addstr(&execlist, "-lo=ls");
             addstr(&execlist, "-cp=i");
-            if (ansichoice == 0) {
+            if (ansichoice == ANSICHOICE_KR) {
                 addstr(&execlist, "-sy=k");
             }
             addlist(&execlist, &pcaflags);
@@ -2368,7 +2389,7 @@ int main(int argc, char** argv) {
             if (c_compiler_choice == 2) {
             } else if (c_compiler_choice == 3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == (char*)3) {
+            } else if (edison_type == 3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
@@ -2445,9 +2466,9 @@ int main(int argc, char** argv) {
                 addstr(&execlist, mpc);
                 addstr(&execlist, passin);
                 addstr(&execlist, mkstr("-K", passout, NULL));
-                if ((ansichoice == 1) || (ansichoice == 2)) {
+                if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-ansi");
-                } else if (ansichoice == 0) {
+                } else if (ansichoice == ANSICHOICE_KR) {
                     addstr(&execlist, "-cckr");
                 } else {
                     addstr(&execlist, "-xansi");
@@ -2518,11 +2539,11 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-G");
                     addstr(&execlist, Gnum);
                 }
-                if ((ansichoice == 1) || (ansichoice == 2)) {
+                if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-std1");
-                } else if (ansichoice == 3) {
+                } else if (ansichoice == ANSICHOICE_XANSI) {
                     addstr(&execlist, "-std");
-                } else if (ansichoice == 0) {
+                } else if (ansichoice == ANSICHOICE_KR) {
                     addstr(&execlist, "-std0");
                 }
                 if (prototype_checking_on != 0) {
@@ -2618,7 +2639,7 @@ int main(int argc, char** argv) {
             goto block_1729;
         }
         execlist.length = 0;
-        addstr(&execlist, ansichoice != 0 ? "accom" : "ccom");
+        addstr(&execlist, ansichoice != ANSICHOICE_KR ? "accom" : "ccom");
         if (vflag != 0) {
             addstr(&execlist, "-Xv");
         }
@@ -2632,11 +2653,11 @@ int main(int argc, char** argv) {
         if (use_real_fp) {
             addstr(&execlist, "-Xreal_fp");
         }
-        if ((prototype_checking_on != 0) || (ansichoice != 0)) {
+        if ((prototype_checking_on != 0) || (ansichoice != ANSICHOICE_KR)) {
             addstr(&execlist, "-Xprototypes");
         }
-        if (ansichoice != 0) {
-            if (ansichoice == 3) {
+        if (ansichoice != ANSICHOICE_KR) {
+            if (ansichoice == ANSICHOICE_XANSI) {
                 addstr(&execlist, "-Xxansi");
             } else {
                 addstr(&execlist, "-Xansi");
@@ -3543,7 +3564,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "_rld_new_interface");
             }
         }
-        if ((allBstring != NULL) && (*allBstring != 0)) {
+        if ((allBstring != NULL) && (*allBstring != '\0')) {
             addstr(&execlist, mkstr("-kB", allBstring, NULL));
         }
         addlist(&execlist, &uldflags);
@@ -4504,7 +4525,7 @@ int main(int argc, char** argv) {
         if (fiveflag != 0) {
             addstr(&execlist, mkstr("-L", runlib, NULL));
         }
-        if ((allBstring != NULL) && (*allBstring != 0)) {
+        if ((allBstring != NULL) && (*allBstring != '\0')) {
             addstr(&execlist, mkstr("-B", allBstring, NULL));
         }
         if (cordflag != 0) {
@@ -4607,7 +4628,7 @@ int main(int argc, char** argv) {
                 addlist(&execlist, &dashlfiles);
             }
             addlist(&execlist, &ldZflags);
-            if ((ansichoice == 0) && (compiler == 1) && (irix4 == 0)) {
+            if ((ansichoice == ANSICHOICE_KR) && (compiler == 1) && (irix4 == 0)) {
                 addstr(&execlist, "-cckr");
             }
             addstr(&execlist, "-nocount");
@@ -5663,12 +5684,12 @@ void parse_command(int argc, char** argv) {
 
                 case 'W': /* switch 1 */
                     Wpass = argv[var_s0] + 2;
-                    if (*Wpass != 0) {
+                    if (*Wpass != '\0') {
                         if (1) {} // FAKE
                         Warg = argv[var_s0] + 3;
 
                         while (*Warg != ',') {
-                            if (*Warg++ == 0) {
+                            if (*Warg++ == '\0') {
                                 goto bad_option;
                             }
                         }
@@ -5753,7 +5774,7 @@ void parse_command(int argc, char** argv) {
 
                                     case 'o': /* switch 2 */
                                         addstr(&optflags, Warg);
-                                        if (strstr(Warg, "loopunroll") != 0) {
+                                        if (strstr(Warg, "loopunroll") != NULL) {
                                             set_loop_unroll = 1;
                                         }
                                         break;
@@ -6192,7 +6213,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-crt1") == 0) {
-                        if ((ansichoice == 1) || (ansichoice == 2)) {
+                        if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                             CRTX = "acrt1.o";
                         } else {
                             CRTX = "crt1.o";
@@ -7915,7 +7936,7 @@ void parse_command(int argc, char** argv) {
                         if (compchoice == 1) {
                             compchoice = 0;
                         }
-                        ansichoice = 3;
+                        ansichoice = ANSICHOICE_XANSI;
                         cppchoice = 3;
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
@@ -8277,7 +8298,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
         compose_G0_libs("PE1COMFIUSXnW");
     }
     for (; *var_s1 != '\0'; var_s1++) {
-        if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == 0)) {
+        if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == NULL)) {
             switch (*var_s1) {
                 case 'h':
                     if (includeB != NULL) {
@@ -8286,7 +8307,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if (eincludeB != NULL) {
                         free(eincludeB);
                     }
-                    if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != 0))) {
+                    if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != '\0'))) {
                         if (arg1 != NULL) {
                             if (fiveflag != 0) {
                                 includeB = mkstr(arg1, "usr/5include", arg2, NULL);
@@ -8347,7 +8368,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         if (cmp_flag & 0x10000) {
                             mpc = mkstr(arg1, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(arg1, ansichoice ? "accom" : "ccom", arg2, NULL);
+                        ccom = mkstr(arg1, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
                         cfe = mkstr(arg1,
                                     ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
                                         ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
@@ -8361,7 +8382,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         if (cmp_flag & 0x10000) {
                             mpc = mkstr(comp_host_root, "usr/lib/", currcomp, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp, ansichoice ? "accom" : "ccom", arg2, NULL);
+                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp,
+                                     (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
                         if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) ||
                             ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
                             cfe = mkstr(comp_host_root, "usr/lib/DCC/", currcomp,
