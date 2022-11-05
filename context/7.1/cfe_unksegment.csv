@@ -6,5 +6,6 @@ symbol,0x-07DA8,None,D_-07DA8,,WORD,None,None,0x1,0x0,,False,False,True,False,1,
 symbol,0x-07854,None,D_-07854,,WORD,None,None,0x1,0x0,,False,False,True,False,1,None,True,False,False,False
 symbol,0x-07770,None,D_-07770,,WORD,None,None,0x1,0x0,,False,False,True,False,2,None,True,False,False,False
 symbol,0x-0776C,None,D_-0776C,,WORD,None,None,0x1,0x0,,False,False,True,False,2,None,True,False,False,False
+symbol,0x000004,errno,errno,,None,0x4,None,0x4,0x0,,False,True,False,False,0,None,True,False,False,False
 symbol,0x030014,None,D_030014,,WORD,None,None,0x1,0x0,,False,False,True,False,1,None,True,False,False,False
 symbol,0x344AE9E1,None,.L344AE9E1,@jumptablelabel,None,None,None,0x1,0x0,.text,False,False,True,False,0,None,True,False,False,False
