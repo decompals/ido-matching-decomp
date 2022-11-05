@@ -9211,11 +9211,14 @@ void mklist(list* arg0) {
 }
 
 // function addstr # 14
-// Add a single string entry to a list.
-void addstr(arg0, str) list* arg0;
+// Add a single string entry to a list. K&R since incorrectly called.
+// void addstr(list* arg0, char* str) {
+void addstr(arg0, str)
+    // clang-format off
+list* arg0;
 char* str;
+// clang-format on
 {
-    // void addstr(list* arg0, char* str) {
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
@@ -9232,7 +9235,12 @@ char* str;
 }
 
 // function addspacedstr # 15
-// Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
+/**
+ * Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
+ *
+ * @param arg0 List to add the entries to
+ * @param str Space-separated string to add
+ */
 void addspacedstr(list* arg0, char* str) {
     char* str_end = str;
 
@@ -9279,8 +9287,14 @@ char* newstr(const char* src) {
 }
 
 // function save_place # 17
+/**
+ * Add one new uninitialised entry to a list
+ *
+ * @param arg0 list to add it to
+ * @return int index of new entry
+ */
 int save_place(list* arg0) {
-    int ret;
+    int new_entry_index;
 
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
@@ -9293,10 +9307,10 @@ int save_place(list* arg0) {
         }
         arg0->capacity += LIST_CAPACITY_INCR;
     }
-    ret = arg0->length;
+    new_entry_index = arg0->length;
     arg0->length++;
     arg0->entries[arg0->length] = NULL;
-    return ret;
+    return new_entry_index;
 }
 
 // function set_place # 18
@@ -9341,10 +9355,12 @@ void addlist(list* arg0, list* arg1) {
 }
 
 // function adduldlist # 20
-// Adds entries from arg1 and arg2 onto the end of arg0:
-// - up to the first NULL from arg2,
-// - then everything from arg1,
-// - then the rest of arg2.
+/**
+ * Adds entries from arg1 and arg2 onto the end of arg0:
+ * - up to the first NULL from arg2,
+ * - then everything from arg1,
+ * - then the rest of arg2.
+ */
 void adduldlist(list* arg0, list* arg1, list* arg2) {
     int sp3C;
     int sp38;
@@ -9386,7 +9402,11 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 }
 
 // function nodup # 21
-// Search for a string in a list. If found, return 0, else return 1.
+/**
+ * Search for a string in a list.
+ *
+ * return int boolean, TRUE if not found
+ */
 int nodup(list* arg0, const char* str) {
     register int i;
     register char* entry;
@@ -9394,11 +9414,11 @@ int nodup(list* arg0, const char* str) {
     for (i = 0; i < arg0->length; i++) {
         entry = arg0->entries[i];
         if ((entry != NULL) && (strcmp(entry, str) == 0)) {
-            return 0;
+            return FALSE;
         }
     }
 
-    return 1;
+    return TRUE;
 }
 
 // function getsuf # 22
