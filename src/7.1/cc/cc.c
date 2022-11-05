@@ -2123,7 +2123,6 @@ int main(int argc, char** argv) {
             }
             addstr(&execlist, "-D_SYSTYPE_SYSV");
         }
-
         if (sixty4bitflag) {
             addstr(&execlist, "-D__64BIT");
         }
