@@ -575,17 +575,17 @@ int svr4_systype = 0;
 int c_inline = 0;
 int tfp_flag = 0;
 int abi_flag = 0;
-int NoMoreOptions = 0; //!< flag, pseudoboolean
-int memory_flag = 0;
+int NoMoreOptions = FALSE; //!< flag, pseudoboolean
+int memory_flag = 0;       // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
 int default_call_shared = 1;
-int haspascal = FALSE;  //!< flag, boolean. If file is Pascal, set by file extension ".p"
-int hasfortran = FALSE; //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
-int lmflag = 0;
-int srcexists = 0;
-int w1flag = 1;
-static int D_1000C130 = 0;
-int prototype_checking_on = 0;
-int showdirt_flag = 0;
+int haspascal = FALSE;             //!< flag, boolean. If file is Pascal, set by file extension ".p"
+int hasfortran = FALSE;            //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
+int lmflag = FALSE;                //!< flag, pseudoboolean, set and not used
+int srcexists = 0;                 // Number of source code files present? Set in the main loop of parse_command()
+int w1flag = 1;                    //!< flag, values 0,1,2 used
+static int D_1000C130 = 0;         // values 0,1,2 used
+int prototype_checking_on = FALSE; //!< flag, boolean. Set on by "-prototypes" and off by "-noprototypes"
+int showdirt_flag = FALSE;         //!< flag, boolean. Set by "-mp_keep"
 int mp_prepass_count = 0;
 
 // not sure about this struct
@@ -634,6 +634,35 @@ static char* D_1000C1D8 = NULL;
 static char* D_1000C1DC = NULL;
 
 // function main # 2
+/**
+ * Main fuction for `cc`. Structure is roughly
+ * 1. Argument parsing
+ *   a. Environment variable parsing. The `compiler` (overall set of programs to run for compilation) is determined from
+ * the name of the executable (for example `cc` for the default C compiler, `pc` for Pascal).
+ *   b. Initial pass through options, presumably to pick up the most important ones.
+ *   c. Preliminary uses of relocate_passes().
+ *   d. process_config() and parse_command() to parse and store all remaining options.
+ *   e. End of initial option parsing, including setting endianness, propagating debugging and optimisation arguments,
+ * etc.
+ *   .
+ * 2. Main loop for parsing files: looks through all the input file arguments one by one, follows a complex graph of
+ * options depending on the type of file present and various options. The file type is determined by its suffix, both
+ * for input/output and internally between the various stages. Most of this loop is composed of blocks that
+ *   a. Check flags, both for whether to carry out the compilation step in the first place, and what options to add for
+ * that program.
+ *   b. actually run the external program for that pass using run().
+ *   c. based on the output, either clean up and error out, or clean up and continue to the next stage, or the next loop
+ * iteration.
+ *   .
+ *   Assuming success, files will emerge from this loop as unlinked ".o" files.
+ * 3. Execute linking
+ *   a. Post-loop cleanup.
+ *   b. If enabled, run prelinking.
+ *   c. link with `ld`.
+ *   d. If enabled, run supplementary programs: `filter`, `patch`, and `strip`.
+ *   .
+ * 4. Final cleanup and exit
+ */
 int main(int argc, char** argv) {
     register int i;
     register char* var_s1;
@@ -2726,7 +2755,7 @@ int main(int argc, char** argv) {
                 } else if (ansichoice == ANSICHOICE_KR) {
                     addstr(&execlist, "-std0");
                 }
-                if (prototype_checking_on != 0) {
+                if (prototype_checking_on) {
                     addstr(&execlist, "-Xprototypes");
                 }
                 addstr(&execlist, mkstr("-XS", symtab, NULL));
@@ -2845,7 +2874,7 @@ int main(int argc, char** argv) {
         if (use_real_fp) {
             addstr(&execlist, "-Xreal_fp");
         }
-        if ((prototype_checking_on != 0) || (ansichoice != ANSICHOICE_KR)) {
+        if (prototype_checking_on || (ansichoice != ANSICHOICE_KR)) {
             addstr(&execlist, "-Xprototypes");
         }
         if (ansichoice != ANSICHOICE_KR) {
@@ -3447,7 +3476,7 @@ int main(int argc, char** argv) {
             if (Hchar == 'K') {
                 continue;
             }
-            goto block_1660;
+            goto pass_fcom;
         }
 
     skip_sopt2:
@@ -3606,7 +3635,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    block_1660:
+    pass_fcom:
         execlist.length = 0;
         addstr(&execlist, "fcom");
         if (alignarg != NULL) {
@@ -3618,7 +3647,7 @@ int main(int argc, char** argv) {
         if (mp_flag & 0x10000) {
             addstr(&execlist, "-MP");
         }
-        if (showdirt_flag != 0) {
+        if (showdirt_flag) {
             addstr(&execlist, "-showdirt");
         }
         if (vflag != 0) {
@@ -7228,7 +7257,7 @@ void parse_command(int argc, char** argv) {
                                 exit(2);
                             }
                             mp_flag |= 0x10000;
-                            showdirt_flag = 1;
+                            showdirt_flag = TRUE;
                             break;
                         }
                         if (strncmp(argv[var_s0], "-mp_schedtype=", strlen("-mp_schedtype=")) == 0) {
@@ -7310,7 +7339,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-noprototypes") == 0) {
-                        prototype_checking_on = 0;
+                        prototype_checking_on = FALSE;
                         break;
                     }
                     if ((argv[var_s0][2] == '\0') || (strcmp(argv[var_s0], "-nocount") == 0) ||
@@ -7512,7 +7541,7 @@ void parse_command(int argc, char** argv) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
-                            prototype_checking_on = 1;
+                            prototype_checking_on = TRUE;
                         }
                         break;
                     }
