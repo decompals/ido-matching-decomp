@@ -331,14 +331,22 @@ typedef enum AnsiChoice {
 } AnsiChoice;
 
 int ansichoice = ANSICHOICE_XANSI;
-int c_compiler_choice = 0;
+
+typedef enum CCompilerChoice {
+    /* 0 */ C_COMPILER_CHOICE_0, // default
+    /* 1 */ C_COMPILER_CHOICE_1, // "ncc"
+    /* 2 */ C_COMPILER_CHOICE_2, // "CC.eh", "CC", "NCC"
+    /* 3 */ C_COMPILER_CHOICE_3, // "DCC"
+} CCompilerChoice;
+
+int c_compiler_choice = C_COMPILER_CHOICE_0;
 
 struct _struct_suffixes_0x8 {
     /* 0x0 */ const char* unk0; // name
     /* 0x4 */ int unk4;         // language?
 };                              // size = 0x8
 
-// For various languages' files?
+// Special suffixes
 struct _struct_suffixes_0x8 suffixes[] = {
     { "pl1", 1 }, { "pli", 1 },                                                                     // PL/1?
     { "cob", 2 },                                                                                   // COBOL
@@ -476,7 +484,7 @@ int Vflag = 0;
 int Kflag = 0;
 int nodeflib = 0;
 int minus_M = 0;
-int anachronisms = 1;
+int anachronisms = TRUE; //!< flag, boolean. Adds "-O" to `execlist`
 int disable_inlines = 0;
 int cfront_compatible = 1;
 int make_edison_shlib = 0;
@@ -808,49 +816,52 @@ int main(int argc, char** argv) {
         Bstring = var_s1 + strlen("cobol");
     } else if (strncmp(var_s1, "ncc", strlen("ncc")) == 0) {
         compiler = COMPILER_1;
-        c_compiler_choice = 1;
+        c_compiler_choice = C_COMPILER_CHOICE_1;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("ncc");
     } else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
         compiler = COMPILER_1;
-        c_compiler_choice = 2;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
-        anachronisms = 0;
+        anachronisms = FALSE;
         cfront_compatible = 0;
         D_1000BF7C = 0;
         exception_handling = 1;
         Bstring = var_s1 + strlen("CC");
     } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
         compiler = COMPILER_1;
-        c_compiler_choice = 2;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
         D_1000BF7C = 0;
         Bstring = var_s1 + strlen("CC");
     } else if (strncmp(var_s1, "NCC", strlen("NCC")) == 0) {
         compiler = COMPILER_1;
-        c_compiler_choice = 2;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("NCC");
     } else if (strncmp(var_s1, "DCC", strlen("DCC")) == 0) {
         compiler = COMPILER_1;
-        c_compiler_choice = 3;
+        c_compiler_choice = C_COMPILER_CHOICE_3;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("DCC");
         D_1000BF90 = 1;
     }
-    Bstring = NULL;
+    Bstring = NULL; // This appears to make the `Bstring` operations done in the above code useless?
+
     comp_target_root = getenv("COMP_TARGET_ROOT");
     if (comp_target_root == NULL) {
         comp_target_root = "/";
     } else if (comp_target_root[strlen(comp_target_root) - 1] != '/') {
         comp_target_root = mkstr(comp_target_root, "/", NULL);
     }
+
     comp_host_root = getenv("TOOLROOT");
     if (comp_host_root == NULL) {
         comp_host_root = "/";
     } else if (comp_host_root[strlen(comp_host_root) - 1] != '/') {
         comp_host_root = mkstr(comp_host_root, "/", NULL);
     }
+
     aligndir = mkstr(comp_host_root, "lib/align", NULL);
 
     sp12C = getenv("DCC_STD_PATHS");
@@ -1206,7 +1217,7 @@ int main(int argc, char** argv) {
         error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
-    if ((irix4 != 0) && (compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+    if ((irix4 != 0) && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
         error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
         exit(2);
     }
@@ -1222,7 +1233,8 @@ int main(int argc, char** argv) {
     if ((cflag == 0) && (nocode == 0) && (srcfiles.length == 1) && (objfiles.length == 1)) {
         default_template_instantiation_mode = 1;
     }
-    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (Fflag != 0) &&
+    if ((compiler == COMPILER_1) &&
+        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && (Fflag != 0) &&
         (smart_build != 0)) {
         error(2, NULL, 0, NULL, 0, "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
         smart_build = 0;
@@ -1231,7 +1243,7 @@ int main(int argc, char** argv) {
         no_prelink = 1;
     }
 
-    if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
         sp124 = getenv("DCC_FORCE_OPT");
         sp120 = 1;
         if (Oflag >= 3) {
@@ -1504,10 +1516,11 @@ int main(int argc, char** argv) {
             D_1000BF74 = 0;
             relocate_passes("f", NULL, NULL);
         }
-        if ((D_1000BF74 != 0) && ((compiler == COMPILER_3) || ((compiler == COMPILER_1) && (c_compiler_choice != 0)))) {
+        if ((D_1000BF74 != 0) &&
+            ((compiler == COMPILER_3) || ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)))) {
             record_static_fileset(srcfiles.entries[i]);
         }
-        if ((compiler == COMPILER_1) && (c_compiler_choice == 1)) {
+        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_1)) {
             switch (ansichoice) {
                 case 1:
                 case 2:
@@ -1676,7 +1689,7 @@ int main(int argc, char** argv) {
                 error(1, NULL, 0, NULL, 0, "-64bit option is not implemented with ccom or accom.\n");
                 exit(2);
             }
-            if (c_compiler_choice == 0) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_0) {
                 addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
             }
         }
@@ -1706,7 +1719,7 @@ int main(int argc, char** argv) {
             error(1, NULL, 0, NULL, 0, "Unknown value for mips_abi: %d.\n", mips_abi);
             exit(2);
         }
-        if (c_compiler_choice == 0) {
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
             if ((emptyIflag != 0) && (compchoice != 3)) {
                 addstr(&execlist, "-nostdinc");
             }
@@ -1746,11 +1759,12 @@ int main(int argc, char** argv) {
             case 0x63:
             case 0x68:
                 if ((srcsuf != 0x68) || (D_1000BF74 != 0)) {
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                         addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
                         addstr(&execlist, "-D__cplusplus=1");
                         addstr(&execlist, "-D__ANSI_CPP__=1");
-                        if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                             addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
                         }
                     } else {
@@ -1888,7 +1902,8 @@ int main(int argc, char** argv) {
             include = mkstr("/usr/irix4/", "usr/include", NULL);
         }
         if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || (fiveflag != 0)) &&
-            ((compiler != COMPILER_1) || (c_compiler_choice == 0)) && ((compiler != COMPILER_3) || (D_1000BF74 == 0))) {
+            ((compiler != COMPILER_1) || (c_compiler_choice == C_COMPILER_CHOICE_0)) &&
+            ((compiler != COMPILER_3) || (D_1000BF74 == 0))) {
             addstr(&execlist, "-I");
         }
         addlist(&execlist, &cppflags);
@@ -1901,7 +1916,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, mkstr("-I", includeB, NULL));
             }
             if ((einclude != NULL) && (compiler == COMPILER_1) &&
-                ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 addstr(&execlist, mkstr("-I", einclude, NULL));
             }
             if (include != NULL) {
@@ -1934,7 +1949,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-E");
             addstr(&execlist, sp144);
         }
-        if (c_compiler_choice == 0) {
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
             addstr(&execlist, passin);
         }
         if (((compchoice != 3) && (compchoice != 4)) || ((compiler != COMPILER_1) && (compiler != COMPILER_4)) ||
@@ -1964,7 +1979,7 @@ int main(int argc, char** argv) {
         if (minus_M == 0) {
             addstr(&execlist, "-E");
         }
-        if ((compiler != COMPILER_1) || (c_compiler_choice == 0)) {
+        if ((compiler != COMPILER_1) || (c_compiler_choice == C_COMPILER_CHOICE_0)) {
             switch (srcsuf) {
                 case 0x63:
                     addstr(&execlist, "-D_LANGUAGE_C");
@@ -2039,7 +2054,7 @@ int main(int argc, char** argv) {
         if ((Eflag == 0) && (Pflag == 0)) {
             if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
                  (fiveflag != 0)) &&
-                (c_compiler_choice == 0)) {
+                (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 addstr(&execlist, "-I");
             }
             addlist(&execlist, &cppflags);
@@ -2056,7 +2071,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if (((Pflag != 0) || (Eflag != 0)) && (c_compiler_choice == 0)) {
+        if (((Pflag != 0) || (Eflag != 0)) && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
             if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                 addstr(&execlist, "-std1");
             } else if (ansichoice == ANSICHOICE_XANSI) {
@@ -2065,7 +2080,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-std0");
             }
         }
-        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
             if (vflag != 0) {
                 addstr(&execlist, "-v");
             }
@@ -2084,9 +2099,9 @@ int main(int argc, char** argv) {
                 sp118 = mksuf(srcfiles.entries[i], 'o');
             }
             addstr(&execlist, mkstr("-YN", sp118, NULL));
-            if (c_compiler_choice == 2) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_2) {
 
-            } else if (c_compiler_choice == 3) {
+            } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
             } else if (edison_type == 3) {
                 addstr(&execlist, "-K");
@@ -2160,7 +2175,7 @@ int main(int argc, char** argv) {
     block_922:
         cppchoice = sp114;
         relocate_passes("p", NULL, NULL);
-        if (c_compiler_choice == 0) {
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
             if ((Pflag == 0) && (Eflag == 0)) {
                 if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) || ((srcsuf == 0x73) && (mflag != 0))) {
                     unlink(passin);
@@ -2359,7 +2374,7 @@ int main(int argc, char** argv) {
         if (gflag >= 2) {
             func_00431D00(srcfiles.entries[i]);
         }
-        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
             if (!docpp || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 'i') || (acpp != 0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
@@ -2367,8 +2382,9 @@ int main(int argc, char** argv) {
             if (vflag != 0) {
                 addstr(&execlist, "-v");
             }
-            if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                if (anachronisms != 0) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                if (anachronisms) {
                     addstr(&execlist, "-O");
                 }
                 if (cfront_compatible != 0) {
@@ -2383,7 +2399,8 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-ZO");
                 addstr(&execlist, mkstr("-ZS", symtab, NULL));
             }
-            if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 if (Oflag >= 3) {
                     addstr(&execlist, "-Qz");
                 }
@@ -2402,8 +2419,8 @@ int main(int argc, char** argv) {
             if (disable_inlines != 0) {
                 addstr(&execlist, "-YJ");
             }
-            if (c_compiler_choice == 2) {
-            } else if (c_compiler_choice == 3) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_2) {
+            } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
             } else if (edison_type == 3) {
                 addstr(&execlist, "-K");
@@ -2429,7 +2446,8 @@ int main(int argc, char** argv) {
                 sp118 = mksuf(srcfiles.entries[i], 'o');
             }
             addstr(&execlist, mkstr("-YN", sp118, NULL));
-            if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 switch (default_template_instantiation_mode) {
                     case 0:
                         break;
@@ -2508,7 +2526,7 @@ int main(int argc, char** argv) {
             }
             if ((!docpp || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) || (acpp != 0) ||
                  (cmp_flag & 0x10000)) &&
-                (c_compiler_choice == 0)) {
+                (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
                 addstr(&execlist, passin);
@@ -2540,7 +2558,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-nocpp");
                 }
             }
-            if (c_compiler_choice == 0) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_0) {
                 if (vflag != 0) {
                     addstr(&execlist, "-Xv");
                 }
@@ -2603,7 +2621,7 @@ int main(int argc, char** argv) {
                 addstr(&umergeflags, "-c_inline");
             } else if (retcode != 0) {
                 runerror++;
-                if ((oldcflag == 1) && docpp && (srcsuf != 'i') && (c_compiler_choice == 0)) {
+                if ((oldcflag == 1) && docpp && (srcsuf != 'i') && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                     unlink(passin);
                 }
                 if (Kflag == 0) {
@@ -2647,7 +2665,7 @@ int main(int argc, char** argv) {
             if (Hchar == 0x66) {
                 continue;
             }
-            if ((compiler == COMPILER_1) && (c_compiler_choice != 0) &&
+            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
                 ((Eflag != 0) || (nocode != 0) || (nocompileneeded != 0))) {
                 unlink(passout);
                 continue;
@@ -2769,7 +2787,7 @@ int main(int argc, char** argv) {
         if (Hchar == 'f') {
             continue;
         }
-        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) &&
+        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) &&
             ((Eflag != 0) || (nocode != 0) || (nocompileneeded != 0))) {
             continue;
         }
@@ -4382,7 +4400,9 @@ int main(int argc, char** argv) {
             D_1000BF74 = sp11C;
             relocate_passes("f", NULL, NULL);
         }
-        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+            (no_prelink == 0)) {
             update_instantiation_info_file(srcfiles.entries[i], passout);
         }
     }
@@ -4438,7 +4458,9 @@ int main(int argc, char** argv) {
             exit(2);
         }
 
-        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+            (no_prelink == 0)) {
             execlist.length = 0;
             addstr(&execlist, "edg_prelink");
             addstr(&execlist, "-fSGI");
@@ -4483,7 +4505,7 @@ int main(int argc, char** argv) {
         if (tfp_flag != 0) {
             addstr(&execlist, "-allow_jump_at_eop");
         }
-        if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
             addstr(&execlist, "-delta");
         }
         if (cordflag != 0) {
@@ -4504,7 +4526,8 @@ int main(int argc, char** argv) {
         if (make_edison_shlib != 0) {
             addstr(&execlist, "-shared");
         }
-        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             add_cxx_symbol_options();
         }
         if (irix4 != 0) {
@@ -4585,7 +4608,7 @@ int main(int argc, char** argv) {
         }
         if (strcmp("/", comp_target_root) != 0) {
             if (Lflag == 0) {
-                if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
                 }
                 if (non_shared != 0) {
@@ -4594,14 +4617,15 @@ int main(int argc, char** argv) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
                 }
             }
-        } else if ((Lflag == 0) && (compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+        } else if ((Lflag == 0) && (compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
             addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
         }
         if (make_edison_shlib != 0) {
-            if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 addstr(&execlist, cxx_init);
             }
-            if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+            if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                 addstr(&execlist, delta_init);
             }
             addlist(&execlist, &objfiles);
@@ -4609,7 +4633,8 @@ int main(int argc, char** argv) {
                 addlist(&execlist, &dashlfiles);
             }
             if (nodeflib == 0) {
-                if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                     spDC = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
                     if (spDC != 0) {
                         addstr(&execlist, "-dont_warn_unused");
@@ -4632,10 +4657,11 @@ int main(int argc, char** argv) {
         } else {
             addstr(&execlist, "-nocount");
             addstr(&execlist, crtx);
-            if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 addstr(&execlist, cxx_init);
             }
-            if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+            if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                 addstr(&execlist, delta_init);
             }
             addstr(&execlist, "-count");
@@ -4739,7 +4765,8 @@ int main(int argc, char** argv) {
                     if ((irix4 != 0) && (cmp_flag & 0x10000)) {
                         addstr(&execlist, "-lmpc");
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                         spD0 = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
                         if (spD0 != 0) {
                             addstr(&execlist, "-dont_warn_unused");
@@ -4777,7 +4804,8 @@ int main(int argc, char** argv) {
             runerror++;
             if (Kflag == 0) {
                 if ((strcmp(LD, "old_ld") == 0) ||
-                    ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)))) {
+                    ((compiler == COMPILER_1) &&
+                     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
                     if (outfile != NULL) {
                         unlink(outfile);
                     } else {
@@ -4797,7 +4825,8 @@ int main(int argc, char** argv) {
             }
             unlink(tempstr[32]);
         }
-        if ((runerror == 0) && (compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+        if ((runerror == 0) && (compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             execlist.length = 0;
             addstr(&execlist, patch);
             if (vflag != 0) {
@@ -5211,7 +5240,8 @@ void parse_command(int argc, char** argv) {
                     if (argv[var_s0][2] == '\0') {
                         if (compiler == COMPILER_3) {
                             Fflag++;
-                        } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                        } else if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                                (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                             cflag = 1;
                             Fflag = 1;
                             default_template_instantiation_mode = 1;
@@ -5479,7 +5509,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             addstr(&ldflags, argv[var_s0 + 1]);
                         } else if (strcmp(argv[var_s0] + 3, "target") == 0) {
-                            if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                                 sp154 = argv[var_s0 + 1];
                             } else {
                                 addstr(&cppflags, argv[var_s0]);
@@ -5988,14 +6018,16 @@ void parse_command(int argc, char** argv) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-auto_include") == 0)) {
                         auto_template_include = 1;
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-anach") == 0)) {
-                        anachronisms = 1;
+                        anachronisms = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ansi") == 0) {
@@ -6030,7 +6062,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-acpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -6144,7 +6176,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cfe") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -6154,7 +6186,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-common") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -6162,7 +6194,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-cfront") == 0)) {
                         cfront_compatible = 1;
                         break;
@@ -6388,9 +6421,11 @@ void parse_command(int argc, char** argv) {
                             addstr(&objfiles, argv[var_s0]);
                             break;
                         }
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        if ((compiler == COMPILER_1) &&
+                            ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                             (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                             (strcmp(argv[var_s0], "-exceptions") == 0)) {
-                            if ((compiler != COMPILER_1) || (c_compiler_choice != 3)) {
+                            if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
                                 exception_handling = 1;
                                 relocate_passes("f", NULL, NULL);
                                 if (access(cfe, EX_OK) == -1) {
@@ -6957,9 +6992,10 @@ void parse_command(int argc, char** argv) {
                         no_transitive_link = 1;
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-no_exceptions") == 0)) {
-                        if ((compiler != COMPILER_1) || (c_compiler_choice != 3)) {
+                        if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
                             exception_handling = 0;
                             relocate_passes("f", NULL, NULL);
                             break;
@@ -6970,7 +7006,7 @@ void parse_command(int argc, char** argv) {
                         if (D_1000BF94 != 0) {
                             error(1, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
                             exit(2);
-                        } else if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
+                        } else if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                             error(1, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
                             exit(2);
                         } else {
@@ -7056,7 +7092,7 @@ void parse_command(int argc, char** argv) {
                         goto bad_option;
                     }
                     if (strcmp(argv[var_s0], "-nocpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7065,7 +7101,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_3) || ((compiler == COMPILER_1) && (c_compiler_choice != 0))) {
+                    if ((compiler == COMPILER_3) ||
+                        ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0))) {
                         if (strcmp(argv[var_s0], "-nocode") == 0) {
                             nocode = 1;
                             cflag = 1;
@@ -7085,13 +7122,14 @@ void parse_command(int argc, char** argv) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-nofilt") == 0)) {
                         nofilt = 1;
                         add_static_opt(argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && (c_compiler_choice == 3) &&
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3) &&
                         (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
                         char* spFC;
 
@@ -7128,7 +7166,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-oldcpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7176,7 +7214,9 @@ void parse_command(int argc, char** argv) {
                             var_s1 = getsuf(outfile);
                             if (((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
                                  (var_s1 == 'r') || (var_s1 == 'e') ||
-                                 ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                                 ((compiler == COMPILER_1) &&
+                                  ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                   (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                                   (var_s1 == 6)) ||
                                  (var_s1 == 's') || (var_s1 == 1) || (var_s1 == 2)) &&
                                 (stat(outfile, &sp74) == 0)) {
@@ -7201,7 +7241,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'p': /* switch 1 */
                     if (strcmp(argv[var_s0], "-prototypes") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7210,7 +7250,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-pedantic") == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7261,7 +7301,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                         if (strncmp(argv[var_s0], "-pt", 3) == 0) {
                             char* sp68 = argv[var_s0] + 3;
 
@@ -7371,7 +7412,8 @@ void parse_command(int argc, char** argv) {
 
                 case 's': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                        if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                         (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                             do_strip = 1;
                         } else {
                             addstr(&ldflags, argv[var_s0]);
@@ -7382,7 +7424,8 @@ void parse_command(int argc, char** argv) {
                         addstr(&optflags, argv[var_s0]);
                         break;
                     }
-                    if ((((compiler == COMPILER_1) && (c_compiler_choice != 0)) || (compiler == COMPILER_3)) &&
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
                         (strncmp(argv[var_s0], "-sa", 3) == 0) &&
                         ((argv[var_s0][3] == '\0') || (argv[var_s0][3] == ','))) {
                         D_1000BF74 = 1;
@@ -7404,7 +7447,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((((compiler == COMPILER_1) && (c_compiler_choice != 0)) || (compiler == COMPILER_3)) &&
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
                         (strncmp(argv[var_s0], "-sa_fs", 6) == 0) &&
                         ((argv[var_s0][6] == '\0') || (argv[var_s0][6] == ','))) {
                         D_1000BF84 =
@@ -7503,7 +7547,7 @@ void parse_command(int argc, char** argv) {
                     if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) {
                         if ((compiler != COMPILER_1) && (compiler != COMPILER_3)) {
                             error(2, NULL, 0, NULL, 0, "-sopt only available with Fortran and C; option ignored.\n");
-                        } else if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        } else if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7542,7 +7586,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (compiler == COMPILER_1) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0) &&
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
                             (strncmp(argv[var_s0], "-smart", 6) == 0)) {
                             if ((argv[var_s0][6] == 0x2C) && (argv[var_s0][7] != 0)) {
                                 sbrepos = argv[var_s0] + 7;
@@ -7572,7 +7616,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&pcaflags, "-signed");
                             addstr(&soptflags, "-signed");
                             addstr(&ccomflags, "-Xsigned");
-                            if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                                 signedcharflag = 1;
                             }
                             break;
@@ -7791,7 +7835,7 @@ void parse_command(int argc, char** argv) {
                     }
 
                     if (strcmp(argv[var_s0], "-use_readwrite_const") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             addstr(&edisonflags, "-Yr0");
                         } else {
                             addstr(&accomflags, "-use_readwrite_const");
@@ -7799,7 +7843,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-use_readonly_const") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             addstr(&edisonflags, "-Yr1");
                         } else {
                             addstr(&accomflags, "-use_readonly_const");
@@ -7847,9 +7891,10 @@ void parse_command(int argc, char** argv) {
                         add_static_opt(argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-v2") == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         }
@@ -7859,7 +7904,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'w': /* switch 1 */
                     if ((compiler == COMPILER_1) && (strncmp(argv[var_s0], "-wlint", 6) == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
                                   "");
                         } else {
@@ -7910,7 +7955,8 @@ void parse_command(int argc, char** argv) {
                         addstr(&fcomflags, argv[var_s0]);
                         break;
                     }
-                    if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                    if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) &&
+                        (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                         error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
                         break;
                     }
@@ -7979,16 +8025,16 @@ void parse_command(int argc, char** argv) {
             }
             continue;
         } else if ((argv[var_s0][0] == '+') && (compiler == COMPILER_1) &&
-                   ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                   ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             switch (argv[var_s0][1]) { /* switch 5 */
                 case 'p':              /* switch 5 */
                     if (argv[var_s0][2] == '\0') {
-                        anachronisms = 0;
+                        anachronisms = FALSE;
                     } else if (argv[var_s0][2] == 'p') {
-                        anachronisms = 0;
+                        anachronisms = FALSE;
                         cfront_compatible = 0;
                     } else if (argv[var_s0][2] == 'a') {
-                        anachronisms = 0;
+                        anachronisms = FALSE;
                     } else if (argv[var_s0][2] == 'c') {
                         cfront_compatible = 0;
                     }
@@ -8008,7 +8054,7 @@ void parse_command(int argc, char** argv) {
                     break;
 
                 case 'e': /* switch 5 */
-                    if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                         error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
                         break;
                     }
@@ -8146,7 +8192,8 @@ void parse_command(int argc, char** argv) {
             }
         }
 
-        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) || ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
+        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+            ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
             if ((srcfiles.length == 1) && ((outfile != NULL) || (cflag == 0))) {
                 addstr(&ldflags, "-MDignore");
                 addstr(&ldflags, sp158);
@@ -8385,7 +8432,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                         ccom = mkstr(arg1, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
                         cfe = mkstr(arg1,
-                                    ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
+                                    ((c_compiler_choice != C_COMPILER_CHOICE_0) ||
+                                     ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
                                         ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                         : "cfe",
                                     arg2, NULL);
@@ -8399,16 +8447,18 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         }
                         ccom = mkstr(comp_host_root, "usr/lib/", currcomp,
                                      (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
-                        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) ||
+                        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
                             ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
                             cfe = mkstr(comp_host_root, "usr/lib/DCC/", currcomp,
-                                        ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
+                                        ((c_compiler_choice != C_COMPILER_CHOICE_0) ||
+                                         ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                             : "cfe",
                                         arg2, NULL);
                         } else {
                             cfe = mkstr(comp_host_root, "usr/lib/", currcomp,
-                                        ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
+                                        ((c_compiler_choice != C_COMPILER_CHOICE_0) ||
+                                         ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
                                             : "cfe",
                                         arg2, NULL);
@@ -8525,7 +8575,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         opt = mkstr(arg1, "uopt", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                                (D_1000BF8C != 0)) {
                         opt = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "uopt", arg2, NULL);
                     } else {
@@ -8539,7 +8591,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         gen = mkstr(arg1, "ugen", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                                (D_1000BF8C != 0)) {
                         gen = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "ugen", arg2, NULL);
                     } else {
@@ -8564,7 +8618,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         as1 = mkstr(arg1, "as1", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                                (D_1000BF8C != 0)) {
                         as1 = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "as1", arg2, NULL);
                     } else {
@@ -8598,7 +8654,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         patch = mkstr(arg1, "c++patch", arg2, NULL);
                         filter = mkstr(arg1, "c++filt", arg2, NULL);
                     } else {
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        if ((compiler == COMPILER_1) &&
+                            ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                             (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                             (D_1000BF90 != 0)) {
                             ld = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, LD, arg2, NULL);
                         } else if (irix4 != 0) {
@@ -9644,7 +9702,8 @@ void mktempstr(void) {
 
     tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", NULL));
 
-    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (nofilt == 0) &&
+    if ((compiler == COMPILER_1) &&
+        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && (nofilt == 0) &&
         (access(filter, EX_OK) == 0)) {
         tempstr[32] = mktemp(mkstr(tmpdir, "ctmfiltXXXXXX", NULL));
     } else {
@@ -10149,7 +10208,8 @@ static char* func_0042FD7C(const char* name, char** dirs) {
     char* path;
 
     for (; *dirs != NULL; dirs++) {
-        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             fildes = open(path = mkstr(*dirs, "/DCC", runlib, name, NULL), 0, 0);
             if (fildes >= 0) {
                 close(fildes);
