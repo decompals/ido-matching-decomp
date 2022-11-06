@@ -1402,7 +1402,7 @@ int main(int argc, char** argv) {
         if (srcfiles.length >= 2) {
             fprintf(stderr, "%s:\n", srcfiles.entries[i]);
         }
-        if ((NoMoreOptions != 0) && (*srcfiles.entries[i] == '-')) {
+        if (NoMoreOptions && (*srcfiles.entries[i] == '-')) {
             passin = func_00433534(srcfiles.entries[i]);
         } else {
             passin = srcfiles.entries[i];
@@ -2633,7 +2633,7 @@ int main(int argc, char** argv) {
             if (((run_sopt != 0) && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) || (cmp_flag & 0x10000)) {
                 unlink(passin);
             }
-            if ((NoMoreOptions != 0) && (*passout == 0x2D)) {
+            if (NoMoreOptions && (*passout == '-')) {
                 passout = func_00433534(passout);
             }
             passin = passout;
@@ -4012,9 +4012,9 @@ int main(int argc, char** argv) {
                     error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
-                if (NoMoreOptions != 0) {
-                    *passout = 0x2D;
-                    if (*passout != 0) {
+                if (NoMoreOptions) {
+                    *passout = '-';
+                    if (*passout != '\0') {
                         passout = func_00433534(passout);
                     }
                 }
@@ -4194,31 +4194,25 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-G");
             addstr(&execlist, Gnum);
             addlist(&execlist, &asflags);
-            if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
+            if (NoMoreOptions && (*passin == '-')) {
                 passin = func_00433534(passin);
             }
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
-            if ((Hchar == 0x61) || (Kflag != 0)) {
+            if ((Hchar == 'a') || (Kflag != 0)) {
                 if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                     passout = mkstr(srcfiles.entries[i], ".G", NULL);
                 } else {
                     passout = mksuf(srcfiles.entries[i], 'G');
                 }
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                          "can't overwrite a write-protected "
-                          "file %s \n",
-                          passout);
+                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
                 passout = tempstr[11];
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                          "can't overwrite a write-protected "
-                          "file %s \n",
-                          passout);
+                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             }
@@ -4312,7 +4306,7 @@ int main(int argc, char** argv) {
         if (irix4 == 0) {
             addlist(&execlist, &olimitflags);
         }
-        if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
+        if (NoMoreOptions && (*passin == '-')) {
             passin = func_00433534(passin);
         }
         addstr(&execlist, passin);
@@ -4368,14 +4362,11 @@ int main(int argc, char** argv) {
                     unlink(passout);
                 } else if (spE0 != 0) {
                     error(2, NULL, 0, NULL, 0,
-                          "%s does not exist or is not "
-                          "stat(2)-able. Not deleted (if it "
-                          "exists) even though as1 failed.\n",
+                          "%s does not exist or is not stat(2)-able. Not deleted (if it exists) even though as1 "
+                          "failed.\n",
                           passout);
                 } else {
-                    error(2, NULL, 0, NULL, 0,
-                          "%s is not a regular file, not "
-                          "deleted even though as1 failed.\n",
+                    error(2, NULL, 0, NULL, 0, "%s is not a regular file, not deleted even though as1 failed.\n",
                           passout);
                 }
                 if (tmpst != 0) {
@@ -4416,9 +4407,9 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (NoMoreOptions != 0) {
+    if (NoMoreOptions) {
         for (i = 0; i < objfiles.length; i++) {
-            if ((*objfiles.entries[i] == 0x2D) && (strchr(objfiles.entries[i], 0x2E) != NULL)) {
+            if ((*objfiles.entries[i] == '-') && (strchr(objfiles.entries[i], '.') != NULL)) {
                 objfiles.entries[i] = func_00433534(objfiles.entries[i]);
             }
         }
@@ -5039,7 +5030,7 @@ void parse_command(int argc, char** argv) {
     }
 
     for (var_s0 = 0; var_s0 < argc; var_s0++) {
-        if ((argv[var_s0][0] == '-') && ((NoMoreOptions == 0) || (strchr(argv[var_s0], '.') == NULL))) {
+        if ((argv[var_s0][0] == '-') && (!NoMoreOptions || (strchr(argv[var_s0], '.') == NULL))) {
             switch (argv[var_s0][1]) { /* switch 1 */
                 case '#':              /* switch 1 */
                                        //! @bug Should end in '\n'.
@@ -8099,7 +8090,7 @@ void parse_command(int argc, char** argv) {
             int sp5C; // option index
 
             srcexists++;
-            if ((argv[var_s0][0] == '-') && (NoMoreOptions == 0)) {
+            if ((argv[var_s0][0] == '-') && !NoMoreOptions) {
                 sp60 = 1;
                 while (argv[var_s0][sp60] == '-') {
                     sp60++;
