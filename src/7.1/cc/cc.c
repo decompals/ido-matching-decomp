@@ -354,7 +354,7 @@ typedef enum Suffix {
     /* 3 */ SUF_3,     // ?
     /* 4 */ SUF_4,     // ?
     /* 5 */ SUF_5,     // ?
-    /* 6 */ SUF_6,     // C
+    /* 6 */ SUF_6,     // C++
     /* 7 */ SUF_7      // C
 } Suffix;
 
@@ -545,9 +545,9 @@ int ignore_unresolved_flag = 0;
 int no_unresolved_flag = 0;
 int swopcodeflag = 0;
 int dwopcodeflag = 0;
-int sixty4bit_spec = 0;
-int sixty4bitflag = FALSE; //!< flag, boolean. Always 0
-int thirty2bitflag = 0;
+int sixty4bit_spec = 0;     //!< Set and not used, not clear if boolean
+int sixty4bitflag = FALSE;  //!< flag, boolean. Always 0
+int thirty2bitflag = FALSE; //!< flag, boolean
 int fullasoptflag = 0;
 int old_non_shared = 0;
 int non_shared_emitted = 0;
@@ -578,8 +578,8 @@ int abi_flag = 0;
 int NoMoreOptions = 0; //!< flag, pseudoboolean
 int memory_flag = 0;
 int default_call_shared = 1;
-int haspascal = 0;
-int hasfortran = 0;
+int haspascal = FALSE;  //!< flag, boolean. If file is Pascal, set by file extension ".p"
+int hasfortran = FALSE; //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
 int lmflag = 0;
 int srcexists = 0;
 int w1flag = 1;
@@ -1243,7 +1243,7 @@ int main(int argc, char** argv) {
         error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
         exit(2);
     }
-    if ((mips3flag != 0) && (thirty2bitflag == 0)) {
+    if ((mips3flag != 0) && !thirty2bitflag) {
         error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
@@ -3848,7 +3848,7 @@ int main(int argc, char** argv) {
         adduldlist(&execlist, &ufiles, &objfiles);
         if (cflag == 0) {
             addlist(&execlist, &uldlibflags);
-            if ((compiler == COMPILER_2) || (haspascal != 0)) {
+            if ((compiler == COMPILER_2) || haspascal) {
                 addspacedstr(&execlist, newstr(libp));
                 addspacedstr(&execlist, newstr(libxmalloc));
                 addspacedstr(&execlist, newstr(libexc));
@@ -3858,7 +3858,7 @@ int main(int argc, char** argv) {
                     addspacedstr(&execlist, "-lbsd");
                 }
             }
-            if ((compiler == COMPILER_3) || (hasfortran != 0)) {
+            if ((compiler == COMPILER_3) || hasfortran) {
                 if (mp_flag) {
                     addstr(&execlist, libI77_mp);
                 }
@@ -3884,8 +3884,8 @@ int main(int argc, char** argv) {
                 addstr(&execlist, libexc);
                 addstr(&execlist, libmld);
             }
-            if (((compiler == COMPILER_2) || (compiler == COMPILER_3) || (haspascal != 0) || (hasfortran != 0) ||
-                 haspl1 || (compiler == COMPILER_5) || (compiler == COMPILER_6)) &&
+            if (((compiler == COMPILER_2) || (compiler == COMPILER_3) || haspascal || hasfortran || haspl1 ||
+                 (compiler == COMPILER_5) || (compiler == COMPILER_6)) &&
                 (nonshared != 0)) {
                 addspacedstr(&execlist, newstr(libm));
             }
@@ -4935,13 +4935,13 @@ int main(int argc, char** argv) {
             }
             addstr(&execlist, "-nocount");
             if (nodeflib == 0) {
-                if ((compiler == COMPILER_2) || (haspascal != 0)) {
+                if ((compiler == COMPILER_2) || haspascal) {
                     addspacedstr(&execlist, libp);
                     addspacedstr(&execlist, libxmalloc);
                     addspacedstr(&execlist, libexc);
                     addspacedstr(&execlist, libmld);
                 }
-                if ((compiler == COMPILER_3) || (hasfortran != 0)) {
+                if ((compiler == COMPILER_3) || hasfortran) {
                     if (mp_flag) {
                         addspacedstr(&execlist, libI77_mp);
                     }
@@ -4972,8 +4972,8 @@ int main(int argc, char** argv) {
                     addspacedstr(&execlist, libexc);
                     addspacedstr(&execlist, libmld);
                 }
-                if ((compiler == COMPILER_2) || ((hasfortran != 0) && (compiler != COMPILER_3)) || (haspascal != 0) ||
-                    haspl1 || (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
+                if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
+                    (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
                     addspacedstr(&execlist, libm);
                 }
                 if (pgflag != 0) {
@@ -5079,6 +5079,7 @@ int main(int argc, char** argv) {
             }
         }
 
+        // pass_filter
         if (tempstr[32] != NULL) {
             if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
                 execlist.length = 0;
@@ -5088,9 +5089,9 @@ int main(int argc, char** argv) {
             unlink(tempstr[32]);
         }
 
+        // pass_patch
         if ((runerror == 0) && (compiler == COMPILER_1) &&
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-            // pass_patch
             execlist.length = 0;
             addstr(&execlist, patch);
             if (vflag != 0) {
@@ -5105,8 +5106,9 @@ int main(int argc, char** argv) {
                 runerror++;
             }
         }
+
+        // pass_strip
         if ((runerror == 0) && (do_strip != 0)) {
-            // pass_strip
             execlist.length = 0;
             addstr(&execlist, strip);
             if (outfile != NULL) {
@@ -5321,7 +5323,7 @@ void parse_command(int argc, char** argv) {
 
                 case '3': /* switch 1 */
                     if ((strcmp(argv[var_s0], "-32bit") == 0) || (strcmp(argv[var_s0], "-32") == 0)) {
-                        thirty2bitflag = 1;
+                        thirty2bitflag = TRUE;
                         mips_abi = 1;
                     }
                     break;
@@ -7453,7 +7455,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-o32") == 0) {
-                        thirty2bitflag = 1;
+                        thirty2bitflag = TRUE;
                         mips_abi = 1;
                         if (var_s0 >= (argc - 1)) {
                             func_00431B38(var_s0 + 1, 1);
@@ -8014,10 +8016,10 @@ void parse_command(int argc, char** argv) {
                                 error(2, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lgl_s. See your graphics documentation.\n");
                             }
-                            if ((hasfortran != 0) || (compiler == COMPILER_3)) {
+                            if (hasfortran || (compiler == COMPILER_3)) {
                                 error(2, NULL, 0, NULL, 0, "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
                             }
-                            if ((haspascal != 0) || (compiler == COMPILER_2)) {
+                            if (haspascal || (compiler == COMPILER_2)) {
                                 error(2, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lpgl /usr/lib/p2cstr.o -lgl_s  See pc(1).\n");
                             }
@@ -8346,20 +8348,20 @@ void parse_command(int argc, char** argv) {
             var_s1 = 'f';
         }
         if (var_s1 == 'p') {
-            haspascal = 1;
+            haspascal = TRUE;
         }
         if (var_s1 == 'f') {
-            hasfortran = 1;
+            hasfortran = TRUE;
         }
-        if (var_s1 == 1) {
+        if (var_s1 == SUF_1) {
             haspl1 = TRUE;
         }
         if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
             (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
             (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
-            (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') || (var_s1 == 6) ||
-            ((compiler == COMPILER_1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) || (Eflag != 0) ||
-            (compiler == COMPILER_4)) {
+            (var_s1 == SUF_1) || (var_s1 == 'D') || (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == 'u') ||
+            (var_s1 == SUF_6) || ((compiler == COMPILER_1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) ||
+            (Eflag != 0) || (compiler == COMPILER_4)) {
             int sp60; // number of '-' on the end?
             int sp5C; // option index
 
@@ -8378,8 +8380,8 @@ void parse_command(int argc, char** argv) {
             }
             if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0) &&
                 ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
-                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == 1) ||
-                 (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
+                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == SUF_1) ||
+                 (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == SUF_6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
                 if (var_s1 != 'u') {
                     addstr(&srcfiles, argv[var_s0]);
                     var_s2 = mksuf(argv[var_s0], 'u');
