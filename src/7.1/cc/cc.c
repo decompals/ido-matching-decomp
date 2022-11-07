@@ -610,22 +610,29 @@ int mips_abi = 1;
 int compchoice = 0;
 int cppchoice = 0;
 int acpp_traditional = 0;
-int G_flag = 0;
-int dn_flag = 0;
-int edison_cpp = 1; //!< set and not used
-int edison_type = 1;
-int exception_handling = FALSE; //!< flag, boolean. Whether to use exception handling in C++.
-char* Gnum = "0";               //!< argument to pass with "-G"
-int runerror = 0;               //!< number of errors triggered
-int uload = FALSE;              //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
-int uldobj_place = -1;          //!< Index into the `objfiles` list where the output of `uld` is?
+int G_flag = FALSE;  //!< flag, boolean. Whether "-G" has been passed
+int dn_flag = FALSE; //!< flag, boolean. Enable static linking over the default dynamic linking. Set by "-dn"
+int edison_cpp = 1;  //!< set and not used
+
+typedef enum EdisonType {
+    /* 1 */ EDISON_TYPE_1 = 1,
+    /* 2 */ EDISON_TYPE_2,
+    /* 3 */ EDISON_TYPE_3
+} EdisonType;
+
+int edison_type = EDISON_TYPE_1; //!< Uses `EdisonType` enum. Set based on `ansichoice`.
+int exception_handling = FALSE;  //!< flag, boolean. Whether to use exception handling in C++.
+char* Gnum = "0";                //!< argument to pass with "-G"
+int runerror = 0;                //!< number of errors triggered
+int uload = FALSE;               //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
+int uldobj_place = -1;           //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
 
 typedef enum ChipTarget {
     /* -1 */ CHIP_TARGET_UNSET = -1,
     /*  0 */ CHIP_TARGET_MIPS1,
     /*  1 */ CHIP_TARGET_MIPS2,
-    /*  2 */ CHIP_TARGET_MIPS3,
+    /*  2 */ CHIP_TARGET_MIPS3
 } ChipTarget;
 
 int chip_targ = CHIP_TARGET_UNSET; //!< "Chip target", uses `ChipTarget` enum.
@@ -1608,16 +1615,16 @@ int main(int argc, char** argv) {
 
         if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_1)) {
             switch (ansichoice) {
-                case 1:
-                case 2:
-                    edison_type = 2;
+                case ANSICHOICE_ANSI:
+                case ANSICHOICE_ANSIPOSIX:
+                    edison_type = EDISON_TYPE_2;
                     break;
-                case 3:
-                    edison_type = 1;
+                case ANSICHOICE_XANSI:
+                    edison_type = EDISON_TYPE_1;
                     break;
                 default:
-                case 0:
-                    edison_type = 3;
+                case ANSICHOICE_KR:
+                    edison_type = EDISON_TYPE_3;
                     break;
             }
         }
@@ -1856,10 +1863,10 @@ int main(int argc, char** argv) {
             }
         } else {
             addstr(&execlist, "-YE");
-            if (edison_type == 2) {
+            if (edison_type == EDISON_TYPE_2) {
                 addstr(&execlist, "-a");
             }
-            if ((edison_type == 1) || (edison_type == 3)) {
+            if ((edison_type == EDISON_TYPE_1) || (edison_type == EDISON_TYPE_3)) {
                 addstr(&execlist, "-D__EXTENSIONS__");
             }
         }
@@ -2246,7 +2253,7 @@ int main(int argc, char** argv) {
 
             } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == 3) {
+            } else if (edison_type == EDISON_TYPE_3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
@@ -2592,13 +2599,13 @@ int main(int argc, char** argv) {
             if (c_compiler_choice == C_COMPILER_CHOICE_2) {
             } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == 3) {
+            } else if (edison_type == EDISON_TYPE_3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
             }
 
-            if (srcsuf == 0x69) {
+            if (srcsuf == 'i') {
                 addstr(&execlist, "-Yp");
             }
             if (smart_build != 0) {
@@ -5562,11 +5569,11 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] == '\0') {
                         if (default_svr4) {
-                            if (dn_flag != 0) {
+                            if (dn_flag) {
                                 error(1, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
                                 exit(2);
                             }
-                            G_flag = 1;
+                            G_flag = TRUE;
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
@@ -6337,7 +6344,7 @@ void parse_command(int argc, char** argv) {
                         if (compchoice == 1) {
                             compchoice = 0;
                         }
-                        ansichoice = 1;
+                        ansichoice = ANSICHOICE_ANSI;
                         if (cppchoice != 1) {
                             cppchoice = 3;
                         }
@@ -6349,7 +6356,7 @@ void parse_command(int argc, char** argv) {
                         if (compchoice == 1) {
                             compchoice = 0;
                         }
-                        ansichoice = 2;
+                        ansichoice = ANSICHOICE_ANSIPOSIX;
                         if (cppchoice != 1) {
                             cppchoice = 3;
                         }
@@ -6471,7 +6478,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cckr") == 0) {
-                        ansichoice = 0;
+                        ansichoice = ANSICHOICE_KR;
                         if (cppchoice != 1) {
                             cppchoice = 2;
                         }
@@ -6643,11 +6650,11 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
-                        if (G_flag != 0) {
+                        if (G_flag) {
                             error(1, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
                             exit(2);
                         }
-                        dn_flag = 1;
+                        dn_flag = TRUE;
                         addstr(&ldflags, argv[var_s0]);
                         break;
                     }
