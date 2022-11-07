@@ -1778,16 +1778,13 @@ int main(int argc, char** argv) {
                     if (oldccomflag != TRUE) {
                         oldcflag = FALSE;
                     }
-                    if (!docpp) {
-                        if (default_nocpp) {
-                            goto block_531;
-                        }
-                        goto block_940;
+                    if (docpp || default_nocpp) {
+                        goto block_531;
                     }
-                    goto block_531;
+                    goto block_940;
 
                 case 'i': /* switch 19 */
-                          // 'i' is preprocessed so does not convey a specific compiler by itself
+                          // 'i' is a preprocessed file so does not convey a specific compiler by itself
                     switch (compiler) {
                         case COMPILER_1:
                             goto block_940;
@@ -1805,13 +1802,10 @@ int main(int argc, char** argv) {
                     // fallthrough
                 case 'p': /* switch 19 */
                 block_512:
-                    if (stdflag == 0) {
-                        if (!docpp && !default_nocpp) {
-                            goto block_1341;
-                        }
-                        goto block_531;
+                    if (stdflag != 0 || (!docpp && !default_nocpp)) {
+                        goto block_1341;
                     }
-                    goto block_1341;
+                    goto block_531;
 
                 case 'f': /* switch 19 */
                     if (docpp) {
@@ -4851,12 +4845,13 @@ int main(int argc, char** argv) {
 
     if (NoMoreOptions) {
         for (i = 0; i < objfiles.length; i++) {
-            if ((*objfiles.entries[i] == '-') && (strchr(objfiles.entries[i], '.') != NULL)) {
+            if ((objfiles.entries[i][0] == '-') && (strchr(objfiles.entries[i], '.') != NULL)) {
                 objfiles.entries[i] = func_00433534(objfiles.entries[i]);
             }
         }
     }
 
+    // linking passes
     if (!cflag && !Sflag && !Eflag && !Pflag && !jflag && (runerror == 0) && (objfiles.length != 0) &&
         (Hchar == '\0') && !nocode) {
         if (old_non_shared && mips2flag && !kpic_flag) {
@@ -4892,6 +4887,7 @@ int main(int argc, char** argv) {
             exit(2);
         }
 
+    pass_prelinker : {
         if ((compiler == COMPILER_1) &&
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && !no_prelink) {
             execlist.length = 0;
@@ -4910,8 +4906,9 @@ int main(int argc, char** argv) {
                 goto pass_cord;
             }
         }
+    }
 
-        // pass_ld
+    pass_ld : {
         execlist.length = 0;
         addstr(&execlist, LD);
         if (kpic_flag && !irix4 && !coff_spec) {
@@ -5261,8 +5258,9 @@ int main(int argc, char** argv) {
                 }
             }
         }
+    }
 
-        // pass_filter
+    pass_filter:
         if (tempstr[32] != NULL) {
             if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
                 execlist.length = 0;
@@ -5272,7 +5270,7 @@ int main(int argc, char** argv) {
             unlink(tempstr[32]);
         }
 
-        // pass_patch
+    pass_patch:
         if ((runerror == 0) && (compiler == COMPILER_1) &&
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             execlist.length = 0;
@@ -5290,7 +5288,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        // pass_strip
+    pass_strip:
         if ((runerror == 0) && do_strip) {
             execlist.length = 0;
             addstr(&execlist, strip);
@@ -5304,7 +5302,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_cord:
+    pass_cord : {
         if (cordflag && (runerror == 0)) {
             execlist.length = 0;
             addstr(&execlist, "cord");
@@ -5336,6 +5334,7 @@ int main(int argc, char** argv) {
         if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && !Kflag) {
             unlink(mksuf(srcfiles.entries[0], 'o'));
         }
+    }
     }
 
     if (tmp_uldobj != NULL) {
