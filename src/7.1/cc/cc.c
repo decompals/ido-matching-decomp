@@ -617,12 +617,12 @@ int edison_type = 1;
 int exception_handling = 0;
 char* Gnum = "0";
 int runerror = 0;
-int uload = 0;
-int uldobj_place = -1;
+int uload = FALSE;     //!< whether to run `uld` after compiling all files. Set by -O>=3
+int uldobj_place = -1; //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
 
 typedef enum ChipTarget {
-    /* -1 */ CHIP_TARGET_UNSET,
+    /* -1 */ CHIP_TARGET_UNSET = -1,
     /*  0 */ CHIP_TARGET_MIPS1,
     /*  1 */ CHIP_TARGET_MIPS2,
     /*  2 */ CHIP_TARGET_MIPS3,
@@ -1184,7 +1184,7 @@ int main(int argc, char** argv) {
         error(2, NULL, 0, NULL, 0,
               "-O3 is not supported for assembly compiles for ucode compilers; changing to -O2.\n");
         Oflag = 2;
-        uload = 0;
+        uload = FALSE;
     }
 
     get_host_chiptype();
@@ -1317,10 +1317,9 @@ int main(int argc, char** argv) {
         sp120 = 1;
         if (Oflag >= 3) {
             Oflag = 2;
-            uload = 0;
+            uload = FALSE;
         }
         if (sp124 != NULL) {
-            // temp_t6 = sp124->unk_0;
             if ((sp124[0] >= '0') && (sp124[0] <= '3') && (sp124[1] == '\0')) {
                 sp120 = sp124[0] - '0';
             }
@@ -1449,7 +1448,7 @@ int main(int argc, char** argv) {
     mktempstr();
 
     // Main loop for program execution, runs per source file
-    for (i = 0; (i < srcfiles.length) || (uload != 0); i++) {
+    for (i = 0; (i < srcfiles.length) || uload; i++) {
         nocompileneeded = 0;
         sp118 = NULL;
         longlong_emitted = 0;
@@ -1457,7 +1456,7 @@ int main(int argc, char** argv) {
 
         // Finished srcfiles, `uload` on.
         if (i == srcfiles.length) {
-            uload = 0;
+            uload = FALSE;
             if ((runerror == 0) && (Eflag == 0) && (Pflag == 0)) {
                 if (uoutfile == NULL) {
                     addstr(&srcfiles, "u.out.?");
@@ -5900,7 +5899,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&olimitflags, sp11C);
                             }
                             if ((Oflag >= 3) && (jflag == 0)) {
-                                uload = 1;
+                                uload = TRUE;
                             }
                             break;
                         }
@@ -7059,7 +7058,7 @@ void parse_command(int argc, char** argv) {
                           // "-j"
                     if (argv[var_s0][2] == '\0') {
                         jflag++;
-                        uload = 0;
+                        uload = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-jalr") == 0) {
@@ -8425,7 +8424,7 @@ void parse_command(int argc, char** argv) {
                 } else {
                     var_s2 = argv[var_s0];
                 }
-                uload = 1;
+                uload = TRUE;
                 if (uldobj_place == -1) {
                     uldobj_place = save_place(&objfiles);
                 }
@@ -8453,7 +8452,7 @@ void parse_command(int argc, char** argv) {
                     uldobj_place = save_place(&objfiles);
                 }
                 addstr(&ufiles, argv[var_s0]);
-                uload = 1;
+                uload = TRUE;
             }
         } else {
             addstr(&objfiles, argv[var_s0]);
