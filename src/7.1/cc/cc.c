@@ -537,18 +537,24 @@ int elfflag = 1;
 int coff_spec = 0;
 int elf_spec = 0;
 int compose_first_G0 = 0;
-int mips2_spec_flag = 0;
-int mips1flag = 0;
-int mips2flag = 1;
-int mips3flag = 0;
+
+// Flags relating to the specified MIPS ISA
+int mips2_spec_flag =
+    FALSE; //!< flag, boolean. Whether "-mips2" has been passed explicitly (and not overridden). Set by "-mips2".
+//! Only one of the following can be set at once.
+int mips1flag = FALSE; //! flag, boolean. Set by "-mips1".
+int mips2flag = TRUE;  //! flag, boolean. Set by "-mips2". @see mips2_spec_flag
+int mips3flag = FALSE; //! flag, boolean. Set by "-mips3" and in several other places.
+
 int ignore_unresolved_flag = 0;
 int no_unresolved_flag = 0;
 int swopcodeflag = 0;
 int dwopcodeflag = 0;
-int sixty4bit_spec = 0;     //!< Set and not used, not clear if boolean
-int sixty4bitflag = FALSE;  //!< flag, boolean. Always 0
-int thirty2bitflag = FALSE; //!< flag, boolean
-int fullasoptflag = 0;
+int sixty4bit_spec = 0;         //!< Set and not used, not clear if boolean
+int sixty4bitflag = FALSE;      //!< flag, boolean. Always 0
+int thirty2bitflag = FALSE;     //!< flag, boolean
+int fullasoptflag = FALSE;      //!< flag, boolean. Whether full assembler optimisation is enabled. Set by "-fullasopt".
+                                //!< Passed on as "-noglobal" when not set
 int old_non_shared = FALSE;     //!< flag, boolean. Set in (most of) the same places as `non_shared`.
 int non_shared_emitted = FALSE; //!< flag, boolean. Whether non_shared code will be emitted in this pass?
 int longlong_emitted = FALSE;   //!< boolean. Set when passing on "-D_LONGLONG"
@@ -559,7 +565,8 @@ int transitive_link = 0;
 int full_transitive_link = 0;
 int no_transitive_link = 0;
 int quickstart_info = 0;
-int force_rm_dead_code = 0;
+int force_rm_dead_code = FALSE; //!< flag, boolean. Whether `uld` should remove dead code? Set by "-rm_dead_code",
+                                //!< passed on as "-preserve_dead_code" if not set.
 int kpic_flag = TRUE;    //!< flag, boolean. Whether to emit Position-Independent Code. On by default, set by "-KPIC",
                          //!< unset by IRIX4 and "-non_shared"
 int kpic_spec = FALSE;   //!< flag, boolean. Whether "-KPIC" has been passed explicitly?
@@ -995,7 +1002,7 @@ int main(int argc, char** argv) {
             kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-mips3") == 0) {
-            mips3flag = 1;
+            mips3flag = TRUE;
             Gnum = "8";
             kpic_flag = FALSE;
         } else if (strcmp(argv[i], "-excpt") == 0) {
@@ -1004,8 +1011,8 @@ int main(int argc, char** argv) {
             Gnum = "8";
         } else if (strcmp(argv[i], "-abi") == 0) {
             abi_flag = 1;
-            mips1flag = 1;
-            mips2flag = 0;
+            mips1flag = TRUE;
+            mips2flag = FALSE;
         } else if (strcmp(argv[i], "-O3") == 0) {
             Oflag = 3;
         } else if (strcmp(argv[i], "-old_ld") == 0) {
@@ -1079,7 +1086,7 @@ int main(int argc, char** argv) {
     }
 
     if (sp148 == 0) {
-        if (non_shared || (coff_spec != 0) || (mips3flag != 0) || excpt_flag) {
+        if (non_shared || (coff_spec != 0) || mips3flag || excpt_flag) {
             addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
         } else if (abi_flag != 0) {
             addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
@@ -1144,8 +1151,7 @@ int main(int argc, char** argv) {
         newrunlib();
     }
 
-    if (((mips2flag != 0) || (mips3flag != 0) || sixty4bitflag) && !kpic_flag &&
-        (non_shared || call_shared || default_call_shared)) {
+    if ((mips2flag || mips3flag || sixty4bitflag) && !kpic_flag && (non_shared || call_shared || default_call_shared)) {
         if (!non_shared) {
             non_shared = TRUE;
             old_non_shared = TRUE;
@@ -1320,7 +1326,7 @@ int main(int argc, char** argv) {
         error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
         exit(2);
     }
-    if ((mips3flag != 0) && !thirty2bitflag) {
+    if (mips3flag && !thirty2bitflag) {
         error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
@@ -1371,14 +1377,14 @@ int main(int argc, char** argv) {
     addstr(&execlist, "-Dunix");
 
     if (dmips_emit == 0) {
-        if (mips2flag != 0) {
+        if (mips2flag) {
             if (dwopcodeflag != 0) {
                 error(1, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
                 exit(2);
             }
             addstr(&execlist, "-Dmips=2");
         }
-        if (mips3flag != 0) {
+        if (mips3flag) {
             addstr(&execlist, "-Dmips=3");
         } else {
             addstr(&execlist, "-Dmips=1");
@@ -1392,9 +1398,9 @@ int main(int argc, char** argv) {
         add_info("-64bit");
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
-        if (mips3flag == 0) {
+        if (!mips3flag) {
             chip_targ = CHIP_TARGET_MIPS3;
-            mips3flag = 1;
+            mips3flag = TRUE;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
             relocate_passes("M", NULL, NULL);
@@ -1402,9 +1408,9 @@ int main(int argc, char** argv) {
     } else if (dwopcodeflag != 0) {
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
-        if (mips3flag == 0) {
+        if (!mips3flag) {
             chip_targ = CHIP_TARGET_MIPS3;
-            mips3flag = 1;
+            mips3flag = TRUE;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
             relocate_passes("M", NULL, NULL);
@@ -1841,11 +1847,11 @@ int main(int argc, char** argv) {
 
         if (mips_abi == MIPS_ABI_1) {
             addstr(&execlist, "-D_MIPS_FPSET=16");
-            if (mips1flag != 0) {
+            if (mips1flag) {
                 addstr(&execlist, "-D_MIPS_ISA=1");
-            } else if (mips2flag != 0) {
+            } else if (mips2flag) {
                 addstr(&execlist, "-D_MIPS_ISA=2");
-            } else if (mips3flag != 0) {
+            } else if (mips3flag) {
                 addstr(&execlist, "-D_MIPS_ISA=3");
             }
             addstr(&execlist, "-D_ABIO32=1");
@@ -2045,7 +2051,7 @@ int main(int argc, char** argv) {
         }
 
         if (dmips_emit == 0) {
-            if (mips2flag != 0) {
+            if (mips2flag) {
                 if ((call_shared || default_call_shared) && !kpic_flag) {
                     old_non_shared = TRUE;
                     non_shared = TRUE;
@@ -2053,7 +2059,7 @@ int main(int argc, char** argv) {
                     call_shared = FALSE;
                 }
                 addstr(&execlist, "-D__mips=2");
-            } else if (mips3flag != 0) {
+            } else if (mips3flag) {
                 addstr(&execlist, "-D__mips=3");
             } else {
                 addstr(&execlist, "-D__mips=1");
@@ -2202,7 +2208,7 @@ int main(int argc, char** argv) {
                 longlong_emitted = TRUE;
             }
             if (dmips_emit == 0) {
-                if (mips2flag != 0) {
+                if (mips2flag) {
                     if (call_shared || default_call_shared) {
                         old_non_shared = TRUE;
                         non_shared = TRUE;
@@ -2210,7 +2216,7 @@ int main(int argc, char** argv) {
                         call_shared = FALSE;
                     }
                     addstr(&execlist, "-D__mips=2");
-                } else if (mips3flag != 0) {
+                } else if (mips3flag) {
                     addstr(&execlist, "-D__mips=3");
                 } else {
                     addstr(&execlist, "-D__mips=1");
@@ -3853,7 +3859,7 @@ int main(int argc, char** argv) {
 
         execlist.length = 0;
         addstr(&execlist, "uld");
-        if ((mips2flag != 0) && (sp148 == 0)) {
+        if (mips2flag && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
                 if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
@@ -3868,7 +3874,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if ((mips1flag != 0) && (sp148 == 0)) {
+        if (mips1flag && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
                 if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
@@ -3922,7 +3928,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, crtx);
         } else {
             addstr(&execlist, "-no_AutoGnum");
-            if (force_rm_dead_code == 0) {
+            if (!force_rm_dead_code) {
                 addstr(&execlist, "-preserve_dead_code");
             }
         }
@@ -4633,7 +4639,7 @@ int main(int argc, char** argv) {
         if (vflag != 0) {
             addstr(&execlist, "-v");
         }
-        if ((fullasoptflag == 0) && (srcsuf == 's') && (Oflag >= 2)) {
+        if (!fullasoptflag && (srcsuf == 's') && (Oflag >= 2)) {
             addstr(&execlist, "-noglobal");
         }
         addstr(&execlist, "-G");
@@ -4766,12 +4772,12 @@ int main(int argc, char** argv) {
 
     if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
         (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
-        if (old_non_shared && (mips2flag != 0) && !kpic_flag) {
+        if (old_non_shared && mips2flag && !kpic_flag) {
             error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
         }
-        if (old_non_shared && (mips3flag != 0)) {
+        if (old_non_shared && mips3flag) {
             error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
@@ -4825,7 +4831,7 @@ int main(int argc, char** argv) {
             addstr(&ldflags, "-KPIC");
         }
         if (non_shared && !non_shared_emitted) {
-            if ((mips2flag == 0) && (mips3flag == 0)) {
+            if (!mips2flag && !mips3flag) {
                 addstr(&ldflags, "-non_shared");
                 non_shared_emitted = TRUE;
             }
@@ -4922,7 +4928,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, Gnum);
         addlist(&execlist, &ldflags);
         addlist(&execlist, &nldflags);
-        if ((mips2flag != 0) && (sp148 == 0)) {
+        if (mips2flag && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
                 if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
@@ -4937,7 +4943,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if ((mips1flag != 0) && (sp148 == 0)) {
+        if (mips1flag && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
                 if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
@@ -7240,32 +7246,32 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-mips1") == 0) {
                         chip_targ = CHIP_TARGET_MIPS1;
-                        mips1flag = 1;
-                        mips2flag = 0;
+                        mips1flag = TRUE;
+                        mips2flag = FALSE;
                         if (dwopcodeflag != 0) {
                             error(1, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
                             exit(2);
                         }
-                        if (mips2_spec_flag != 0) {
+                        if (mips2_spec_flag) {
                             error(2, NULL, 0, NULL, 0, "-mips1 conflicts with -mips2; using last value (mips1)\n");
-                            mips2_spec_flag = 0;
+                            mips2_spec_flag = FALSE;
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips2") == 0) {
-                        if ((mips1flag != 0) || (mips3flag != 0)) {
+                        if (mips1flag || mips3flag) {
                             error(2, NULL, 0, NULL, 0, "-mips2 conflicts with -mips1; using last value (mips2)\n");
                         }
-                        mips1flag = 0;
-                        mips2flag = 1;
-                        mips2_spec_flag = 1;
+                        mips1flag = FALSE;
+                        mips2flag = TRUE;
+                        mips2_spec_flag = TRUE;
                         relocate_passes("M", NULL, NULL);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips3") == 0) {
-                        mips1flag = 0;
-                        mips2flag = 0;
-                        if (mips2_spec_flag != 0) {
+                        mips1flag = FALSE;
+                        mips2flag = FALSE;
+                        if (mips2_spec_flag) {
                             error(1, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
                             exit(2);
                         }
@@ -7276,7 +7282,7 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                         chip_targ = CHIP_TARGET_MIPS3;
-                        mips3flag = 1;
+                        mips3flag = TRUE;
                         dwopcodeflag = 1;
                         relocate_passes("M", NULL, NULL);
                         if (!non_shared_emitted) {
@@ -7737,7 +7743,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-rm_dead_code") == 0) {
-                        force_rm_dead_code = 1;
+                        force_rm_dead_code = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-rpath") == 0) && (argv[var_s0 + 1] != 0) &&
@@ -8589,7 +8595,7 @@ void parse_command(int argc, char** argv) {
         }
     }
 
-    if (mips2flag != 0) {
+    if (mips2flag) {
         addstr(&ccomflags, "-mips2");
         addstr(&upasflags, "-mips2");
         addstr(&fcomflags, "-mips2");
