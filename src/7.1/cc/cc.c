@@ -614,11 +614,11 @@ int G_flag = 0;
 int dn_flag = 0;
 int edison_cpp = 1; //!< set and not used
 int edison_type = 1;
-int exception_handling = 0;
-char* Gnum = "0";
-int runerror = 0;
-int uload = FALSE;     //!< whether to run `uld` after compiling all files. Set by -O>=3
-int uldobj_place = -1; //!< Index into the `objfiles` list where the output of `uld` is?
+int exception_handling = FALSE; //!< flag, boolean. Whether to use exception handling in C++.
+char* Gnum = "0";               //!< argument to pass with "-G"
+int runerror = 0;               //!< number of errors triggered
+int uload = FALSE;              //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
+int uldobj_place = -1;          //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
 
 typedef enum ChipTarget {
@@ -872,8 +872,8 @@ int main(int argc, char** argv) {
         anachronisms = FALSE;
         cfront_compatible = 0;
         D_1000BF7C = 0;
-        exception_handling = 1;
-        Bstring = var_s1 + strlen("CC");
+        exception_handling = TRUE;
+        Bstring = var_s1 + strlen("CC"); //! @bug too short?
     } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
         compiler = COMPILER_1;
         c_compiler_choice = C_COMPILER_CHOICE_2;
@@ -4935,7 +4935,7 @@ int main(int argc, char** argv) {
                     if (spDC != 0) {
                         addstr(&execlist, "-dont_warn_unused");
                     }
-                    if (exception_handling != 0) {
+                    if (exception_handling) {
                         addstr(&execlist, "-lCsup");
                     }
                     addstr(&execlist, "-lC");
@@ -5067,7 +5067,7 @@ int main(int argc, char** argv) {
                         if (spD0 != 0) {
                             addstr(&execlist, "-dont_warn_unused");
                         }
-                        if (exception_handling != 0) {
+                        if (exception_handling) {
                             addstr(&execlist, "-lCsup");
                         }
                         addstr(&execlist, "-lC");
@@ -6729,10 +6729,10 @@ void parse_command(int argc, char** argv) {
                              (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                             (strcmp(argv[var_s0], "-exceptions") == 0)) {
                             if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
-                                exception_handling = 1;
+                                exception_handling = TRUE;
                                 relocate_passes("f", NULL, NULL);
                                 if (access(cfe, EX_OK) == -1) {
-                                    exception_handling = 0;
+                                    exception_handling = FALSE;
                                     relocate_passes("f", NULL, NULL);
                                 } else {
                                     break;
@@ -7299,7 +7299,7 @@ void parse_command(int argc, char** argv) {
                         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-no_exceptions") == 0)) {
                         if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
-                            exception_handling = 0;
+                            exception_handling = FALSE;
                             relocate_passes("f", NULL, NULL);
                             break;
                         }
@@ -10735,7 +10735,7 @@ int force_use_cfront(int argc, char** argv) {
         if (strcmp(argv[i], "-exceptions") == 0) {
             D_1000BF7C = 1;
         }
-        if ((D_1000BF7C == 0) && (exception_handling == 0) &&
+        if ((D_1000BF7C == 0) && !exception_handling &&
             ((strcmp(argv[i], "-F") == 0) || (strcmp(argv[i], "-Fc") == 0))) {
             return 1;
         }
