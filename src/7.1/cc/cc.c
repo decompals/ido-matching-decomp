@@ -502,7 +502,8 @@ int disable_inlines = 0;
 int cfront_compatible = 1;
 int make_edison_shlib = FALSE; //!< flag, pseudoboolean. Set by "-shared"
 int plusIflag = 0;
-int signedcharflag = 0;
+int signedcharflag = FALSE; //!< flag, boolean. Use signed chars, only effective on non-default C_COMPILER_CHOICEs. Set
+                            //!< by "-signed" passed on to `cfe` as "-s".
 int Lflag = 0;
 int set_loop_unroll = 0;
 int mflag = 0;
@@ -511,7 +512,7 @@ int stdflag = 0;
 int cplusflag = 0;
 int ucodeflag = 0;
 int Bflag = 0;
-int fiveflag = 0;
+int fiveflag = FALSE; //!< flag, pseudoboolean. Set by passing "-5".
 int automaticflag = 1;
 int emptyIflag = 0;
 int cordflag = 0;
@@ -522,35 +523,46 @@ int unrollflag = 0;
 int libm_spec = 0;
 int libfastm_spec = 0;
 int editflag = 0;
-int oldccomflag = 0;
-int oldcflag = 0;
-int oldcppflag = 0;
-int fflag = 0; // Unused
-int tpflag = 0;
-int ddoptflag = 0;
-int uopt0flag = 0;
-int protoflag = 0; // Unused
-int kminabiflag = 0;
-int kpicopt_flag = 0;
-int nokpicopt_flag = 0;
-int elfflag = 1;
-int coff_spec = 0;
-int elf_spec = 0;
-int compose_first_G0 = 0;
+int oldccomflag = FALSE; //!< flag, boolean. Purpose unclear, sets @see oldcflag. Never set to `TRUE`.
+int oldcflag = FALSE;    //!< flag, boolean. Purpose unclear, related to preprocessing. Never set to `TRUE`.
+int oldcppflag = FALSE;  //!< flag, boolean. Use a different preprocessor from the one built in to `cfe`, `acpp` in ANSI
+                         //!< modes and `cpp` in ANSICHOICE_KR. (`cfe` is run with "-nocpp" passed.). Set by "-oldcpp".
+int fflag = 0;           // Unused
+int tpflag = FALSE;      //!< flag, boolean. Never set. Related to "-oldcpp".
+int ddoptflag =
+    FALSE; //!< flag, boolean. Whether to run `ddopt`. Set by "-ddopt". Passed on to `as1` as "-e [source file]".
+int uopt0flag = FALSE;      //!< flag, boolean. Whether to run `uopt0`. Unset by "-nouopt0", never set.
+int protoflag = FALSE;      // Unused
+int kminabiflag = FALSE;    //!< flag, boolean. Set by "-Kminabi". Not checked.
+int kpicopt_flag = FALSE;   //!< flag, boolean. Set by "-kpicopt". Passed on to `uopt` as "-kpicopt".
+int nokpicopt_flag = FALSE; //!< flag, boolean. Set by "-nokpicopt". Passed on to `uopt` as "-nokpicopt".
+int elfflag = TRUE; //!< flag, boolean. Whether to assemble/link an ELF. On by default, off for irix4, and set by
+                    //!< "-elf" or "-systype svr4". @see elf_spec.
+int coff_spec =
+    FALSE; //!< flag, boolean. Whether "-coff" has been passed explicitly. Passed on to other programs as "-coff"
+int elf_spec = FALSE;         //!< boolean. Whether "-elf" has been passed explicitly. Never checked. @see elfflag.
+int compose_first_G0 = FALSE; //!< flag, boolean. Never set except in a dead block.
 
-// Flags relating to the specified MIPS ISA
+//! Flags relating to the specified MIPS ISA
 int mips2_spec_flag =
     FALSE; //!< flag, boolean. Whether "-mips2" has been passed explicitly (and not overridden). Set by "-mips2".
 //! Only one of the following can be set at once.
-int mips1flag = FALSE; //! flag, boolean. Set by "-mips1".
-int mips2flag = TRUE;  //! flag, boolean. Set by "-mips2". @see mips2_spec_flag
-int mips3flag = FALSE; //! flag, boolean. Set by "-mips3" and in several other places.
+int mips1flag = FALSE; //!< flag, boolean. Set by "-mips1".
+int mips2flag = TRUE;  //!< flag, boolean. Set by "-mips2". @see mips2_spec_flag
+int mips3flag = FALSE; //!< flag, boolean. Set by "-mips3" and in several other places.
 
-int ignore_unresolved_flag = 0;
-int no_unresolved_flag = 0;
-int swopcodeflag = 0;
-int dwopcodeflag = 0;
-int sixty4bit_spec = 0;         //!< Set and not used, not clear if boolean
+//! Flags associated to resolving symbols. `ignore_unresolved_flag` takes precedence.
+int ignore_unresolved_flag =
+    FALSE; //!< flag, boolean. Set by passing "-ignore_unresolved". Passed on to `ld` as "-ignore_unresolved"
+int no_unresolved_flag =
+    FALSE; //!< flag, boolean. Set by passing "-no_unresolved". Passed on to `ld` as "-no_unresolved"
+
+int swopcodeflag =
+    FALSE; //!< flag, boolean. Set by passing "-swopcode". Errors if used with 64-bit, otherwise no effect.
+int dwopcodeflag = FALSE; //!< flag, boolean. Set by passing "-mips3". Passed on to other programs as "-dwopcode".
+                          //!< Cannot be used with "-mips1" or "-mips2"
+
+int sixty4bit_spec = FALSE;     //!< boolean. Set by passing "-64bit". Unused.
 int sixty4bitflag = FALSE;      //!< flag, boolean. Always 0
 int thirty2bitflag = FALSE;     //!< flag, boolean
 int fullasoptflag = FALSE;      //!< flag, boolean. Whether full assembler optimisation is enabled. Set by "-fullasopt".
@@ -560,11 +572,17 @@ int non_shared_emitted = FALSE; //!< flag, boolean. Whether non_shared code will
 int longlong_emitted = FALSE;   //!< boolean. Set when passing on "-D_LONGLONG"
 int non_shared = FALSE; //!< flag, boolean. Produce a static executable (non-PIC, incompatible with -KPIC, -shared,
                         //!< etc.) Set by "-non_shared".
-int Gseen_flag = 0;
-int transitive_link = 0;
-int full_transitive_link = 0;
-int no_transitive_link = 0;
-int quickstart_info = 0;
+int Gseen_flag =
+    FALSE; //!< boolean. Whether a "-G" argument has been parsed yet, triggers a relocate_passes() call if not.
+
+//! Flags associated to transitive linking. Only one may be `TRUE` at a time: the last will take precedence.
+int transitive_link = FALSE; //!< flag, boolean. Set by "-transitive_link". Passed on to `ld` as "-transitive_link"
+int full_transitive_link =
+    FALSE; //!< flag, boolean. Set by "-full_transitive_link". Passed on to `ld` as "-full_transitive_link"
+int no_transitive_link =
+    FALSE; //!< flag, boolean. Set by "-no_transitive_link". Passed on to `ld` as "-no_transitive_link"
+
+int quickstart_info = FALSE;    //!< flag, boolean. Set by "-quickstart_info". Passed on to `ld` as "-quickstart_info".
 int force_rm_dead_code = FALSE; //!< flag, boolean. Whether `uld` should remove dead code? Set by "-rm_dead_code",
                                 //!< passed on as "-preserve_dead_code" if not set.
 int kpic_flag = TRUE;    //!< flag, boolean. Whether to emit Position-Independent Code. On by default, set by "-KPIC",
@@ -575,15 +593,18 @@ int excpt_flag = FALSE; //!< flag, boolean. Set by "-excpt". Purpose unclear, no
 int trapuv_flag =
     FALSE; //!< flag, boolean. Whether to compile with trapping for uninitialised variables. Set by "-trapuv".
 int dmips_emit = 0;
-int Xvalues_Flag = 0; // Unused
-int user_systype = 0;
-int ddoptinfo = 0;
-int systype_seen = 0;
-int multiple_systype = 0;
-int systype_warn = 0;
-int svr4_systype = 0;
-int c_inline = 0;
-int tfp_flag = 0;
+int Xvalues_Flag = 0;     // Unused
+int user_systype = FALSE; //!< boolean. Whether user has specified a `-systype` argument.
+int ddoptinfo = FALSE;    //!< flag, boolean. Set by "-ddoptinfo". Passed on to `ddopt` as "-e", inter alia.
+int systype_seen = FALSE; //!< boolean. Whether a "-systype" argument has been parsed yet, used to confirm that it
+                          //!< precedes any "-B" arguments.
+int multiple_systype =
+    FALSE;                //!< boolean. Disables some systype checking. Set by passing multiple "-systype" arguments.
+int systype_warn = FALSE; //!< flag, boolean. Warned about unrecongized argument to "-systype".
+int svr4_systype = FALSE; //!< flag, boolean. Set by main() as default, unset by IRIX4, set by "-systype svr4"
+int c_inline = FALSE; //!< flag, boolean. Whether to run `umerge`. Set by `cfe`/`fcom` returning `0xFF`. Passes on to
+                      //!< `umerge` as "-c_inline".
+int tfp_flag = FALSE; //!< flag, boolean. Set by "-tfp"
 int abi_flag = 0;
 int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
 int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
@@ -1007,7 +1028,7 @@ int main(int argc, char** argv) {
             Gnum = "8";
         } else if (strcmp(argv[i], "-coff") == 0) {
             LD = "old_ld";
-            coff_spec = 1;
+            coff_spec = TRUE;
             kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-mips3") == 0) {
@@ -1095,7 +1116,7 @@ int main(int argc, char** argv) {
     }
 
     if (sp148 == 0) {
-        if (non_shared || (coff_spec != 0) || mips3flag || excpt_flag) {
+        if (non_shared || coff_spec || mips3flag || excpt_flag) {
             addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
         } else if (abi_flag != 0) {
             addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
@@ -1114,13 +1135,13 @@ int main(int argc, char** argv) {
     }
 
     if (compiler == COMPILER_1) {
-        oldcflag = 0;
+        oldcflag = FALSE;
     } else {
         cpp_stdflag = "-std0";
     }
 
     systype = "svr4";
-    svr4_systype = 1;
+    svr4_systype = TRUE;
 
     process_config(argc, argv);
     parse_command(argc - 1, argv + 1);
@@ -1147,8 +1168,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (user_systype == 0) {
-        if (fiveflag != 0) {
+    if (!user_systype) {
+        if (fiveflag) {
             include = mkstr(comp_target_root, "usr/5include", NULL);
         } else {
             einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
@@ -1332,7 +1353,7 @@ int main(int argc, char** argv) {
             break;
     }
 
-    if (mp_flag && (ddoptflag != 0)) {
+    if (mp_flag && ddoptflag) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
         exit(2);
     }
@@ -1389,7 +1410,7 @@ int main(int argc, char** argv) {
 
     if (dmips_emit == 0) {
         if (mips2flag) {
-            if (dwopcodeflag != 0) {
+            if (dwopcodeflag) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
                 exit(2);
             }
@@ -1416,7 +1437,7 @@ int main(int argc, char** argv) {
             add_info("-mips3");
             relocate_passes("M", NULL, NULL);
         }
-    } else if (dwopcodeflag != 0) {
+    } else if (dwopcodeflag) {
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
         if (!mips3flag) {
@@ -1698,8 +1719,8 @@ int main(int argc, char** argv) {
             switch (srcsuf) { /* switch 19 */
                 case SUF_6:   /* switch 19 */
                 case 'c':     /* switch 19 */
-                    if (oldccomflag != 1) {
-                        oldcflag = 0;
+                    if (oldccomflag != TRUE) {
+                        oldcflag = FALSE;
                     }
                     if (!docpp) {
                         if (default_nocpp) {
@@ -1826,7 +1847,7 @@ int main(int argc, char** argv) {
 
         if ((srcsuf == 'c') || (srcsuf == SUF_6) ||
             ((compiler == COMPILER_1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 'h'))) {
-            if ((cppchoice != CPP_CHOICE_2) || ((oldcppflag != 0) && (ansichoice != ANSICHOICE_KR))) {
+            if ((cppchoice != CPP_CHOICE_2) || (oldcppflag && (ansichoice != ANSICHOICE_KR))) {
                 cppchoice = CPP_CHOICE_1;
                 relocate_passes("p", NULL, NULL);
             }
@@ -1984,14 +2005,14 @@ int main(int argc, char** argv) {
         if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&execlist, "-D__INLINE_INTRINSICS");
             addstr(&execlist, "-Dsgi");
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 addstr(&execlist, "-DSVR3");
                 addstr(&execlist, "-D__SVR3");
             }
             addstr(&execlist, "-D__sgi");
         } else {
             addstr(&execlist, "-D__sgi");
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 addstr(&execlist, "-D__SVR3");
             }
         }
@@ -2011,7 +2032,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
             if (!irix4) {
-                if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
+                if (svr4_systype && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
@@ -2025,7 +2046,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
             if (!irix4) {
-                if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
+                if (svr4_systype && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
@@ -2047,7 +2068,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, mkstr("-D_SYSTYPE_", systype, NULL));
         }
 
-        if (svr4_systype == 0) {
+        if (!svr4_systype) {
             if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, "-DSYSTYPE_SYSV");
             }
@@ -2083,7 +2104,7 @@ int main(int argc, char** argv) {
         if (irix4) {
             include = mkstr("/usr/irix4/", "usr/include", NULL);
         }
-        if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || (fiveflag != 0)) &&
+        if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || fiveflag) &&
             ((compiler != COMPILER_1) || (c_compiler_choice == C_COMPILER_CHOICE_0)) &&
             ((compiler != COMPILER_3) || (D_1000BF74 == 0))) {
             addstr(&execlist, "-I");
@@ -2144,7 +2165,7 @@ int main(int argc, char** argv) {
 
         if (((compchoice != COMP_CHOICE_3) && (compchoice != COMP_CHOICE_4)) ||
             ((compiler != COMPILER_1) && (compiler != COMPILER_4)) || run_sopt || (cmp_flag & 1) || (cmp_flag & 8) ||
-            acpp || (oldcppflag != 0)) {
+            acpp || oldcppflag) {
             if (run((((compiler == COMPILER_3) && (D_1000BF74 != 0)) ? cfe : cpp), execlist.entries, NULL, passout,
                     NULL) != 0) {
                 runerror++;
@@ -2177,7 +2198,7 @@ int main(int argc, char** argv) {
             switch (srcsuf) {
                 case 'c':
                     addstr(&execlist, "-D_LANGUAGE_C");
-                    if (oldcflag == 0) {
+                    if (!oldcflag) {
                         addstr(&execlist, "-D_CFE");
                     }
                     break;
@@ -2253,8 +2274,7 @@ int main(int argc, char** argv) {
         }
 
         if ((Eflag == 0) && (Pflag == 0)) {
-            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
-                 (fiveflag != 0)) &&
+            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || fiveflag) &&
                 (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 addstr(&execlist, "-I");
             }
@@ -2330,16 +2350,18 @@ int main(int argc, char** argv) {
             exit(2);
         }
 
-        if (oldcflag == 1) {
-            if (oldcppflag != 0) {
+        if (oldcflag == TRUE) {
+            if (oldcppflag) {
                 retcode = run(cpp, execlist.entries, NULL, passout, NULL);
             } else {
                 retcode = run(cpp, execlist.entries, NULL, passout, NULL);
             }
-        } else if (oldcppflag != 0) {
-            retcode = run(cpp, execlist.entries, NULL, passout, NULL);
         } else {
-            retcode = run(cfe, execlist.entries, NULL, passout, NULL);
+            if (oldcppflag) {
+                retcode = run(cpp, execlist.entries, NULL, passout, NULL);
+            } else {
+                retcode = run(cfe, execlist.entries, NULL, passout, NULL);
+            }
         }
 
         if (retcode != 0) {
@@ -2605,7 +2627,7 @@ int main(int argc, char** argv) {
         }
 
         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-            if (!docpp || (oldcppflag != 0) || run_sopt || (srcsuf == 'i') || acpp) {
+            if (!docpp || oldcppflag || run_sopt || (srcsuf == 'i') || acpp) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
             }
@@ -2638,7 +2660,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-Qn");
                 }
             }
-            if (signedcharflag != 0) {
+            if (signedcharflag) {
                 addstr(&execlist, "-s");
             } else {
                 addstr(&execlist, "-u");
@@ -2764,7 +2786,7 @@ int main(int argc, char** argv) {
                 passin = passout;
             }
 
-            if ((!docpp || (oldcppflag != 0) || run_sopt || (srcsuf == 'i') || acpp || (cmp_flag & 0x10000)) &&
+            if ((!docpp || oldcppflag || run_sopt || (srcsuf == 'i') || acpp || (cmp_flag & 0x10000)) &&
                 (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
@@ -2791,11 +2813,11 @@ int main(int argc, char** argv) {
                 exit(2);
             }
 
-            if ((!docpp || (srcsuf == 'i') || acpp || (oldcppflag != 0)) && !run_sopt) {
+            if ((!docpp || (srcsuf == 'i') || acpp || oldcppflag) && !run_sopt) {
                 if (!default_nocpp && ((srcsuf == 'c') || (srcsuf == 's') || (srcsuf == 'p'))) {
                     addstr(&execlist, "-nocpp");
                 }
-                if (srcsuf == i) {
+                if (srcsuf == i) { //! @bug typo for 'i'? So was this variable was actually called `i`?
                     addstr(&execlist, "-nocpp");
                 }
             }
@@ -2866,11 +2888,11 @@ int main(int argc, char** argv) {
             }
 
             if (retcode == 0xFF) {
-                c_inline = 1;
+                c_inline = TRUE;
                 addstr(&umergeflags, "-c_inline");
             } else if (retcode != 0) {
                 runerror++;
-                if ((oldcflag == 1) && docpp && (srcsuf != 'i') && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
+                if ((oldcflag == TRUE) && docpp && (srcsuf != 'i') && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                     unlink(passin);
                 }
                 if (Kflag == 0) {
@@ -2880,7 +2902,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((run_sopt && (Kflag == 0)) || acpp || (oldcppflag != 0) || (cmp_flag & 0x10000)) {
+            if ((run_sopt && (Kflag == 0)) || acpp || oldcppflag || (cmp_flag & 0x10000)) {
                 unlink(passin);
             }
 
@@ -2979,7 +3001,7 @@ int main(int argc, char** argv) {
 
         retcode = run(ccom, execlist.entries, var_s1, passout, errout);
         if (retcode == 0xFF) {
-            c_inline = 1;
+            c_inline = TRUE;
             addstr(&umergeflags, "-c_inline");
         } else if (retcode != 0) {
             if (editflag != 0) {
@@ -3813,7 +3835,7 @@ int main(int argc, char** argv) {
 
     pass_ujoin:
         if ((Oflag != 3) && (Oflag != 4) && (jflag == 0)) {
-            if (c_inline == 0) {
+            if (!c_inline) {
                 goto pass_uloop;
             } else {
                 goto pass_umerge;
@@ -3902,7 +3924,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if (((fiveflag != 0) || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) &&
+        if ((fiveflag || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) &&
             (strcmp("/", comp_target_root) != 0)) {
             if (non_shared) {
                 addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
@@ -3910,7 +3932,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
             }
         }
-        if (svr4_systype != 0) {
+        if (svr4_systype) {
             if (compchoice == COMP_CHOICE_1) {
                 addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
             }
@@ -4124,7 +4146,7 @@ int main(int argc, char** argv) {
         }
 
     pass_umerge:
-        if ((Oflag == 3) || (Oflag == 4) || (c_inline != 0)) {
+        if ((Oflag == 3) || (Oflag == 4) || c_inline) {
             execlist.length = 0;
             addstr(&execlist, "umerge");
             if (vflag != 0) {
@@ -4225,7 +4247,7 @@ int main(int argc, char** argv) {
         }
 
     pass_uopt0:
-        if ((uopt0flag == 1) && (compiler == COMPILER_3) && (Oflag >= 2)) {
+        if ((uopt0flag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "uopt0");
             if (vflag != 0) {
@@ -4279,7 +4301,7 @@ int main(int argc, char** argv) {
         }
 
     pass_ddopt:
-        if ((ddoptflag == 1) && (compiler == COMPILER_3) && (Oflag >= 2)) {
+        if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "ddopt");
             if (vflag != 0) {
@@ -4300,7 +4322,7 @@ int main(int argc, char** argv) {
                 passout = tempstr[27];
             }
 
-            if (ddoptinfo != 0) {
+            if (ddoptinfo) {
                 addstr(&execlist, "-e");
                 if (((Hchar == 'd') && (ucodeflag == 0)) || (Kflag != 0)) {
                     addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
@@ -4349,10 +4371,10 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-noPalias");
             }
             if (!irix4) {
-                if (kpicopt_flag != 0) {
+                if (kpicopt_flag) {
                     addstr(&execlist, "-kpicopt");
                 }
-                if (nokpicopt_flag != 0) {
+                if (nokpicopt_flag) {
                     addstr(&execlist, "-nokpicopt");
                 }
             }
@@ -4442,7 +4464,7 @@ int main(int argc, char** argv) {
         }
         addstr(&execlist, "-G");
         addstr(&execlist, Gnum);
-        if (kpic_flag && (coff_spec == 0) && !irix4) {
+        if (kpic_flag && !coff_spec && !irix4) {
             if (Oflag >= 3) {
                 addstr(&execlist, "-pic1");
             } else {
@@ -4609,7 +4631,7 @@ int main(int argc, char** argv) {
         execlist.length = 0;
         addstr(&execlist, "as1");
         addstr(&execlist, "-t5_ll_sc_bug");
-        if (tfp_flag != 0) {
+        if (tfp_flag) {
             addstr(&execlist, "-tfp");
         }
         if (noaliasokflag) {
@@ -4626,12 +4648,12 @@ int main(int argc, char** argv) {
         if (((compiler == COMPILER_4) || (srcsuf == 's')) && !kpic_spec && !irix4) {
             addstr(&execlist, "-pic0");
         }
-        if (coff_spec != 0) {
+        if (coff_spec) {
             addstr(&execlist, "-coff");
             kpic_flag = FALSE;
         } else if (kpic_flag) {
             if (!irix4) {
-                if (coff_spec == 0) {
+                if (!coff_spec) {
                     addstr(&execlist, "-elf");
                     if (Oflag >= 3) {
                         addstr(&execlist, "-pic1");
@@ -4644,7 +4666,7 @@ int main(int argc, char** argv) {
                 }
             }
         } else if (!irix4) {
-            if (coff_spec != 0) {
+            if (coff_spec) {
                 addstr(&execlist, "-coff");
             } else {
                 addstr(&execlist, "-elf");
@@ -4707,7 +4729,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, passout);
         addstr(&execlist, "-t");
         addstr(&execlist, symtab);
-        if ((ddoptflag == 1) && (compiler == COMPILER_3) && (ddoptinfo != 0) && (Oflag >= 2)) {
+        if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
             addstr(&execlist, "-e");
             if (((Hchar == 'b') && (ucodeflag == 0)) || (Kflag != 0)) {
                 addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
@@ -4746,7 +4768,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((ddoptflag == 1) && (compiler == COMPILER_3) && (ddoptinfo != 0) && (Oflag >= 2)) {
+        if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
             unlink(tempstr[26]);
         }
         if ((srcsuf != 'G') && (Kflag == 0)) {
@@ -4798,7 +4820,7 @@ int main(int argc, char** argv) {
             call_shared = FALSE;
             exit(2);
         }
-        if (old_non_shared && (coff_spec != 0)) {
+        if (old_non_shared && coff_spec) {
             error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
@@ -4842,7 +4864,7 @@ int main(int argc, char** argv) {
         // pass_ld
         execlist.length = 0;
         addstr(&execlist, LD);
-        if (kpic_flag && !irix4 && (coff_spec == 0)) {
+        if (kpic_flag && !irix4 && !coff_spec) {
             addstr(&ldflags, "-KPIC");
         }
         if (non_shared && !non_shared_emitted) {
@@ -4851,21 +4873,21 @@ int main(int argc, char** argv) {
                 non_shared_emitted = TRUE;
             }
         } else if (call_shared || make_edison_shlib) {
-            if (transitive_link != 0) {
+            if (transitive_link) {
                 addstr(&ldflags, "-transitive_link");
-            } else if (full_transitive_link != 0) {
+            } else if (full_transitive_link) {
                 addstr(&ldflags, "-full_transitive_link");
-            } else if (no_transitive_link != 0) {
+            } else if (no_transitive_link) {
                 addstr(&ldflags, "-no_transitive_link");
             }
         }
-        if (quickstart_info != 0) {
+        if (quickstart_info) {
             addstr(&ldflags, "-quickstart_info");
         }
-        if ((elfflag != 0) && (coff_spec == 0)) {
+        if (elfflag && !coff_spec) {
             addstr(&execlist, "-elf");
         }
-        if (tfp_flag != 0) {
+        if (tfp_flag) {
             addstr(&execlist, "-allow_jump_at_eop");
         }
         if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
@@ -4905,7 +4927,7 @@ int main(int argc, char** argv) {
                 crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
             }
         }
-        if (svr4_systype != 0) {
+        if (svr4_systype) {
             if (compchoice == COMP_CHOICE_1) {
                 addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
             }
@@ -4913,9 +4935,9 @@ int main(int argc, char** argv) {
             if (call_shared || make_edison_shlib) {
                 addstr(&execlist, "-require_dynamic_link");
                 addstr(&execlist, "_rld_new_interface");
-                if (ignore_unresolved_flag != 0) {
+                if (ignore_unresolved_flag) {
                     addstr(&execlist, "-ignore_unresolved");
-                } else if (no_unresolved_flag != 0) {
+                } else if (no_unresolved_flag) {
                     addstr(&execlist, "-no_unresolved");
                 } else if (default_svr4 || make_edison_shlib) {
                     addstr(&execlist, "-ignore_unresolved");
@@ -4924,7 +4946,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        if (fiveflag != 0) {
+        if (fiveflag) {
             addstr(&execlist, mkstr("-L", runlib, NULL));
         }
         if ((allBstring != NULL) && (*allBstring != '\0')) {
@@ -5299,10 +5321,10 @@ void process_config(int argc, char** argv) {
                 exit(2);
             }
 
-            user_systype = 1;
+            user_systype = TRUE;
             systype = argv[i];
             if (strcmp(systype, "svr4") == 0) {
-                svr4_systype = 1;
+                svr4_systype = TRUE;
             } else {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
                 exit(2);
@@ -5314,26 +5336,26 @@ void process_config(int argc, char** argv) {
                 && (strcmp(systype, "svr3") != 0) 
                 && (strcmp(systype, "sysv") != 0) 
                 && (fopen(strcat("/", systype), "r") == NULL) 
-                && (systype_warn == 0)) {
+                && !systype_warn) {
                 // clang-format on
                 error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                       "This systype doesn't exist on this machine; changed systype to svr3.\n");
-                systype_warn = 1;
+                systype_warn = TRUE;
                 systype = "svr3";
             }
 
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 sp1144 = mkstr(comp_target_root, systype, "/", NULL);
             }
             break;
         }
     }
 
-    if (user_systype == 0) {
+    if (!user_systype) {
         sp1144 = mkstr(comp_target_root, systype, "/", NULL);
     }
 
-    user_systype = 0;
+    user_systype = FALSE;
     sp1140 = mkstr(sp1144, "usr/lib/", currcomp, "comp.config", NULL);
     sp113C = fopen(sp1140, "r");
     if (sp113C != NULL) {
@@ -5400,8 +5422,8 @@ void parse_command(int argc, char** argv) {
         irix4 = TRUE;
         comp_host_root = "/usr/irix4/";
         systype = "";
-        elfflag = 0;
-        svr4_systype = 0;
+        elfflag = FALSE;
+        svr4_systype = FALSE;
         call_shared = FALSE;
         non_shared = FALSE;
         old_non_shared = FALSE;
@@ -5440,7 +5462,7 @@ void parse_command(int argc, char** argv) {
                     error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-5 not supported\n");
                     if (argv[var_s0][2] == '\0') {
                         if (Bflag != 0) {
-                            if (fiveflag == 0) {
+                            if (!fiveflag) {
                                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
                                 exit(2);
                             }
@@ -5464,8 +5486,8 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-64bit") == 0) {
                         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                               "-64bit option is not yet implemented for ucode compilers, ignore\n");
-                        sixty4bit_spec = 1;
-                        if (swopcodeflag != 0) {
+                        sixty4bit_spec = TRUE;
+                        if (swopcodeflag) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                   "-64bit can not be used with -swopcode for ucode compilers\n");
                             exit(2);
@@ -5669,9 +5691,9 @@ void parse_command(int argc, char** argv) {
                             exit(2);
                         }
                     }
-                    if (Gseen_flag == 0) {
+                    if (!Gseen_flag) {
                         relocate_passes(tstring, hstring, NULL);
-                        Gseen_flag = 1;
+                        Gseen_flag = TRUE;
                     }
                     break;
 
@@ -5753,7 +5775,7 @@ void parse_command(int argc, char** argv) {
                             Kpass = var_s2;
 
                             if (strncmp(Karg, "minabi", 6) == 0) {
-                                kminabiflag = 1;
+                                kminabiflag = TRUE;
                             } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
                             } else if (strncmp(Karg, "sd", 2) == 0) {
@@ -5785,7 +5807,7 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if (svr4_systype != 0) {
+                    if (svr4_systype) {
                         Kpass = argv[var_s0] + 2;
                         if (*Kpass == '\0') {
                             Kflag++;
@@ -5801,7 +5823,7 @@ void parse_command(int argc, char** argv) {
                             Kpass = var_s2;
 
                             if (strncmp(Karg, "minabi", 6) == 0) {
-                                kminabiflag = 1;
+                                kminabiflag = TRUE;
                             } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
                             } else if (strncmp(Karg, "sd", 2) == 0) {
@@ -6262,8 +6284,8 @@ void parse_command(int argc, char** argv) {
                                                         var_s3++;
                                                     }
                                                 }
-                                                if (Gseen_flag == 0) {
-                                                    Gseen_flag = 1;
+                                                if (!Gseen_flag) {
+                                                    Gseen_flag = TRUE;
                                                     relocate_passes(tstring, hstring, NULL);
                                                 }
                                                 Warg = var_s3;
@@ -6614,7 +6636,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-coff") == 0) {
                         addstr(&ldflags, argv[var_s0]);
-                        coff_spec = 1;
+                        coff_spec = TRUE;
                         if (default_call_shared == TRUE) {
                             if (!non_shared) {
                                 old_non_shared = TRUE;
@@ -6718,7 +6740,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ddoptinfo") == 0) {
-                        ddoptinfo = 1;
+                        ddoptinfo = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
@@ -6731,7 +6753,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ddopt") == 0) {
-                        ddoptflag = 1;
+                        ddoptflag = TRUE;
                         break;
                     }
                     if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-d_lines") == 0)) {
@@ -6839,8 +6861,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-elf") == 0) {
-                        elfflag = 1;
-                        elf_spec = 1;
+                        elfflag = TRUE;
+                        elf_spec = TRUE;
                         addstr(&asflags, argv[var_s0]);
                         addstr(&ldflags, argv[var_s0]);
                         break;
@@ -6891,11 +6913,12 @@ void parse_command(int argc, char** argv) {
                     goto bad_option;
 
                 case 'f': /* switch 1 */
+                          // Accounts for a misspelling?
                     if ((strcmp(argv[var_s0], "-full_transtive_link") == 0) ||
                         (strcmp(argv[var_s0], "-full_transitive_link") == 0)) {
-                        full_transitive_link = 1;
-                        transitive_link = 0;
-                        no_transitive_link = 0;
+                        full_transitive_link = TRUE;
+                        transitive_link = FALSE;
+                        no_transitive_link = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-feedback") == 0) {
@@ -7075,7 +7098,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ignore_unresolved") == 0) {
-                        ignore_unresolved_flag = 1;
+                        ignore_unresolved_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ignore_minor") == 0) {
@@ -7087,8 +7110,8 @@ void parse_command(int argc, char** argv) {
                         comp_host_root = "/usr/irix4/";
                         Gnum = "8";
                         systype = "";
-                        elfflag = 0;
-                        svr4_systype = 0;
+                        elfflag = FALSE;
+                        svr4_systype = FALSE;
                         kpic_flag = FALSE;
                         default_call_shared = FALSE;
                         call_shared = FALSE;
@@ -7157,7 +7180,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-kpicopt") == 0) {
-                        kpicopt_flag = 1;
+                        kpicopt_flag = TRUE;
                         break;
                     }
                     switch (argv[var_s0][2]) { /* switch 7; irregular */
@@ -7271,7 +7294,7 @@ void parse_command(int argc, char** argv) {
                         chip_targ = CHIP_TARGET_MIPS1;
                         mips1flag = TRUE;
                         mips2flag = FALSE;
-                        if (dwopcodeflag != 0) {
+                        if (dwopcodeflag) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
                             exit(2);
                         }
@@ -7310,7 +7333,7 @@ void parse_command(int argc, char** argv) {
                         }
                         chip_targ = CHIP_TARGET_MIPS3;
                         mips3flag = TRUE;
-                        dwopcodeflag = 1;
+                        dwopcodeflag = TRUE;
                         relocate_passes("M", NULL, NULL);
                         if (!non_shared_emitted) {
                             addstr(&ldflags, "-non_shared");
@@ -7366,17 +7389,17 @@ void parse_command(int argc, char** argv) {
 
                 case 'n': /* switch 1 */
                     if (strcmp(argv[var_s0], "-nokpicopt") == 0) {
-                        nokpicopt_flag = 1;
+                        nokpicopt_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-no_unresolved") == 0) {
-                        no_unresolved_flag = 1;
+                        no_unresolved_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-no_transitive_link") == 0) {
-                        transitive_link = 0;
-                        full_transitive_link = 0;
-                        no_transitive_link = 1;
+                        transitive_link = FALSE;
+                        full_transitive_link = FALSE;
+                        no_transitive_link = TRUE;
                         break;
                     }
                     if ((compiler == COMPILER_1) &&
@@ -7408,7 +7431,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-nouopt0") == 0) {
-                        uopt0flag = 0;
+                        uopt0flag = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-noaliasok") == 0) {
@@ -7557,8 +7580,8 @@ void parse_command(int argc, char** argv) {
                             error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
                                   argv[var_s0], "");
                         } else {
-                            oldcppflag = 1;
-                            if ((compiler == COMPILER_1) && (tpflag != 0)) {
+                            oldcppflag = TRUE;
+                            if ((compiler == COMPILER_1) && tpflag) {
                                 relocate_passes(tstring, hstring, Bstring);
                             }
                         }
@@ -7750,7 +7773,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'q': /* switch 1 */
                     if (strcmp(argv[var_s0], "-quickstart_info") == 0) {
-                        quickstart_info = 1;
+                        quickstart_info = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-ql") == 0) || (strcmp(argv[var_s0], "-qp") == 0)) {
@@ -7872,30 +7895,30 @@ void parse_command(int argc, char** argv) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
                             exit(2);
                         }
-                        if (user_systype != 0) {
-                            if (strcmp(systype, argv[var_s0]) != 0) {
+                        if (user_systype) {                           // systype already specified via an argument
+                            if (strcmp(systype, argv[var_s0]) != 0) { // Different systype from previous
                                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one -systype option allowed\n");
                                 exit(2);
                             } else {
-                                multiple_systype = 1;
+                                multiple_systype = TRUE;
                             }
                         }
                         systype = argv[var_s0];
-                        user_systype = 1;
-                        if ((Bflag != 0) && (systype_seen == 0)) {
+                        user_systype = TRUE;
+                        if ((Bflag != 0) && !systype_seen) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
                             exit(2);
                         } else {
-                            systype_seen = 1;
+                            systype_seen = TRUE;
                         }
-                        if (multiple_systype == 0) {
+                        if (!multiple_systype) {
                             if (strcmp(systype, "svr4") == 0) {
-                                svr4_systype = 1;
-                                if (elfflag == 0) {
+                                svr4_systype = TRUE;
+                                if (!elfflag) {
                                     addstr(&asflags, "-elf");
                                     addstr(&ldflags, "-elf");
                                 }
-                                elfflag = 1;
+                                elfflag = TRUE;
                             } else {
                                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
                                 exit(2);
@@ -7903,16 +7926,16 @@ void parse_command(int argc, char** argv) {
                             if ((strcmp(systype, "svr4") != 0) && (strcmp(systype, "bsd43") != 0) &&
                                 (strcmp(systype, "svr3") != 0) && (strcmp(systype, "sysv") != 0) &&
                                 (fopen(strcat("/", systype), "r") == NULL)) {
-                                if (systype_warn == 0) {
+                                if (!systype_warn) {
                                     error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "This systype doesn't exist on this machine; changed systype to svr3.\n");
                                 }
                                 systype = "svr3";
                             }
-                            if (svr4_systype == 0) {
+                            if (!svr4_systype) {
                                 comp_target_root = mkstr(comp_target_root, systype, "/", NULL);
                             }
-                            if (fiveflag != 0) {
+                            if (fiveflag) {
                                 include = mkstr(comp_target_root, "usr/5include", NULL);
                             } else {
                                 einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
@@ -7927,12 +7950,12 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-swopcode") == 0) {
-                        if ((dwopcodeflag != 0) || sixty4bitflag) {
+                        if (dwopcodeflag || sixty4bitflag) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                   "-swopcode can not be used with -dwopcode/-64bit\n");
                             exit(2);
                         }
-                        swopcodeflag = 1;
+                        swopcodeflag = TRUE;
                         break;
                     }
                     if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) { // "-sopt"
@@ -8009,7 +8032,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&soptflags, "-signed");
                             addstr(&ccomflags, "-Xsigned");
                             if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                                signedcharflag = 1;
+                                signedcharflag = TRUE;
                             }
                             break;
                         }
@@ -8059,9 +8082,9 @@ void parse_command(int argc, char** argv) {
 
                 case 't': /* switch 1 */
                     if (strcmp(argv[var_s0], "-transitive_link") == 0) {
-                        full_transitive_link = 0;
-                        transitive_link = 1;
-                        no_transitive_link = 0;
+                        full_transitive_link = FALSE;
+                        transitive_link = TRUE;
+                        no_transitive_link = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-trapuv") == 0) {
@@ -8078,7 +8101,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-tfp") == 0) {
-                        tfp_flag = 1;
+                        tfp_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-traditional") == 0) {
@@ -8749,19 +8772,24 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     register const char* var_s1;
 
     currcomp = "";
+
     if (arg2 == NULL) {
         arg2 = Bstring;
     }
+
     if (arg0 == NULL) {
         var_s1 = "hpfekjusmvodqcablyzrP1EXCOnMFISUtKYwx";
         allBstring = arg2;
     } else {
         var_s1 = arg0;
     }
-    if ((strcmp(Gnum, "0") == 0) && (compose_first_G0 != 0)) {
-        compose_first_G0 = 0;
+
+    // condition never passes since `compose_first_G0` is never `TRUE`
+    if ((strcmp(Gnum, "0") == 0) && compose_first_G0) {
+        compose_first_G0 = FALSE;
         compose_G0_libs("PE1COMFIUSXnW");
     }
+
     for (; *var_s1 != '\0'; var_s1++) {
         if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == NULL)) {
             switch (*var_s1) {
@@ -8774,7 +8802,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != '\0'))) {
                         if (arg1 != NULL) {
-                            if (fiveflag != 0) {
+                            if (fiveflag) {
                                 includeB = mkstr(arg1, "usr/5include", arg2, NULL);
                             } else if (abi_flag != 0) {
                                 includeB = mkstr(arg1, "usr/include/abi", arg2, NULL);
@@ -8782,13 +8810,15 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 eincludeB = mkstr(arg1, "usr/include/CC", arg2, NULL);
                                 includeB = mkstr(arg1, "usr/include", arg2, NULL);
                             }
-                        } else if (fiveflag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/5include", arg2, NULL);
-                        } else if (abi_flag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/include/abi", arg2, NULL);
                         } else {
-                            eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, NULL);
-                            includeB = mkstr(comp_target_root, "usr/include", arg2, NULL);
+                            if (fiveflag) {
+                                includeB = mkstr(comp_target_root, "usr/5include", arg2, NULL);
+                            } else if (abi_flag != 0) {
+                                includeB = mkstr(comp_target_root, "usr/include/abi", arg2, NULL);
+                            } else {
+                                eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, NULL);
+                                includeB = mkstr(comp_target_root, "usr/include", arg2, NULL);
+                            }
                         }
                     } else {
                         includeB = NULL;
@@ -9500,7 +9530,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
 
 // function newrunlib # 9
 void newrunlib(void) {
-    if (fiveflag != 0) {
+    if (fiveflag) {
         runlib_base = "usr/5lib";
     } else if (irix4) {
         runlib_base = "/usr/irix4/";
