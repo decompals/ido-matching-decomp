@@ -624,7 +624,8 @@ int chip_targ = -1; //!< unset, mips1, mips2 or mips3
 int nobjs = 0;
 int targetsex = BIGENDIAN;
 int default_svr4 = 0;
-int irix4 = 0;
+int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or the environment variable
+                   //!< "SGI_IRIX4"
 char* runlib = "/";
 char* runlib_base = "/";
 static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, 0x1900 };
@@ -939,7 +940,7 @@ int main(int argc, char** argv) {
                 Gnum = "8";
             }
         } else if (strcmp(argv[i], "-irix4") == 0) {
-            irix4 = 1;
+            irix4 = TRUE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-coff") == 0) {
             LD = "old_ld";
@@ -1186,7 +1187,7 @@ int main(int argc, char** argv) {
             addstr(&cppflags, "-DMIPSEB");
         }
         if ((compiler == COMPILER_1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) ||
-                                         ((ansichoice == ANSICHOICE_XANSI) && (irix4 == 0)))) {
+                                         ((ansichoice == ANSICHOICE_XANSI) && !irix4))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
         if ((compiler == COMPILER_1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
@@ -1209,7 +1210,7 @@ int main(int argc, char** argv) {
             addstr(&cppflags, "-DMIPSEL");
         }
         if ((compiler == COMPILER_1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) ||
-                                         ((ansichoice == ANSICHOICE_XANSI) && (irix4 == 0)))) {
+                                         ((ansichoice == ANSICHOICE_XANSI) && !irix4))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
         if ((compiler == COMPILER_1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
@@ -1276,11 +1277,11 @@ int main(int argc, char** argv) {
         error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
-    if ((irix4 != 0) && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+    if (irix4 && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
         error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
         exit(2);
     }
-    if ((irix4 != 0) && (compiler == COMPILER_3) && (D_1000BF74 != 0)) {
+    if (irix4 && (compiler == COMPILER_3) && (D_1000BF74 != 0)) {
         error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
         exit(2);
     }
@@ -1616,7 +1617,7 @@ int main(int argc, char** argv) {
 
     repeat_after_edit:
         if (compchoice == 0) {
-            if (irix4 != 0) {
+            if (irix4) {
                 if (ansichoice == ANSICHOICE_KR) {
                     compchoice = 1;
                 } else {
@@ -1752,7 +1753,7 @@ int main(int argc, char** argv) {
         sp114 = cppchoice;
         execlist.length = 0;
 
-        if ((Eflag != 0) && (irix4 == 0)) {
+        if ((Eflag != 0) && !irix4) {
             compchoice = 3;
         } else if (srcsuf == 's') {
             compchoice = 4;
@@ -1943,7 +1944,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-Dhost_mips");
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
-            if (irix4 == 0) {
+            if (!irix4) {
                 if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
@@ -1957,7 +1958,7 @@ int main(int argc, char** argv) {
         } else {
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
-            if (irix4 == 0) {
+            if (!irix4) {
                 if ((svr4_systype != 0) && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
@@ -1969,7 +1970,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D__DSO__");
         }
 
-        if ((systype != NULL) && (irix4 == 0)) {
+        if ((systype != NULL) && !irix4) {
             var_s1 = systype;
             while (*var_s1 != '\0') {
                 *var_s1++ = toupper(*var_s1);
@@ -2013,7 +2014,7 @@ int main(int argc, char** argv) {
         }
         dmips_emit = 1;
 
-        if (irix4 != 0) {
+        if (irix4) {
             include = mkstr("/usr/irix4/", "usr/include", NULL);
         }
         if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || (fiveflag != 0)) &&
@@ -3445,7 +3446,7 @@ int main(int argc, char** argv) {
             if (vflag != 0) {
                 addstr(&execlist, "-lo=lno");
             }
-            if (irix4 != 0) {
+            if (irix4) {
                 addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
             } else {
                 addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
@@ -3555,10 +3556,10 @@ int main(int argc, char** argv) {
             }
             if (mp_flag & 2) {
                 addstr(&execlist, mkstr("-analysis=", mksuf(srcfiles.entries[i], SUF_5), NULL));
-            } else if (irix4 == 0) {
+            } else if (!irix4) {
                 addstr(&execlist, "-noanalysis");
             }
-            if (irix4 != 0) {
+            if (irix4) {
                 addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
             } else {
                 addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
@@ -3853,7 +3854,7 @@ int main(int argc, char** argv) {
         }
         addlist(&execlist, &uldflags);
         addlist(&execlist, &ldflags);
-        if (irix4 != 0) {
+        if (irix4) {
             addstr(&execlist, mkstr("-L", NULL));
             if (non_shared != 0) {
                 addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
@@ -3890,18 +3891,18 @@ int main(int argc, char** argv) {
                 if (mp_flag) {
                     addstr(&execlist, libI77_mp);
                 }
-                if ((non_shared != 0) || (irix4 != 0)) {
+                if ((non_shared != 0) || irix4) {
                     addspacedstr(&execlist, newstr(libF77));
                 } else {
                     addspacedstr(&execlist, libftn);
                 }
-                if ((non_shared != 0) || (irix4 != 0)) {
+                if ((non_shared != 0) || irix4) {
                     addspacedstr(&execlist, newstr(libI77));
                 }
-                if ((non_shared != 0) || (irix4 != 0)) {
+                if ((non_shared != 0) || irix4) {
                     addspacedstr(&execlist, newstr(libU77));
                 }
-                if ((non_shared != 0) || (irix4 != 0)) {
+                if ((non_shared != 0) || irix4) {
                     addspacedstr(&execlist, newstr(libisam));
                 }
             }
@@ -3941,7 +3942,7 @@ int main(int argc, char** argv) {
                     }
                     addstr(&execlist, "-lc");
                 } else {
-                    if ((irix4 != 0) && (B_1000ED74 == 0)) {
+                    if (irix4 && (B_1000ED74 == 0)) {
                         addstr(&execlist, "-lmpc");
                     }
                     if (B_1000ED2C != 0) {
@@ -4276,7 +4277,7 @@ int main(int argc, char** argv) {
             if ((mp_flag & 0x10000) && ((srcsuf == 'f') || (srcsuf == 'F'))) {
                 addstr(&execlist, "-noPalias");
             }
-            if (irix4 == 0) {
+            if (!irix4) {
                 if (kpicopt_flag != 0) {
                     addstr(&execlist, "-kpicopt");
                 }
@@ -4370,7 +4371,7 @@ int main(int argc, char** argv) {
         }
         addstr(&execlist, "-G");
         addstr(&execlist, Gnum);
-        if ((kpic_flag != 0) && (coff_spec == 0) && (irix4 == 0)) {
+        if ((kpic_flag != 0) && (coff_spec == 0) && !irix4) {
             if (Oflag >= 3) {
                 addstr(&execlist, "-pic1");
             } else {
@@ -4549,14 +4550,14 @@ int main(int argc, char** argv) {
         if (align_common > 0) {
             addstr(&execlist, "-align_common");
         }
-        if (((compiler == COMPILER_4) || (srcsuf == 0x73)) && (kpic_spec == 0) && (irix4 == 0)) {
+        if (((compiler == COMPILER_4) || (srcsuf == 's')) && (kpic_spec == 0) && !irix4) {
             addstr(&execlist, "-pic0");
         }
         if (coff_spec != 0) {
             addstr(&execlist, "-coff");
             kpic_flag = 0;
         } else if (kpic_flag != 0) {
-            if (irix4 == 0) {
+            if (!irix4) {
                 if (coff_spec == 0) {
                     addstr(&execlist, "-elf");
                     if (Oflag >= 3) {
@@ -4569,7 +4570,7 @@ int main(int argc, char** argv) {
                     kpic_flag = 0;
                 }
             }
-        } else if (irix4 == 0) {
+        } else if (!irix4) {
             if (coff_spec != 0) {
                 addstr(&execlist, "-coff");
             } else {
@@ -4594,7 +4595,7 @@ int main(int argc, char** argv) {
         }
         addlist(&execlist, &asflags);
         addlist(&execlist, &as1flags);
-        if (irix4 == 0) {
+        if (!irix4) {
             addlist(&execlist, &olimitflags);
         }
 
@@ -4767,7 +4768,7 @@ int main(int argc, char** argv) {
         // pass_ld
         execlist.length = 0;
         addstr(&execlist, LD);
-        if ((kpic_flag != 0) && (irix4 == 0) && (coff_spec == 0)) {
+        if ((kpic_flag != 0) && !irix4 && (coff_spec == 0)) {
             addstr(&ldflags, "-KPIC");
         }
         if ((non_shared != 0) && (non_shared_emitted == 0)) {
@@ -4818,7 +4819,7 @@ int main(int argc, char** argv) {
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             add_cxx_symbol_options();
         }
-        if (irix4 != 0) {
+        if (irix4) {
             addstr(&execlist, mkstr("-L", NULL));
             if (non_shared != 0) {
                 addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
@@ -4860,7 +4861,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-d");
             addstr(&execlist, "-z");
         }
-        if (irix4 != 0) {
+        if (irix4) {
             addstr(&execlist, "-G");
         } else {
             addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
@@ -4958,7 +4959,7 @@ int main(int argc, char** argv) {
                 addlist(&execlist, &dashlfiles);
             }
             addlist(&execlist, &ldZflags);
-            if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) && (irix4 == 0)) {
+            if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) && !irix4) {
                 addstr(&execlist, "-cckr");
             }
             addstr(&execlist, "-nocount");
@@ -4973,7 +4974,7 @@ int main(int argc, char** argv) {
                     if (mp_flag) {
                         addspacedstr(&execlist, libI77_mp);
                     }
-                    if ((non_shared != 0) || (irix4 != 0)) {
+                    if ((non_shared != 0) || irix4) {
                         addspacedstr(&execlist, libF77);
                         addspacedstr(&execlist, libm);
                         addspacedstr(&execlist, libU77);
@@ -5034,7 +5035,7 @@ int main(int argc, char** argv) {
                         }
                         addstr(&execlist, "-lc");
                     } else {
-                        if ((irix4 != 0) && (B_1000ED74 == 0)) {
+                        if (irix4 && (B_1000ED74 == 0)) {
                             addstr(&execlist, "-lmpc");
                         }
                         if (B_1000ED2C != 0) {
@@ -5050,7 +5051,7 @@ int main(int argc, char** argv) {
                         addstr(&execlist, "-lc");
                     }
                 } else {
-                    if ((irix4 != 0) && (cmp_flag & 0x10000)) {
+                    if (irix4 && (cmp_flag & 0x10000)) {
                         addstr(&execlist, "-lmpc");
                     }
                     if ((compiler == COMPILER_1) &&
@@ -5317,7 +5318,7 @@ void parse_command(int argc, char** argv) {
     char* sp148 = getenv("SGI_IRIX4");
 
     if (sp148 != NULL) {
-        irix4 = 1;
+        irix4 = TRUE;
         comp_host_root = "/usr/irix4/";
         systype = "";
         elfflag = 0;
@@ -6995,7 +6996,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-irix4") == 0) {
-                        irix4 = 1;
+                        irix4 = TRUE;
                         comp_host_root = "/usr/irix4/";
                         Gnum = "8";
                         systype = "";
@@ -8954,7 +8955,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                              (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                             (D_1000BF90 != 0)) {
                             ld = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, LD, arg2, NULL);
-                        } else if (irix4 != 0) {
+                        } else if (irix4) {
                             ld = mkstr(comp_host_root, "usr/bin/", currcomp, LD, arg2, NULL);
                         } else {
                             ld = mkstr(comp_host_root, "usr/lib/", currcomp, LD, arg2, NULL);
@@ -9385,7 +9386,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
 void newrunlib(void) {
     if (fiveflag != 0) {
         runlib_base = "usr/5lib";
-    } else if (irix4 != 0) {
+    } else if (irix4) {
         runlib_base = "/usr/irix4/";
     } else {
         runlib_base = "/";
