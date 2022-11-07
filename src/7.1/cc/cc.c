@@ -620,11 +620,19 @@ int runerror = 0;
 int uload = 0;
 int uldobj_place = -1;
 char* tmp_uldobj = NULL;
-int chip_targ = -1; //!< unset, mips1, mips2 or mips3
-int nobjs = 0;
-int targetsex = BIGENDIAN;
-int default_svr4 = 0;
-int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or the environment variable
+
+typedef enum ChipTarget {
+    /* -1 */ CHIP_TARGET_UNSET,
+    /*  0 */ CHIP_TARGET_MIPS1,
+    /*  1 */ CHIP_TARGET_MIPS2,
+    /*  2 */ CHIP_TARGET_MIPS3,
+} ChipTarget;
+
+int chip_targ = CHIP_TARGET_UNSET; //!< "Chip target", uses `ChipTarget` enum.
+int nobjs = 0;                     //!< Number of output objects?
+int targetsex = BIGENDIAN;         //!< Endianness, constants from sex.h (yes really).
+int default_svr4 = FALSE;          //!< flag, boolean. Set by environment variable "SGI_SVR4"
+int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or environment variable
                    //!< "SGI_IRIX4"
 char* runlib = "/";
 char* runlib_base = "/";
@@ -777,7 +785,7 @@ int main(int argc, char** argv) {
 
     sp13C = getenv("SGI_SVR4");
     if (sp13C != NULL) {
-        default_svr4 = 1;
+        default_svr4 = TRUE;
     }
 
     sp138 = getenv("SGI_CC");
@@ -1347,7 +1355,7 @@ int main(int argc, char** argv) {
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
         if (mips3flag == 0) {
-            chip_targ = 2;
+            chip_targ = CHIP_TARGET_MIPS3;
             mips3flag = 1;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
@@ -1357,7 +1365,7 @@ int main(int argc, char** argv) {
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
         if (mips3flag == 0) {
-            chip_targ = 2;
+            chip_targ = CHIP_TARGET_MIPS3;
             mips3flag = 1;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
@@ -4843,7 +4851,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-ignore_unresolved");
                 } else if (no_unresolved_flag != 0) {
                     addstr(&execlist, "-no_unresolved");
-                } else if ((default_svr4 != 0) || (make_edison_shlib != 0)) {
+                } else if (default_svr4 || (make_edison_shlib != 0)) {
                     addstr(&execlist, "-ignore_unresolved");
                 } else {
                     addstr(&execlist, "-no_unresolved");
@@ -5554,7 +5562,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (argv[var_s0][2] == '\0') {
-                        if (default_svr4 != 0) {
+                        if (default_svr4) {
                             if (dn_flag != 0) {
                                 error(1, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
                                 exit(2);
@@ -5574,7 +5582,7 @@ void parse_command(int argc, char** argv) {
                             Gnum = "0";
                         }
                     } else {
-                        if (default_svr4 != 0) {
+                        if (default_svr4) {
                             break;
                         }
                         if (Oflag < 3) {
@@ -5658,7 +5666,7 @@ void parse_command(int argc, char** argv) {
                     }
                     //! @bug fallthrough means -K options can also be specified with -J
                 case 'K': /* switch 1 */
-                    if (default_svr4 != 0) {
+                    if (default_svr4) {
                         Kpass = argv[var_s0] + 2;
                         if (*Kpass == '\0') {
                             Kpass = argv[var_s0] + 3;
@@ -7181,7 +7189,7 @@ void parse_command(int argc, char** argv) {
                         }
                     }
                     if (strcmp(argv[var_s0], "-mips1") == 0) {
-                        chip_targ = 0;
+                        chip_targ = CHIP_TARGET_MIPS1;
                         mips1flag = 1;
                         mips2flag = 0;
                         if (dwopcodeflag != 0) {
@@ -7217,7 +7225,7 @@ void parse_command(int argc, char** argv) {
                             error(1, NULL, 0, NULL, 0, "-mips3 cannot be used for ucode 32-bit compiles\n");
                             exit(2);
                         }
-                        chip_targ = 2;
+                        chip_targ = CHIP_TARGET_MIPS3;
                         mips3flag = 1;
                         dwopcodeflag = 1;
                         relocate_passes("M", NULL, NULL);
@@ -8160,7 +8168,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'v': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if (default_svr4 == 0) {
+                        if (!default_svr4) {
                             vflag = 1;
                             time_flag = 1;
                         }
@@ -9217,7 +9225,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if (arg1 != NULL) {
                         switch (chip_targ) {
                             default:
-                            case 0:
+                            case CHIP_TARGET_MIPS1:
                                 if ((arg2 != NULL) && (*arg2 != 0)) {
                                     libm = mkstr(arg1, " -B", arg2, LibM, NULL);
                                 } else {
@@ -9225,11 +9233,13 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 }
                                 libm_b = mkstr(arg1, "libm.b", arg2, NULL);
                                 break;
-                            case 1:
+
+                            case CHIP_TARGET_MIPS2:
                                 libm = mkstr(arg1, "libm_mips2.a", arg2, NULL);
                                 libm_b = mkstr(arg1, "libm_mips2.b", arg2, NULL);
                                 break;
-                            case 2:
+
+                            case CHIP_TARGET_MIPS3:
                                 libm = mkstr(arg1, "libm_mips3.a", arg2, NULL);
                                 libm_b = mkstr(arg1, "libm_mips3.b", arg2, NULL);
                                 break;
@@ -9237,7 +9247,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     } else {
                         switch (chip_targ) {
                             default:
-                            case 0:
+                            case CHIP_TARGET_MIPS1:
                                 libm = "-lm";
                                 if (non_shared != 0) {
                                     libm_b =
@@ -9246,7 +9256,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                     libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm.b", arg2, NULL);
                                 }
                                 break;
-                            case 1:
+
+                            case CHIP_TARGET_MIPS2:
                                 if (non_shared != 0) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.a", arg2,
                                                  NULL);
@@ -9257,7 +9268,8 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                     libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.b", arg2, NULL);
                                 }
                                 break;
-                            case 2:
+
+                            case CHIP_TARGET_MIPS3:
                                 if (non_shared != 0) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.a", arg2,
                                                  NULL);
