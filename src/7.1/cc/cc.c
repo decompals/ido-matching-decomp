@@ -629,7 +629,7 @@ char* runlib = "/";
 char* runlib_base = "/";
 static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, 0x1900 };
 static char* D_1000C1D0 = NULL; // full path of current working directory
-int run_sopt = 0;
+int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
 static char* D_1000C1D8 = NULL;
 static char* D_1000C1DC = NULL;
 
@@ -1779,7 +1779,7 @@ int main(int argc, char** argv) {
             relocate_passes("p", NULL, NULL);
         }
 
-        if (((compchoice == 3) || (compchoice == 4)) && (run_sopt == 0) && !(cmp_flag & 1) && !(cmp_flag & 8)) {
+        if (((compchoice == 3) || (compchoice == 4)) && !run_sopt && !(cmp_flag & 1) && !(cmp_flag & 8)) {
             addstr(&execlist, cfe);
         } else {
             if (sixty4bitflag) {
@@ -1877,7 +1877,7 @@ int main(int argc, char** argv) {
                         if (cmp_flag != 0) {
                             addstr(&execlist, "-D_LANGUAGE_PWRC");
                         }
-                        if (((cmp_flag & 1) || (run_sopt != 0)) && (cppchoice == 1)) {
+                        if (((cmp_flag & 1) || run_sopt) && (cppchoice == 1)) {
                             addstr(&execlist, "-trigraphs");
                         }
                     }
@@ -2052,7 +2052,7 @@ int main(int argc, char** argv) {
         } else if (Eflag != 0) {
             passout = NULL;
         } else if ((Hchar == 'K') || (Kflag != 0)) {
-            if ((compchoice == 3) && (run_sopt == 0) && (acpp == 0) && (cmp_flag == 0) && (compiler == COMPILER_1)) {
+            if ((compchoice == 3) && !run_sopt && (acpp == 0) && (cmp_flag == 0) && (compiler == COMPILER_1)) {
                 passout = mksuf(srcfiles.entries[i], 'B');
             } else {
                 passout = mksuf(srcfiles.entries[i], 'i');
@@ -2076,8 +2076,8 @@ int main(int argc, char** argv) {
         }
 
         if (((compchoice != 3) && (compchoice != 4)) || ((compiler != COMPILER_1) && (compiler != COMPILER_4)) ||
-            (run_sopt != 0) || (cmp_flag & 1) || (cmp_flag & 8) || (acpp != 0) || (oldcppflag != 0)) {
-            if (run(((compiler == COMPILER_3) && (D_1000BF74 != 0)) ? cfe : cpp, execlist.entries, NULL, passout,
+            run_sopt || (cmp_flag & 1) || (cmp_flag & 8) || (acpp != 0) || (oldcppflag != 0)) {
+            if (run((((compiler == COMPILER_3) && (D_1000BF74 != 0)) ? cfe : cpp), execlist.entries, NULL, passout,
                     NULL) != 0) {
                 runerror++;
                 if ((Eflag == 0) &&
@@ -2357,8 +2357,8 @@ int main(int argc, char** argv) {
                 goto block_1505;
         }
 
-    block_940:
-        if (run_sopt != 0) {
+    block_940: // pass_sopt
+        if (run_sopt) {
             if (cmp_flag & 1) {
                 error(2, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
                 goto skip_sopt;
@@ -2537,7 +2537,7 @@ int main(int argc, char** argv) {
         }
 
         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-            if (!docpp || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 'i') || (acpp != 0)) {
+            if (!docpp || (oldcppflag != 0) || run_sopt || (srcsuf == 'i') || (acpp != 0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
             }
@@ -2696,8 +2696,7 @@ int main(int argc, char** argv) {
                 passin = passout;
             }
 
-            if ((!docpp || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 'i') || (acpp != 0) ||
-                 (cmp_flag & 0x10000)) &&
+            if ((!docpp || (oldcppflag != 0) || run_sopt || (srcsuf == 'i') || (acpp != 0) || (cmp_flag & 0x10000)) &&
                 (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
@@ -2724,7 +2723,7 @@ int main(int argc, char** argv) {
                 exit(2);
             }
 
-            if ((!docpp || (srcsuf == 'i') || (acpp != 0) || (oldcppflag != 0)) && (run_sopt == 0)) {
+            if ((!docpp || (srcsuf == 'i') || (acpp != 0) || (oldcppflag != 0)) && !run_sopt) {
                 if (!default_nocpp && ((srcsuf == 'c') || (srcsuf == 's') || (srcsuf == 'p'))) {
                     addstr(&execlist, "-nocpp");
                 }
@@ -2738,7 +2737,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-Xv");
                 }
                 if (compiler == COMPILER_1) {
-                    if ((run_sopt == 0) && !(cmp_flag & 1)) {
+                    if (!run_sopt && !(cmp_flag & 1)) {
                         addstr(&execlist, "-D_CFE");
                         addstr(&execlist, "-Amachine(mips)");
                         addstr(&execlist, "-Asystem(unix)");
@@ -2765,11 +2764,11 @@ int main(int argc, char** argv) {
                 }
             }
 
-            if ((run_sopt != 0) || (cmp_flag & 1)) {
+            if (run_sopt || (cmp_flag & 1)) {
                 unlink(tempstr[2]);
             }
 
-            if (run_sopt != 0) {
+            if (run_sopt) {
                 addlist(&execlist, &undefineflags);
             }
             retcode = run(cfe, execlist.entries, (Fflag != 0 ? passin : NULL), passout, errout);
@@ -2813,7 +2812,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if (((run_sopt != 0) && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) || (cmp_flag & 0x10000)) {
+            if ((run_sopt && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) || (cmp_flag & 0x10000)) {
                 unlink(passin);
             }
 
@@ -3378,13 +3377,13 @@ int main(int argc, char** argv) {
                 break;
         }
 
-    block_1505:
+    block_1505: // pass_sopt2
         sp100 = 0;
         spFC = 0;
         spF0[0] = '1';
         spF0[1] = '\0';
 
-        if (run_sopt != 0) {
+        if (run_sopt) {
             if (mp_flag & 1) {
                 error(2, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
                 goto skip_sopt2;
@@ -3733,7 +3732,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((docpp || (mp_flag & 1) || (run_sopt != 0) || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) &&
+        if ((docpp || (mp_flag & 1) || run_sopt || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) &&
             (srcsuf != 'i') && (srcsuf != 'm') && (Kflag == 0) && !(mp_flag & 4)) {
             unlink(passin);
         }
@@ -3929,7 +3928,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, "-lkapio");
                 }
             }
-            if ((run_sopt != 0) && (compiler == COMPILER_1)) {
+            if (run_sopt && (compiler == COMPILER_1)) {
                 addstr(&execlist, "-lkapio");
             }
             if (compiler == COMPILER_3) {
@@ -5022,7 +5021,7 @@ int main(int argc, char** argv) {
                         addstr(&execlist, "-lkapio");
                     }
                 }
-                if ((run_sopt != 0) && (compiler == COMPILER_1)) {
+                if (run_sopt && (compiler == COMPILER_1)) {
                     addstr(&execlist, "-lkapio");
                 }
                 if (compiler == COMPILER_3) {
@@ -7840,7 +7839,7 @@ void parse_command(int argc, char** argv) {
                         swopcodeflag = 1;
                         break;
                     }
-                    if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) {
+                    if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) { // "-sopt"
                         if ((compiler != COMPILER_1) && (compiler != COMPILER_3)) {
                             error(2, NULL, 0, NULL, 0, "-sopt only available with Fortran and C; option ignored.\n");
                         } else if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
@@ -7855,7 +7854,7 @@ void parse_command(int argc, char** argv) {
                                     Warg++;
                                 }
                             }
-                            run_sopt = 1;
+                            run_sopt = TRUE;
                         }
                         break;
                     }
