@@ -500,7 +500,7 @@ int minus_M = 0;
 int anachronisms = TRUE; //!< flag, boolean. Adds "-O" to `execlist`
 int disable_inlines = 0;
 int cfront_compatible = 1;
-int make_edison_shlib = 0;
+int make_edison_shlib = FALSE; //!< flag, pseudoboolean. Set by "-shared"
 int plusIflag = 0;
 int signedcharflag = 0;
 int Lflag = 0;
@@ -549,21 +549,24 @@ int sixty4bit_spec = 0;     //!< Set and not used, not clear if boolean
 int sixty4bitflag = FALSE;  //!< flag, boolean. Always 0
 int thirty2bitflag = FALSE; //!< flag, boolean
 int fullasoptflag = 0;
-int old_non_shared = 0;
-int non_shared_emitted = 0;
-int longlong_emitted = 0;
-int non_shared = 0;
+int old_non_shared = FALSE;     //!< flag, boolean. Set in (most of) the same places as `non_shared`.
+int non_shared_emitted = FALSE; //!< flag, boolean. Whether non_shared code will be emitted in this pass?
+int longlong_emitted = FALSE;   //!< boolean. Set when passing on "-D_LONGLONG"
+int non_shared = FALSE; //!< flag, boolean. Produce a static executable (non-PIC, incompatible with -KPIC, -shared,
+                        //!< etc.) Set by "-non_shared".
 int Gseen_flag = 0;
 int transitive_link = 0;
 int full_transitive_link = 0;
 int no_transitive_link = 0;
 int quickstart_info = 0;
 int force_rm_dead_code = 0;
-int kpic_flag = 1;
-int kpic_spec = 0;
-int call_shared = 0;
-int excpt_flag = 0;
-int trapuv_flag = 0;
+int kpic_flag = TRUE;    //!< flag, boolean. Whether to emit Position-Independent Code. On by default, set by "-KPIC",
+                         //!< unset by IRIX4 and "-non_shared"
+int kpic_spec = FALSE;   //!< flag, boolean. Whether "-KPIC" has been passed explicitly?
+int call_shared = FALSE; //!< flag, boolean. Allows created object to call shared library code. Set by "-call_shared".
+int excpt_flag = FALSE; //!< flag, boolean. Set by "-excpt". Purpose unclear, not passed on, not useable with "-shared".
+int trapuv_flag =
+    FALSE; //!< flag, boolean. Whether to compile with trapping for uninitialised variables. Set by "-trapuv".
 int dmips_emit = 0;
 int Xvalues_Flag = 0; // Unused
 int user_systype = 0;
@@ -575,15 +578,15 @@ int svr4_systype = 0;
 int c_inline = 0;
 int tfp_flag = 0;
 int abi_flag = 0;
-int NoMoreOptions = FALSE; //!< flag, pseudoboolean
-int memory_flag = 0;       // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
-int default_call_shared = 1;
-int haspascal = FALSE;             //!< flag, boolean. If file is Pascal, set by file extension ".p"
-int hasfortran = FALSE;            //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
-int lmflag = FALSE;                //!< flag, pseudoboolean, set and not used
-int srcexists = 0;                 // Number of source code files present? Set in the main loop of parse_command()
-int w1flag = 1;                    //!< flag, values 0,1,2 used
-static int D_1000C130 = 0;         // values 0,1,2 used
+int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
+int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
+int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
+int haspascal = FALSE;          //!< flag, boolean. If file is Pascal, set by file extension ".p"
+int hasfortran = FALSE;         //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
+int lmflag = FALSE;             //!< flag, pseudoboolean, set and not used
+int srcexists = 0;              // Number of source code files present? Set in the main loop of parse_command()
+int w1flag = 1;                 //!< flag, values 0,1,2 used
+static int D_1000C130 = 0;      // values 0,1,2 used
 int prototype_checking_on = FALSE; //!< flag, boolean. Set on by "-prototypes" and off by "-noprototypes"
 int showdirt_flag = FALSE;         //!< flag, boolean. Set by "-mp_keep"
 int mp_prepass_count = 0;
@@ -979,7 +982,7 @@ int main(int argc, char** argv) {
 
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-non_shared") == 0) {
-            non_shared = 1;
+            non_shared = TRUE;
             if (Oflag < 3) {
                 Gnum = "8";
             }
@@ -989,15 +992,15 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[i], "-coff") == 0) {
             LD = "old_ld";
             coff_spec = 1;
-            kpic_flag = 0;
+            kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-mips3") == 0) {
             mips3flag = 1;
             Gnum = "8";
-            kpic_flag = 0;
+            kpic_flag = FALSE;
         } else if (strcmp(argv[i], "-excpt") == 0) {
-            excpt_flag = 1;
-            kpic_flag = 0;
+            excpt_flag = TRUE;
+            kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-abi") == 0) {
             abi_flag = 1;
@@ -1076,7 +1079,7 @@ int main(int argc, char** argv) {
     }
 
     if (sp148 == 0) {
-        if ((non_shared != 0) || (coff_spec != 0) || (mips3flag != 0) || (excpt_flag != 0)) {
+        if (non_shared || (coff_spec != 0) || (mips3flag != 0) || excpt_flag) {
             addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
         } else if (abi_flag != 0) {
             addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
@@ -1141,25 +1144,25 @@ int main(int argc, char** argv) {
         newrunlib();
     }
 
-    if (((mips2flag != 0) || (mips3flag != 0) || sixty4bitflag) && (kpic_flag == 0) &&
-        ((non_shared != 0) || (call_shared != 0) || (default_call_shared != 0))) {
-        if (non_shared == 0) {
-            non_shared = 1;
-            old_non_shared = 1;
+    if (((mips2flag != 0) || (mips3flag != 0) || sixty4bitflag) && !kpic_flag &&
+        (non_shared || call_shared || default_call_shared)) {
+        if (!non_shared) {
+            non_shared = TRUE;
+            old_non_shared = TRUE;
         }
-        default_call_shared = 0;
-        call_shared = 0;
-        if (non_shared_emitted == 0) {
+        default_call_shared = FALSE;
+        call_shared = FALSE;
+        if (!non_shared_emitted) {
             addstr(&ldflags, "-non_shared");
             addstr(&cfeflags, "-non_shared");
-            non_shared_emitted = 1;
+            non_shared_emitted = TRUE;
         }
     }
-    if ((non_shared != 0) && (non_shared_emitted == 0)) {
+    if (non_shared && !non_shared_emitted) {
         addstr(&ldflags, "-non_shared");
         addstr(&cfeflags, "-non_shared");
-        non_shared_emitted = 1;
-    } else if (call_shared != 0) {
+        non_shared_emitted = TRUE;
+    } else if (call_shared) {
         addstr(&ldflags, "-call_shared");
         addstr(&cfeflags, "-call_shared");
     }
@@ -1203,16 +1206,16 @@ int main(int argc, char** argv) {
     //! FAKE: The second and third comparison of this if check are fake and optimized out
     if (Oflag >= 3 && Oflag >= 3 && Oflag >= 3) {}
 
-    if ((kpic_flag != 0) && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
+    if (kpic_flag && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
         error(2, NULL, 0, NULL, 0,
               "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
         Gnum = "0";
     }
 
-    if ((abi_flag != 0) && (non_shared != 0)) {
+    if ((abi_flag != 0) && non_shared) {
         error(2, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
-        non_shared = 0;
-        kpic_flag = 1;
+        non_shared = FALSE;
+        kpic_flag = TRUE;
         Gnum = "0";
     }
 
@@ -1329,7 +1332,7 @@ int main(int argc, char** argv) {
         error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
         exit(2);
     }
-    if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && (make_edison_shlib != 0)) {
+    if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && make_edison_shlib) {
         error(1, NULL, 0, NULL, 0,
               "-shared can be specified only when a link is to be performed for ucode compilers\n");
         exit(2);
@@ -1487,7 +1490,7 @@ int main(int argc, char** argv) {
     for (i = 0; (i < srcfiles.length) || uload; i++) {
         nocompileneeded = 0;
         sp118 = NULL;
-        longlong_emitted = 0;
+        longlong_emitted = FALSE;
         sp11C = D_1000BF74;
 
         // Finished srcfiles, `uload` on.
@@ -1995,7 +1998,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-D_MODERN_C");
                 addstr(&execlist, "-D_SGI_SOURCE");
             }
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
@@ -2008,7 +2011,7 @@ int main(int argc, char** argv) {
                 }
                 addstr(&execlist, "-D_MODERN_C");
             }
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
@@ -2036,18 +2039,18 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D__64BIT");
         }
 
-        if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && (longlong_emitted == 0)) {
+        if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && !longlong_emitted) {
             addstr(&execlist, "-D_LONGLONG");
-            longlong_emitted = 1;
+            longlong_emitted = TRUE;
         }
 
         if (dmips_emit == 0) {
             if (mips2flag != 0) {
-                if (((call_shared != 0) || (default_call_shared != 0)) && (kpic_flag == 0)) {
-                    old_non_shared = 1;
-                    non_shared = 1;
-                    default_call_shared = 0;
-                    call_shared = 0;
+                if ((call_shared || default_call_shared) && !kpic_flag) {
+                    old_non_shared = TRUE;
+                    non_shared = TRUE;
+                    default_call_shared = FALSE;
+                    call_shared = FALSE;
                 }
                 addstr(&execlist, "-D__mips=2");
             } else if (mips3flag != 0) {
@@ -2194,17 +2197,17 @@ int main(int argc, char** argv) {
             if (sixty4bitflag) {
                 addstr(&execlist, "-D__64BIT");
             }
-            if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && (longlong_emitted == 0)) {
+            if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && !longlong_emitted) {
                 addstr(&execlist, "-D_LONGLONG");
-                longlong_emitted = 1;
+                longlong_emitted = TRUE;
             }
             if (dmips_emit == 0) {
                 if (mips2flag != 0) {
-                    if ((call_shared != 0) || (default_call_shared != 0)) {
-                        old_non_shared = 1;
-                        non_shared = 1;
-                        default_call_shared = 0;
-                        call_shared = 0;
+                    if (call_shared || default_call_shared) {
+                        old_non_shared = TRUE;
+                        non_shared = TRUE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
                     }
                     addstr(&execlist, "-D__mips=2");
                 } else if (mips3flag != 0) {
@@ -2216,7 +2219,7 @@ int main(int argc, char** argv) {
             dmips_emit = 1;
 
             addstr(&execlist, "-D__host_mips");
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
@@ -2612,7 +2615,7 @@ int main(int argc, char** argv) {
                 if (Oflag >= 3) {
                     addstr(&execlist, "-Qz");
                 }
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, "-Qn");
                 }
             }
@@ -3843,42 +3846,46 @@ int main(int argc, char** argv) {
         goto pass_uloop;
 
     pass_uld:
-        if ((non_shared != 0) && (non_shared_emitted == 0)) {
+        if (non_shared && !non_shared_emitted) {
             addstr(&ldflags, "-non_shared");
-            non_shared_emitted = 1;
+            non_shared_emitted = TRUE;
         }
 
         execlist.length = 0;
         addstr(&execlist, "uld");
         if ((mips2flag != 0) && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
                 } else {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
                 }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
             } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                } else {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                }
             }
         }
         if ((mips1flag != 0) && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
                 } else {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
                 }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
             } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                } else {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                }
             }
         }
         if (((fiveflag != 0) || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) &&
             (strcmp("/", comp_target_root) != 0)) {
-            if (non_shared != 0) {
+            if (non_shared) {
                 addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
             } else {
                 addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
@@ -3889,7 +3896,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
             }
             addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-            if (call_shared != 0) {
+            if (call_shared) {
                 addstr(&execlist, "-require_dynamic_link");
                 addstr(&execlist, "_rld_new_interface");
             }
@@ -3901,7 +3908,7 @@ int main(int argc, char** argv) {
         addlist(&execlist, &ldflags);
         if (irix4) {
             addstr(&execlist, mkstr("-L", NULL));
-            if (non_shared != 0) {
+            if (non_shared) {
                 addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
                 crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
                 crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
@@ -3927,8 +3934,7 @@ int main(int argc, char** argv) {
                 addspacedstr(&execlist, newstr(libxmalloc));
                 addspacedstr(&execlist, newstr(libexc));
                 addspacedstr(&execlist, newstr(libmld));
-                if (((default_call_shared != 0) || (call_shared != 0)) && (systype != NULL) &&
-                    (strcmp(systype, "svr3") == 0)) {
+                if ((default_call_shared || call_shared) && (systype != NULL) && (strcmp(systype, "svr3") == 0)) {
                     addspacedstr(&execlist, "-lbsd");
                 }
             }
@@ -3936,18 +3942,18 @@ int main(int argc, char** argv) {
                 if (mp_flag) {
                     addstr(&execlist, libI77_mp);
                 }
-                if ((non_shared != 0) || irix4) {
+                if (non_shared || irix4) {
                     addspacedstr(&execlist, newstr(libF77));
                 } else {
                     addspacedstr(&execlist, libftn);
                 }
-                if ((non_shared != 0) || irix4) {
+                if (non_shared || irix4) {
                     addspacedstr(&execlist, newstr(libI77));
                 }
-                if ((non_shared != 0) || irix4) {
+                if (non_shared || irix4) {
                     addspacedstr(&execlist, newstr(libU77));
                 }
-                if ((non_shared != 0) || irix4) {
+                if (non_shared || irix4) {
                     addspacedstr(&execlist, newstr(libisam));
                 }
             }
@@ -4416,7 +4422,7 @@ int main(int argc, char** argv) {
         }
         addstr(&execlist, "-G");
         addstr(&execlist, Gnum);
-        if ((kpic_flag != 0) && (coff_spec == 0) && !irix4) {
+        if (kpic_flag && (coff_spec == 0) && !irix4) {
             if (Oflag >= 3) {
                 addstr(&execlist, "-pic1");
             } else {
@@ -4595,13 +4601,15 @@ int main(int argc, char** argv) {
         if (align_common > 0) {
             addstr(&execlist, "-align_common");
         }
-        if (((compiler == COMPILER_4) || (srcsuf == 's')) && (kpic_spec == 0) && !irix4) {
+        //! @note `as1` does not generate PIC by default, -KPIC must be passed explicitly or an assembler directive used
+        //! (.pic0 for not PIC, .pic2 for PIC)
+        if (((compiler == COMPILER_4) || (srcsuf == 's')) && !kpic_spec && !irix4) {
             addstr(&execlist, "-pic0");
         }
         if (coff_spec != 0) {
             addstr(&execlist, "-coff");
-            kpic_flag = 0;
-        } else if (kpic_flag != 0) {
+            kpic_flag = FALSE;
+        } else if (kpic_flag) {
             if (!irix4) {
                 if (coff_spec == 0) {
                     addstr(&execlist, "-elf");
@@ -4612,7 +4620,7 @@ int main(int argc, char** argv) {
                     }
                 } else {
                     addstr(&execlist, "-coff");
-                    kpic_flag = 0;
+                    kpic_flag = FALSE;
                 }
             }
         } else if (!irix4) {
@@ -4758,34 +4766,34 @@ int main(int argc, char** argv) {
 
     if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
         (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
-        if ((old_non_shared != 0) && (mips2flag != 0) && (kpic_flag == 0)) {
+        if (old_non_shared && (mips2flag != 0) && !kpic_flag) {
             error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+            default_call_shared = FALSE;
+            call_shared = FALSE;
         }
-        if ((old_non_shared != 0) && (mips3flag != 0)) {
+        if (old_non_shared && (mips3flag != 0)) {
             error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if ((old_non_shared != 0) && (coff_spec != 0)) {
+        if (old_non_shared && (coff_spec != 0)) {
             error(1, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if ((old_non_shared != 0) && (excpt_flag != 0)) {
+        if (old_non_shared && excpt_flag) {
             error(1, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if (((old_non_shared != 0) || (non_shared != 0)) && (make_edison_shlib != 0)) {
+        if ((old_non_shared || non_shared) && make_edison_shlib) {
             error(1, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
             exit(2);
         }
-        if ((cordflag != 0) && (make_edison_shlib != 0)) {
+        if ((cordflag != 0) && make_edison_shlib) {
             error(1, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
             exit(2);
         }
@@ -4813,15 +4821,15 @@ int main(int argc, char** argv) {
         // pass_ld
         execlist.length = 0;
         addstr(&execlist, LD);
-        if ((kpic_flag != 0) && !irix4 && (coff_spec == 0)) {
+        if (kpic_flag && !irix4 && (coff_spec == 0)) {
             addstr(&ldflags, "-KPIC");
         }
-        if ((non_shared != 0) && (non_shared_emitted == 0)) {
+        if (non_shared && !non_shared_emitted) {
             if ((mips2flag == 0) && (mips3flag == 0)) {
                 addstr(&ldflags, "-non_shared");
-                non_shared_emitted = 1;
+                non_shared_emitted = TRUE;
             }
-        } else if ((call_shared != 0) || (make_edison_shlib != 0)) {
+        } else if (call_shared || make_edison_shlib) {
             if (transitive_link != 0) {
                 addstr(&ldflags, "-transitive_link");
             } else if (full_transitive_link != 0) {
@@ -4857,7 +4865,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-EL");
             }
         }
-        if (make_edison_shlib != 0) {
+        if (make_edison_shlib) {
             addstr(&execlist, "-shared");
         }
         if ((compiler == COMPILER_1) &&
@@ -4866,7 +4874,7 @@ int main(int argc, char** argv) {
         }
         if (irix4) {
             addstr(&execlist, mkstr("-L", NULL));
-            if (non_shared != 0) {
+            if (non_shared) {
                 addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
                 crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
                 crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
@@ -4881,14 +4889,14 @@ int main(int argc, char** argv) {
                 addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
             }
             addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-            if ((call_shared != 0) || (make_edison_shlib != 0)) {
+            if (call_shared || make_edison_shlib) {
                 addstr(&execlist, "-require_dynamic_link");
                 addstr(&execlist, "_rld_new_interface");
                 if (ignore_unresolved_flag != 0) {
                     addstr(&execlist, "-ignore_unresolved");
                 } else if (no_unresolved_flag != 0) {
                     addstr(&execlist, "-no_unresolved");
-                } else if (default_svr4 || (make_edison_shlib != 0)) {
+                } else if (default_svr4 || make_edison_shlib) {
                     addstr(&execlist, "-ignore_unresolved");
                 } else {
                     addstr(&execlist, "-no_unresolved");
@@ -4916,28 +4924,32 @@ int main(int argc, char** argv) {
         addlist(&execlist, &nldflags);
         if ((mips2flag != 0) && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
                 } else {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
                 }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
             } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                } else {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                }
             }
         }
         if ((mips1flag != 0) && (sp148 == 0)) {
             if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
                 } else if (abi_flag == 0) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
                 }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-            } else if (abi_flag == 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+            } else {
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                } else if (abi_flag == 0) {
+                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                }
             }
         }
         if (strcmp("/", comp_target_root) != 0) {
@@ -4945,7 +4957,7 @@ int main(int argc, char** argv) {
                 if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
                 }
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
                 } else if (abi_flag == 0) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
@@ -4954,7 +4966,7 @@ int main(int argc, char** argv) {
         } else if ((Lflag == 0) && (compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
             addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
         }
-        if (make_edison_shlib != 0) {
+        if (make_edison_shlib) {
             if ((compiler == COMPILER_1) &&
                 ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 addstr(&execlist, cxx_init);
@@ -5019,7 +5031,7 @@ int main(int argc, char** argv) {
                     if (mp_flag) {
                         addspacedstr(&execlist, libI77_mp);
                     }
-                    if ((non_shared != 0) || irix4) {
+                    if (non_shared || irix4) {
                         addspacedstr(&execlist, libF77);
                         addspacedstr(&execlist, libm);
                         addspacedstr(&execlist, libU77);
@@ -5027,7 +5039,7 @@ int main(int argc, char** argv) {
                             spD8 = strlen(libI77);
                             spD4 = malloc(spD8 + 2);
                             memcpy(spD4, libI77, spD8);
-                            spD4[spD8] = '_';
+                            spD4[spD8 + 0] = '_';
                             spD4[spD8 + 1] = 's';
                             spD4[spD8 + 2] = '\0';
                             libI77 = spD4;
@@ -5368,12 +5380,12 @@ void parse_command(int argc, char** argv) {
         systype = "";
         elfflag = 0;
         svr4_systype = 0;
-        call_shared = 0;
-        non_shared = 0;
-        old_non_shared = 0;
-        default_call_shared = 0;
+        call_shared = FALSE;
+        non_shared = FALSE;
+        old_non_shared = FALSE;
+        default_call_shared = FALSE;
         Gnum = "8";
-        kpic_flag = 0;
+        kpic_flag = FALSE;
         mips_abi = MIPS_ABI_0;
         runlib = "/usr/irix4/";
         relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
@@ -5728,13 +5740,13 @@ void parse_command(int argc, char** argv) {
                             } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     error(2, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                    kpic_flag = 0;
+                                    kpic_flag = FALSE;
                                 } else {
-                                    kpic_flag = 1;
-                                    kpic_spec = 1;
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
                                 }
                             } else {
                                 goto bad_option;
@@ -5776,13 +5788,13 @@ void parse_command(int argc, char** argv) {
                             } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     error(2, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                    kpic_flag = 0;
+                                    kpic_flag = FALSE;
                                 } else {
-                                    kpic_flag = 1;
-                                    kpic_spec = 1;
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
                                 }
                             } else {
                                 goto bad_option;
@@ -5800,12 +5812,12 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] != '\0') {
                         if (strcmp(argv[var_s0], "-KPIC") == 0) {
-                            if (non_shared != 0) {
+                            if (non_shared) {
                                 error(2, NULL, 0, NULL, 0, "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                kpic_flag = 0;
+                                kpic_flag = FALSE;
                             } else {
-                                kpic_flag = 1;
-                                kpic_spec = 1;
+                                kpic_flag = TRUE;
+                                kpic_spec = TRUE;
                             }
                             break;
                         } else {
@@ -6575,24 +6587,25 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-coff") == 0) {
                         addstr(&ldflags, argv[var_s0]);
                         coff_spec = 1;
-                        if (default_call_shared == 1) {
-                            if (non_shared == 0) {
-                                old_non_shared = 1;
-                                non_shared = 1;
+                        if (default_call_shared == TRUE) {
+                            if (!non_shared) {
+                                old_non_shared = TRUE;
+                                non_shared = TRUE;
                             }
-                            default_call_shared = 0;
-                            call_shared = 0;
+                            default_call_shared = FALSE;
+                            call_shared = FALSE;
                         }
                         break;
                     }
+                    //! @bug Impossible to satisfy this conditional
                     if ((strcmp(argv[var_s0], "-call_shared") == 0) &&
                         ((strcmp(argv[var_s0], "-count") == 0) || (strcmp(argv[var_s0], "-countall") == 0))) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-call_shared") == 0) {
-                        non_shared = 0;
-                        call_shared = 1;
+                        non_shared = FALSE;
+                        call_shared = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-crt0") == 0) {
@@ -7047,11 +7060,11 @@ void parse_command(int argc, char** argv) {
                         systype = "";
                         elfflag = 0;
                         svr4_systype = 0;
-                        kpic_flag = 0;
-                        default_call_shared = 0;
-                        call_shared = 0;
-                        non_shared = 0;
-                        old_non_shared = 0;
+                        kpic_flag = FALSE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        non_shared = FALSE;
+                        old_non_shared = FALSE;
                         mips_abi = MIPS_ABI_0;
                         relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
                         add_static_opt(argv[var_s0]);
@@ -7266,10 +7279,10 @@ void parse_command(int argc, char** argv) {
                         mips3flag = 1;
                         dwopcodeflag = 1;
                         relocate_passes("M", NULL, NULL);
-                        if (non_shared_emitted == 0) {
+                        if (!non_shared_emitted) {
                             addstr(&ldflags, "-non_shared");
                             addstr(&cfeflags, "-non_shared");
-                            non_shared_emitted = 1;
+                            non_shared_emitted = TRUE;
                         }
                         addstr(&ccomflags, argv[var_s0]);
                         addstr(&upasflags, argv[var_s0]);
@@ -7393,15 +7406,15 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-non_shared") == 0) {
-                        old_non_shared = 0;
-                        non_shared = 1;
-                        default_call_shared = 0;
-                        call_shared = 0;
-                        kpic_flag = 0;
-                        if (non_shared_emitted == 0) {
+                        old_non_shared = FALSE;
+                        non_shared = TRUE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        kpic_flag = FALSE;
+                        if (!non_shared_emitted) {
                             addstr(&ldflags, "-non_shared");
                             addstr(&cfeflags, "-non_shared");
-                            non_shared_emitted = 1;
+                            non_shared_emitted = TRUE;
                         }
                         break;
                     }
@@ -7939,7 +7952,7 @@ void parse_command(int argc, char** argv) {
                             break;
                         }
                         if (strcmp(argv[var_s0], "-shared") == 0) {
-                            call_shared = 0;
+                            call_shared = FALSE;
                             make_edison_shlib++;
                             break;
                         }
@@ -8014,7 +8027,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-trapuv") == 0) {
-                        trapuv_flag = 1;
+                        trapuv_flag = TRUE;
                         addstr(&upasflags, argv[var_s0]);
                         addstr(&fcomflags, argv[var_s0]);
                         addstr(&upl1flags, argv[var_s0]);
@@ -9083,7 +9096,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL),
                                               dirs_for_abi_crtn.entries);
                             delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, NULL), dirs_for_abi_crtn.entries);
-                        } else if (non_shared != 0) {
+                        } else if (non_shared) {
                             crtx = func_0042FD7C(mkstr(MCRTX, arg2, NULL), dirs_for_nonshared_crtn.entries);
                             crtn = func_0042FD7C(mkstr("crtn.o", arg2, NULL), dirs_for_nonshared_crtn.entries);
                             cxx_init =
@@ -9105,7 +9118,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         cxx_init =
                             func_0042FD7C(exception_handling ? "c++init_eh.o" : "c++init.o", dirs_for_abi_crtn.entries);
                         delta_init = func_0042FD7C("delta_init.o", dirs_for_abi_crtn.entries);
-                    } else if (non_shared != 0) {
+                    } else if (non_shared) {
                         crtx = func_0042FD7C(CRTX, dirs_for_nonshared_crtn.entries);
                         crtn = func_0042FD7C("crtn.o", dirs_for_nonshared_crtn.entries);
                         cxx_init = func_0042FD7C(exception_handling ? "c++init_eh.o" : "c++init.o",
@@ -9127,7 +9140,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libp_b = mkstr(arg1, "libp.b", arg2, NULL);
                     } else {
                         libp = "-lp";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libp_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libp.b", arg2, NULL);
                         } else {
                             libp_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libp.b", arg2, NULL);
@@ -9141,7 +9154,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libpl1_b = mkstr(arg1, "libpl1.b", arg2, NULL);
                     } else {
                         libpl1 = "-lpl1";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libpl1_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libpl1.b", arg2, NULL);
                         } else {
                             libpl1_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libpl1.b", arg2, NULL);
@@ -9167,7 +9180,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             libexc = "-lexc";
                             libmld = "-lmld";
                         }
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libexc_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libexc.b", arg2, NULL);
                         } else {
                             libexc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libexc.b", arg2, NULL);
@@ -9186,18 +9199,20 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libdw_b = mkstr(arg1, "libdw.b", arg2, NULL);
                     } else {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            if (non_shared != 0) {
+                            if (non_shared) {
                                 libdw = mkstr("-L", comp_target_root, "usr/lib/nonshared/", currcomp, " -B", arg2,
                                               LibDw, NULL);
                             } else {
                                 libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, " -B", arg2, LibDw, NULL);
                             }
-                        } else if (non_shared != 0) {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
                         } else {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            if (non_shared) {
+                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            } else {
+                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            }
                         }
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libdw_path = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.a", arg2, NULL);
                             libdw_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.b", arg2, NULL);
                         } else {
@@ -9217,7 +9232,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libxmalloc_b = mkstr(arg1, "libxmalloc.b", arg2, NULL);
                     } else {
                         libxmalloc = "-lxmalloc";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libxmalloc_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libxmalloc.b", arg2, NULL);
                         } else {
@@ -9232,7 +9247,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libsort_b = mkstr(arg1, "libsort.b", arg2, NULL);
                     } else {
                         libsort = "-lsort";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libsort_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libsort.b", arg2, NULL);
                         } else {
@@ -9251,7 +9266,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 libprof = mkstr("-L", arg1, LibProf1, NULL);
                                 libgprof = mkstr("-L", arg1, LibGProf1, NULL);
                             }
-                        } else if (non_shared != 0) {
+                        } else if (non_shared) {
                             libprof = func_0042FD7C("libprof.a", dirs_for_nonshared_crtn.entries);
                             libgprof = func_0042FD7C("libgprof.a", dirs_for_nonshared_crtn.entries);
                         } else {
@@ -9289,7 +9304,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             default:
                             case CHIP_TARGET_MIPS1:
                                 libm = "-lm";
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     libm_b =
                                         mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm.b", arg2, NULL);
                                 } else {
@@ -9298,7 +9313,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 break;
 
                             case CHIP_TARGET_MIPS2:
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.a", arg2,
                                                  NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.b",
@@ -9310,7 +9325,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 break;
 
                             case CHIP_TARGET_MIPS3:
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.a", arg2,
                                                  NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.b",
@@ -9335,7 +9350,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     } else {
                         libftn = "-lftn";
                         libF77 = "-lF77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libF77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libF77.b", arg2, NULL);
                         } else {
                             libF77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libF77.b", arg2, NULL);
@@ -9353,7 +9368,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libI77_b = mkstr(arg1, "libI77.b", arg2, NULL);
                     } else {
                         libI77 = "-lI77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libI77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libI77.b", arg2, NULL);
                         } else {
                             libI77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libI77.b", arg2, NULL);
@@ -9371,7 +9386,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libisam_b = mkstr(arg1, "libisam.b", arg2, NULL);
                     } else {
                         libisam = "-lisam";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libisam_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libisam.b", arg2, NULL);
                         } else {
@@ -9390,7 +9405,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libU77_b = mkstr(arg1, "libU77.b", arg2, NULL);
                     } else {
                         libU77 = "-lU77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libU77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libU77.b", arg2, NULL);
                         } else {
                             libU77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libU77.b", arg2, NULL);
@@ -10574,7 +10589,7 @@ static char* func_0042FD7C(const char* name, char** dirs) {
 
     if (abi_flag != 0) {
         path = mkstr("/", "usr/lib/abi", runlib, name, NULL);
-    } else if (non_shared != 0) {
+    } else if (non_shared) {
         path = mkstr("/", "usr/lib/nonshared", runlib, name, NULL);
     } else {
         path = mkstr("/", "usr/lib", runlib, name, NULL);
