@@ -688,6 +688,15 @@ int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar op
 static char* D_1000C1D8 = NULL;
 static char* D_1000C1DC = NULL;
 
+typedef enum ErrorCategory {
+    /* 0 */ ERRORCAT_INTERNAL, // Unused
+    /* 1 */ ERRORCAT_ERROR,
+    /* 2 */ ERRORCAT_WARNING,
+    /* 3 */ ERRORCAT_INFO, // Unsued
+    /* 4 */ ERRORCAT_FIX,  // Unused
+    /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
+} ErrorCategory;
+
 // function main # 2
 /**
  * Main fuction for `cc`. Structure is roughly
@@ -841,7 +850,7 @@ int main(int argc, char** argv) {
         }
         sp130 = strlen(sp138);
         if (sp130 <= 0) {
-            error(2, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
+            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
         } else {
             sp134 = sp130 + sp138 - 1;
             while (isspace(*sp134)) {
@@ -866,7 +875,7 @@ int main(int argc, char** argv) {
                 cppchoice = CPP_CHOICE_3;
                 relocate_passes("p", NULL, NULL);
             } else {
-                error(2, NULL, 0, NULL, 0,
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                       "Environment variable SGI_CC contents unrecognizable and ignored; \"%s\" not one of: -cckr -ansi "
                       "-xansi -ansiposix\n",
                       sp138);
@@ -894,7 +903,7 @@ int main(int argc, char** argv) {
         compiler = COMPILER_3;
         Bstring = var_s1 + strlen("f77");
     } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) { // Fortran 90
-        error(1, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
         exit(2);
     } else if (strncmp(var_s1, "as", strlen("as")) == 0) { // (MIPS) Assembly
         compiler = COMPILER_4;
@@ -1044,14 +1053,14 @@ int main(int argc, char** argv) {
                         if ((argv[i][3] == '\0') && ((argv[i][2] == 'B') || (argv[i][2] == 'L'))) {
                             if (argv[i][2] == 'B') {
                                 if ((Bflag != 0) && (targetsex != BIGENDIAN)) {
-                                    error(1, NULL, 0, NULL, 0,
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                           "-EB or -EL must precede any -B flags for ucode compilers.\n");
                                     exit(2);
                                 }
                                 targetsex = BIGENDIAN;
                             } else { // argv[i][2] == 'L'
                                 if ((Bflag != 0) && (targetsex != LITTLEENDIAN)) {
-                                    error(1, NULL, 0, NULL, 0,
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                           "-EB or -EL must precede any -B flags for ucode compilers.\n");
                                     exit(2);
                                 }
@@ -1174,7 +1183,7 @@ int main(int argc, char** argv) {
     }
 
     if ((Vflag == 0) && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
-        error(1, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
         exit(2);
     }
 
@@ -1185,7 +1194,7 @@ int main(int argc, char** argv) {
     }
 
     if ((srcexists == 0) && ((cflag != 0) || (Sflag != 0))) {
-        error(1, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
         exit(4);
     }
 
@@ -1205,7 +1214,7 @@ int main(int argc, char** argv) {
 
     if ((B_1000ED30 != 0) && (compiler == COMPILER_1) &&
         ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX))) {
-        error(2, NULL, 0, NULL, 0,
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "'-lc_s' specified. Shared version of C library does not conform to ANSI X3.159-1989.\n");
     }
 
@@ -1213,20 +1222,21 @@ int main(int argc, char** argv) {
     if (Oflag >= 3 && Oflag >= 3 && Oflag >= 3) {}
 
     if (kpic_flag && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
-        error(2, NULL, 0, NULL, 0,
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
         Gnum = "0";
     }
 
     if ((abi_flag != 0) && non_shared) {
-        error(2, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+              "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
         non_shared = FALSE;
         kpic_flag = TRUE;
         Gnum = "0";
     }
 
     if ((Oflag >= 3) && (compiler == COMPILER_4)) {
-        error(2, NULL, 0, NULL, 0,
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-O3 is not supported for assembly compiles for ucode compilers; changing to -O2.\n");
         Oflag = 2;
         uload = FALSE;
@@ -1323,23 +1333,23 @@ int main(int argc, char** argv) {
     }
 
     if (mp_flag && (ddoptflag != 0)) {
-        error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
         exit(2);
     }
     if (mips3flag && !thirty2bitflag) {
-        error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
     if (irix4 && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-        error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
         exit(2);
     }
     if (irix4 && (compiler == COMPILER_3) && (D_1000BF74 != 0)) {
-        error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
         exit(2);
     }
     if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && make_edison_shlib) {
-        error(1, NULL, 0, NULL, 0,
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
               "-shared can be specified only when a link is to be performed for ucode compilers\n");
         exit(2);
     }
@@ -1350,7 +1360,8 @@ int main(int argc, char** argv) {
     if ((compiler == COMPILER_1) &&
         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && (Fflag != 0) &&
         (smart_build != 0)) {
-        error(2, NULL, 0, NULL, 0, "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+              "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
         smart_build = 0;
     }
     if ((default_template_instantiation_mode != 0) && (force_prelink == 0)) {
@@ -1379,7 +1390,7 @@ int main(int argc, char** argv) {
     if (dmips_emit == 0) {
         if (mips2flag) {
             if (dwopcodeflag != 0) {
-                error(1, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
                 exit(2);
             }
             addstr(&execlist, "-Dmips=2");
@@ -1474,19 +1485,20 @@ int main(int argc, char** argv) {
     }
 
     if ((compiler == COMPILER_6) && (nolockflag != 0) && (lpilockflag != 0)) {
-        error(1, NULL, 0, NULL, 0,
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
               "Conflicting flags; -nolock and -lpilock can't both be specified for ucode compilers\n");
         exit(2);
     }
 
     if ((Oflag >= 3) && (cflag != 0) && (srcfiles.length == 1)) {
-        error(2, NULL, 0, NULL, 0,
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-c should not be used with ucode -O3 -o32 on a single file; use -j instead to get inter-module "
               "optimization.\n");
     }
 
     if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && (Eflag == 0) && (Pflag == 0)) {
-        error(1, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n", "as");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n",
+              "as");
         exit(2);
     }
 
@@ -1755,7 +1767,8 @@ int main(int argc, char** argv) {
                         passout = tempstr[1];
                     }
                     if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                              passout);
                         exit(2);
                     }
                     addstr(&execlist, passout);
@@ -1837,7 +1850,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, cfe);
         } else {
             if (sixty4bitflag) {
-                error(1, NULL, 0, NULL, 0, "-64bit option is not implemented with ccom or accom.\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-64bit option is not implemented with ccom or accom.\n");
                 exit(2);
             }
             if (c_compiler_choice == C_COMPILER_CHOICE_0) {
@@ -1868,7 +1881,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-D_MIPS_SZPTR=64");
         } else if (mips_abi != MIPS_ABI_0) {
             if (1) {}
-            error(1, NULL, 0, NULL, 0, "Unknown value for mips_abi: %d.\n", mips_abi);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown value for mips_abi: %d.\n", mips_abi);
             exit(2);
         }
 
@@ -2115,7 +2128,7 @@ int main(int argc, char** argv) {
             passout = tempstr[2];
         }
         if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
             exit(2);
         }
 
@@ -2313,7 +2326,7 @@ int main(int argc, char** argv) {
             passout = tempstr[2];
         }
         if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
             exit(2);
         }
 
@@ -2415,7 +2428,7 @@ int main(int argc, char** argv) {
     block_940: // pass_sopt
         if (run_sopt) {
             if (cmp_flag & 1) {
-                error(2, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
                 goto skip_sopt;
             }
 
@@ -2774,7 +2787,7 @@ int main(int argc, char** argv) {
                 passout = tempstr[3];
             }
             if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
 
@@ -2882,7 +2895,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, passin);
                 passout = mksuf(srcfiles.entries[i], 'U');
                 if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
                 addstr(&execlist, passout);
@@ -2952,7 +2965,7 @@ int main(int argc, char** argv) {
             passout = tempstr[3];
         }
         if (regular_not_writeable(passout) == 1) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
             exit(2);
         }
 
@@ -3015,7 +3028,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, passin);
             passout = mksuf(srcfiles.entries[i], 'U');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
@@ -3055,7 +3068,7 @@ int main(int argc, char** argv) {
         if (((Hchar == 'f') && (ucodeflag == 0)) || (Kflag != 0)) {
             passout = mksuf(srcfiles.entries[i], 'B');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
         } else {
@@ -3111,7 +3124,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, passin);
             passout = mksuf(srcfiles.entries[i], 'U');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
@@ -3404,7 +3417,7 @@ int main(int argc, char** argv) {
 
             case 'e':
             default:
-                error(1, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
                 exit(2);
                 // not actually fallthrough due to exit being noreturn
             case 'r':
@@ -3440,7 +3453,7 @@ int main(int argc, char** argv) {
 
         if (run_sopt) {
             if (mp_flag & 1) {
-                error(2, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
                 goto skip_sopt2;
             }
 
@@ -3450,19 +3463,19 @@ int main(int argc, char** argv) {
             }
 
             if (mp_i2flag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
             }
             if (mp_66flag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
             }
             if (mp_uflag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
             }
             if (mp_backslashflag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
             }
             if (mp_caseflag) {
-                error(1, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
                 exit(2);
             }
 
@@ -3544,19 +3557,19 @@ int main(int argc, char** argv) {
             }
 
             if (mp_i2flag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
             }
             if (mp_66flag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
             }
             if (mp_uflag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
             }
             if (mp_backslashflag && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
             }
             if (mp_caseflag) {
-                error(1, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
                 exit(2);
             }
 
@@ -3631,7 +3644,7 @@ int main(int argc, char** argv) {
                 while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
                     sp100++;
                     if (argv[sp100] == NULL) {
-                        error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
                         exit(2);
                     }
                 }
@@ -3640,7 +3653,7 @@ int main(int argc, char** argv) {
                 while (TRUE) {
                     spEC = spE8 + 1;
                     if (*spEC == 0) {
-                        error(1, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
                         exit(2);
                     }
                     spE8 = spEC + 1;
@@ -3725,7 +3738,7 @@ int main(int argc, char** argv) {
         } else if (Kflag != 0) {
             passout = mksuf(srcfiles.entries[i], 'B');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
         } else {
@@ -4076,7 +4089,7 @@ int main(int argc, char** argv) {
         if ((Hchar == 0x73) || (Kflag != 0)) {
             passout = mksuf(srcfiles.entries[i], 'S');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
         } else {
@@ -4124,7 +4137,7 @@ int main(int argc, char** argv) {
             if ((Hchar == 'm') || (Kflag != 0)) {
                 passout = mksuf(srcfiles.entries[i], 'M');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
@@ -4175,7 +4188,8 @@ int main(int argc, char** argv) {
                 if ((Hchar == 'v') || (Kflag != 0)) {
                     passout = mksuf(srcfiles.entries[i], 'V');
                     if (regular_not_writeable(passout) == 1) {
-                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                              passout);
                         exit(2);
                     }
                 } else {
@@ -4225,7 +4239,7 @@ int main(int argc, char** argv) {
             if ((Hchar == 'q') || (Kflag != 0)) {
                 passout = mksuf(srcfiles.entries[i], 'Q');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
@@ -4279,7 +4293,7 @@ int main(int argc, char** argv) {
             if (((Hchar == 'd') && (ucodeflag == 0)) || (Kflag != 0)) {
                 passout = mksuf(srcfiles.entries[i], 'D');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
@@ -4348,7 +4362,7 @@ int main(int argc, char** argv) {
             if (((Hchar == 'o') && (ucodeflag == 0)) || (Kflag != 0)) {
                 passout = mksuf(srcfiles.entries[i], 'O');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
                 if (NoMoreOptions) {
@@ -4448,7 +4462,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-l");
             passout = mksuf(srcfiles.entries[i], 's');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
@@ -4456,7 +4470,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-o");
             passout = mksuf(srcfiles.entries[i], 'G');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
@@ -4464,12 +4478,12 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-o");
             passout = mksuf(srcfiles.entries[i], 'G');
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
             if (regular_not_writeable(mksuf(srcfiles.entries[i], 's')) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
                       mksuf(srcfiles.entries[i], 's'));
                 exit(2);
             }
@@ -4479,7 +4493,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "-o");
             passout = tempstr[10];
             if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
             addstr(&execlist, passout);
@@ -4552,13 +4566,13 @@ int main(int argc, char** argv) {
                     passout = mksuf(srcfiles.entries[i], 'G');
                 }
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
                 passout = tempstr[11];
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             }
@@ -4714,13 +4728,13 @@ int main(int argc, char** argv) {
                 if (spE0 == 1) {
                     unlink(passout);
                 } else if (spE0 != 0) {
-                    error(2, NULL, 0, NULL, 0,
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                           "%s does not exist or is not stat(2)-able. Not deleted (if it exists) even though as1 "
                           "failed.\n",
                           passout);
                 } else {
-                    error(2, NULL, 0, NULL, 0, "%s is not a regular file, not deleted even though as1 failed.\n",
-                          passout);
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                          "%s is not a regular file, not deleted even though as1 failed.\n", passout);
                 }
                 if (tmpst != 0) {
                     unlink(symtab);
@@ -4773,34 +4787,35 @@ int main(int argc, char** argv) {
     if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
         (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
         if (old_non_shared && mips2flag && !kpic_flag) {
-            error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                  "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
         }
         if (old_non_shared && mips3flag) {
-            error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
             exit(2);
         }
         if (old_non_shared && (coff_spec != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
             exit(2);
         }
         if (old_non_shared && excpt_flag) {
-            error(1, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
             exit(2);
         }
         if ((old_non_shared || non_shared) && make_edison_shlib) {
-            error(1, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
             exit(2);
         }
         if ((cordflag != 0) && make_edison_shlib) {
-            error(1, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
             exit(2);
         }
 
@@ -5280,7 +5295,7 @@ void process_config(int argc, char** argv) {
         if (strcmp(argv[i], "-systype") == 0) {
             i++;
             if (i >= argc) {
-                error(1, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
                 exit(2);
             }
 
@@ -5289,7 +5304,7 @@ void process_config(int argc, char** argv) {
             if (strcmp(systype, "svr4") == 0) {
                 svr4_systype = 1;
             } else {
-                error(1, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
                 exit(2);
             }
 
@@ -5301,7 +5316,8 @@ void process_config(int argc, char** argv) {
                 && (fopen(strcat("/", systype), "r") == NULL) 
                 && (systype_warn == 0)) {
                 // clang-format on
-                error(2, NULL, 0, NULL, 0, "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                      "This systype doesn't exist on this machine; changed systype to svr3.\n");
                 systype_warn = 1;
                 systype = "svr3";
             }
@@ -5402,7 +5418,7 @@ void parse_command(int argc, char** argv) {
             switch (argv[var_s0][1]) { /* switch 1 */
                 case '#':              /* switch 1 */
                                        //! @bug Should end in '\n'.
-                    error(2, NULL, 0, NULL, 0, "-# is not supported. Use -v to see compiler passesn");
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-# is not supported. Use -v to see compiler passesn");
                     break;
 
                 case '1': /* switch 1 */
@@ -5421,11 +5437,11 @@ void parse_command(int argc, char** argv) {
                     break;
 
                 case '5': /* switch 1 */
-                    error(2, NULL, 0, NULL, 0, "-5 not supported\n");
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-5 not supported\n");
                     if (argv[var_s0][2] == '\0') {
                         if (Bflag != 0) {
                             if (fiveflag == 0) {
-                                error(1, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
                                 exit(2);
                             }
                         } else {
@@ -5446,11 +5462,12 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-64bit") == 0) {
-                        error(2, NULL, 0, NULL, 0,
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                               "-64bit option is not yet implemented for ucode compilers, ignore\n");
                         sixty4bit_spec = 1;
                         if (swopcodeflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-64bit can not be used with -swopcode for ucode compilers\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-64bit can not be used with -swopcode for ucode compilers\n");
                             exit(2);
                         }
                         break;
@@ -5465,7 +5482,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&objfiles, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
                             exit(2);
                         }
                     }
@@ -5526,7 +5543,7 @@ void parse_command(int argc, char** argv) {
                     }
                     //! @note Only checks for "-CG_E"
                     if (strncmp(argv[var_s0], "-CG_EMIT:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-CG_EMIT options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-CG_EMIT options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -5577,14 +5594,14 @@ void parse_command(int argc, char** argv) {
                     if ((argv[var_s0][3] == '\0') && ((argv[var_s0][2] == 'B') || (argv[var_s0][2] == 'L'))) {
                         if (argv[var_s0][2] == 'B') {
                             if ((Bflag != 0) && (targetsex != 0)) {
-                                error(1, NULL, 0, NULL, 0,
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                       "-EB or -EL must precede any -B flags for ucode compilers\n");
                                 exit(2);
                             }
                             targetsex = BIGENDIAN;
                         } else {
                             if ((Bflag != 0) && (targetsex != 1)) {
-                                error(1, NULL, 0, NULL, 0,
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                       "-EB or -EL must precede any -B flags for ucode compilers\n");
                                 exit(2);
                             }
@@ -5613,13 +5630,13 @@ void parse_command(int argc, char** argv) {
 
                 case 'G': /* switch 1 */
                     if (strncmp(argv[var_s0], "-GCM:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-GCM options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-GCM options are ignored\n");
                         break;
                     }
                     if (argv[var_s0][2] == '\0') {
                         if (default_svr4) {
                             if (dn_flag) {
-                                error(1, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
                                 exit(2);
                             }
                             G_flag = TRUE;
@@ -5628,7 +5645,7 @@ void parse_command(int argc, char** argv) {
                         }
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-G requires a decimal number argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G requires a decimal number argument\n");
                             exit(2);
                         }
                         if (Oflag < 3) {
@@ -5648,7 +5665,7 @@ void parse_command(int argc, char** argv) {
                     }
                     for (var_s2 = Gnum; *var_s2 != '\0'; var_s2++) {
                         if (!isdigit(*var_s2)) {
-                            error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", Gnum);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", Gnum);
                             exit(2);
                         }
                     }
@@ -5671,7 +5688,7 @@ void parse_command(int argc, char** argv) {
                         for (var_s2 = "fKMdkjusmocab"; (*var_s2 != '\0' && *var_s2 != Hchar); var_s2++) {}
 
                         if (*var_s2 == '\0') {
-                            error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                             exit(2);
                         }
                         break;
@@ -5710,7 +5727,7 @@ void parse_command(int argc, char** argv) {
 
                         for (sp130 = sp12C; *sp130 != 0; sp130++) {
                             if (!isdigit(*sp130)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
                                 exit(2);
                             }
                         }
@@ -5747,7 +5764,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
                                 if (non_shared) {
-                                    error(2, NULL, 0, NULL, 0,
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
                                     kpic_flag = FALSE;
                                 } else {
@@ -5795,7 +5812,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
                                 if (non_shared) {
-                                    error(2, NULL, 0, NULL, 0,
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
                                     kpic_flag = FALSE;
                                 } else {
@@ -5819,7 +5836,8 @@ void parse_command(int argc, char** argv) {
                     if (argv[var_s0][2] != '\0') {
                         if (strcmp(argv[var_s0], "-KPIC") == 0) {
                             if (non_shared) {
-                                error(2, NULL, 0, NULL, 0, "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "Can't mix -KPIC and -non_shared, change to -non_shared\n");
                                 kpic_flag = FALSE;
                             } else {
                                 kpic_flag = TRUE;
@@ -5879,7 +5897,8 @@ void parse_command(int argc, char** argv) {
                         }
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "%s must be followed by a file name\n", argv[var_s0 - 1]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must be followed by a file name\n",
+                                  argv[var_s0 - 1]);
                             exit(2);
                         }
                         break;
@@ -5969,12 +5988,13 @@ void parse_command(int argc, char** argv) {
                         addstr(&olimitflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-Olimit must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-Olimit must have an argument\n");
                             exit(2);
                         }
                         for (var_s2 = argv[var_s0]; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n",
+                                      argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -5986,7 +6006,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strncmp(argv[var_s0], "-OPT:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-OPT options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-OPT options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -6019,7 +6039,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'S': /* switch 1 */
                     if (strncmp(argv[var_s0], "-SWP:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-SWP options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-SWP options are ignored\n");
                         break;
                     }
                     if (argv[var_s0][2] == '\0') {
@@ -6036,15 +6056,15 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
                         exit(2);
                     }
                     if (strncmp(argv[var_s0], "-TARG:", 6) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-TARG options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TARG options are ignored\n");
                         break;
                     }
                     if (strncmp(argv[var_s0], "-TENV:", 6) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-TENV options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TENV options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -6072,7 +6092,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'V': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        error(2, NULL, 0, NULL, 0, "-V is not supported.\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-V is not supported.\n");
                         break;
                     }
                     if (strcmp(argv[var_s0], "-VS") == 0) {
@@ -6082,7 +6102,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
                         exit(2);
                     }
                     goto bad_option;
@@ -6113,7 +6133,7 @@ void parse_command(int argc, char** argv) {
                                         } else if (compiler == COMPILER_1) {
                                             addstr(&pcaflags, Warg);
                                         } else {
-                                            error(1, NULL, 0, NULL, 0,
+                                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                   "-WK only valid in FORTRAN or C compilations.\n");
                                             exit(2);
                                         }
@@ -6218,7 +6238,7 @@ void parse_command(int argc, char** argv) {
                                                 if (Warg[2] == '\0') {
                                                     var_s0++;
                                                     if (var_s0 >= argc) {
-                                                        error(1, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                               "-G requires a decimal number argument\n");
                                                         exit(2);
                                                     }
@@ -6234,8 +6254,8 @@ void parse_command(int argc, char** argv) {
                                                 }
                                                 for (var_s3 = Gnum; ((*var_s3 != ',') && (*var_s3 != 0));) {
                                                     if (!isdigit(*var_s3)) {
-                                                        error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n",
-                                                              Gnum);
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                              "non-digit character in -G %s\n", Gnum);
                                                         exit(2);
                                                     }
                                                     if (*var_s3 != ',') {
@@ -6253,7 +6273,7 @@ void parse_command(int argc, char** argv) {
                                                 if ((Warg[2] == '\0') || (Warg[2] == ',')) {
                                                     vflag = 1;
                                                     if (getenv("ROOTDIR") != NULL) {
-                                                        error(2, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                                               "ROOTDIR env var ignored, use COMP_TARGET_ROOT and "
                                                               "COMP_HOST_ROOT\n");
                                                     }
@@ -6271,7 +6291,7 @@ void parse_command(int argc, char** argv) {
                                                         if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
                                                             (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
-                                                            error(2, NULL, 0, NULL, 0,
+                                                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                                                   "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
                                                             break;
                                                         }
@@ -6283,7 +6303,7 @@ void parse_command(int argc, char** argv) {
                                                         addstr(&ldflags, argv[var_s0]);
                                                         break;
                                                     } else {
-                                                        error(1, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                               "ld requires -D to have an argument\n");
                                                         exit(2);
                                                     }
@@ -6309,7 +6329,8 @@ void parse_command(int argc, char** argv) {
                                                     if (var_s0 < argc) {
                                                         addstr(&objfiles, "-A");
                                                     }
-                                                    error(1, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
+                                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                          "ld requires -A to have an argument\n");
                                                     exit(2);
                                                 }
                                                 break;
@@ -6317,7 +6338,8 @@ void parse_command(int argc, char** argv) {
                                         break;
 
                                     default: /* switch 2 */
-                                        error(1, NULL, 0, NULL, 0, "Unknown pass character in %s\n", argv[var_s0]);
+                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown pass character in %s\n",
+                                              argv[var_s0]);
                                         exit(2);
                                         break;
                                 }
@@ -6367,7 +6389,7 @@ void parse_command(int argc, char** argv) {
                         if (var_s0 < argc) {
                             addstr(&ldflags, argv[var_s0]);
                         } else {
-                            error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
                         }
                     }
                     break;
@@ -6422,8 +6444,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-acpp") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             cppchoice = CPP_CHOICE_1;
                             acpp = TRUE;
@@ -6536,8 +6558,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-cfe") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             compchoice = COMP_CHOICE_3;
                             relocate_passes("p", NULL, NULL);
@@ -6546,8 +6568,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-common") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&accomflags, "-Xcommon");
                         }
@@ -6563,13 +6585,13 @@ void parse_command(int argc, char** argv) {
                         addstr(&ddoptflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-cachesz must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-cachesz must have an argument\n");
                             exit(2);
                         }
 
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -6583,7 +6605,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cpp") == 0) {
-                        error(2, NULL, 0, NULL, 0, "-cpp is default\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-cpp is default\n");
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cord") == 0) {
@@ -6672,7 +6694,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-check_registry") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -6701,7 +6723,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
                         if (G_flag) {
-                            error(1, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
                             exit(2);
                         }
                         dn_flag = TRUE;
@@ -6739,7 +6761,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'e': /* switch 1 */
                     if (strcmp(argv[var_s0], "-excpt") == 0) {
-                        error(1, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
                         exit(2);
                     }
                     if (compiler == COMPILER_1) {
@@ -6754,7 +6776,8 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exported_symbol") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exported_symbol requires a symbol argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-exported_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6764,7 +6787,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exports_file") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6774,7 +6797,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exclude") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&objfiles, argv[var_s0 - 1]);
@@ -6806,7 +6829,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -e to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -e to have an argument\n");
                             exit(2);
                         }
                     }
@@ -6840,7 +6863,7 @@ void parse_command(int argc, char** argv) {
                         } else if (isdigit(argv[var_s0][5]) && (argv[var_s0][6] == '\0')) {
                             edit_cnt_max = argv[var_s0][5] - '0';
                         } else {
-                            error(1, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
                             exit(2);
                         }
                         editflag = 1;
@@ -6860,8 +6883,8 @@ void parse_command(int argc, char** argv) {
                         xserver = getenv("DISPLAY");
                         if ((ioctl(2, TIOCGPGRP, &sp108) == 0) && (getpgrp() == sp108) && (xserver == 0)) {
                             editflag = 0;
-                            error(2, NULL, 0, NULL, 0, "%s ignored for background compile in non-X environment\n",
-                                  argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "%s ignored for background compile in non-X environment\n", argv[var_s0]);
                         }
                         break;
                     }
@@ -6881,7 +6904,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&feedlist, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-feedback must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-feedback must have an argument\n");
                             exit(2);
                         }
                     }
@@ -6938,7 +6961,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&ucobflags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
                                 exit(2);
                             }
                         } else {
@@ -6952,7 +6975,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
                         exit(2);
                     }
                     goto bad_option;
@@ -6987,7 +7010,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strncmp(argv[var_s0], "-help", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-help is ignored.\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-help is ignored.\n");
                         break;
                     }
                     if (compiler == COMPILER_1) {
@@ -6998,7 +7021,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-hidden_symbol") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -7008,7 +7031,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-hides_file") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -7030,7 +7053,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -i to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -i to have an argument\n");
                             exit(2);
                         }
                     }
@@ -7039,12 +7062,12 @@ void parse_command(int argc, char** argv) {
                         addstr(&umergeflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-inline_to must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-inline_to must have an argument\n");
                             exit(2);
                         }
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -7093,7 +7116,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&upl1flags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-ipath must have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ipath must have an argument\n");
                                 exit(2);
                             }
                         }
@@ -7104,7 +7127,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&upl1flags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
                                 exit(2);
                             }
                         }
@@ -7146,7 +7169,7 @@ void parse_command(int argc, char** argv) {
                                 if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
                                     (var_s1 == 'r') || (var_s1 == 'e') || (var_s1 == 6) || (var_s1 == 's') ||
                                     (var_s1 == 1) || (var_s1 == 2)) {
-                                    error(1, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
                                     exit(2);
                                 }
                             }
@@ -7217,7 +7240,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-mp") == 0)) {
                         cmp_flag |= 0x10008;
                         if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "'-mp' must preceed any -B flags.\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "'-mp' must preceed any -B flags.\n");
                             exit(2);
                         }
                         relocate_passes("fY", NULL, NULL);
@@ -7249,18 +7272,20 @@ void parse_command(int argc, char** argv) {
                         mips1flag = TRUE;
                         mips2flag = FALSE;
                         if (dwopcodeflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
                             exit(2);
                         }
                         if (mips2_spec_flag) {
-                            error(2, NULL, 0, NULL, 0, "-mips1 conflicts with -mips2; using last value (mips1)\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips1 conflicts with -mips2; using last value (mips1)\n");
                             mips2_spec_flag = FALSE;
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips2") == 0) {
                         if (mips1flag || mips3flag) {
-                            error(2, NULL, 0, NULL, 0, "-mips2 conflicts with -mips1; using last value (mips2)\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips2 conflicts with -mips1; using last value (mips2)\n");
                         }
                         mips1flag = FALSE;
                         mips2flag = TRUE;
@@ -7272,13 +7297,15 @@ void parse_command(int argc, char** argv) {
                         mips1flag = FALSE;
                         mips2flag = FALSE;
                         if (mips2_spec_flag) {
-                            error(1, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
                             exit(2);
                         }
                         if ((compiler == COMPILER_4) || (compiler == COMPILER_1)) {
-                            error(2, NULL, 0, NULL, 0, "-mips3 should not be used for ucode 32-bit compiles\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips3 should not be used for ucode 32-bit compiles\n");
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-mips3 cannot be used for ucode 32-bit compiles\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-mips3 cannot be used for ucode 32-bit compiles\n");
                             exit(2);
                         }
                         chip_targ = CHIP_TARGET_MIPS3;
@@ -7307,7 +7334,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips4") == 0) {
-                        error(1, NULL, 0, NULL, 0, "-mips4 cannot be used for ucode 32-bit compiles\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips4 cannot be used for ucode 32-bit compiles\n");
                         exit(2);
                     }
                     if (compiler == COMPILER_3) {
@@ -7317,7 +7344,7 @@ void parse_command(int argc, char** argv) {
                         }
                         if (strncmp(argv[var_s0], "-mp_keep", strlen("-mp_keep")) == 0) {
                             if (argv[var_s0][8] != '\0') {
-                                error(1, NULL, 0, NULL, 0, " Unknown flag: %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, " Unknown flag: %s\n", argv[var_s0]);
                                 exit(2);
                             }
                             mp_flag |= 0x10000;
@@ -7364,10 +7391,10 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-new_ld") == 0) {
                         if (D_1000BF94 != 0) {
-                            error(1, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
                             exit(2);
                         } else if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                            error(1, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
                             exit(2);
                         } else {
                             LD = "ld";
@@ -7453,8 +7480,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-nocpp") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             docpp = FALSE;
                             add_static_opt(argv[var_s0]);
@@ -7504,12 +7531,12 @@ void parse_command(int argc, char** argv) {
                         }
                         if (spFC != NULL) {
                             if (var_s0 >= (argc - 1)) {
-                                error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0]);
                                 exit(2);
                             }
                             var_s0++;
                             if (argv[var_s0][0] == '-') {
-                                error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
                                 exit(2);
                             }
                             addstr(&edisonflags, mkstr(spFC, argv[var_s0], NULL));
@@ -7527,8 +7554,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-oldcpp") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             oldcppflag = 1;
                             if ((compiler == COMPILER_1) && (tpflag != 0)) {
@@ -7539,7 +7566,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-old_ld") == 0) {
                         if (D_1000BF94 != 0) {
-                            error(1, NULL, 0, NULL, 0, "malformed or unknown option: -old_ld\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -old_ld\n");
                             exit(2);
                         } else {
                             LD = "old_ld";
@@ -7561,7 +7588,7 @@ void parse_command(int argc, char** argv) {
                             var_s0++;
                             addstr(&objfiles, argv[var_s0]);
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-objectlist must be given a file argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-objectlist must be given a file argument\n");
                         }
                         break;
                     }
@@ -7580,15 +7607,15 @@ void parse_command(int argc, char** argv) {
                                   (var_s1 == 6)) ||
                                  (var_s1 == 's') || (var_s1 == 1) || (var_s1 == 2)) &&
                                 (stat(outfile, &sp74) == 0)) {
-                                error(1, NULL, 0, NULL, 0, "-o %s resembles the name of a source file, disallowed\n",
-                                      argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-o %s resembles the name of a source file, disallowed\n", argv[var_s0]);
                                 exit(2);
                             }
                             B_1000ECCC = mkstr(outfile, NULL);
                             func_00431B38(var_s0, 2);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-o must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-o must have an argument\n");
                             exit(2);
                         }
                     }
@@ -7602,8 +7629,8 @@ void parse_command(int argc, char** argv) {
                 case 'p': /* switch 1 */
                     if (strcmp(argv[var_s0], "-prototypes") == 0) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             prototype_checking_on = TRUE;
                         }
@@ -7611,8 +7638,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-pedantic") == 0)) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&acppflags, "-p");
                         }
@@ -7642,7 +7669,7 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-pca") == 0) {
                         cmp_flag |= 0x10001;
                         if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-pca must preceed any -B flags.\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-pca must preceed any -B flags.\n");
                             exit(2);
                         }
                         relocate_passes("fKY", NULL, NULL);
@@ -7679,10 +7706,12 @@ void parse_command(int argc, char** argv) {
                                     (strcmp(sp68 + 1, ".c++") != 0) && (strcmp(sp68 + 1, ".C") != 0) &&
                                     (strcmp(sp68 + 1, ".cxx") != 0) && (strcmp(sp68 + 1, ".CXX") != 0) &&
                                     (strcmp(sp68 + 1, ".cpp") != 0) && (strcmp(sp68 + 1, ".CPP") != 0)) {
-                                    error(2, NULL, 0, NULL, 0, "unsupported suffix in %s\n", argv[var_s0]);
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "unsupported suffix in %s\n",
+                                          argv[var_s0]);
                                 }
                             } else {
-                                error(2, NULL, 0, NULL, 0, "ignored unsupported option %s\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "ignored unsupported option %s\n",
+                                      argv[var_s0]);
                             }
                             break;
                         }
@@ -7708,11 +7737,11 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((pflag == 0) || (pflag == 1)) {
                         if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-p0 or -p1 must precede any -B flags\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-p0 or -p1 must precede any -B flags\n");
                             exit(2);
                         }
                     } else {
-                        error(1, NULL, 0, NULL, 0, "%s has been superseded, see prof (1) and pixie (1)\n",
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s has been superseded, see prof (1) and pixie (1)\n",
                               argv[var_s0]);
                         exit(2);
                     }
@@ -7796,7 +7825,8 @@ void parse_command(int argc, char** argv) {
                                 if (strcmp(sp64, "nosrc") == 0) {
                                     D_1000BF78 = 1;
                                 } else if (D_1000BF80 != NULL) {
-                                    error(1, NULL, 0, NULL, 0, "Static analysis directory already specified\n");
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                          "Static analysis directory already specified\n");
                                 } else {
                                     D_1000BF80 = sp64;
                                     if (sp64[strlen(sp64) - 1] != '/') {
@@ -7819,7 +7849,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-set_version") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-set_version requires an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-set_version requires an argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -7829,7 +7859,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-soname") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-soname requires an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-soname requires an argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -7839,12 +7869,12 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-systype") == 0) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
                             exit(2);
                         }
                         if (user_systype != 0) {
                             if (strcmp(systype, argv[var_s0]) != 0) {
-                                error(1, NULL, 0, NULL, 0, "only one -systype option allowed\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one -systype option allowed\n");
                                 exit(2);
                             } else {
                                 multiple_systype = 1;
@@ -7853,7 +7883,7 @@ void parse_command(int argc, char** argv) {
                         systype = argv[var_s0];
                         user_systype = 1;
                         if ((Bflag != 0) && (systype_seen == 0)) {
-                            error(1, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
                             exit(2);
                         } else {
                             systype_seen = 1;
@@ -7867,14 +7897,14 @@ void parse_command(int argc, char** argv) {
                                 }
                                 elfflag = 1;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
                                 exit(2);
                             }
                             if ((strcmp(systype, "svr4") != 0) && (strcmp(systype, "bsd43") != 0) &&
                                 (strcmp(systype, "svr3") != 0) && (strcmp(systype, "sysv") != 0) &&
                                 (fopen(strcat("/", systype), "r") == NULL)) {
                                 if (systype_warn == 0) {
-                                    error(2, NULL, 0, NULL, 0,
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "This systype doesn't exist on this machine; changed systype to svr3.\n");
                                 }
                                 systype = "svr3";
@@ -7898,7 +7928,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-swopcode") == 0) {
                         if ((dwopcodeflag != 0) || sixty4bitflag) {
-                            error(1, NULL, 0, NULL, 0, "-swopcode can not be used with -dwopcode/-64bit\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-swopcode can not be used with -dwopcode/-64bit\n");
                             exit(2);
                         }
                         swopcodeflag = 1;
@@ -7906,10 +7937,11 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) { // "-sopt"
                         if ((compiler != COMPILER_1) && (compiler != COMPILER_3)) {
-                            error(2, NULL, 0, NULL, 0, "-sopt only available with Fortran and C; option ignored.\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-sopt only available with Fortran and C; option ignored.\n");
                         } else if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             Warg = argv[var_s0] + 5;
                             while (*Warg == ',') {
@@ -8060,39 +8092,39 @@ void parse_command(int argc, char** argv) {
                 case 'Z':                      /* switch 1 */
                     switch (argv[var_s0][2]) { /* switch 4 */
                         case 'A':              /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'C': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'F': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'N': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'P': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'U': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'f': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'i': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'R': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'G': /* switch 4 */
@@ -8104,22 +8136,23 @@ void parse_command(int argc, char** argv) {
                             break;
 
                         case 'g': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "-Zg is obsolete and is ignored.\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zg is obsolete and is ignored.\n");
                             if (compiler == COMPILER_1) {
-                                error(2, NULL, 0, NULL, 0,
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lgl_s. See your graphics documentation.\n");
                             }
                             if (hasfortran || (compiler == COMPILER_3)) {
-                                error(2, NULL, 0, NULL, 0, "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
                             }
                             if (haspascal || (compiler == COMPILER_2)) {
-                                error(2, NULL, 0, NULL, 0,
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lpgl /usr/lib/p2cstr.o -lgl_s  See pc(1).\n");
                             }
                             break;
 
                         case 'r': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "-Zr is obsolete and is ignored.\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zr is obsolete and is ignored.\n");
                             break;
 
                         case 'v': /* switch 4 */
@@ -8132,11 +8165,11 @@ void parse_command(int argc, char** argv) {
                             break;
 
                         case 'z': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         default: /* switch 4 */
-                            error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                             exit(2);
                             break;
                     }
@@ -8150,13 +8183,13 @@ void parse_command(int argc, char** argv) {
                     } else {
                         switch (argv[var_s0][2]) { /* switch 8; irregular */
                             case 'n':              /* switch 8 */
-                                error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
                             case 'x': /* switch 8 */
-                                error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
                             default:
-                                error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                                 exit(2);
                                 break;
                         }
@@ -8180,14 +8213,14 @@ void parse_command(int argc, char** argv) {
                                 addstr(&objfiles, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
                                 exit(2);
                             }
                         }
                     }
 
                     if (strcmp(argv[var_s0], "-unroll") == 0) {
-                        error(1, NULL, 0, NULL, 0, "This flag is no longer supported\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "This flag is no longer supported\n");
                         exit(2);
                     } else if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-usefpidx") == 0)) {
                         addstr(&fcomflags, argv[var_s0]);
@@ -8213,7 +8246,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-update_registry") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -8232,7 +8265,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (compiler == COMPILER_1) {
                         if (strcmp(argv[var_s0], "-volatile") == 0) {
-                            error(2, NULL, 0, NULL, 0,
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                   "-volatile is no longer supported; use the volatile qualifier instead\n");
                             break;
                         }
@@ -8255,8 +8288,8 @@ void parse_command(int argc, char** argv) {
                         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-v2") == 0)) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         }
                         break;
                     }
@@ -8265,8 +8298,8 @@ void parse_command(int argc, char** argv) {
                 case 'w': /* switch 1 */
                     if ((compiler == COMPILER_1) && (strncmp(argv[var_s0], "-wlint", 6) == 0)) {
                         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&ccomflags, argv[var_s0]);
                         }
@@ -8280,7 +8313,7 @@ void parse_command(int argc, char** argv) {
                                 break;
                             }
                             if ((argv[var_s0][0] < '0') || (argv[var_s0][0] > '9')) {
-                                error(2, NULL, 0, NULL, 0,
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "-woff requires a comma-separated list of error numbers - ignored\n");
                                 var_s0--;
                                 break;
@@ -8289,12 +8322,13 @@ void parse_command(int argc, char** argv) {
                             addstr(&edisonflags, mkstr("-YW", argv[var_s0], NULL));
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "-woff requires a warning number (or a list of them)\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                              "-woff requires a warning number (or a list of them)\n");
                         exit(2);
                     }
                     if ((argv[var_s0][2] == '1') && (argv[var_s0][3] == '\0')) {
                         if (compiler != COMPILER_3) {
-                            error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 1;
                         }
@@ -8302,7 +8336,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((argv[var_s0][2] == '0') && (argv[var_s0][3] == '\0')) {
                         if (compiler != COMPILER_3) {
-                            error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 0;
                         }
@@ -8317,7 +8351,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) &&
                         (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                        error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
                         break;
                     }
                     if ((argv[var_s0][2] == '\0') ||
@@ -8415,7 +8450,8 @@ void parse_command(int argc, char** argv) {
 
                 case 'e': /* switch 5 */
                     if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-                        error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
                         break;
                     }
 
@@ -8522,10 +8558,10 @@ void parse_command(int argc, char** argv) {
 
     bad_option:
         if (sp14C != 0) {
-            error(1, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
             exit(2);
         } else {
-            error(2, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
         }
     } /* end of loop */
 
@@ -8623,8 +8659,14 @@ void get_host_chiptype(void) {
 
 // function error # 7
 
+// Error message types
 static const char* D_1000C1E0[] = {
-    "Internal", "Error", "Warning", "Info", "Fix", "",
+    "Internal", // ERRORCAT_INTERNAL
+    "Error",    // ERRORCAT_ERROR
+    "Warning",  // ERRORCAT_WARNING
+    "Info",     // ERRORCAT_INFO
+    "Fix",      // ERRORCAT_FIX
+    "",         // ERRORCAT_ERRNO
 };
 
 #ifndef PERMUTER
@@ -8674,7 +8716,8 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
         D_1000C1DC[i] = '\0';
     }
 
-    if (arg0 == 5) {
+    if (arg0 == ERRORCAT_ERRNO) {
+        //! @bug `D_1000C1DC` is null if the previous block did not run.
         fprintf(stderr, "%s: ", D_1000C1DC);
     } else {
         fprintf(stderr, "%s: %s: ", D_1000C1D8, D_1000C1E0[arg0]);
@@ -9447,7 +9490,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     break;
 
                 default:
-                    error(1, NULL, 0, NULL, 0, "Unknown character in -t%c\n", *var_s1);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in -t%c\n", *var_s1);
                     exit(2);
                     break;
             }
@@ -9599,9 +9642,9 @@ va_dcl // K&R syntax
 
     ret = malloc(len);
     if (ret == NULL) {
-        error(1, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -9626,9 +9669,9 @@ va_dcl // K&R syntax
 // Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
 void mklist(list* arg0) {
     if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
-        error(1, NULL, 0, "mklist ()", 14561, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "mklist ()", 14561, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -9648,9 +9691,9 @@ char* str;
 {
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
-            error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14595, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9680,9 +9723,9 @@ void addspacedstr(list* arg0, char* str) {
         if ((arg0->length + 1) >= arg0->capacity) {
             if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) ==
                 NULL) {
-                error(1, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
+                error(ERRORCAT_ERROR, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 exit(1);
             }
@@ -9707,7 +9750,7 @@ char* newstr(const char* src) {
     if (dest != NULL) {
         strcpy(dest, src);
     } else {
-        error(1, NULL, 0, NULL, 0, "newstr: unable to malloc for string %s\n", src);
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "newstr: unable to malloc for string %s\n", src);
         exit(2);
     }
     return dest;
@@ -9725,10 +9768,10 @@ int save_place(list* arg0) {
 
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "save_place()", 14695, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "save_place()", 14695, "out of memory\n");
 
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9750,7 +9793,7 @@ int save_place(list* arg0) {
  */
 void set_place(list* arg0, char* str, int place) {
     if ((place < 0) || (place >= arg0->length)) {
-        error(0, NULL, 0, "set_place ()", 14726, "place out of range");
+        error(ERRORCAT_INTERNAL, NULL, 0, "set_place ()", 14726, "place out of range");
         exit(1);
     }
     arg0->entries[place] = str;
@@ -9764,9 +9807,9 @@ void addlist(list* arg0, list* arg1) {
     if ((arg0->length + arg1->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries,
                                      (arg0->capacity + arg1->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "addlist ()", 14756, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14756, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9797,9 +9840,9 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
         if ((arg0->entries =
                  realloc(arg0->entries, (arg0->capacity + arg1->capacity + arg2->capacity + LIST_CAPACITY_INCR) *
                                             sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "addlist ()", 14795, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14795, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9949,7 +9992,7 @@ char* mksuf(const char* path, char value) {
         }
 
         if (new_suf == NULL) {
-            error(0, NULL, 0, "mksuf ()", 14938, "passed an unknown suffix value: %s\n", value);
+            error(ERRORCAT_INTERNAL, NULL, 0, "mksuf ()", 14938, "passed an unknown suffix value: %s\n", value);
             exit(4);
         }
         new_suf_length = strlen(new_suf);
@@ -9990,7 +10033,7 @@ char* mksuf(const char* path, char value) {
 
         // If no extension, error out
         if (k == 0) {
-            error(1, NULL, 0, "mksuf ()", 14977, "Bad file name, no suffix: %s\n", path);
+            error(ERRORCAT_ERROR, NULL, 0, "mksuf ()", 14977, "Bad file name, no suffix: %s\n", path);
             exit(4);
         }
 
@@ -10022,9 +10065,9 @@ char* savestr(const char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
 
     if (dest == NULL) {
-        error(1, NULL, 0, "savestr ()", 15014, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 15014, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -10120,15 +10163,15 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         return 0;
     }
     if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
-        error(1, NULL, 0, NULL, 0, "pipe failed for -showm");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "pipe failed for -showm");
         return -1;
     }
 
     spA0 = fork();
     if (spA0 == -1) { // fork failed
-        error(1, NULL, 0, NULL, 0, "no more processes\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no more processes\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         return -1;
     }
@@ -10141,9 +10184,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg2 != NULL) {
             sp94 = open(arg2, O_RDONLY);
             if (sp94 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -10154,9 +10197,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg3 != NULL) {
             sp90 = creat(arg3, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp90 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -10167,9 +10210,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg4 != NULL) {
             sp8C = creat(arg4, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp8C == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -10180,15 +10223,15 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         execvp(arg0, arg1);
         sp78 = func_00430414(arg0, 1);
         if ((errno == ENOENT) && (sp78 != NULL)) {
-            error(1, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
         } else {
             sp78 = func_00430414(arg0, 0);
             if ((errno == ENOENT) && (sp78 != NULL)) {
-                error(1, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
             } else {
-                error(1, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
             }
         }
@@ -10291,9 +10334,9 @@ int edit_src(const char* arg0, char* arg1, int arg2) {
 
     forkPid = fork();
     if (forkPid == (pid_t)-1) { // fork failed
-        error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         return -1;
     }
@@ -10308,9 +10351,9 @@ int edit_src(const char* arg0, char* arg1, int arg2) {
         } else {
             execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", arg0, "+1", errout, arg1, (char*)NULL);
         }
-        error(1, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
 
         exit(1);
@@ -10821,7 +10864,7 @@ void exec_OCC(int argc, char** argv) {
     sprintf(spB8, "%susr/bin/OCC", comp_host_root);
     *argv = spB8;
     execv(spB8, argv);
-    error(2, NULL, 0, NULL, 0, "could not exec %s", spB8);
+    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "could not exec %s", spB8);
 }
 
 // function add_cxx_symbol_options # 44
@@ -10922,7 +10965,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28E0 = fopen(D_1000C2EC, "w+");
     if (sp28E0 == NULL) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n", D_1000C2EC);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n",
+              D_1000C2EC);
         perror(D_1000C2F0);
         cleanup();
         exit(1);
@@ -10930,7 +10974,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28D8 = open(D_1000C2E8, 0x102, 0777);
     if (sp28D8 < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10938,7 +10983,8 @@ void record_static_fileset(const char* arg0) {
     }
 
     if (flock(sp28D8, 2) < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10946,7 +10992,8 @@ void record_static_fileset(const char* arg0) {
     }
 
     if (fstat(sp28D8, &sp34) < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10959,7 +11006,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28DC = fdopen(sp28D8, "r+");
     if (sp28DC == NULL) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10985,7 +11033,8 @@ void record_static_fileset(const char* arg0) {
 
     while ((sp28E4 = fread(spD8, 1, 0x2800, sp28E0)) > 0) {
         if (fwrite(&spD8, 1, sp28E4, sp28DC) != sp28E4) {
-            error(1, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n", D_1000C2E8);
+            error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n",
+                  D_1000C2E8);
             perror(D_1000C2F0);
             unlink(D_1000C2EC);
             cleanup();
@@ -11159,7 +11208,7 @@ static void func_00431D00(const char* arg0) {
         func_00431B88(file, arg0, FALSE);
         fclose(file);
     } else {
-        error(2, NULL, 0, NULL, 0, "cannot open commandfile '%s'\n", tempstr[33]);
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "cannot open commandfile '%s'\n", tempstr[33]);
     }
 }
 
@@ -11258,7 +11307,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         }
         sp48 = fopen(sp50, "w");
         if (sp48 == NULL) {
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", sp50);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", sp50);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
@@ -11274,7 +11323,8 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         fclose(sp48);
 
         if (rename(sp50, sp54) < 0) {
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", sp50, sp54);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", sp50,
+                  sp54);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
