@@ -519,20 +519,26 @@ int pgflag = 0; //!< Option. Related to profiling. Set to 1 by "-pg".
 
 int jflag = FALSE; //!< flag, pseudoboolean. Only process to ucode, do not run subsequent passes, output to file with
                    //!< extension replaced by ".u". Set by "-j".
-int cflag =
-    FALSE;     //!< flag, pseudoboolean. Compile a single file to a ".o", do not link. Set by "-c", "-nocode", "+I", and
-               //!< "-F" for C++ compilers.
-int Sflag = 0; //! flag, pseudoboolean. only compile to assembly, do not assemble, output to file with extension
-               //! replaced by ".s". Set by "-S".
+int cflag = FALSE; //!< flag, pseudoboolean. Compile a single file to a ".o", do not link. Set by "-c", "-nocode", "+I",
+                   //!< and "-F" for C++ compilers.
+int Sflag = FALSE; //! flag, pseudoboolean. only compile to assembly, do not assemble, output to file with extension
+                   //! replaced by ".s". Set by "-S".
 
 int Oflag = 1; //! Option. Optimisation level, 1 by default. Set by "-ON", N one of 0,1,2,3, or "-O". Interacts with
                //! `gflag`, see parse_command() for details.
 
-int vflag = 0;
-int time_flag = 0;
-int execute_flag = 1;
-int Vflag = 0;
-int Kflag = 0;
+int vflag = FALSE; //! flag, boolean. Whether to print verbose output of compilation steps including program arguments.
+                   //! Set by "-show", "-v", "-Wxv", "-Zq", "+v" Passed to other programs. "-v" also sets `time_flag`
+                   //! @see time_flag
+int time_flag =
+    FALSE; //! flag, boolean. Whether to print execution times for called programs. Set by "-showt" and "-v".
+int execute_flag =
+    TRUE; //! flag, boolean. Whether to execute the programs called. Unset by "-show0" and "-show_defaults".
+
+int Vflag = FALSE; //! flag, boolean. Should print version information, but is disabled, see 'V' in parse_command().
+int Kflag = FALSE; //! flag, pseudoboolean. Whether to keep intermediate files from compilation. These have the same
+                   //! filename but change the extension based on pass. Set by "-K" and "-keep".
+                   //! TODO: document extensions
 int nodeflib = 0;
 int minus_M = 0;
 int anachronisms = TRUE; //!< flag, boolean. Adds "-O" to `execlist`
@@ -1243,7 +1249,7 @@ int main(int argc, char** argv) {
         addstr(&cfeflags, "-call_shared");
     }
 
-    if ((Vflag == 0) && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
+    if (!Vflag && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
         exit(2);
     }
@@ -1529,7 +1535,7 @@ int main(int argc, char** argv) {
             addstr(&optflags, "-static");
         }
     }
-    if (Vflag != 0) {
+    if (Vflag) {
         whats();
     }
     if (runerror != 0) {
@@ -1584,7 +1590,7 @@ int main(int argc, char** argv) {
                     addstr(&srcfiles, mkstr(uoutfile, ".?", NULL));
                 }
                 srcsuf = '?';
-                if ((Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'c') || (Kflag != 0)) {
+                if ((Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'c') || Kflag) {
                     symtab = mksuf(srcfiles.entries[i], 'T');
                     tmpst = 0;
                 } else {
@@ -1613,8 +1619,8 @@ int main(int argc, char** argv) {
             srcsuf = 's';
         }
         if ((Hchar == 'f') || (Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'k') || (Hchar == 'c') ||
-            (Kflag != 0) || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') ||
-            (srcsuf == 'S') || (srcsuf == 'M') || (srcsuf == 'V') || (srcsuf == 'D') || (srcsuf == 'Q')) {
+            Kflag || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') || (srcsuf == 'S') ||
+            (srcsuf == 'M') || (srcsuf == 'V') || (srcsuf == 'D') || (srcsuf == 'Q')) {
             tmpst = 0;
             if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == '\0')) {
                 symtab = mkstr(srcfiles.entries[i], ".T", NULL);
@@ -1822,7 +1828,7 @@ int main(int argc, char** argv) {
                     execlist.length = 0;
                     addstr(&execlist, "utob");
                     addstr(&execlist, srcfiles.entries[i]);
-                    if (Kflag != 0) {
+                    if (Kflag) {
                         passout = mksuf(srcfiles.entries[i], 'B');
                     } else {
                         passout = tempstr[1];
@@ -1835,7 +1841,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, passout);
                     if (run(utob, execlist.entries, NULL, NULL, NULL) != 0) {
                         runerror++;
-                        if (Kflag == 0) {
+                        if (!Kflag) {
                             unlink(passout);
                         }
                         continue;
@@ -2179,7 +2185,7 @@ int main(int argc, char** argv) {
             }
         } else if (Eflag) {
             passout = NULL;
-        } else if ((Hchar == 'K') || (Kflag != 0)) {
+        } else if ((Hchar == 'K') || Kflag) {
             if ((compchoice == COMP_CHOICE_3) && !run_sopt && !acpp && (cmp_flag == 0) && (compiler == COMPILER_1)) {
                 passout = mksuf(srcfiles.entries[i], 'B');
             } else {
@@ -2209,8 +2215,7 @@ int main(int argc, char** argv) {
             if (run((((compiler == COMPILER_3) && D_1000BF74) ? cfe : cpp), execlist.entries, NULL, passout, NULL) !=
                 0) {
                 runerror++;
-                if (!Eflag &&
-                    ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0)))) {
+                if (!Eflag && ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && (mflag != 0)))) {
                     unlink(passin);
                 }
                 unlink(passout);
@@ -2344,7 +2349,7 @@ int main(int argc, char** argv) {
         }
 
         if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             if (fullwarn) {
@@ -2406,8 +2411,7 @@ int main(int argc, char** argv) {
 
         if (retcode != 0) {
             runerror++;
-            if (!Eflag &&
-                ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0)))) {
+            if (!Eflag && ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && (mflag != 0)))) {
                 unlink(passin);
             }
             unlink(passout);
@@ -2418,7 +2422,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0))) {
+        if ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && (mflag != 0))) {
             unlink(passin);
         }
         passin = passout;
@@ -2453,7 +2457,7 @@ int main(int argc, char** argv) {
 
         if (c_compiler_choice == C_COMPILER_CHOICE_0) {
             if (!Pflag && !Eflag) {
-                if ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0))) {
+                if ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && (mflag != 0))) {
                     unlink(passin);
                 }
                 passin = passout;
@@ -2503,7 +2507,7 @@ int main(int argc, char** argv) {
                 addstr(&optflags, "0");
             }
             addstr(&execlist, mkstr("-I=", passin, NULL));
-            if ((Hchar == 'K') || (Kflag != 0)) {
+            if ((Hchar == 'K') || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'M');
             } else {
                 passout = mkstr(tempstr[31], "M", NULL);
@@ -2517,16 +2521,16 @@ int main(int argc, char** argv) {
 
             if (run(copt, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (docpp && (srcsuf != 'i') && (Kflag == 0)) {
+                if (docpp && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
-                if ((Hchar != 'K') || (Kflag != 0)) {
+                if ((Hchar != 'K') || Kflag) {
                     unlink(passout);
                 }
                 continue;
             }
 
-            if (docpp && (srcsuf != 'i') && (Kflag == 0)) {
+            if (docpp && (srcsuf != 'i') && !Kflag) {
                 unlink(passin);
             }
             passin = passout;
@@ -2534,12 +2538,12 @@ int main(int argc, char** argv) {
                 if (Hchar == 'K') {
                     continue;
                 }
-                if ((Hchar == 'K') || (Kflag != 0)) {
+                if ((Hchar == 'K') || Kflag) {
                     passout = mksuf(srcfiles.entries[i], 'I');
                 } else {
                     passout = mkstr(tempstr[31], "I", NULL);
                 }
-                if (vflag != 0) {
+                if (vflag) {
                     addstr(&execlist, "-v");
                 }
                 execlist.length = 0;
@@ -2559,14 +2563,14 @@ int main(int argc, char** argv) {
 
                 if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
                     runerror++;
-                    if (Kflag == 0) {
+                    if (!Kflag) {
                         unlink(passin);
                     }
                     unlink(passout);
                     continue;
                 }
 
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                 }
                 passin = passout;
@@ -2575,7 +2579,7 @@ int main(int argc, char** argv) {
         }
 
     skip_sopt:
-        if ((Hchar == 'K') || (Kflag != 0)) {
+        if ((Hchar == 'K') || Kflag) {
             cmp_flag |= 6;
         }
         if (cmp_flag & 1) {
@@ -2607,7 +2611,7 @@ int main(int argc, char** argv) {
             addlist(&execlist, &pcaflags);
             if (run(pca, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (docpp && (srcsuf != 'i') && (Kflag == 0)) {
+                if (docpp && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
                 if (!(cmp_flag & 4)) {
@@ -2618,7 +2622,7 @@ int main(int argc, char** argv) {
             if (!(cmp_flag & 2)) {
                 unlink(sp110);
             }
-            if (docpp && (srcsuf != 'i') && (Kflag == 0)) {
+            if (docpp && (srcsuf != 'i') && !Kflag) {
                 unlink(passin);
             }
             passin = passout;
@@ -2626,12 +2630,12 @@ int main(int argc, char** argv) {
             if (Hchar != 'K') {
                 execlist.length = 0;
                 addstr(&execlist, ((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3) ? "cpp" : "acpp"));
-                if ((Hchar == 'K') || (Kflag != 0)) {
+                if ((Hchar == 'K') || Kflag) {
                     passout = mksuf(srcfiles.entries[i], 'I');
                 } else {
                     passout = mkstr(tempstr[31], "I", NULL);
                 }
-                if (vflag != 0) {
+                if (vflag) {
                     addstr(&execlist, "-v");
                 }
                 addstr(&execlist, passin);
@@ -2648,13 +2652,13 @@ int main(int argc, char** argv) {
                 relocate_passes("p", NULL, NULL);
                 if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
                     runerror++;
-                    if ((Kflag == 0) && !(cmp_flag & 4)) {
+                    if (!Kflag && !(cmp_flag & 4)) {
                         unlink(passin);
                     }
                     unlink(passout);
                     continue;
                 }
-                if ((Kflag == 0) && !(cmp_flag & 4)) {
+                if (!Kflag && !(cmp_flag & 4)) {
                     unlink(passin);
                 }
                 passin = passout;
@@ -2672,7 +2676,7 @@ int main(int argc, char** argv) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
             }
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             if ((compiler == COMPILER_1) &&
@@ -2790,7 +2794,7 @@ int main(int argc, char** argv) {
 
         if (compchoice == COMP_CHOICE_3) {
             if (cmp_flag & 0x10000) {
-                if ((Hchar == 'M') || (Kflag != 0) || (cmp_flag & 4)) {
+                if ((Hchar == 'M') || Kflag || (cmp_flag & 4)) {
                     passout = mksuf(srcfiles.entries[i], 'P');
                 } else {
                     passout = mkstr(tempstr[31], "P", NULL);
@@ -2809,12 +2813,12 @@ int main(int argc, char** argv) {
                 }
                 addlist(&execlist, &mpcflags);
                 retcode = run(mpc, execlist.entries, NULL, NULL, errout);
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                 }
                 if (retcode != 0) {
                     runerror++;
-                    if ((Hchar != 'M') && (Kflag == 0) && !(cmp_flag & 4)) {
+                    if ((Hchar != 'M') && !Kflag && !(cmp_flag & 4)) {
                         unlink(passout);
                     }
                     continue;
@@ -2844,7 +2848,7 @@ int main(int argc, char** argv) {
                 passout = NULL;
             } else if (plusIflag != 0) {
                 passout = mksuf(srcfiles.entries[i], SUF_7);
-            } else if (Kflag != 0) {
+            } else if (Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'B');
             } else {
                 passout = tempstr[3];
@@ -2864,7 +2868,7 @@ int main(int argc, char** argv) {
             }
 
             if (c_compiler_choice == C_COMPILER_CHOICE_0) {
-                if (vflag != 0) {
+                if (vflag) {
                     addstr(&execlist, "-Xv");
                 }
                 if (compiler == COMPILER_1) {
@@ -2909,7 +2913,7 @@ int main(int argc, char** argv) {
 
                 if ((outfile != NULL) && cflag && (srcfiles.length == 1)) {
                     sp104 = outfile;
-                } else if ((srcsuf == '?') && (Hchar != 'b') && (Kflag == 0)) {
+                } else if ((srcsuf == '?') && (Hchar != 'b') && !Kflag) {
                     tmp_uldobj = sp104 = tempstr[12];
                 } else {
                     sp104 = mksuf(srcfiles.entries[i], 'o');
@@ -2936,14 +2940,14 @@ int main(int argc, char** argv) {
                 if ((oldcflag == TRUE) && docpp && (srcsuf != 'i') && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                     unlink(passin);
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passout);
                     unlink(symtab);
                 }
                 continue;
             }
 
-            if ((run_sopt && (Kflag == 0)) || acpp || oldcppflag || (cmp_flag & 0x10000)) {
+            if ((run_sopt && !Kflag) || acpp || oldcppflag || (cmp_flag & 0x10000)) {
                 unlink(passin);
             }
 
@@ -2964,7 +2968,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, passout);
                 if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                     runerror++;
-                    if (Kflag == 0) {
+                    if (!Kflag) {
                         unlink(passin);
                         unlink(passout);
                     }
@@ -2972,7 +2976,7 @@ int main(int argc, char** argv) {
                     if (tmpst != 0) {
                         unlink(symtab);
                     }
-                } else if (Kflag == 0) {
+                } else if (!Kflag) {
                     unlink(passin);
                 }
                 continue;
@@ -2991,7 +2995,7 @@ int main(int argc, char** argv) {
 
         execlist.length = 0;
         addstr(&execlist, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-Xv");
         }
         if (cmp_flag & 0x10000) {
@@ -3022,7 +3026,7 @@ int main(int argc, char** argv) {
             } else {
                 passout = mksuf(srcfiles.entries[i], 'B');
             }
-        } else if (Kflag != 0) {
+        } else if (Kflag) {
             passout = mksuf(srcfiles.entries[i], 'B');
         } else {
             passout = tempstr[3];
@@ -3033,7 +3037,7 @@ int main(int argc, char** argv) {
         }
 
         addstr(&execlist, mkstr("-XS", symtab, NULL));
-        if ((Kflag == 0) && docpp && (srcsuf != 'i')) {
+        if (!Kflag && docpp && (srcsuf != 'i')) {
             var_s1 = passin;
         } else {
             addstr(&execlist, passin);
@@ -3065,11 +3069,11 @@ int main(int argc, char** argv) {
             }
             runerror++;
 
-            if ((Kflag == 0) && docpp && (srcsuf != 'i')) {
+            if (!Kflag && docpp && (srcsuf != 'i')) {
                 unlink(passin);
             }
 
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 unlink(symtab);
             }
@@ -3080,7 +3084,7 @@ int main(int argc, char** argv) {
             unlink(errout);
         }
 
-        if ((Kflag == 0) && docpp && (srcsuf != 'i')) {
+        if (!Kflag && docpp && (srcsuf != 'i')) {
             unlink(passin);
         }
         passin = passout;
@@ -3097,14 +3101,14 @@ int main(int argc, char** argv) {
             addstr(&execlist, passout);
             if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                     unlink(passout);
                 }
                 if (tmpst != 0) {
                     unlink(symtab);
                 }
-            } else if (Kflag == 0) {
+            } else if (!Kflag) {
                 unlink(passin);
             }
             continue;
@@ -3121,14 +3125,14 @@ int main(int argc, char** argv) {
     block_1341:
         execlist.length = 0;
         addstr(&execlist, "upas");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addstr(&execlist, "-G");
         addstr(&execlist, Gnum);
         addlist(&execlist, &upasflags);
         addstr(&execlist, passin);
-        if (((Hchar == 'f') && (ucodeflag == 0)) || (Kflag != 0)) {
+        if (((Hchar == 'f') && (ucodeflag == 0)) || Kflag) {
             passout = mksuf(srcfiles.entries[i], 'B');
             if (regular_not_writeable(passout) == 1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -3148,7 +3152,7 @@ int main(int argc, char** argv) {
                         show_err(errout);
                         exit(1);
                     }
-                    if ((stdflag == 0) && docpp && (srcsuf != 'i') && (Kflag == 0)) {
+                    if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -3161,11 +3165,11 @@ int main(int argc, char** argv) {
             }
             runerror++;
 
-            if ((stdflag == 0) && docpp && (srcsuf != 'i') && (Kflag == 0)) {
+            if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
                 unlink(passin);
             }
 
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 unlink(symtab);
             }
@@ -3176,7 +3180,7 @@ int main(int argc, char** argv) {
             unlink(errout);
         }
 
-        if ((stdflag == 0) && docpp && (srcsuf != 'i') && (Kflag == 0)) {
+        if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
             unlink(passin);
         }
         passin = passout;
@@ -3193,14 +3197,14 @@ int main(int argc, char** argv) {
             addstr(&execlist, passout);
             if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                     unlink(passout);
                 }
                 if (tmpst != 0) {
                     unlink(symtab);
                 }
-            } else if (Kflag == 0) {
+            } else if (!Kflag) {
                 unlink(passin);
             }
             continue;
@@ -3213,13 +3217,13 @@ int main(int argc, char** argv) {
     block_1388:
         execlist.length = 0;
         addstr(&execlist, "pl1fe");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &upl1flags);
         addstr(&execlist, passin);
 
-        if ((Hchar == 'f') || (Kflag != 0)) {
+        if ((Hchar == 'f') || Kflag) {
             passout = mksuf(srcfiles.entries[i], SUF_3);
             lpi_st = mksuf(srcfiles.entries[i], SUF_4);
         } else {
@@ -3262,7 +3266,7 @@ int main(int argc, char** argv) {
             if (docpp && (srcsuf != 'i')) {
                 unlink(passin);
             }
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 unlink(lpi_st);
             }
@@ -3285,19 +3289,19 @@ int main(int argc, char** argv) {
     pass_ulpi:
         execlist.length = 0;
         addstr(&execlist, "ulpi");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &ulpiflags);
         addstr(&execlist, passin);
 
-        if (((Hchar == 'k') && (ucodeflag == 0)) || (Kflag != 0)) {
+        if (((Hchar == 'k') && (ucodeflag == 0)) || Kflag) {
             passout = mksuf(srcfiles.entries[i], 'B');
         } else {
             passout = tempstr[3];
         }
 
-        if ((srcsuf == SUF_3) || (Kflag != 0)) {
+        if ((srcsuf == SUF_3) || Kflag) {
             lpi_st = mksuf(srcfiles.entries[i], SUF_4);
         } else {
             lpi_st = tempstr[17];
@@ -3314,7 +3318,7 @@ int main(int argc, char** argv) {
             if (srcsuf != 3) {
                 unlink(passin);
             }
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 if (srcsuf != 3) {
                     unlink(lpi_st);
@@ -3326,10 +3330,10 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((srcsuf != 3) && (Kflag == 0)) {
+        if ((srcsuf != 3) && !Kflag) {
             unlink(passin);
         }
-        if ((Kflag == 0) && (srcsuf != 3)) {
+        if (!Kflag && (srcsuf != 3)) {
             unlink(lpi_st);
         }
 
@@ -3343,14 +3347,14 @@ int main(int argc, char** argv) {
             addstr(&execlist, passout);
             if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                     unlink(passout);
                 }
                 if (tmpst != 0) {
                     unlink(symtab);
                 }
-            } else if (Kflag == 0) {
+            } else if (!Kflag) {
                 unlink(passin);
             }
             continue;
@@ -3363,13 +3367,13 @@ int main(int argc, char** argv) {
     block_1453:
         execlist.length = 0;
         addstr(&execlist, "cobfe");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &ucobflags);
         addstr(&execlist, passin);
 
-        if ((Hchar == 'f') || (Kflag != 0)) {
+        if ((Hchar == 'f') || Kflag) {
             passout = mksuf(srcfiles.entries[i], SUF_3);
             lpi_st = mksuf(srcfiles.entries[i], SUF_4);
         } else {
@@ -3420,7 +3424,7 @@ int main(int argc, char** argv) {
             if (docpp && (srcsuf != 'i')) {
                 unlink(passin);
             }
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 unlink(lpi_st);
             }
@@ -3459,7 +3463,7 @@ int main(int argc, char** argv) {
             }
             if (run(m4, execlist.entries, NULL, passout, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passout);
                 }
                 continue;
@@ -3491,7 +3495,7 @@ int main(int argc, char** argv) {
                 passout = mksuf(srcfiles.entries[i], 'f');
                 if (run(ratfor, execlist.entries, NULL, passout, NULL) != 0) {
                     runerror++;
-                    if (Kflag == 0) {}
+                    if (!Kflag) {}
                     continue;
                 }
                 if (mflag != 0) {
@@ -3547,7 +3551,7 @@ int main(int argc, char** argv) {
             spF4 = mkstr(tempstr[31], "l", NULL);
             addstr(&execlist, mkstr("-L=", spF4, NULL));
 
-            if ((Hchar == 'K') || (Kflag != 0)) {
+            if ((Hchar == 'K') || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'm');
             } else {
                 passout = mkstr(tempstr[31], "m", &spF0, NULL);
@@ -3573,7 +3577,7 @@ int main(int argc, char** argv) {
             if (w1flag == 2) {
                 addstr(&execlist, "-suppress=w");
             }
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-lo=lno");
             }
             if (irix4) {
@@ -3587,16 +3591,16 @@ int main(int argc, char** argv) {
             addlist(&execlist, &soptflags);
             if (run(fopt, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && (Kflag == 0)) {
+                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
-                if ((Hchar != 'K') || (Kflag != 0)) {
+                if ((Hchar != 'K') || Kflag) {
                     unlink(passout);
                 }
                 unlink(spF4);
                 continue;
             }
-            if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') && (Kflag == 0)) {
+            if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') && !Kflag) {
                 unlink(passin);
             }
             unlink(spF4);
@@ -3610,7 +3614,7 @@ int main(int argc, char** argv) {
         }
 
     skip_sopt2:
-        if ((Hchar == 'K') || (Kflag != 0)) {
+        if ((Hchar == 'K') || Kflag) {
             mp_flag |= 6;
         }
         if (mp_flag & 1) {
@@ -3679,7 +3683,7 @@ int main(int argc, char** argv) {
             if (w1flag == 2) {
                 addstr(&execlist, "-suppress=w");
             }
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-lo=lno");
             } else {
                 addstr(&execlist, "-lo=lo");
@@ -3732,7 +3736,7 @@ int main(int argc, char** argv) {
             }
             if (run(pfa, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && (Kflag == 0)) {
+                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
                 if (!(mp_flag & 4)) {
@@ -3745,8 +3749,7 @@ int main(int argc, char** argv) {
                 unlink(spF8);
             }
             if (spFC == 0) {
-                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') &&
-                    (Kflag == 0)) {
+                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
             } else if (!(mp_flag & 4)) {
@@ -3780,7 +3783,7 @@ int main(int argc, char** argv) {
         if (showdirt_flag) {
             addstr(&execlist, "-showdirt");
         }
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &fcomflags);
@@ -3798,7 +3801,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-Xu");
                 var_s2 = mksuf(srcfiles.entries[i], 'U');
             }
-        } else if (Kflag != 0) {
+        } else if (Kflag) {
             passout = mksuf(srcfiles.entries[i], 'B');
             if (regular_not_writeable(passout) == 1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -3843,10 +3846,10 @@ int main(int argc, char** argv) {
             runerror++;
 
             if ((docpp || (mp_flag & 1) || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && (srcsuf != 'm') &&
-                (Kflag == 0) && !(mp_flag & 4)) {
+                !Kflag && !(mp_flag & 4)) {
                 unlink(passin);
             }
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
                 unlink(symtab);
             }
@@ -3864,7 +3867,7 @@ int main(int argc, char** argv) {
         }
 
         if ((docpp || (mp_flag & 1) || run_sopt || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) &&
-            (srcsuf != 'i') && (srcsuf != 'm') && (Kflag == 0) && !(mp_flag & 4)) {
+            (srcsuf != 'i') && (srcsuf != 'm') && !Kflag && !(mp_flag & 4)) {
             unlink(passin);
         }
 
@@ -3885,7 +3888,7 @@ int main(int argc, char** argv) {
 
         execlist.length = 0;
         addstr(&execlist, "ujoin");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &ujoinflags);
@@ -3902,7 +3905,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, symtab);
         if (run(ujoin, execlist.entries, NULL, NULL, NULL) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if (srcsuf != 'B') {
                     unlink(passin);
                 }
@@ -3914,7 +3917,7 @@ int main(int argc, char** argv) {
             continue;
         }
         if (!cflag || (Oflag == 3) || (Oflag == 4)) {
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if (srcsuf != 'B') {
                     unlink(passin);
                 }
@@ -4118,7 +4121,7 @@ int main(int argc, char** argv) {
 
         if (uoutfile != NULL) {
             passout = uoutfile;
-        } else if ((Hchar == 'u') || (Kflag != 0)) {
+        } else if ((Hchar == 'u') || Kflag) {
             passout = mksuf(srcfiles.entries[i], 'u');
         } else {
             passout = tempstr[4];
@@ -4126,7 +4129,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, passout);
         if (run(uld, execlist.entries, NULL, NULL, NULL) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passout);
             }
             continue;
@@ -4144,12 +4147,12 @@ int main(int argc, char** argv) {
     pass_usplit:
         execlist.length = 0;
         addstr(&execlist, "usplit");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addlist(&execlist, &usplitflags);
 
-        if ((Hchar == 0x73) || (Kflag != 0)) {
+        if ((Hchar == 0x73) || Kflag) {
             passout = mksuf(srcfiles.entries[i], 'S');
             if (regular_not_writeable(passout) == 1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -4166,7 +4169,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, passin);
         if (run(usplit, execlist.entries, NULL, NULL, NULL) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 unlink(passin);
                 unlink(passout);
             }
@@ -4176,7 +4179,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((Kflag == 0) && (srcsuf != 'u') && (uoutfile == NULL)) {
+        if (!Kflag && (srcsuf != 'u') && (uoutfile == NULL)) {
             unlink(passin);
         }
 
@@ -4190,14 +4193,14 @@ int main(int argc, char** argv) {
         if ((Oflag == 3) || (Oflag == 4) || c_inline) {
             execlist.length = 0;
             addstr(&execlist, "umerge");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addlist(&execlist, &umergeflags);
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
 
-            if ((Hchar == 'm') || (Kflag != 0)) {
+            if ((Hchar == 'm') || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'M');
                 if (regular_not_writeable(passout) == 1) {
                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -4213,7 +4216,7 @@ int main(int argc, char** argv) {
             if (run(umerge, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
 
-                if (Kflag == 0) {
+                if (!Kflag) {
                     if (srcsuf != 'S') {
                         unlink(passin);
                     }
@@ -4225,7 +4228,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((Kflag == 0) && (srcsuf != 'S')) {
+            if (!Kflag && (srcsuf != 'S')) {
                 unlink(passin);
             }
 
@@ -4240,15 +4243,15 @@ int main(int argc, char** argv) {
         if (unrollflag != 0) {
             execlist.length = 0;
             addstr(&execlist, "uloop");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addlist(&execlist, &uloopflags);
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
 
-            if ((Hchar == 'v') || (Kflag != 0)) {
-                if ((Hchar == 'v') || (Kflag != 0)) {
+            if ((Hchar == 'v') || Kflag) {
+                if ((Hchar == 'v') || Kflag) {
                     passout = mksuf(srcfiles.entries[i], 'V');
                     if (regular_not_writeable(passout) == 1) {
                         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
@@ -4265,7 +4268,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, symtab);
             if (run(uloop, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     if (srcsuf != 'M') {
                         unlink(passin);
                     }
@@ -4277,7 +4280,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((Kflag == 0) && (srcsuf != 'M')) {
+            if (!Kflag && (srcsuf != 'M')) {
                 unlink(passin);
             }
             passin = passout;
@@ -4291,7 +4294,7 @@ int main(int argc, char** argv) {
         if ((uopt0flag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "uopt0");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
@@ -4299,7 +4302,7 @@ int main(int argc, char** argv) {
             addlist(&execlist, &uopt0flags);
             addstr(&execlist, passin);
 
-            if ((Hchar == 'q') || (Kflag != 0)) {
+            if ((Hchar == 'q') || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'Q');
                 if (regular_not_writeable(passout) == 1) {
                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -4316,7 +4319,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, uopt0str);
             if (run(uopt0, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     if ((srcsuf != 'M') && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q')) {
                         unlink(passin);
                     }
@@ -4329,7 +4332,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((Kflag == 0) && (srcsuf != 'M') && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q')) {
+            if (!Kflag && (srcsuf != 'M') && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q')) {
                 unlink(passin);
             }
             unlink(uopt0str);
@@ -4345,7 +4348,7 @@ int main(int argc, char** argv) {
         if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "ddopt");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
@@ -4353,7 +4356,7 @@ int main(int argc, char** argv) {
             addlist(&execlist, &ddoptflags);
             addstr(&execlist, passin);
 
-            if (((Hchar == 'd') && (ucodeflag == 0)) || (Kflag != 0)) {
+            if (((Hchar == 'd') && (ucodeflag == 0)) || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'D');
                 if (regular_not_writeable(passout) == 1) {
                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -4365,7 +4368,7 @@ int main(int argc, char** argv) {
 
             if (ddoptinfo) {
                 addstr(&execlist, "-e");
-                if (((Hchar == 'd') && (ucodeflag == 0)) || (Kflag != 0)) {
+                if (((Hchar == 'd') && (ucodeflag == 0)) || Kflag) {
                     addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
                 } else {
                     addstr(&execlist, tempstr[26]);
@@ -4374,7 +4377,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, passout);
             if (run(ddopt, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     if ((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'M') && (srcsuf != 'Q')) {
                         unlink(passin);
                     }
@@ -4387,7 +4390,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((Kflag == 0) && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'M') && (srcsuf != 'Q')) {
+            if (!Kflag && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'M') && (srcsuf != 'Q')) {
                 unlink(passin);
             }
             unlink(ddoptstr);
@@ -4403,7 +4406,7 @@ int main(int argc, char** argv) {
         if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
             execlist.length = 0;
             addstr(&execlist, "uopt");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
@@ -4422,7 +4425,7 @@ int main(int argc, char** argv) {
             addlist(&execlist, &optflags);
             addstr(&execlist, passin);
 
-            if (((Hchar == 'o') && (ucodeflag == 0)) || (Kflag != 0)) {
+            if (((Hchar == 'o') && (ucodeflag == 0)) || Kflag) {
                 passout = mksuf(srcfiles.entries[i], 'O');
                 if (regular_not_writeable(passout) == 1) {
                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
@@ -4445,7 +4448,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, optstr);
             if (run(opt, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
-                if (Kflag == 0) {
+                if (!Kflag) {
                     if ((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
                         (srcsuf != 'V')) {
                         unlink(passin);
@@ -4459,8 +4462,8 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((Kflag == 0) && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') &&
-                (srcsuf != 'M') && (srcsuf != 'V')) {
+            if (!Kflag && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
+                (srcsuf != 'V')) {
                 unlink(passin);
             }
             unlink(optstr);
@@ -4475,7 +4478,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, passout);
                 if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
                     runerror++;
-                    if (Kflag == 0) {
+                    if (!Kflag) {
                         unlink(passin);
                         unlink(passout);
                         if (tmpst != 0) {
@@ -4484,7 +4487,7 @@ int main(int argc, char** argv) {
                     }
                     continue;
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                     if (tmpst != 0) {
                         unlink(symtab);
@@ -4500,7 +4503,7 @@ int main(int argc, char** argv) {
     pass_ugen:
         execlist.length = 0;
         addstr(&execlist, "ugen");
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         addstr(&execlist, "-G");
@@ -4516,7 +4519,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, passin);
         if (Sflag) {
             addstr(&execlist, "-o");
-            if (Kflag != 0) {
+            if (Kflag) {
                 addstr(&execlist, mksuf(srcfiles.entries[i], 'G'));
             } else {
                 binasm = tempstr[9];
@@ -4537,7 +4540,7 @@ int main(int argc, char** argv) {
                 exit(2);
             }
             addstr(&execlist, passout);
-        } else if (Kflag != 0) {
+        } else if (Kflag) {
             addstr(&execlist, "-o");
             passout = mksuf(srcfiles.entries[i], 'G');
             if (regular_not_writeable(passout) == 1) {
@@ -4568,7 +4571,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, gentmp);
         if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if ((srcsuf != 'B') && (srcsuf != 'O') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
                     (srcsuf != 'S') && (srcsuf != 'V')) {
                     unlink(passin);
@@ -4588,11 +4591,11 @@ int main(int argc, char** argv) {
         if ((((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
               (srcsuf != 'V')) ||
              (Oflag >= 2)) &&
-            (srcsuf != 'O') && (Kflag == 0)) {
+            (srcsuf != 'O') && !Kflag) {
             unlink(passin);
         }
         if (Sflag) {
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if (tmpst != 0) {
                     unlink(symtab);
                 }
@@ -4610,7 +4613,7 @@ int main(int argc, char** argv) {
         if (srcsuf == 's') {
             execlist.length = 0;
             addstr(&execlist, "as0");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
@@ -4622,7 +4625,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
 
-            if ((Hchar == 'a') || (Kflag != 0)) {
+            if ((Hchar == 'a') || Kflag) {
                 if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                     passout = mkstr(srcfiles.entries[i], ".G", NULL);
                 } else {
@@ -4648,7 +4651,7 @@ int main(int argc, char** argv) {
                 if (docpp || (mflag != 0)) {
                     unlink(passin);
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passout);
                     if (tmpst != 0) {
                         unlink(symtab);
@@ -4713,7 +4716,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-elf");
             }
         }
-        if (vflag != 0) {
+        if (vflag) {
             addstr(&execlist, "-v");
         }
         if (!fullasoptflag && (srcsuf == 's') && (Oflag >= 2)) {
@@ -4750,7 +4753,7 @@ int main(int argc, char** argv) {
         } else if ((outfile != NULL) && cflag && ((Oflag == 3) || (srcfiles.length == 1))) {
             passout = outfile;
         } else {
-            if ((srcsuf == '?') && (Hchar != 'b') && (Kflag == 0)) {
+            if ((srcsuf == '?') && (Hchar != 'b') && !Kflag) {
                 if (!cflag) {
                     tmp_uldobj = passout = tempstr[12];
                 } else if (srcfiles.length == 2) {
@@ -4772,7 +4775,7 @@ int main(int argc, char** argv) {
         addstr(&execlist, symtab);
         if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
             addstr(&execlist, "-e");
-            if (((Hchar == 'b') && (ucodeflag == 0)) || (Kflag != 0)) {
+            if (((Hchar == 'b') && (ucodeflag == 0)) || Kflag) {
                 addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
             } else {
                 addstr(&execlist, tempstr[26]);
@@ -4783,7 +4786,7 @@ int main(int argc, char** argv) {
         }
         if (run(as1, execlist.entries, NULL, NULL, NULL) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if (srcsuf != 'G') {
                     unlink(passin);
                 }
@@ -4812,10 +4815,10 @@ int main(int argc, char** argv) {
         if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
             unlink(tempstr[26]);
         }
-        if ((srcsuf != 'G') && (Kflag == 0)) {
+        if ((srcsuf != 'G') && !Kflag) {
             unlink(passin);
         }
-        if ((tmpst != 0) && (Kflag == 0)) {
+        if ((tmpst != 0) && !Kflag) {
             unlink(symtab);
         }
 
@@ -4887,7 +4890,7 @@ int main(int argc, char** argv) {
             addstr(&execlist, "edg_prelink");
             addstr(&execlist, "-fSGI");
             addlist(&execlist, &prelinkerflags);
-            if ((vflag != 0) || verbose_prelink) {
+            if (vflag || verbose_prelink) {
                 addstr(&execlist, "-v");
             }
             add_prelinker_objects(&execlist, &objfiles);
@@ -5231,7 +5234,7 @@ int main(int argc, char** argv) {
         passin = NULL;
         if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
             runerror++;
-            if (Kflag == 0) {
+            if (!Kflag) {
                 if ((strcmp(LD, "old_ld") == 0) ||
                     ((compiler == COMPILER_1) &&
                      ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
@@ -5262,7 +5265,7 @@ int main(int argc, char** argv) {
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             execlist.length = 0;
             addstr(&execlist, patch);
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-d");
             }
             if (outfile != NULL) {
@@ -5293,7 +5296,7 @@ int main(int argc, char** argv) {
         if ((cordflag != 0) && (runerror == 0)) {
             execlist.length = 0;
             addstr(&execlist, "cord");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addlist(&execlist, &cordflags);
@@ -5318,7 +5321,7 @@ int main(int argc, char** argv) {
                 unlink(tempstr[22]);
             }
         }
-        if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && (Kflag == 0)) {
+        if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && !Kflag) {
             unlink(mksuf(srcfiles.entries[0], 'o'));
         }
     }
@@ -6331,8 +6334,9 @@ void parse_command(int argc, char** argv) {
                                                 break;
 
                                             case 'v': /* switch 3 */
+                                                // -Wxv
                                                 if ((Warg[2] == '\0') || (Warg[2] == ',')) {
-                                                    vflag = 1;
+                                                    vflag = TRUE;
                                                     if (getenv("ROOTDIR") != NULL) {
                                                         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                                               "ROOTDIR env var ignored, use COMP_TARGET_ROOT and "
@@ -6342,7 +6346,7 @@ void parse_command(int argc, char** argv) {
                                                 break;
 
                                             case 'D': /* switch 3 */
-                                                // -WxD?
+                                                // -WxD
                                                 if (argv[var_s0][2] == '\0') {
                                                     if ((var_s0 + 1) < argc) {
                                                         int sp114;
@@ -8018,16 +8022,16 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show") == 0) {
-                        vflag = 1;
+                        vflag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-showt") == 0) {
-                        time_flag = 1;
+                        time_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show0") == 0) {
-                        vflag = 1;
-                        execute_flag = 0;
+                        vflag = TRUE;
+                        execute_flag = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-showm") == 0) {
@@ -8035,7 +8039,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show_defaults") == 0) {
-                        execute_flag = 0;
+                        execute_flag = FALSE;
                         exit(0);
                         break;
                     }
@@ -8194,7 +8198,8 @@ void parse_command(int argc, char** argv) {
                             break;
 
                         case 'q': /* switch 4 */
-                            vflag = 1;
+                            // -Zq
+                            vflag = TRUE;
                             break;
 
                         case 'g': /* switch 4 */
@@ -8320,8 +8325,8 @@ void parse_command(int argc, char** argv) {
                 case 'v': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         if (!default_svr4) {
-                            vflag = 1;
-                            time_flag = 1;
+                            vflag = TRUE;
+                            time_flag = TRUE;
                         }
                         break;
                     }
@@ -8503,7 +8508,7 @@ void parse_command(int argc, char** argv) {
                     break;
 
                 case 'v': /* switch 5 */
-                    vflag = 1;
+                    vflag = TRUE;
                     break;
 
                 case 'd': /* switch 5 */
@@ -8754,7 +8759,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
     int len;
     int i;
 
-    if ((Vflag == 0) && (D_1000C1D8 == NULL)) {
+    if (!Vflag && (D_1000C1D8 == NULL)) {
         D_1000C1D8 = strrchr(progname, '/');
         if (D_1000C1D8 == NULL) {
             D_1000C1D8 = progname;
@@ -10211,10 +10216,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     sysset_t sp34;
     register int var_s0;
 
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "%s ", arg0);
         spA4 = arg1 + 1;
-        while (*spA4 != 0) {
+        while (*spA4 != '\0') {
             fprintf(stderr, "%s ", *spA4++);
         }
 
@@ -10226,10 +10231,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
         fprintf(stderr, "\n");
     }
-    if (time_flag != 0) {
+    if (time_flag) {
         settimes();
     }
-    if (execute_flag == 0) {
+    if (!execute_flag) {
         return 0;
     }
     if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
@@ -10345,7 +10350,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         sigset(SIGINT, sp84);
         sigset(SIGTERM, sp88);
 
-        if (time_flag != 0) {
+        if (time_flag) {
             dotime(arg0);
         }
 
@@ -10575,7 +10580,7 @@ void handler(void) {
 
 // function cleanup # 31
 void cleanup(void) {
-    if (Kflag == 0) {
+    if (!Kflag) {
         if (passout != NULL) {
             unlink(passout);
         }
@@ -11032,7 +11037,7 @@ void record_static_fileset(const char* arg0) {
     spD4 = full_path(arg0);
     spD0 = strlen(spD4);
 
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "Static fileset: %s %s", spD4, D_1000C2F0);
         for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
             fprintf(stderr, " %s", staticopts.entries[sp28E4]);
@@ -11133,7 +11138,7 @@ int touch(const char* arg0) {
     char* str;
 
     init_curr_dir();
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "%s: touch %s\n", D_1000C2F0, arg0);
     }
     sp34.modtime = curtime;
