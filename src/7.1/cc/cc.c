@@ -420,8 +420,8 @@ int nofilt = FALSE; //!< flag, boolean. For C++ compilers, whether to not run th
 int force_prelink =
     FALSE; //!< flag, boolean. Whether to force prelinking, also requires nonzero default_template_instantiation_mode.
            //!< Set by "-prelink". @see no_prelink, default_template_instantiation_mode
-int verbose_prelink = 0; //!< flag, pseudoboolean. For C++ compilers, whether to pass "-v" to prelinker. Set by "-ptv".
-                         //!< Passed on to prelinker as "-v". @see vflag
+int verbose_prelink = FALSE;      //!< flag, pseudoboolean. For C++ compilers, whether to pass "-v" to prelinker. Set by
+                                  //!< "-ptv". Passed on to prelinker as "-v". @see vflag
 int auto_template_include = TRUE; //!< flag, boolean. For C++ compilers. Set by "-auto_include" and unset by
                                   //!< "-no_auto_include", last takes priority. Passed on to `cfe` as "-B" when not set.
 int nocode = FALSE; //!< flag, boolean. Whether to *not* create object files (used for e.g. static analysis). Set by
@@ -506,15 +506,28 @@ static int D_1000BF90 =
     FALSE; //!< boolean. Related to unused warnings. Set by using "DCC" compiler, unset by `D_1000BF8C` off, "-old_ld".
 static int D_1000BF94 = FALSE; //!< boolean. Disables use of "-new_ld" or "-old_ld". Never set.
 
-int Eflag = 0; // only preprocess
-int Pflag = 0;
-int gflag = 0;
-int pflag = 0;
-int pgflag = 0;
-int jflag = 0; // only process to ucode
-int cflag = 0;
-int Sflag = 0; // only compile to assembly
-int Oflag = 1;
+int Eflag = FALSE; //!< flag, pseudoboolean. Only preprocess, do not run subsequent passes, output to stdout. Set by
+                   //!< "-E", "-H", "-M".
+int Pflag = FALSE; //!< flag, pseudoboolean. Only preprocess, do not run subsequent passes, output to file with
+                   //!< extension replaced by ".i". Set by "-P".
+
+int gflag = 0; //!< Option. Debugging level, 0 by default. Set by "-gN", N one of 0,1,2,3, or "-g". Interacts with
+               //!< `Oflag`, see parse_command() for details.
+
+int pflag = 0;  //!< Option. Enabled profiling level. Set to 1 by "-p" or "-pg".
+int pgflag = 0; //!< Option. Related to profiling. Set to 1 by "-pg".
+
+int jflag = FALSE; //!< flag, pseudoboolean. Only process to ucode, do not run subsequent passes, output to file with
+                   //!< extension replaced by ".u". Set by "-j".
+int cflag =
+    FALSE;     //!< flag, pseudoboolean. Compile a single file to a ".o", do not link. Set by "-c", "-nocode", "+I", and
+               //!< "-F" for C++ compilers.
+int Sflag = 0; //! flag, pseudoboolean. only compile to assembly, do not assemble, output to file with extension
+               //! replaced by ".s". Set by "-S".
+
+int Oflag = 1; //! Option. Optimisation level, 1 by default. Set by "-ON", N one of 0,1,2,3, or "-O". Interacts with
+               //! `gflag`, see parse_command() for details.
+
 int vflag = 0;
 int time_flag = 0;
 int execute_flag = 1;
@@ -688,7 +701,7 @@ typedef enum CppChoice {
     /* 0 */ CPP_CHOICE_0,
     /* 1 */ CPP_CHOICE_1,
     /* 2 */ CPP_CHOICE_2, // ANSICHOICE_KR
-    /* 3 */ CPP_CHOICE_3, // Other ANSICHOICE_
+    /* 3 */ CPP_CHOICE_3  // Other ANSICHOICE_
 } CppChoice;
 
 int cppchoice = CPP_CHOICE_0; //!< Preprocessor selection? Uses `CppChoice` enum. CPP_CHOICE_1 and CPP_CHOICE_3 use
@@ -1241,7 +1254,7 @@ int main(int argc, char** argv) {
         addstr(&fcomflags, "-w");
     }
 
-    if ((srcexists == 0) && ((cflag != 0) || (Sflag != 0))) {
+    if ((srcexists == 0) && (cflag || Sflag)) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
         exit(4);
     }
@@ -1396,13 +1409,13 @@ int main(int argc, char** argv) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
         exit(2);
     }
-    if (((cflag != 0) || (Sflag != 0) || nocode || (Eflag != 0) || (Pflag != 0)) && make_edison_shlib) {
+    if ((cflag || Sflag || nocode || Eflag || Pflag) && make_edison_shlib) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
               "-shared can be specified only when a link is to be performed for ucode compilers\n");
         exit(2);
     }
 
-    if ((cflag == 0) && !nocode && (srcfiles.length == 1) && (objfiles.length == 1)) {
+    if (!cflag && !nocode && (srcfiles.length == 1) && (objfiles.length == 1)) {
         default_template_instantiation_mode = 1;
     }
     if ((compiler == COMPILER_1) &&
@@ -1538,13 +1551,13 @@ int main(int argc, char** argv) {
         exit(2);
     }
 
-    if ((Oflag >= 3) && (cflag != 0) && (srcfiles.length == 1)) {
+    if ((Oflag >= 3) && cflag && (srcfiles.length == 1)) {
         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-c should not be used with ucode -O3 -o32 on a single file; use -j instead to get inter-module "
               "optimization.\n");
     }
 
-    if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && (Eflag == 0) && (Pflag == 0)) {
+    if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && !Eflag && !Pflag) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n",
               "as");
         exit(2);
@@ -1562,7 +1575,7 @@ int main(int argc, char** argv) {
         // Finished srcfiles, `uload` on.
         if (i == srcfiles.length) {
             uload = FALSE;
-            if ((runerror == 0) && (Eflag == 0) && (Pflag == 0)) {
+            if ((runerror == 0) && !Eflag && !Pflag) {
                 if (uoutfile == NULL) {
                     addstr(&srcfiles, "u.out.?");
                 } else if (getsuf(uoutfile) != '\0') {
@@ -1742,7 +1755,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        if ((Eflag == 0) || (srcsuf == 'a')) {
+        if (!Eflag || (srcsuf == 'a')) {
             switch (srcsuf) { /* switch 19 */
                 case SUF_6:   /* switch 19 */
                 case 'c':     /* switch 19 */
@@ -1866,7 +1879,7 @@ int main(int argc, char** argv) {
         sp114 = cppchoice;
         execlist.length = 0;
 
-        if ((Eflag != 0) && !irix4) {
+        if (Eflag && !irix4) {
             compchoice = COMP_CHOICE_3;
         } else if (srcsuf == 's') {
             compchoice = COMP_CHOICE_4;
@@ -1884,7 +1897,7 @@ int main(int argc, char** argv) {
                 relocate_passes("p", NULL, NULL);
             }
         } else if (compiler == COMPILER_1) {
-            if ((Eflag == 0) && (Pflag == 0) && (cppchoice == CPP_CHOICE_3)) {
+            if (!Eflag && !Pflag && (cppchoice == CPP_CHOICE_3)) {
                 cppchoice = CPP_CHOICE_2;
                 relocate_passes("p", NULL, NULL);
             }
@@ -2158,13 +2171,13 @@ int main(int argc, char** argv) {
             }
         }
 
-        if (Pflag != 0) {
+        if (Pflag) {
             if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                 passout = mkstr(srcfiles.entries[i], ".i", NULL);
             } else {
                 passout = mksuf(srcfiles.entries[i], 'i');
             }
-        } else if (Eflag != 0) {
+        } else if (Eflag) {
             passout = NULL;
         } else if ((Hchar == 'K') || (Kflag != 0)) {
             if ((compchoice == COMP_CHOICE_3) && !run_sopt && !acpp && (cmp_flag == 0) && (compiler == COMPILER_1)) {
@@ -2196,7 +2209,7 @@ int main(int argc, char** argv) {
             if (run((((compiler == COMPILER_3) && D_1000BF74) ? cfe : cpp), execlist.entries, NULL, passout, NULL) !=
                 0) {
                 runerror++;
-                if ((Eflag == 0) &&
+                if (!Eflag &&
                     ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0)))) {
                     unlink(passin);
                 }
@@ -2213,7 +2226,7 @@ int main(int argc, char** argv) {
 
         if (((srcsuf == 'c') || (srcsuf == SUF_6) ||
              ((compiler == COMPILER_1) && nocode && D_1000BF74 && (srcsuf == 'h'))) &&
-            (Pflag == 0) && (Eflag == 0)) {
+            !Pflag && !Eflag) {
             goto block_1042;
         }
 
@@ -2300,7 +2313,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        if ((Eflag == 0) && (Pflag == 0)) {
+        if (!Eflag && !Pflag) {
             if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || fiveflag) &&
                 (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 addstr(&execlist, "-I");
@@ -2320,7 +2333,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        if (((Pflag != 0) || (Eflag != 0)) && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
+        if ((Pflag || Eflag) && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
             if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                 addstr(&execlist, "-std1");
             } else if (ansichoice == ANSICHOICE_XANSI) {
@@ -2340,7 +2353,7 @@ int main(int argc, char** argv) {
             if (srcfiles.length == 1) {
                 if (outfile != NULL) {
                     sp118 = outfile;
-                } else if (cflag == 0) {
+                } else if (!cflag) {
                     sp118 = "a.out";
                 } else {
                     sp118 = mksuf(srcfiles.entries[i], 'o');
@@ -2361,13 +2374,13 @@ int main(int argc, char** argv) {
             addstr(&execlist, passin);
         }
 
-        if (Pflag != 0) {
+        if (Pflag) {
             if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                 passout = mkstr(srcfiles.entries[i], ".i", NULL);
             } else {
                 passout = mksuf(srcfiles.entries[i], 'i');
             }
-        } else if (Eflag != 0) {
+        } else if (Eflag) {
             passout = NULL;
         } else {
             passout = tempstr[2];
@@ -2393,7 +2406,7 @@ int main(int argc, char** argv) {
 
         if (retcode != 0) {
             runerror++;
-            if ((Eflag == 0) &&
+            if (!Eflag &&
                 ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0)))) {
                 unlink(passin);
             }
@@ -2401,7 +2414,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if ((Pflag != 0) || (Eflag != 0)) {
+        if (Pflag || Eflag) {
             continue;
         }
 
@@ -2439,13 +2452,14 @@ int main(int argc, char** argv) {
         relocate_passes("p", NULL, NULL);
 
         if (c_compiler_choice == C_COMPILER_CHOICE_0) {
-            if ((Pflag == 0) && (Eflag == 0)) {
+            if (!Pflag && !Eflag) {
                 if ((((srcsuf == 'e') || (srcsuf == 'r')) && (Kflag == 0)) || ((srcsuf == 's') && (mflag != 0))) {
                     unlink(passin);
                 }
                 passin = passout;
-            } else
+            } else {
                 continue;
+            }
         }
 
         dmips_emit = 0;
@@ -2717,7 +2731,7 @@ int main(int argc, char** argv) {
             if (srcfiles.length == 1) {
                 if (outfile != NULL) {
                     sp118 = outfile;
-                } else if (cflag == 0) {
+                } else if (!cflag) {
                     sp118 = "a.out";
                 } else {
                     sp118 = mksuf(srcfiles.entries[i], 'o');
@@ -2743,7 +2757,7 @@ int main(int argc, char** argv) {
                 if (no_prelink) {
                     addstr(&execlist, "-T");
                 } else {
-                    if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                    if ((outfile != NULL) && cflag && (srcfiles.length == 1)) {
                         sp10C = outfile;
                     } else {
                         sp10C = mksuf(srcfiles.entries[i], 'o');
@@ -2893,7 +2907,7 @@ int main(int argc, char** argv) {
                 retcode = 0;
                 nocompileneeded = TRUE;
 
-                if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                if ((outfile != NULL) && cflag && (srcfiles.length == 1)) {
                     sp104 = outfile;
                 } else if ((srcsuf == '?') && (Hchar != 'b') && (Kflag == 0)) {
                     tmp_uldobj = sp104 = tempstr[12];
@@ -2905,7 +2919,7 @@ int main(int argc, char** argv) {
                     runerror++;
                 }
 
-                if ((srcfiles.length == 1) && (cflag == 0)) {
+                if ((srcfiles.length == 1) && !cflag) {
                     goto pass_cord;
                 }
             }
@@ -2968,7 +2982,7 @@ int main(int argc, char** argv) {
                 continue;
             }
             if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
-                ((Eflag != 0) || nocode || nocompileneeded)) {
+                (Eflag || nocode || nocompileneeded)) {
                 unlink(passout);
                 continue;
             }
@@ -3099,7 +3113,7 @@ int main(int argc, char** argv) {
             continue;
         }
         if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) &&
-            ((Eflag != 0) || nocode || nocompileneeded)) {
+            (Eflag || nocode || nocompileneeded)) {
             continue;
         }
         goto pass_ujoin;
@@ -3861,7 +3875,7 @@ int main(int argc, char** argv) {
         }
 
     pass_ujoin:
-        if ((Oflag != 3) && (Oflag != 4) && (jflag == 0)) {
+        if ((Oflag != 3) && (Oflag != 4) && !jflag) {
             if (!c_inline) {
                 goto pass_uloop;
             } else {
@@ -3876,7 +3890,7 @@ int main(int argc, char** argv) {
         }
         addlist(&execlist, &ujoinflags);
 
-        if ((outfile != NULL) && (jflag != 0) && (srcfiles.length == 1)) {
+        if ((outfile != NULL) && jflag && (srcfiles.length == 1)) {
             passout = outfile;
         } else {
             passout = mksuf(srcfiles.entries[i], 'u');
@@ -3899,7 +3913,7 @@ int main(int argc, char** argv) {
             }
             continue;
         }
-        if ((cflag == 0) || (Oflag == 3) || (Oflag == 4)) {
+        if (!cflag || (Oflag == 3) || (Oflag == 4)) {
             if (Kflag == 0) {
                 if (srcsuf != 'B') {
                     unlink(passin);
@@ -3986,7 +4000,7 @@ int main(int argc, char** argv) {
                 crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
             }
         }
-        if (cflag == 0) {
+        if (!cflag) {
             addstr(&execlist, crtx);
         } else {
             addstr(&execlist, "-no_AutoGnum");
@@ -3995,7 +4009,7 @@ int main(int argc, char** argv) {
             }
         }
         adduldlist(&execlist, &ufiles, &objfiles);
-        if (cflag == 0) {
+        if (!cflag) {
             addlist(&execlist, &uldlibflags);
             if ((compiler == COMPILER_2) || haspascal) {
                 addspacedstr(&execlist, newstr(libp));
@@ -4094,7 +4108,7 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-lfastm");
             }
         }
-        if ((cflag == 0) && crtn_required) {
+        if (!cflag && crtn_required) {
             addstr(&execlist, crtn);
         }
         if (rls_id_object != NULL) {
@@ -4500,7 +4514,7 @@ int main(int argc, char** argv) {
         }
         addlist(&execlist, &genflags);
         addstr(&execlist, passin);
-        if (Sflag != 0) {
+        if (Sflag) {
             addstr(&execlist, "-o");
             if (Kflag != 0) {
                 addstr(&execlist, mksuf(srcfiles.entries[i], 'G'));
@@ -4563,7 +4577,7 @@ int main(int argc, char** argv) {
                 if (tmpst != 0) {
                     unlink(symtab);
                 }
-            } else if (Sflag != 0) {
+            } else if (Sflag) {
                 unlink(binasm);
             }
             unlink(gentmp);
@@ -4577,7 +4591,7 @@ int main(int argc, char** argv) {
             (srcsuf != 'O') && (Kflag == 0)) {
             unlink(passin);
         }
-        if (Sflag != 0) {
+        if (Sflag) {
             if (Kflag == 0) {
                 if (tmpst != 0) {
                     unlink(symtab);
@@ -4733,11 +4747,11 @@ int main(int argc, char** argv) {
             } else {
                 passout = "a.out";
             }
-        } else if ((outfile != NULL) && (cflag != 0) && ((Oflag == 3) || (srcfiles.length == 1))) {
+        } else if ((outfile != NULL) && cflag && ((Oflag == 3) || (srcfiles.length == 1))) {
             passout = outfile;
         } else {
             if ((srcsuf == '?') && (Hchar != 'b') && (Kflag == 0)) {
-                if (cflag == 0) {
+                if (!cflag) {
                     tmp_uldobj = passout = tempstr[12];
                 } else if (srcfiles.length == 2) {
                     passout = mksuf(*srcfiles.entries, 'o');
@@ -4832,8 +4846,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
-        (objfiles.length != 0) && (Hchar == '\0') && !nocode) {
+    if (!cflag && !Sflag && !Eflag && !Pflag && !jflag && (runerror == 0) && (objfiles.length != 0) &&
+        (Hchar == '\0') && !nocode) {
         if (old_non_shared && mips2flag && !kpic_flag) {
             error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                   "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
@@ -5665,7 +5679,7 @@ void parse_command(int argc, char** argv) {
                             Fflag++;
                         } else if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
                                                                 (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                            cflag = 1;
+                            cflag = TRUE;
                             Fflag = 1;
                             default_template_instantiation_mode = 1;
                         } else {
@@ -6020,7 +6034,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&olimitflags, sp120);
                                 addstr(&olimitflags, sp11C);
                             }
-                            if ((Oflag >= 3) && (jflag == 0)) {
+                            if ((Oflag >= 3) && !jflag) {
                                 uload = TRUE;
                             }
                             break;
@@ -6063,7 +6077,7 @@ void parse_command(int argc, char** argv) {
                         if (1) {} // FAKE
                         docpp = TRUE;
                         addstr(&cppflags, argv[var_s0]);
-                        if (Eflag == 0) {
+                        if (!Eflag) {
                             Pflag++;
                         }
                         break;
@@ -7540,7 +7554,7 @@ void parse_command(int argc, char** argv) {
                         ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0))) {
                         if (strcmp(argv[var_s0], "-nocode") == 0) {
                             nocode = TRUE;
-                            cflag = 1;
+                            cflag = TRUE;
                             break;
                         }
                         if (strcmp(argv[var_s0], "-no_prelink") == 0) {
@@ -8504,7 +8518,7 @@ void parse_command(int argc, char** argv) {
                     }
 
                 case 'I': /* switch 5 */
-                    cflag = 1;
+                    cflag = TRUE;
                     plusIflag = 1;
                     Fflag = 1;
                     default_template_instantiation_mode = 1;
@@ -8537,8 +8551,8 @@ void parse_command(int argc, char** argv) {
             (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
             (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
             (var_s1 == SUF_1) || (var_s1 == 'D') || (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == 'u') ||
-            (var_s1 == SUF_6) || ((compiler == COMPILER_1) && nocode && D_1000BF74 && (var_s1 == 'h')) ||
-            (Eflag != 0) || (compiler == COMPILER_4)) {
+            (var_s1 == SUF_6) || ((compiler == COMPILER_1) && nocode && D_1000BF74 && (var_s1 == 'h')) || Eflag ||
+            (compiler == COMPILER_4)) {
             int sp60; // number of '-' on the end?
             int sp5C; // option index
 
@@ -8555,7 +8569,7 @@ void parse_command(int argc, char** argv) {
                     jflag++;
                 }
             }
-            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0) &&
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag &&
                 ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
                  (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == SUF_1) ||
                  (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == SUF_6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
@@ -8576,7 +8590,7 @@ void parse_command(int argc, char** argv) {
                 if (nodup(&objfiles, var_s2) != 0) {
                     sp158 = var_s2;
                 }
-            } else if ((Eflag == 0) && (compiler != COMPILER_4)) {
+            } else if (!Eflag && (compiler != COMPILER_4)) {
                 addstr(&srcfiles, argv[var_s0]);
                 var_s2 = mksuf(argv[var_s0], 'o');
                 if (nodup(&objfiles, var_s2) != 0) {
@@ -8588,7 +8602,7 @@ void parse_command(int argc, char** argv) {
                 addstr(&srcfiles, argv[var_s0]);
             }
         } else if (var_s1 == 'b') {
-            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0)) {
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag) {
                 if (uldobj_place == -1) {
                     uldobj_place = save_place(&objfiles);
                 }
@@ -8622,12 +8636,13 @@ void parse_command(int argc, char** argv) {
                 sp58 = sp158;
             } else {
                 int sp54 = strlen(sp58); // length of single source file's name
+
                 if ((sp54 >= 3) && (sp58[sp54 - 2] == '.')) {
-                    if (Eflag != 0) {
+                    if (Eflag) {
                         sp58[sp54 - 1] = 'i';
-                    } else if (Sflag != 0) {
+                    } else if (Sflag) {
                         sp58[sp54 - 1] = 's';
-                    } else if (jflag != 0) {
+                    } else if (jflag) {
                         sp58[sp54 - 1] = 'u';
                     } else {
                         sp58[sp54 - 2] = '\0';
@@ -8638,7 +8653,7 @@ void parse_command(int argc, char** argv) {
 
         if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
             ((compiler == COMPILER_3) && D_1000BF74)) {
-            if ((srcfiles.length == 1) && ((outfile != NULL) || (cflag == 0))) {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
                 addstr(&ldflags, "-MDignore");
                 addstr(&ldflags, sp158);
             }
@@ -8649,7 +8664,7 @@ void parse_command(int argc, char** argv) {
             addstr(&ldflags, "-MDupdate");
             addstr(&ldflags, sp15C);
         } else {
-            if ((srcfiles.length == 1) && ((outfile != NULL) || (cflag == 0))) {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
                 addstr(&cppflags, "-MDtarget");
                 if (outfile != NULL) {
                     addstr(&cppflags, outfile);
@@ -8665,7 +8680,7 @@ void parse_command(int argc, char** argv) {
                 addstr(&uldflags, "-MDtarget");
                 if (outfile != NULL) {
                     addstr(&uldflags, outfile);
-                } else if (cflag != 0) {
+                } else if (cflag) {
                     addstr(&uldflags, "u.out.o");
                 } else {
                     addstr(&uldflags, "a.out");
@@ -10568,7 +10583,7 @@ void cleanup(void) {
             char suf = getsuf(passin);
 
             if (((suf == '\0')) || ((suf != srcsuf) && (suf != 'm'))) {
-                if (Eflag == 0) {
+                if (!Eflag) {
                     unlink(passin);
                 }
             }
@@ -11243,10 +11258,10 @@ static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
         fputs("CMDLINE=", arg0);
     }
     fprintf(arg0, "%s ", progname);
-    if (cflag == 0) {
+    if (!cflag) {
         fputs("-c ", arg0);
     }
-    if ((srcfiles.length == 1) && (cflag != 0)) {
+    if ((srcfiles.length == 1) && cflag) {
         if (B_1000ECCC != 0) {
             fprintf(arg0, "-o %s ", B_1000ECCC);
         }
