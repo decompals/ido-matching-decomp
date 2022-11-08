@@ -1,107 +1,46 @@
 src/7.1/cc/cc.c: In function ‘parse_command’:
-src/7.1/cc/cc.c:6450:49: error: ‘EX_OK’ undeclared (first use in this function); did you mean ‘X_OK’?
- 6450 |                                 if (access(cfe, EX_OK) == -1) {
+src/7.1/cc/cc.c:6454:49: error: ‘EX_OK’ undeclared (first use in this function); did you mean ‘X_OK’?
+ 6454 |                                 if (access(cfe, EX_OK) == -1) {
       |                                                 ^~~~~
       |                                                 X_OK
-src/7.1/cc/cc.c:6450:49: note: each undeclared identifier is reported only once for each function it appears in
-src/7.1/cc/cc.c: In function ‘mklist’:
-src/7.1/cc/cc.c:9256:21: error: ‘sys_nerr’ undeclared (first use in this function)
- 9256 |         if (errno < sys_nerr) {
-      |                     ^~~~~~~~
-src/7.1/cc/cc.c:9257:48: error: ‘sys_errlist’ undeclared (first use in this function)
- 9257 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘addstr’:
-src/7.1/cc/cc.c:9276:25: error: ‘sys_nerr’ undeclared (first use in this function)
- 9276 |             if (errno < sys_nerr) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:9277:52: error: ‘sys_errlist’ undeclared (first use in this function)
- 9277 |                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                    ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘addspacedstr’:
-src/7.1/cc/cc.c:9303:29: error: ‘sys_nerr’ undeclared (first use in this function)
- 9303 |                 if (errno < sys_nerr) {
-      |                             ^~~~~~~~
-src/7.1/cc/cc.c:9304:56: error: ‘sys_errlist’ undeclared (first use in this function)
- 9304 |                     error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                        ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘save_place’:
-src/7.1/cc/cc.c:9343:25: error: ‘sys_nerr’ undeclared (first use in this function)
- 9343 |             if (errno < sys_nerr) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:9344:52: error: ‘sys_errlist’ undeclared (first use in this function)
- 9344 |                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                    ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘addlist’:
-src/7.1/cc/cc.c:9381:25: error: ‘sys_nerr’ undeclared (first use in this function)
- 9381 |             if (errno < sys_nerr) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:9382:52: error: ‘sys_errlist’ undeclared (first use in this function)
- 9382 |                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                    ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘adduldlist’:
-src/7.1/cc/cc.c:9412:25: error: ‘sys_nerr’ undeclared (first use in this function)
- 9412 |             if (errno < sys_nerr) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:9413:52: error: ‘sys_errlist’ undeclared (first use in this function)
- 9413 |                 error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                    ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘savestr’:
-src/7.1/cc/cc.c:9594:21: error: ‘sys_nerr’ undeclared (first use in this function)
- 9594 |         if (errno < sys_nerr) {
-      |                     ^~~~~~~~
-src/7.1/cc/cc.c:9595:48: error: ‘sys_errlist’ undeclared (first use in this function)
- 9595 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                ^~~~~~~~~~~
+src/7.1/cc/cc.c:6454:49: note: each undeclared identifier is reported only once for each function it appears in
 src/7.1/cc/cc.c: In function ‘mktempstr’:
-src/7.1/cc/cc.c:9643:25: error: ‘EX_OK’ undeclared (first use in this function); did you mean ‘X_OK’?
- 9643 |         (access(filter, EX_OK) == 0)) {
+src/7.1/cc/cc.c:9647:25: error: ‘EX_OK’ undeclared (first use in this function); did you mean ‘X_OK’?
+ 9647 |         (access(filter, EX_OK) == 0)) {
       |                         ^~~~~
       |                         X_OK
 src/7.1/cc/cc.c: In function ‘run’:
-src/7.1/cc/cc.c:9659:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
- 9659 |     SIG_PF sp88;
+src/7.1/cc/cc.c:9663:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
+ 9663 |     SIG_PF sp88;
       |     ^~~~~~
       |     SIGFPE
-src/7.1/cc/cc.c:9660:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
- 9660 |     SIG_PF sp84;
+src/7.1/cc/cc.c:9664:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
+ 9664 |     SIG_PF sp84;
       |     ^~~~~~
       |     SIGFPE
-src/7.1/cc/cc.c:9665:5: error: unknown type name ‘sysset_t’; did you mean ‘sigset_t’?
- 9665 |     sysset_t sp34;
+src/7.1/cc/cc.c:9669:5: error: unknown type name ‘sysset_t’; did you mean ‘sigset_t’?
+ 9669 |     sysset_t sp34;
       |     ^~~~~~~~
       |     sigset_t
-src/7.1/cc/cc.c:9697:21: error: ‘sys_nerr’ undeclared (first use in this function)
- 9697 |         if (errno < sys_nerr) {
-      |                     ^~~~~~~~
-src/7.1/cc/cc.c:9698:48: error: ‘sys_errlist’ undeclared (first use in this function)
- 9698 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                ^~~~~~~~~~~
-src/7.1/cc/cc.c:9780:21: error: request for member ‘word’ in something not a structure or union
- 9780 |                 sp34.word[var_s0] = 0;
+src/7.1/cc/cc.c:9784:21: error: request for member ‘word’ in something not a structure or union
+ 9784 |                 sp34.word[var_s0] = 0;
       |                     ^
 src/7.1/cc/cc.c: In function ‘edit_src’:
-src/7.1/cc/cc.c:9855:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
- 9855 |     SIG_PF sp48;
+src/7.1/cc/cc.c:9859:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
+ 9859 |     SIG_PF sp48;
       |     ^~~~~~
       |     SIGFPE
-src/7.1/cc/cc.c:9856:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
- 9856 |     SIG_PF sp44;
+src/7.1/cc/cc.c:9860:5: error: unknown type name ‘SIG_PF’; did you mean ‘SIGFPE’?
+ 9860 |     SIG_PF sp44;
       |     ^~~~~~
       |     SIGFPE
-src/7.1/cc/cc.c:9862:21: error: ‘sys_nerr’ undeclared (first use in this function)
- 9862 |         if (errno < sys_nerr) {
-      |                     ^~~~~~~~
-src/7.1/cc/cc.c:9863:48: error: ‘sys_errlist’ undeclared (first use in this function)
- 9863 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
-      |                                                ^~~~~~~~~~~
 src/7.1/cc/cc.c: In function ‘record_static_fileset’:
-src/7.1/cc/cc.c:10560:23: error: ‘FILE’ has no member named ‘_file’; did you mean ‘_fileno’?
-10560 |     ftruncate(sp28DC->_file, 0);
+src/7.1/cc/cc.c:10564:23: error: ‘FILE’ has no member named ‘_file’; did you mean ‘_fileno’?
+10564 |     ftruncate(sp28DC->_file, 0);
       |                       ^~~~~
       |                       _fileno
 src/7.1/cc/cc.c: In function ‘func_00432940’:
-src/7.1/cc/cc.c:10876:5: error: unknown type name ‘sysset_t’; did you mean ‘sigset_t’?
-10876 |     sysset_t syscalls; // sp24
+src/7.1/cc/cc.c:10880:5: error: unknown type name ‘sysset_t’; did you mean ‘sigset_t’?
+10880 |     sysset_t syscalls; // sp24
       |     ^~~~~~~~
       |     sigset_t
