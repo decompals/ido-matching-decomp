@@ -6287,7 +6287,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == COMPILER_3) &&
                         ((strcmp(argv[var_s0], "-col120") == 0) || (strcmp(argv[var_s0], "-col72") == 0) ||
-                         (strcmp(argv[var_s0], "-charargv") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
+                         (strcmp(argv[var_s0], "-chararg1") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
                          (strcmp(argv[var_s0], "-check_bounds") == 0))) {
                         if (strcmp(argv[var_s0], "-col120") == 0) {
                             mp_col120flag = 1;
@@ -9052,6 +9052,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libI77_mp = "-lI77_mp";
                         libc_mp = "-lc_mp";
                     }
+                    break;
+
+                case 'C':
                     break;
 
                 default:
