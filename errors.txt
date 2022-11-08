@@ -1,44 +1,9 @@
-src/7.1/cc/cc.c: In function ‘main’:
-src/7.1/cc/cc.c:847:9: warning: implicit declaration of function ‘force_use_cfront’ [-Wimplicit-function-declaration]
-  847 |     if (force_use_cfront(argc, argv)) {
-      |         ^~~~~~~~~~~~~~~~
-src/7.1/cc/cc.c:944:34: warning: implicit declaration of function ‘isdir’ [-Wimplicit-function-declaration]
-  944 |                                 (isdir(argv[i + 1]) == 0)) {
-      |                                  ^~~~~
-src/7.1/cc/cc.c:1306:9: warning: implicit declaration of function ‘sigset’ [-Wimplicit-function-declaration]
- 1306 |     if (sigset(2, (void (*)())1) != (void (*)())1) {
-      |         ^~~~~~
-src/7.1/cc/cc.c:1306:34: warning: comparison between pointer and integer
- 1306 |     if (sigset(2, (void (*)())1) != (void (*)())1) {
-      |                                  ^~
-src/7.1/cc/cc.c:1309:36: warning: comparison between pointer and integer
- 1309 |     if (sigset(0xF, (void (*)())1) != (void (*)())1) {
-      |                                    ^~
-src/7.1/cc/cc.c:1312:36: warning: comparison between pointer and integer
- 1312 |     if (sigset(0xD, (void (*)())1) != (void (*)())1) {
-      |                                    ^~
-src/7.1/cc/cc.c:1573:47: warning: implicit declaration of function ‘regular_not_writeable’ [-Wimplicit-function-declaration]
- 1573 |                     if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-      |                                               ^~~~~~~~~~~~~~~~~~~~~
-src/7.1/cc/cc.c:1578:25: warning: implicit declaration of function ‘run’ [-Wimplicit-function-declaration]
- 1578 |                     if (run(utob, execlist.entries, NULL, NULL, NULL) != 0) {
-      |                         ^~~
-src/7.1/cc/cc.c:2690:25: warning: implicit declaration of function ‘edit_src’ [-Wimplicit-function-declaration]
- 2690 |                     if (edit_src(editor, srcfiles.entries[i], 1) != 0) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:4390:24: warning: implicit declaration of function ‘regular_file’ [-Wimplicit-function-declaration]
- 4390 |                 spE0 = regular_file(passout);
-      |                        ^~~~~~~~~~~~
 src/7.1/cc/cc.c: In function ‘parse_command’:
 src/7.1/cc/cc.c:6450:49: error: ‘EX_OK’ undeclared (first use in this function); did you mean ‘X_OK’?
  6450 |                                 if (access(cfe, EX_OK) == -1) {
       |                                                 ^~~~~
       |                                                 X_OK
 src/7.1/cc/cc.c:6450:49: note: each undeclared identifier is reported only once for each function it appears in
-src/7.1/cc/cc.c:8136:21: warning: implicit declaration of function ‘nodup’; did you mean ‘dup’? [-Wimplicit-function-declaration]
- 8136 |                 if (nodup(&ufiles, var_s2) != 0) {
-      |                     ^~~~~
-      |                     dup
 src/7.1/cc/cc.c: In function ‘error’:
 src/7.1/cc/cc.c:8312:25: error: ‘sys_nerr’ undeclared (first use in this function)
  8312 |             if (errno < sys_nerr) {
@@ -70,9 +35,6 @@ src/7.1/cc/cc.c:9253:25: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or
 src/7.1/cc/cc.c:9269:5: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘list’
  9269 |     list* arg0;
       |     ^~~~
-src/7.1/cc/cc.c:9210:7: warning: type of ‘va_alist’ defaults to ‘int’ [-Wimplicit-int]
- 9210 | char* mkstr(va_alist)
-      |       ^~~~~
 src/7.1/cc/cc.c:9270:11: error: declaration for parameter ‘str’ but no such parameter
  9270 |     char* str;
       |           ^~~
@@ -162,200 +124,13 @@ src/7.1/cc/cc.c:9862:21: error: ‘sys_nerr’ undeclared (first use in this fun
 src/7.1/cc/cc.c:9863:48: error: ‘sys_errlist’ undeclared (first use in this function)
  9863 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
       |                                                ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘dotime’:
-src/7.1/cc/cc.c:10133:50: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 6 has type ‘clock_t’ {aka ‘long int’} [-Wformat=]
-10133 |     fprintf(stderr, "%s phase time: %.2fu %.2fs %u:%04.1f %.0f%%\n", programName, milis, seconds,
-      |                                                 ~^
-      |                                                  |
-      |                                                  unsigned int
-      |                                                 %lu
-10134 |             clockTimeDiff / (60 * CLOCK_TICKS), (double)(clockTimeDiff % (60 * CLOCK_TICKS)) / CLOCK_TICKS,
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-      |                           |
-      |                           clock_t {aka long int}
 src/7.1/cc/cc.c: In function ‘record_static_fileset’:
-src/7.1/cc/cc.c:10516:9: warning: implicit declaration of function ‘flock’ [-Wimplicit-function-declaration]
-10516 |     if (flock(sp28D8, 2) < 0) {
-      |         ^~~~~
 src/7.1/cc/cc.c:10560:23: error: ‘FILE’ has no member named ‘_file’; did you mean ‘_fileno’?
 10560 |     ftruncate(sp28DC->_file, 0);
       |                       ^~~~~
       |                       _fileno
-src/7.1/cc/cc.c: In function ‘touch’:
-src/7.1/cc/cc.c:10582:22: warning: implicit declaration of function ‘time’; did you mean ‘utime’? [-Wimplicit-function-declaration]
-10582 |     time_t curtime = time(NULL);
-      |                      ^~~~
-      |                      utime
-src/7.1/cc/cc.c: In function ‘quote_shell_arg’:
-src/7.1/cc/cc.c:10662:19: warning: multi-character character constant [-Wmultichar]
-10662 |         *arg1++ = '""';
-      |                   ^~~~
-src/7.1/cc/cc.c:10662:19: warning: overflow in conversion from ‘int’ to ‘char’ changes value from ‘8738’ to ‘34’ [-Woverflow]
-src/7.1/cc/cc.c: In function ‘skip_old_ii_controls’:
-src/7.1/cc/cc.c:10785:10: warning: implicit declaration of function ‘getc_locked’; did you mean ‘getc_unlocked’? [-Wimplicit-function-declaration]
-10785 |     ch = getc_locked(arg0);
-      |          ^~~~~~~~~~~
-      |          getc_unlocked
-src/7.1/cc/cc.c: In function ‘update_instantiation_info_file’:
-src/7.1/cc/cc.c:10853:13: warning: implicit declaration of function ‘putc_locked’; did you mean ‘putc_unlocked’? [-Wimplicit-function-declaration]
-10853 |             putc_locked(sp44, sp48);
-      |             ^~~~~~~~~~~
-      |             putc_unlocked
 src/7.1/cc/cc.c: In function ‘func_00432940’:
 src/7.1/cc/cc.c:10876:5: error: unknown type name ‘sysset_t’; did you mean ‘sigset_t’?
 10876 |     sysset_t syscalls; // sp24
       |     ^~~~~~~~
       |     sigset_t
-src/7.1/cc/cc.c: In function ‘func_00432D3C’:
-src/7.1/cc/cc.c:11030:46: warning: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 4 has type ‘caddr_t’ [-Wformat=]
-11030 |             fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, B_1000CAC0[i].pr_vaddr);
-      |                                            ~~^        ~~~~~~~~~~~~~~~~~~~~~~
-      |                                              |                     |
-      |                                              long unsigned int     caddr_t
-      |                                            %s
-src/7.1/cc/cc.c:11045:37: warning: format ‘%d’ expects argument of type ‘int’, but argument 4 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                    ~^                                             ~~~~~~~~~~~~~~~~~
-      |                                     |                                                       |
-      |                                     int                                                     size_t {aka long unsigned int}
-      |                                    %ld
-src/7.1/cc/cc.c:11045:41: warning: format ‘%d’ expects argument of type ‘int’, but argument 5 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                        ~^                                                            ~~~~~~~~~~~~~~~~~
-      |                                         |                                                                      |
-      |                                         int                                                                    size_t {aka long unsigned int}
-      |                                        %ld
-src/7.1/cc/cc.c:11045:45: warning: format ‘%d’ expects argument of type ‘int’, but argument 6 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                            ~^
-      |                                             |
-      |                                             int
-      |                                            %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-      |             ~~~~~~~~~~~~~~~~                 
-      |                      |
-      |                      size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:49: warning: format ‘%d’ expects argument of type ‘int’, but argument 7 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                ~^
-      |                                                 |
-      |                                                 int
-      |                                                %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-      |                               ~~~~~~~~~~~~~~~~~~ 
-      |                                          |
-      |                                          size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:53: warning: format ‘%d’ expects argument of type ‘int’, but argument 8 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                    ~^
-      |                                                     |
-      |                                                     int
-      |                                                    %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-      |                                                   ~~~~~~~~~~~~~~~~~~~~
-      |                                                                |
-      |                                                                size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:57: warning: format ‘%d’ expects argument of type ‘int’, but argument 9 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                        ~^
-      |                                                         |
-      |                                                         int
-      |                                                        %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-      |                                                                         ~~~~~~~~~~~~~~~~~~~~
-      |                                                                                      |
-      |                                                                                      size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:61: warning: format ‘%d’ expects argument of type ‘int’, but argument 10 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                            ~^
-      |                                                             |
-      |                                                             int
-      |                                                            %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-      |                                                                                               ~~~~~~~~~~~~~~~~~~~
-      |                                                                                                           |
-      |                                                                                                           size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:65: warning: format ‘%d’ expects argument of type ‘int’, but argument 11 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                                ~^
-      |                                                                 |
-      |                                                                 int
-      |                                                                %ld
-11046 |             brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400, so_brk_size / 0x400,
-11047 |             mmap_size / 0x400,
-      |             ~~~~~~~~~~~~~~~~~                                    
-      |                       |
-      |                       size_t {aka long unsigned int}
-src/7.1/cc/cc.c:11045:70: warning: format ‘%d’ expects argument of type ‘int’, but argument 12 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11045 |     fprintf(stderr, "%s phase mem: %dT %dD %dB %dS %dt %dd %db %dm= %dK\n", arg0, text_size / 0x400, data_size / 0x400,
-      |                                                                     ~^
-      |                                                                      |
-      |                                                                      int
-      |                                                                     %ld
-......
-11048 |             (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                                                                                                                     |
-      |                                                                                                                     size_t {aka long unsigned int}
-11049 |                 0x400);
-      |                 ~~~~~                                                 
-src/7.1/cc/cc.c:11052:38: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11052 |         fprintf(stderr, "text_size= %d Kbytes\n", text_size / 0x400);
-      |                                     ~^            ~~~~~~~~~~~~~~~~~
-      |                                      |                      |
-      |                                      int                    size_t {aka long unsigned int}
-      |                                     %ld
-src/7.1/cc/cc.c:11053:38: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11053 |         fprintf(stderr, "data_size= %d Kbytes\n", data_size / 0x400);
-      |                                     ~^            ~~~~~~~~~~~~~~~~~
-      |                                      |                      |
-      |                                      int                    size_t {aka long unsigned int}
-      |                                     %ld
-src/7.1/cc/cc.c:11054:37: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11054 |         fprintf(stderr, "brk_size= %d Kbytes\n", brk_size / 0x400);
-      |                                    ~^            ~~~~~~~~~~~~~~~~
-      |                                     |                     |
-      |                                     int                   size_t {aka long unsigned int}
-      |                                    %ld
-src/7.1/cc/cc.c:11055:39: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11055 |         fprintf(stderr, "stack_size= %d Kbytes\n", stack_size / 0x400);
-      |                                      ~^            ~~~~~~~~~~~~~~~~~~
-      |                                       |                       |
-      |                                       int                     size_t {aka long unsigned int}
-      |                                      %ld
-src/7.1/cc/cc.c:11056:41: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11056 |         fprintf(stderr, "so_text_size= %d Kbytes\n", so_text_size / 0x400);
-      |                                        ~^            ~~~~~~~~~~~~~~~~~~~~
-      |                                         |                         |
-      |                                         int                       size_t {aka long unsigned int}
-      |                                        %ld
-src/7.1/cc/cc.c:11057:41: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11057 |         fprintf(stderr, "so_data_size= %d Kbytes\n", so_data_size / 0x400);
-      |                                        ~^            ~~~~~~~~~~~~~~~~~~~~
-      |                                         |                         |
-      |                                         int                       size_t {aka long unsigned int}
-      |                                        %ld
-src/7.1/cc/cc.c:11058:40: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11058 |         fprintf(stderr, "so_brk_size= %d Kbytes\n", so_brk_size / 0x400);
-      |                                       ~^            ~~~~~~~~~~~~~~~~~~~
-      |                                        |                        |
-      |                                        int                      size_t {aka long unsigned int}
-      |                                       %ld
-src/7.1/cc/cc.c:11059:38: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11059 |         fprintf(stderr, "mmap_size= %d Kbytes\n", mmap_size / 0x400);
-      |                                     ~^            ~~~~~~~~~~~~~~~~~
-      |                                      |                      |
-      |                                      int                    size_t {aka long unsigned int}
-      |                                     %ld
-src/7.1/cc/cc.c:11061:35: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
-11061 |             stderr, "TOTAL_SIZE= %d Kbytes\n",
-      |                                  ~^
-      |                                   |
-      |                                   int
-      |                                  %ld
-11062 |             (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                                                                                                                     |
-      |                                                                                                                     size_t {aka long unsigned int}
-11063 |                 0x400);
-      |                 ~~~~~              
