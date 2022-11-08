@@ -3,24 +3,33 @@
  * @brief Compiler driver for IDO 7.1.
  */
 
-#include "signal.h"
-#include "wait.h"
-#include "sex.h"
-#include "sys/times.h"
-#include "stdlib.h"
-#include "utime.h"
-#include "varargs.h"
-#include "errno.h"
-#include "unistd.h"
-#include "ctype.h"
-#include "fcntl.h"
-#include "sys/file.h"
-#include "sys/stat.h"
-#include "sys/ioctl.h"
-#include "ucontext.h"
+// Headers which should be available in modern systems
+#include <string.h>
+#include <malloc.h>
+#include <signal.h>
+#include <wait.h>
+#include <sys/times.h>
+#include <stdlib.h>
+#include <utime.h>
+#include <errno.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <sys/fcntl.h>
+// #include "sys/file.h"
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <ucontext.h>
+
+#ifdef NATIVE_BUILD
+#include <stdarg.h>
+#else
+#include "indy/varargs.h"
+#endif
+
+// indy specific headers
+struct ranlib; // avoids errors on native builds
+#include "indy/sex.h"
 #include "sys/procfs.h"
-#include "string.h"
-#include "malloc.h"
 
 
 #ifndef TRUE
