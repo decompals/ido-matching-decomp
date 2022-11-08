@@ -1,3 +1,4 @@
+#include "sys/types.h"
 #include "stdio.h"
 
 typedef struct {
@@ -7,6 +8,12 @@ typedef struct {
 } list;
 
 typedef int UNK_TYPE;
+
+#if !defined(bool) || !defined(true) || !defined(false)
+#define bool boolean_t
+#define true B_TRUE
+#define false B_FALSE
+#endif
 
 /* 03F310 10008310 */ static char B_10008310[0x1900]; // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0; // line 174
@@ -391,7 +398,7 @@ static const char STR_1000525C[] = "";
  * VROM: 0x02FBF8
  * Size: 0x194
  */
-// int addstr();
+void addstr(list* arg0, const char* str);
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/addstr.s")
 
 /**
@@ -758,8 +765,20 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x034FB4
  * Size: 0xFC
  */
-// int add_prelinker_objects();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/add_prelinker_objects.s")
+void add_prelinker_objects(list* arg0, list* arg1) {
+    int i;
+
+    for (i = 0; i < arg1->length; i++) {
+        if (arg1->entries[i][0] == '-') {
+            if (strcmp(arg1->entries[i], "-B") == 0) {
+                i++;
+            }
+        } else {
+            addstr(arg0, arg1->entries[i]);
+        }
+    }
+}
+
 
 /**
  * quoted_length
@@ -767,8 +786,28 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x0350B0
  * Size: 0x174
  */
-size_t quoted_length(const char *arg0, int *arg1);
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/quoted_length.s")
+size_t quoted_length(const char* arg0, bool* arg1) {
+    size_t len = 0;
+    char ch;
+
+    *arg1 = false;
+    while (ch = *arg0++) { // != 0 does not match
+        if (*arg1 == 0) {
+            if ((ch == '\'') || (ch == '|') || (ch == '&') || (ch == '*') || (ch == '?') || (ch == '[') ||
+                (ch == ']') || (ch == ';') || (ch == '!') || (ch == '(') || (ch == ')') || (ch == '^') || (ch == '<') ||
+                (ch == '>') || (ch <= ' ') || (ch == '\t') || (ch == '\"') || (ch == '\\') || (ch == '`') ||
+                (ch == '$')) {
+                *arg1 = true;
+                len += 2;
+            }
+        }
+        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
+            len++;
+        }
+        len++;
+    }
+    return len;
+}
 
 /**
  * quote_shell_arg
@@ -778,10 +817,10 @@ size_t quoted_length(const char *arg0, int *arg1);
  */
 size_t quote_shell_arg(const char* arg0, char* arg1) {
     char ch;
-    int sp28 = 0;
+    bool sp28 = false;
     size_t len = quoted_length(arg0, &sp28);
 
-    if (sp28 != 0) {
+    if (sp28) {
         *arg1++ = '"';
     }
 
@@ -792,7 +831,7 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
         *arg1++ = ch;
     }
 
-    if (sp28 != 0) {
+    if (sp28) {
         *arg1++ = '"';
     }
     return len;
