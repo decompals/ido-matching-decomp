@@ -4887,307 +4887,342 @@ int main(int argc, char** argv) {
             exit(2);
         }
 
-    pass_prelinker : {
-        if ((compiler == COMPILER_1) &&
-            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && !no_prelink) {
-            execlist.length = 0;
-            addstr(&execlist, "edg_prelink");
-            addstr(&execlist, "-fSGI");
-            addlist(&execlist, &prelinkerflags);
-            if (vflag || verbose_prelink) {
-                addstr(&execlist, "-v");
-            }
-            add_prelinker_objects(&execlist, &objfiles);
-            if (xpg_flag) {
-                add_prelinker_objects(&execlist, &dashlfiles);
-            }
-            if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror++;
-                goto pass_cord;
-            }
-        }
-    }
-
-    pass_ld : {
-        execlist.length = 0;
-        addstr(&execlist, LD);
-        if (kpic_flag && !irix4 && !coff_spec) {
-            addstr(&ldflags, "-KPIC");
-        }
-        if (non_shared && !non_shared_emitted) {
-            if (!mips2flag && !mips3flag) {
-                addstr(&ldflags, "-non_shared");
-                non_shared_emitted = TRUE;
-            }
-        } else if (call_shared || make_edison_shlib) {
-            if (transitive_link) {
-                addstr(&ldflags, "-transitive_link");
-            } else if (full_transitive_link) {
-                addstr(&ldflags, "-full_transitive_link");
-            } else if (no_transitive_link) {
-                addstr(&ldflags, "-no_transitive_link");
-            }
-        }
-        if (quickstart_info) {
-            addstr(&ldflags, "-quickstart_info");
-        }
-        if (elfflag && !coff_spec) {
-            addstr(&execlist, "-elf");
-        }
-        if (tfp_flag) {
-            addstr(&execlist, "-allow_jump_at_eop");
-        }
-        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-            addstr(&execlist, "-delta");
-        }
-        if (cordflag) {
-            addstr(&execlist, "-o");
-            passout = tempstr[22];
-            addstr(&execlist, passout);
-        } else if (outfile != NULL) {
-            addstr(&execlist, "-o");
-            addstr(&execlist, outfile);
-        }
-        if (gethostsex() != targetsex) {
-            if (targetsex == 0) {
-                addstr(&execlist, "-EB");
-            } else {
-                addstr(&execlist, "-EL");
-            }
-        }
-        if (make_edison_shlib) {
-            addstr(&execlist, "-shared");
-        }
-        if ((compiler == COMPILER_1) &&
-            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-            add_cxx_symbol_options();
-        }
-        if (irix4) {
-            addstr(&execlist, mkstr("-L", NULL));
-            if (non_shared) {
-                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
-            } else {
-                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
-            }
-        }
-        if (svr4_systype) {
-            if (compchoice == COMP_CHOICE_1) {
-                addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
-            }
-            addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-            if (call_shared || make_edison_shlib) {
-                addstr(&execlist, "-require_dynamic_link");
-                addstr(&execlist, "_rld_new_interface");
-                if (ignore_unresolved_flag) {
-                    addstr(&execlist, "-ignore_unresolved");
-                } else if (no_unresolved_flag) {
-                    addstr(&execlist, "-no_unresolved");
-                } else if (default_svr4 || make_edison_shlib) {
-                    addstr(&execlist, "-ignore_unresolved");
-                } else {
-                    addstr(&execlist, "-no_unresolved");
-                }
-            }
-        }
-        if (fiveflag) {
-            addstr(&execlist, mkstr("-L", runlib, NULL));
-        }
-        if ((allBstring != NULL) && (*allBstring != '\0')) {
-            addstr(&execlist, mkstr("-B", allBstring, NULL));
-        }
-        if (cordflag) {
-            addstr(&execlist, "-r");
-            addstr(&execlist, "-d");
-            addstr(&execlist, "-z");
-        }
-        if (irix4) {
-            addstr(&execlist, "-G");
-        } else {
-            addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
-        }
-        addstr(&execlist, Gnum);
-        addlist(&execlist, &ldflags);
-        addlist(&execlist, &nldflags);
-        if (mips2flag && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                } else {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            } else {
-                if (non_shared) {
-                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                } else {
-                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            }
-        }
-        if (mips1flag && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                } else if (abi_flag == 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            } else {
-                if (non_shared) {
-                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                } else if (abi_flag == 0) {
-                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            }
-        }
-        if (strcmp("/", comp_target_root) != 0) {
-            if (!Lflag) {
-                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
-                }
-                if (non_shared) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
-                } else if (abi_flag == 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
-                }
-            }
-        } else {
-            if (!Lflag) {
-                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                    addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
-                }
-            }
-        }
-        if (make_edison_shlib) {
+    pass_prelinker:
+        {
             if ((compiler == COMPILER_1) &&
-                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                addstr(&execlist, cxx_init);
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                !no_prelink) {
+                execlist.length = 0;
+                addstr(&execlist, "edg_prelink");
+                addstr(&execlist, "-fSGI");
+                addlist(&execlist, &prelinkerflags);
+                if (vflag || verbose_prelink) {
+                    addstr(&execlist, "-v");
+                }
+                add_prelinker_objects(&execlist, &objfiles);
+                if (xpg_flag) {
+                    add_prelinker_objects(&execlist, &dashlfiles);
+                }
+                if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    goto pass_cord;
+                }
+            }
+        }
+
+    pass_ld:
+        {
+            execlist.length = 0;
+            addstr(&execlist, LD);
+            if (kpic_flag && !irix4 && !coff_spec) {
+                addstr(&ldflags, "-KPIC");
+            }
+            if (non_shared && !non_shared_emitted) {
+                if (!mips2flag && !mips3flag) {
+                    addstr(&ldflags, "-non_shared");
+                    non_shared_emitted = TRUE;
+                }
+            } else if (call_shared || make_edison_shlib) {
+                if (transitive_link) {
+                    addstr(&ldflags, "-transitive_link");
+                } else if (full_transitive_link) {
+                    addstr(&ldflags, "-full_transitive_link");
+                } else if (no_transitive_link) {
+                    addstr(&ldflags, "-no_transitive_link");
+                }
+            }
+            if (quickstart_info) {
+                addstr(&ldflags, "-quickstart_info");
+            }
+            if (elfflag && !coff_spec) {
+                addstr(&execlist, "-elf");
+            }
+            if (tfp_flag) {
+                addstr(&execlist, "-allow_jump_at_eop");
             }
             if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                addstr(&execlist, delta_init);
+                addstr(&execlist, "-delta");
             }
-            addlist(&execlist, &objfiles);
-            if (xpg_flag) {
-                addlist(&execlist, &dashlfiles);
+            if (cordflag) {
+                addstr(&execlist, "-o");
+                passout = tempstr[22];
+                addstr(&execlist, passout);
+            } else if (outfile != NULL) {
+                addstr(&execlist, "-o");
+                addstr(&execlist, outfile);
             }
-            if (!nodeflib) {
+            if (gethostsex() != targetsex) {
+                if (targetsex == 0) {
+                    addstr(&execlist, "-EB");
+                } else {
+                    addstr(&execlist, "-EL");
+                }
+            }
+            if (make_edison_shlib) {
+                addstr(&execlist, "-shared");
+            }
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                add_cxx_symbol_options();
+            }
+            if (irix4) {
+                addstr(&execlist, mkstr("-L", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
+                } else {
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
+                }
+            }
+            if (svr4_systype) {
+                if (compchoice == COMP_CHOICE_1) {
+                    addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
+                }
+                addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
+                if (call_shared || make_edison_shlib) {
+                    addstr(&execlist, "-require_dynamic_link");
+                    addstr(&execlist, "_rld_new_interface");
+                    if (ignore_unresolved_flag) {
+                        addstr(&execlist, "-ignore_unresolved");
+                    } else if (no_unresolved_flag) {
+                        addstr(&execlist, "-no_unresolved");
+                    } else if (default_svr4 || make_edison_shlib) {
+                        addstr(&execlist, "-ignore_unresolved");
+                    } else {
+                        addstr(&execlist, "-no_unresolved");
+                    }
+                }
+            }
+            if (fiveflag) {
+                addstr(&execlist, mkstr("-L", runlib, NULL));
+            }
+            if ((allBstring != NULL) && (*allBstring != '\0')) {
+                addstr(&execlist, mkstr("-B", allBstring, NULL));
+            }
+            if (cordflag) {
+                addstr(&execlist, "-r");
+                addstr(&execlist, "-d");
+                addstr(&execlist, "-z");
+            }
+            if (irix4) {
+                addstr(&execlist, "-G");
+            } else {
+                addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
+            }
+            addstr(&execlist, Gnum);
+            addlist(&execlist, &ldflags);
+            addlist(&execlist, &nldflags);
+            if (mips2flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                } else {
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+            }
+            if (mips1flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                } else {
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+            }
+            if (strcmp("/", comp_target_root) != 0) {
+                if (!Lflag) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
+                    }
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
+                    }
+                }
+            } else {
+                if (!Lflag) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
+                    }
+                }
+            }
+            if (make_edison_shlib) {
                 if ((compiler == COMPILER_1) &&
                     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                    spDC = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
-                    if (spDC) {
-                        addstr(&execlist, "-dont_warn_unused");
-                    }
-                    if (exception_handling) {
-                        addstr(&execlist, "-lCsup");
-                    }
-                    addstr(&execlist, "-lC");
-                    if (spDC) {
-                        addstr(&execlist, "-warn_unused");
-                    }
+                    addstr(&execlist, cxx_init);
                 }
+                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                    addstr(&execlist, delta_init);
+                }
+                addlist(&execlist, &objfiles);
                 if (xpg_flag) {
-                    addstr(&execlist, "-dont_warn_unused");
-                    addstr(&execlist, "-lgen");
-                    addstr(&execlist, "-warn_unused");
+                    addlist(&execlist, &dashlfiles);
                 }
-                addstr(&execlist, "-lc");
-            }
-        } else {
-            addstr(&execlist, "-nocount");
-            addstr(&execlist, crtx);
-            if ((compiler == COMPILER_1) &&
-                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                addstr(&execlist, cxx_init);
-            }
-            if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                addstr(&execlist, delta_init);
-            }
-            addstr(&execlist, "-count");
-            addlist(&execlist, &objfiles);
-            if (xpg_flag) {
-                addlist(&execlist, &dashlfiles);
-            }
-            addlist(&execlist, &ldZflags);
-            if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) && !irix4) {
-                addstr(&execlist, "-cckr");
-            }
-            addstr(&execlist, "-nocount");
-            if (!nodeflib) {
-                if ((compiler == COMPILER_2) || haspascal) {
-                    addspacedstr(&execlist, libp);
-                    addspacedstr(&execlist, libxmalloc);
-                    addspacedstr(&execlist, libexc);
-                    addspacedstr(&execlist, libmld);
-                }
-                if ((compiler == COMPILER_3) || hasfortran) {
-                    if (mp_flag) {
-                        addspacedstr(&execlist, libI77_mp);
-                    }
-                    if (non_shared || irix4) {
-                        addspacedstr(&execlist, libF77);
-                        addspacedstr(&execlist, libm);
-                        addspacedstr(&execlist, libU77);
-                        if (D_1000C130 != 0) {
-                            spD8 = strlen(libI77);
-                            spD4 = malloc(spD8 + 2);
-                            memcpy(spD4, libI77, spD8);
-                            spD4[spD8 + 0] = '_';
-                            spD4[spD8 + 1] = 's';
-                            spD4[spD8 + 2] = '\0';
-                            libI77 = spD4;
-                        }
-                        addspacedstr(&execlist, libI77);
-                        addspacedstr(&execlist, libisam);
-                    } else {
-                        addspacedstr(&execlist, libftn);
-                        addspacedstr(&execlist, libm);
-                    }
-                }
-                if (compiler == COMPILER_5) {
-                    addstr(&execlist, libpl1);
-                    addspacedstr(&execlist, libxmalloc);
-                    addstr(&execlist, "-ltermcap");
-                    addspacedstr(&execlist, libexc);
-                    addspacedstr(&execlist, libmld);
-                }
-                if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
-                    (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
-                    addspacedstr(&execlist, libm);
-                }
-                if (pgflag != 0) {
-                    addspacedstr(&execlist, libgprof);
-                } else if (pflag != 0) {
-                    addspacedstr(&execlist, libprof);
-                }
-                if (!sixty4bitflag) {
-                    ldw_file = fopen(libdw_path, "r");
-                    if (ldw_file != NULL) {
-                        addspacedstr(&execlist, libdw);
-                    }
-                }
-                if (cmp_flag & 0x10000) {
-                    addstr(&execlist, libc_mp);
-                    if (compiler == COMPILER_1) {
-                        addstr(&execlist, "-lkapio");
-                    }
-                }
-                if (run_sopt && (compiler == COMPILER_1)) {
-                    addstr(&execlist, "-lkapio");
-                }
-                if (compiler == COMPILER_3) {
-                    if (D_1000C130 == 2) {
-                        addstr(&execlist, "-lc_s");
-                        if (xpg_flag) {
+                if (!nodeflib) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                        spDC = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                        if (spDC) {
                             addstr(&execlist, "-dont_warn_unused");
-                            addstr(&execlist, "-lgen");
+                        }
+                        if (exception_handling) {
+                            addstr(&execlist, "-lCsup");
+                        }
+                        addstr(&execlist, "-lC");
+                        if (spDC) {
                             addstr(&execlist, "-warn_unused");
                         }
-                        addstr(&execlist, "-lc");
+                    }
+                    if (xpg_flag) {
+                        addstr(&execlist, "-dont_warn_unused");
+                        addstr(&execlist, "-lgen");
+                        addstr(&execlist, "-warn_unused");
+                    }
+                    addstr(&execlist, "-lc");
+                }
+            } else {
+                addstr(&execlist, "-nocount");
+                addstr(&execlist, crtx);
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                    addstr(&execlist, cxx_init);
+                }
+                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                    addstr(&execlist, delta_init);
+                }
+                addstr(&execlist, "-count");
+                addlist(&execlist, &objfiles);
+                if (xpg_flag) {
+                    addlist(&execlist, &dashlfiles);
+                }
+                addlist(&execlist, &ldZflags);
+                if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) && !irix4) {
+                    addstr(&execlist, "-cckr");
+                }
+                addstr(&execlist, "-nocount");
+                if (!nodeflib) {
+                    if ((compiler == COMPILER_2) || haspascal) {
+                        addspacedstr(&execlist, libp);
+                        addspacedstr(&execlist, libxmalloc);
+                        addspacedstr(&execlist, libexc);
+                        addspacedstr(&execlist, libmld);
+                    }
+                    if ((compiler == COMPILER_3) || hasfortran) {
+                        if (mp_flag) {
+                            addspacedstr(&execlist, libI77_mp);
+                        }
+                        if (non_shared || irix4) {
+                            addspacedstr(&execlist, libF77);
+                            addspacedstr(&execlist, libm);
+                            addspacedstr(&execlist, libU77);
+                            if (D_1000C130 != 0) {
+                                spD8 = strlen(libI77);
+                                spD4 = malloc(spD8 + 2);
+                                memcpy(spD4, libI77, spD8);
+                                spD4[spD8 + 0] = '_';
+                                spD4[spD8 + 1] = 's';
+                                spD4[spD8 + 2] = '\0';
+                                libI77 = spD4;
+                            }
+                            addspacedstr(&execlist, libI77);
+                            addspacedstr(&execlist, libisam);
+                        } else {
+                            addspacedstr(&execlist, libftn);
+                            addspacedstr(&execlist, libm);
+                        }
+                    }
+                    if (compiler == COMPILER_5) {
+                        addstr(&execlist, libpl1);
+                        addspacedstr(&execlist, libxmalloc);
+                        addstr(&execlist, "-ltermcap");
+                        addspacedstr(&execlist, libexc);
+                        addspacedstr(&execlist, libmld);
+                    }
+                    if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
+                        (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
+                        addspacedstr(&execlist, libm);
+                    }
+                    if (pgflag != 0) {
+                        addspacedstr(&execlist, libgprof);
+                    } else if (pflag != 0) {
+                        addspacedstr(&execlist, libprof);
+                    }
+                    if (!sixty4bitflag) {
+                        ldw_file = fopen(libdw_path, "r");
+                        if (ldw_file != NULL) {
+                            addspacedstr(&execlist, libdw);
+                        }
+                    }
+                    if (cmp_flag & 0x10000) {
+                        addstr(&execlist, libc_mp);
+                        if (compiler == COMPILER_1) {
+                            addstr(&execlist, "-lkapio");
+                        }
+                    }
+                    if (run_sopt && (compiler == COMPILER_1)) {
+                        addstr(&execlist, "-lkapio");
+                    }
+                    if (compiler == COMPILER_3) {
+                        if (D_1000C130 == 2) {
+                            addstr(&execlist, "-lc_s");
+                            if (xpg_flag) {
+                                addstr(&execlist, "-dont_warn_unused");
+                                addstr(&execlist, "-lgen");
+                                addstr(&execlist, "-warn_unused");
+                            }
+                            addstr(&execlist, "-lc");
+                        } else {
+                            if (irix4 && (B_1000ED74 == 0)) {
+                                addstr(&execlist, "-lmpc");
+                            }
+                            if (B_1000ED2C != 0) {
+                                addstr(&execlist, "-lc_s");
+                            } else if (B_1000ED30 != 0) {
+                                addstr(&execlist, "-lc_s");
+                            }
+                            if (xpg_flag) {
+                                addstr(&execlist, "-dont_warn_unused");
+                                addstr(&execlist, "-lgen");
+                                addstr(&execlist, "-warn_unused");
+                            }
+                            addstr(&execlist, "-lc");
+                        }
                     } else {
-                        if (irix4 && (B_1000ED74 == 0)) {
+                        if (irix4 && (cmp_flag & 0x10000)) {
                             addstr(&execlist, "-lmpc");
+                        }
+                        if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                         (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                            spD0 = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                            if (spD0) {
+                                addstr(&execlist, "-dont_warn_unused");
+                            }
+                            if (exception_handling) {
+                                addstr(&execlist, "-lCsup");
+                            }
+                            addstr(&execlist, "-lC");
+                            if (spD0) {
+                                addstr(&execlist, "-warn_unused");
+                            }
                         }
                         if (B_1000ED2C != 0) {
                             addstr(&execlist, "-lc_s");
@@ -5201,64 +5236,34 @@ int main(int argc, char** argv) {
                         }
                         addstr(&execlist, "-lc");
                     }
-                } else {
-                    if (irix4 && (cmp_flag & 0x10000)) {
-                        addstr(&execlist, "-lmpc");
-                    }
-                    if ((compiler == COMPILER_1) &&
-                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                        spD0 = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
-                        if (spD0) {
-                            addstr(&execlist, "-dont_warn_unused");
-                        }
-                        if (exception_handling) {
-                            addstr(&execlist, "-lCsup");
-                        }
-                        addstr(&execlist, "-lC");
-                        if (spD0) {
-                            addstr(&execlist, "-warn_unused");
-                        }
-                    }
-                    if (B_1000ED2C != 0) {
-                        addstr(&execlist, "-lc_s");
-                    } else if (B_1000ED30 != 0) {
-                        addstr(&execlist, "-lc_s");
-                    }
-                    if (xpg_flag) {
-                        addstr(&execlist, "-dont_warn_unused");
-                        addstr(&execlist, "-lgen");
-                        addstr(&execlist, "-warn_unused");
-                    }
-                    addstr(&execlist, "-lc");
+                }
+                if (crtn_required) {
+                    addstr(&execlist, crtn);
+                }
+                if (rls_id_object != NULL) {
+                    addstr(&execlist, rls_id_object);
                 }
             }
-            if (crtn_required) {
-                addstr(&execlist, crtn);
-            }
-            if (rls_id_object != NULL) {
-                addstr(&execlist, rls_id_object);
-            }
-        }
 
-        passin = NULL;
-        if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
-            runerror++;
-            if (!Kflag) {
-                if ((strcmp(LD, "old_ld") == 0) ||
-                    ((compiler == COMPILER_1) &&
-                     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
-                    if (outfile != NULL) {
-                        unlink(outfile);
-                    } else {
-                        unlink("a.out");
+            passin = NULL;
+            if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    if ((strcmp(LD, "old_ld") == 0) ||
+                        ((compiler == COMPILER_1) &&
+                         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
+                        if (outfile != NULL) {
+                            unlink(outfile);
+                        } else {
+                            unlink("a.out");
+                        }
                     }
-                }
-                if (tmp_uldobj != NULL) {
-                    unlink(tmp_uldobj);
+                    if (tmp_uldobj != NULL) {
+                        unlink(tmp_uldobj);
+                    }
                 }
             }
         }
-    }
 
     pass_filter:
         if (tempstr[32] != NULL) {
@@ -5302,39 +5307,40 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_cord : {
-        if (cordflag && (runerror == 0)) {
-            execlist.length = 0;
-            addstr(&execlist, "cord");
-            if (vflag) {
-                addstr(&execlist, "-v");
+    pass_cord:
+        {
+            if (cordflag && (runerror == 0)) {
+                execlist.length = 0;
+                addstr(&execlist, "cord");
+                if (vflag) {
+                    addstr(&execlist, "-v");
+                }
+                addlist(&execlist, &cordflags);
+                if (outfile != NULL) {
+                    passout = outfile;
+                } else {
+                    passout = "a.out";
+                }
+                addstr(&execlist, "-o");
+                addstr(&execlist, passout);
+                addstr(&execlist, tempstr[22]);
+                if (feedlist.length != 0) {
+                    addlist(&execlist, &feedlist);
+                } else {
+                    addstr(&execlist, mkstr(passout, ".fb", NULL));
+                }
+                if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    unlink(passout);
+                    unlink(tempstr[22]);
+                } else {
+                    unlink(tempstr[22]);
+                }
             }
-            addlist(&execlist, &cordflags);
-            if (outfile != NULL) {
-                passout = outfile;
-            } else {
-                passout = "a.out";
-            }
-            addstr(&execlist, "-o");
-            addstr(&execlist, passout);
-            addstr(&execlist, tempstr[22]);
-            if (feedlist.length != 0) {
-                addlist(&execlist, &feedlist);
-            } else {
-                addstr(&execlist, mkstr(passout, ".fb", NULL));
-            }
-            if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror++;
-                unlink(passout);
-                unlink(tempstr[22]);
-            } else {
-                unlink(tempstr[22]);
+            if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && !Kflag) {
+                unlink(mksuf(srcfiles.entries[0], 'o'));
             }
         }
-        if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && !Kflag) {
-            unlink(mksuf(srcfiles.entries[0], 'o'));
-        }
-    }
     }
 
     if (tmp_uldobj != NULL) {

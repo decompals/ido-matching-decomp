@@ -21,3 +21,8 @@ AllowShortFunctionsOnASingleLine: false
 AlignEscapedNewlines: Left
 AlignTrailingComments: true
 SortIncludes: false
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+IndentCaseBlocks: true
