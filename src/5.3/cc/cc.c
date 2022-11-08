@@ -638,8 +638,9 @@ void addstr(list* arg0, char* str) {
  * VROM: 0x033DB8
  * Size: 0x118
  */
-// int basename();
+char* basename(const char*);
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/basename.s")
+
 
 /**
  * dirname
@@ -647,7 +648,7 @@ void addstr(list* arg0, char* str) {
  * VROM: 0x033ED0
  * Size: 0x1C4
  */
-// int dirname();
+char* dirname(const char*);
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/dirname.s")
 
 static const char STR_10006754[] = "accom";
@@ -916,8 +917,19 @@ void save_off_command_line(int argc, char** argv) {
  * VROM: 0x035BA0
  * Size: 0x134
  */
-// int make_ii_file_name();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/make_ii_file_name.s")
+char* make_ii_file_name(const char* path) {
+    char* base = basename(path);
+    size_t base_len = strlen(base);
+
+    base = mkstr(base, "   ", NULL);
+    if ((base[base_len - 2] == '.') && (base[base_len - 1] == 'o')) {
+        strcpy(&base[base_len - 1], "ii");
+    } else {
+        strcpy(&base[base_len], ".ii");
+    }
+    return mkstr(dirname(path), "/ii_files/", base, NULL);
+}
+
 
 /**
  * update_instantiation_info_file
