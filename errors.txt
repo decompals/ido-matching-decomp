@@ -4,43 +4,14 @@ src/7.1/cc/cc.c:6450:49: error: ‘EX_OK’ undeclared (first use in this functi
       |                                                 ^~~~~
       |                                                 X_OK
 src/7.1/cc/cc.c:6450:49: note: each undeclared identifier is reported only once for each function it appears in
-src/7.1/cc/cc.c: In function ‘error’:
-src/7.1/cc/cc.c:8312:25: error: ‘sys_nerr’ undeclared (first use in this function)
- 8312 |             if (errno < sys_nerr) {
-      |                         ^~~~~~~~
-src/7.1/cc/cc.c:8313:57: error: ‘sys_errlist’ undeclared (first use in this function)
- 8313 |                 fprintf(stderr, "%s: %s\n", D_1000C1D8, sys_errlist[errno]);
-      |                                                         ^~~~~~~~~~~
-src/7.1/cc/cc.c: In function ‘mkstr’:
-src/7.1/cc/cc.c:9212:1: error: expected declaration specifiers before ‘va_dcl’
- 9212 | va_dcl // K&R syntax
-      | ^~~~~~
-src/7.1/cc/cc.c:9220:18: error: macro "va_start" requires 2 arguments, but only 1 given
- 9220 |     va_start(args);
-      |                  ^
-In file included from src/7.1/cc/cc.c:26:
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:47: note: macro "va_start" defined here
-   47 | #define va_start(v,l)   __builtin_va_start(v,l)
-      | 
-src/7.1/cc/cc.c:9236:18: error: macro "va_start" requires 2 arguments, but only 1 given
- 9236 |     va_start(args);
-      |                  ^
-In file included from src/7.1/cc/cc.c:26:
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:47: note: macro "va_start" defined here
-   47 | #define va_start(v,l)   __builtin_va_start(v,l)
-      | 
-src/7.1/cc/cc.c:9253:25: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
- 9253 | void mklist(list* arg0) {
-      |                         ^
-src/7.1/cc/cc.c:9269:5: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘list’
- 9269 |     list* arg0;
-      |     ^~~~
-src/7.1/cc/cc.c:9270:11: error: declaration for parameter ‘str’ but no such parameter
- 9270 |     char* str;
-      |           ^~~
-src/7.1/cc/cc.c:9273:10: error: ‘arg0’ undeclared (first use in this function)
- 9273 |     if ((arg0->length + 1) >= arg0->capacity) {
-      |          ^~~~
+src/7.1/cc/cc.c: In function ‘mklist’:
+src/7.1/cc/cc.c:9256:21: error: ‘sys_nerr’ undeclared (first use in this function)
+ 9256 |         if (errno < sys_nerr) {
+      |                     ^~~~~~~~
+src/7.1/cc/cc.c:9257:48: error: ‘sys_errlist’ undeclared (first use in this function)
+ 9257 |             error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+      |                                                ^~~~~~~~~~~
+src/7.1/cc/cc.c: In function ‘addstr’:
 src/7.1/cc/cc.c:9276:25: error: ‘sys_nerr’ undeclared (first use in this function)
  9276 |             if (errno < sys_nerr) {
       |                         ^~~~~~~~
