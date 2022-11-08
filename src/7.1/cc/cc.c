@@ -5194,14 +5194,9 @@ void parse_command(int argc, char** argv) {
                     if (argv[var_s0][2] == '\0') {
                         if ((var_s0 + 1) < argc) {
                             char* sp140;
-                            // TODO: work out where these should actually go
                             int pad[2];
 
-                            if (0) {
-                                (void)"-D taken as empty cpp -D, not ld(1) -D hexnum\n";
-                                (void)"-D";
-                                (void)"ld requires -D to have an argument\n";
-                            }
+                            if (0) {}
                             sp140 = malloc(strlen(argv[var_s0 + 1]) + 3);
                             sp140[0] = '-';
                             sp140[1] = 'D';
@@ -5215,6 +5210,17 @@ void parse_command(int argc, char** argv) {
                     addstr(&undefineflags, argv[var_s0]);
                     add_static_opt(argv[var_s0]);
                     break;
+
+                    if (0) {
+                        // TODO: work out where these should actually go
+                        // There needs to be a mention of strtoul here for the symbol
+                        // table to end up in the right order (after the first call to
+                        // add_static_opt, but before full_path).
+                        (void)"-D taken as empty cpp -D, not ld(1) -D hexnum\n";
+                        (void)"-D";
+                        (void)"ld requires -D to have an argument\n";
+                        strtoul(sp15C, &sp15C, 16);
+                    }
 
                 case 'E': /* switch 1 */
                     // -E
