@@ -144,39 +144,39 @@ typedef int UNK_TYPE;
 /* 041448 1000A448 */ list uldflags;                           // line 243
                                                                // 0x4 padding
 /* 041458 1000A458 */ static char B_1000A458[0x08];
-/* 041460 1000A460 */ list usplitflags; // line 245
-                                        // 0x4 padding
-/* 041470 1000A470 */ list umergeflags; // line 247
-                                        // 0x4 padding
-/* 041480 1000A480 */ list uloopflags;  // line 249
-/* 04148C 1000A48C */ static char B_1000A48C[0x04];
-/* 041490 1000A490 */ list uopt0flags; // line 253
-/* 04149C 1000A49C */ static char B_1000A49C[0x04];
-/* 0414A0 1000A4A0 */ list ddoptflags; // line 266
-                                       // 0x4 padding
-/* 0414B0 1000A4B0 */ list optflags;   // line 269
-                                       // 0x4 padding
-/* 0414C0 1000A4C0 */ list genflags;   // line 271
-                                       // 0x4 padding
-/* 0414D0 1000A4D0 */ list asflags;    // line 273
-                                       // 0x4 padding
-/* 0414E0 1000A4E0 */ list ldflags;    // line 277
-                                       // 0x4 padding
-/* 0414F0 1000A4F0 */ list as1flags;   // line 275
-                                       // 0x4 padding
-/* 041500 1000A500 */ list ftocflags;  // line 282
-                                       // 0x4 padding
-/* 041510 1000A510 */ list cordflags;  // line 284
-                                       // 0x4 padding
-/* 041520 1000A520 */ list srcfiles;   // line 286
-                                       // 0x4 padding
-/* 041530 1000A530 */ list ufiles;     // line 288
-                                       // 0x4 padding
-/* 041540 1000A540 */ list objfiles;   // line 290
-                                       // 0x4 padding
-/* 041550 1000A550 */ list feedlist;   // line 292
-                                       // 0x4 padding
-/* 041560 1000A560 */ list execlist;   // line 294
+/* 041460 1000A460 */ list usplitflags;        // line 245
+                                               // 0x4 padding
+/* 041470 1000A470 */ list umergeflags;        // line 247
+                                               // 0x4 padding
+/* 041480 1000A480 */ list uloopflags;         // line 249
+/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments
+/* 041490 1000A490 */ list uopt0flags;         // line 253
+/* 04149C 1000A49C */ static char* B_1000A49C; // string containing "-o" arguments
+/* 0414A0 1000A4A0 */ list ddoptflags;         // line 266
+                                               // 0x4 padding
+/* 0414B0 1000A4B0 */ list optflags;           // line 269
+                                               // 0x4 padding
+/* 0414C0 1000A4C0 */ list genflags;           // line 271
+                                               // 0x4 padding
+/* 0414D0 1000A4D0 */ list asflags;            // line 273
+                                               // 0x4 padding
+/* 0414E0 1000A4E0 */ list ldflags;            // line 277
+                                               // 0x4 padding
+/* 0414F0 1000A4F0 */ list as1flags;           // line 275
+                                               // 0x4 padding
+/* 041500 1000A500 */ list ftocflags;          // line 282
+                                               // 0x4 padding
+/* 041510 1000A510 */ list cordflags;          // line 284
+                                               // 0x4 padding
+/* 041520 1000A520 */ list srcfiles;           // line 286
+                                               // 0x4 padding
+/* 041530 1000A530 */ list ufiles;             // line 288
+                                               // 0x4 padding
+/* 041540 1000A540 */ list objfiles;           // line 290
+                                               // 0x4 padding
+/* 041550 1000A550 */ list feedlist;           // line 292
+                                               // 0x4 padding
+/* 041560 1000A560 */ list execlist;           // line 294
 /* 04156C 1000A56C */ static char B_1000A56C[0x04];
 /* 041570 1000A570 */ static char B_1000A570[0x08];
 /* 041578 1000A578 */ list dirs_for_crtn;           // line 299
@@ -857,8 +857,49 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
  * VROM: 0x035364
  * Size: 0x340
  */
-// int save_off_command_line();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/save_off_command_line.s")
+void save_off_command_line(int argc, char** argv) {
+    int sp3C = 0; // total length of most arguments
+    int sp38 = 0; // total length of "-o" arguments
+    bool sp34 = false;
+    int i;
+    char* sp2C; // string pointer for most arguments
+    char* sp28; // string pointer for "-o" arguments
+
+    // Find total length of arguments to add
+    for (i = 1; i < argc; i++) {
+        if ((strcmp(argv[i], "-o") == 0) && (i < (argc - 1))) { // output file argument
+            sp38 += quoted_length(argv[i], &sp34) + 1;
+            sp38 += quoted_length(argv[i + 1], &sp34) + 1;
+            i++;
+        } else {
+            sp3C += quoted_length(argv[i], &sp34) + 1;
+        }
+    }
+
+    // allocate strings for arguments.
+    B_1000A48C = sp2C = malloc(sp3C + 1);
+    if (sp38 != 0) {
+        B_1000A49C = malloc(sp38 + 1);
+    }
+
+    // copy arguments
+    for (i = 1; i < argc; i++) {
+        if ((strcmp(argv[i], "-o") == 0) && (i < (argc - 1))) {
+            sp28 = B_1000A49C; // Reset sp28 every time to only keep last "-o" argument
+            sp28 += quote_shell_arg(argv[i], sp28);
+            *sp28++ = ' ';
+            sp28 += quote_shell_arg(argv[i + 1], sp28);
+            *sp28++ = ' ';
+            *sp28 = '\0';
+            i++;
+        } else {
+            sp2C += quote_shell_arg(argv[i], sp2C);
+            *sp2C++ = ' ';
+        }
+    }
+
+    sp2C[-1] = '\0';
+}
 
 /**
  * skip_old_ii_controls
