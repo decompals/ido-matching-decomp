@@ -40,11 +40,12 @@ typedef unsigned long int uintptr_t;
 #define TO_UPPER(x) ((islower(x)) ? _toupper(x) : (x))
 
 /* File, -O1 */
+
 typedef struct {
     int capacity;
     int length;
     char** entries;
-} list;
+} string_list;
 
 #if __STDC_VERSION__ >= 201112L
 #include <stdnoreturn.h>
@@ -61,15 +62,15 @@ void newrunlib(void);
 void compose_G0_libs(const char* arg0);
 // compose_reg_libs
 // mkstr
-void mklist(list* arg0);
+void mklist(string_list* arg0);
 // addstr
-void addspacedstr(list* arg0, char* str);
+void addspacedstr(string_list* arg0, char* str);
 char* newstr(const char* src);
-int save_place(list* arg0);
-void set_place(list* arg0, char* str, int place);
-void addlist(list* arg0, list* arg1);
-void adduldlist(list* arg0, list* arg1, list* arg2);
-int nodup(list* arg0, const char* str);
+int save_place(string_list* arg0);
+void set_place(string_list* arg0, char* str, int place);
+void addlist(string_list* arg0, string_list* arg1);
+void adduldlist(string_list* arg0, string_list* arg1, string_list* arg2);
+int nodup(string_list* arg0, const char* str);
 char getsuf(const char* path);
 char* mksuf(const char* path, char value);
 char* savestr(const char* src, size_t extra_length);
@@ -98,7 +99,7 @@ char* full_path(const char* relative_path);
 void add_static_opt(char* opt);
 void record_static_fileset(const char* arg0);
 int touch(const char* arg0);
-void add_prelinker_objects(list* arg0, list* arg1);
+void add_prelinker_objects(string_list* arg0, string_list* arg1);
 // quoted_length
 // quote_shell_arg
 static void func_00431A3C(int argc, char** argv);
@@ -119,7 +120,7 @@ static char* func_00433534(const char* arg0);
 #if 0
 void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
 char* mkstr(const char*, ...);
-void addstr(list* arg0, char* str);
+void addstr(string_list* arg0, char* str);
 #else
 void error();  // variadic but not defined as such
 char* mkstr(); // old-style varargs
@@ -305,67 +306,67 @@ int crtn_required =
     TRUE; //!< flag, boolean. On by default, unset by "-crt0", set by "-crt1", ANSICHOICE_ANSI and ANSICHOICE_ANSIPOSIX
 char* CRTX;
 char* MCRTX;
-list undefineflags;
-list cppflags;
-list olimitflags;
-list acppflags;
-list mpcflags;
-list accomflags;
-list cfeflags;
-list cpp2flags;
-list uldlibflags;
-list edisonflags;
-list prelinkerflags;
-list ccomflags;
-list upasflags;
-list fcomflags;
-list eflflags;
-list ratforflags;
-list upl1flags;
-list ucobflags;
-list ulpiflags;
-list ujoinflags;
-list uldflags;
-list usplitflags;
-list umergeflags;
-list uloopflags;
-list uopt0flags;
-list ddoptflags;
-list optflags;
-list genflags;
-list asflags;
-list as1flags;
-list ldflags;
-list nldflags;
-list ftocflags;
-list cordflags;
-list srcfiles;
-list ufiles;
-list objfiles;
-list feedlist;
-list execlist;
-list dashlfiles;
+string_list undefineflags;
+string_list cppflags;
+string_list olimitflags;
+string_list acppflags;
+string_list mpcflags;
+string_list accomflags;
+string_list cfeflags;
+string_list cpp2flags;
+string_list uldlibflags;
+string_list edisonflags;
+string_list prelinkerflags;
+string_list ccomflags;
+string_list upasflags;
+string_list fcomflags;
+string_list eflflags;
+string_list ratforflags;
+string_list upl1flags;
+string_list ucobflags;
+string_list ulpiflags;
+string_list ujoinflags;
+string_list uldflags;
+string_list usplitflags;
+string_list umergeflags;
+string_list uloopflags;
+string_list uopt0flags;
+string_list ddoptflags;
+string_list optflags;
+string_list genflags;
+string_list asflags;
+string_list as1flags;
+string_list ldflags;
+string_list nldflags;
+string_list ftocflags;
+string_list cordflags;
+string_list srcfiles;
+string_list ufiles;
+string_list objfiles;
+string_list feedlist;
+string_list execlist;
+string_list dashlfiles;
 
 static int B_1000ED2C; // number of times -lgl_s is passed
 static int B_1000ED30; // number of times -lc_s is passed
 
-list dirs_for_crtn;
-list dirs_for_nonshared_crtn;
-list dirs_for_abi_crtn;
-list ldZflags;
+string_list dirs_for_crtn;
+string_list dirs_for_nonshared_crtn;
+string_list dirs_for_abi_crtn;
+string_list ldZflags;
 
 static int B_1000ED74; // -no_mpc
 
-list pfaflags;
+string_list pfaflags;
 char* pfa;
 char* libI77_mp;
-list pcaflags;
+string_list pcaflags;
 char* pca = NULL;
 char* libc_mp = NULL;
-list soptflags;
+string_list soptflags;
 char* fopt = NULL;
 char* copt = NULL;
-list staticopts;
+string_list staticopts;
 
 static int D_1000BF74 = FALSE;  //!< flag, boolean. Whether to perform static analysis. Set by "-sa".
 static int D_1000BF78 = FALSE;  //!< flag, boolean. Static analysis, no source. Set by "-sa,nosrc".
@@ -9795,8 +9796,8 @@ va_dcl // K&R syntax
 #define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
 
 // function mklist # 13
-// Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
-void mklist(list* arg0) {
+// Initialise a specified string_list with capacity LIST_INITIAL_CAPACITY and length 0.
+void mklist(string_list* arg0) {
     if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
         error(ERRORCAT_ERROR, NULL, 0, "mklist ()", 14561, "out of memory\n");
         if (errno < sys_nerr) {
@@ -9814,7 +9815,7 @@ void mklist(list* arg0) {
 // Called incorrectly.
 void addstr(arg0, str)
     // clang-format off
-    list* arg0;
+    string_list* arg0;
     char* str;
 // clang-format on
 {
@@ -9835,12 +9836,12 @@ void addstr(arg0, str)
 
 // function addspacedstr # 15
 /**
- * Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
+ * Add a space-separated string to a string_list, dividing it up into separate entries by space characters (' ')
  *
  * @param arg0 List to add the entries to
  * @param str Space-separated string to add
  */
-void addspacedstr(list* arg0, char* str) {
+void addspacedstr(string_list* arg0, char* str) {
     char* str_end = str;
 
     do {
@@ -9887,12 +9888,12 @@ char* newstr(const char* src) {
 
 // function save_place # 17
 /**
- * Add one new uninitialised entry to a list
+ * Add one new uninitialised entry to a string_list
  *
- * @param arg0 list to add it to
+ * @param arg0 string_list to add it to
  * @return int index of new entry
  */
-int save_place(list* arg0) {
+int save_place(string_list* arg0) {
     int new_entry_index;
 
     if ((arg0->length + 1) >= arg0->capacity) {
@@ -9914,13 +9915,13 @@ int save_place(list* arg0) {
 
 // function set_place # 18
 /**
- * Set a specified entry of a list to a particular string
+ * Set a specified entry of a string_list to a particular string
  *
- * @param arg0 list to set entry of
+ * @param arg0 string_list to set entry of
  * @param str string to set entry to
  * @param place entry to write to
  */
-void set_place(list* arg0, char* str, int place) {
+void set_place(string_list* arg0, char* str, int place) {
     if ((place < 0) || (place >= arg0->length)) {
         error(ERRORCAT_INTERNAL, NULL, 0, "set_place ()", 14726, "place out of range");
         exit(1);
@@ -9930,7 +9931,7 @@ void set_place(list* arg0, char* str, int place) {
 
 // function addlist # 19
 // Append all the entries in arg1 to arg0.
-void addlist(list* arg0, list* arg1) {
+void addlist(string_list* arg0, string_list* arg1) {
     int i;
 
     if ((arg0->length + arg1->length + 1) >= arg0->capacity) {
@@ -9960,7 +9961,7 @@ void addlist(list* arg0, list* arg1) {
  * - then everything from arg1,
  * - then the rest of arg2.
  */
-void adduldlist(list* arg0, list* arg1, list* arg2) {
+void adduldlist(string_list* arg0, string_list* arg1, string_list* arg2) {
     int sp3C;
     int sp38;
 
@@ -10002,11 +10003,11 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 
 // function nodup # 21
 /**
- * Search for a string in a list.
+ * Search for a string in a string_list.
  *
  * return int boolean, TRUE if not found
  */
-int nodup(list* arg0, const char* str) {
+int nodup(string_list* arg0, const char* str) {
     register int i;
     register char* entry;
 
@@ -11215,7 +11216,7 @@ int touch(const char* arg0) {
 }
 
 // function add_prelinker_objects # 50
-void add_prelinker_objects(list* arg0, list* arg1) {
+void add_prelinker_objects(string_list* arg0, string_list* arg1) {
     int i;
 
     for (i = 0; i < arg1->length; i++) {

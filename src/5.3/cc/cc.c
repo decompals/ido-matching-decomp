@@ -1,22 +1,48 @@
+/**
+ * @file cc.c
+ * @brief Compiler driver for IDO 5.3 (or 3.19 as it styles itself internally)
+ *
+ * This file incorporates code from Open64's Osprey driver, version 0.13.0, licensed under GPL Version 2
+ */
 #include "sys/types.h"
 #include "stdio.h"
 #include "errno.h"
 #include "string.h"
 #include "malloc.h"
+#include "sys/times.h"
+
+/**
+ * list of strings, implemented as vector.
+ *
+ * @note By Open64 the implementation had become a linked string_list. We write the type as `string_list` instead of
+ * `string_list_t` to distinguish them.
+ */
+
+typedef int UNK_TYPE;
+
+/* basics.h */
+
+typedef int boolean;
+#define FALSE 0
+#define TRUE 1
+typedef char* string;
+typedef char buffer_t[0x200];
+#define NIL '\0'
+
+/* string_utils.h */
+
+/* return true if strings are identical */
+#define same_string(x, y) (strcmp(x, y) == 0)
+#define same_string_prefix(x, y) (strncmp(x, y, strlen(y)) == 0)
+
+/* return true if sub string is contained in s string */
+#define contains_substring(s, sub) (strstr(s, sub) != NULL)
 
 typedef struct {
     int capacity;
     int length;
-    char** entries;
-} list;
-
-typedef int UNK_TYPE;
-
-#if !defined(bool) || !defined(true) || !defined(false)
-#define bool boolean_t
-#define true B_TRUE
-#define false B_FALSE
-#endif
+    string* entries;
+} string_list;
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
@@ -98,104 +124,104 @@ typedef int UNK_TYPE;
 /* 041254 1000A254 */ char* CRTX;                              // line 198
 /* 041258 1000A258 */ char* MCRTX;                             // line 200
 /* 04125C 1000A25C */ char* comp_target_root;                  // line 222
-/* 041260 1000A260 */ list undefineflags;                      // line 202
+/* 041260 1000A260 */ string_list undefineflags;               // line 202
 /* 04126C 1000A26C */ char* comp_host_root;                    // line 261
-/* 041270 1000A270 */ list cppflags;                           // line 204
+/* 041270 1000A270 */ string_list cppflags;                    // line 204
 /* 04127C 1000A27C */ char* systype;                           // line 226
-/* 041280 1000A280 */ list olimitflags;                        // line 206
+/* 041280 1000A280 */ string_list olimitflags;                 // line 206
 /* 04128C 1000A28C */ int nonshared;                           // line 228
-/* 041290 1000A290 */ list acppflags;                          // line 208
+/* 041290 1000A290 */ string_list acppflags;                   // line 208
                                                                // 0x4 padding
-/* 0412A0 1000A2A0 */ list mpcflags;                           // line 210
+/* 0412A0 1000A2A0 */ string_list mpcflags;                    // line 210
                                                                // 0x4 padding
-/* 0412B0 1000A2B0 */ list accomflags;                         // line 212
+/* 0412B0 1000A2B0 */ string_list accomflags;                  // line 212
                                                                // 0x4 padding
-/* 0412C0 1000A2C0 */ list cfeflags;                           // line 215
+/* 0412C0 1000A2C0 */ string_list cfeflags;                    // line 215
                                                                // 0x4 padding
-/* 0412D0 1000A2D0 */ list cpp2flags;                          // line 217
+/* 0412D0 1000A2D0 */ string_list cpp2flags;                   // line 217
                                                                // 0x4 padding
-/* 0412E0 1000A2E0 */ list uldlibflags;                        // line 219
+/* 0412E0 1000A2E0 */ string_list uldlibflags;                 // line 219
                                                                // 0x4 padding
-/* 0412F0 1000A2F0 */ list edisonflags;                        // line 221
+/* 0412F0 1000A2F0 */ string_list edisonflags;                 // line 221
 /* 0412FC 1000A2FC */ char* tmpdir;                            // line 242
-/* 041300 1000A300 */ list prelinkerflags;                     // line 223
+/* 041300 1000A300 */ string_list prelinkerflags;              // line 223
 /* 04130C 1000A30C */ char* rls_id_object;                     // line 244
-/* 041310 1000A310 */ list ccomflags;                          // line 225
+/* 041310 1000A310 */ string_list ccomflags;                   // line 225
 /* 04131C 1000A31C */ char* progname;                          // line 246
-/* 041320 1000A320 */ list upasflags;                          // line 227
+/* 041320 1000A320 */ string_list upasflags;                   // line 227
 /* 04132C 1000A32C */ char* currcomp;                          // line 248
-/* 041330 1000A330 */ list fcomflags;                          // line 229
+/* 041330 1000A330 */ string_list fcomflags;                   // line 229
                                                                // 0x4 padding
 /* 041340 1000A340 */ char* compdirs[7];                       // line 251
                                                                // 0x4 padding
-/* 041360 1000A360 */ list eflflags;                           // line 231
+/* 041360 1000A360 */ string_list eflflags;                    // line 231
 /* 04136C 1000A36C */ int compiler;                            // line 264
-/* 041370 1000A370 */ list ratforflags;                        // line 233
+/* 041370 1000A370 */ string_list ratforflags;                 // line 233
                                                                // 0x4 padding
 /* 041380 1000A380 */ char* tempstr[34];                       // line 268
-/* 041408 1000A408 */ list upl1flags;                          // line 235
+/* 041408 1000A408 */ string_list upl1flags;                   // line 235
                                                                // 0x4 padding
-/* 041418 1000A418 */ list ucobflags;                          // line 237
+/* 041418 1000A418 */ string_list ucobflags;                   // line 237
                                                                // 0x4 padding
-/* 041428 1000A428 */ list ulpiflags;                          // line 239
+/* 041428 1000A428 */ string_list ulpiflags;                   // line 239
                                                                // 0x4 padding
-/* 041438 1000A438 */ list ujoinflags;                         // line 241
+/* 041438 1000A438 */ string_list ujoinflags;                  // line 241
                                                                // 0x4 padding
-/* 041448 1000A448 */ list uldflags;                           // line 243
+/* 041448 1000A448 */ string_list uldflags;                    // line 243
                                                                // 0x4 padding
 /* 041458 1000A458 */ static char B_1000A458[0x08];
-/* 041460 1000A460 */ list usplitflags;        // line 245
+/* 041460 1000A460 */ string_list usplitflags; // line 245
                                                // 0x4 padding
-/* 041470 1000A470 */ list umergeflags;        // line 247
+/* 041470 1000A470 */ string_list umergeflags; // line 247
                                                // 0x4 padding
-/* 041480 1000A480 */ list uloopflags;         // line 249
-/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments
-/* 041490 1000A490 */ list uopt0flags;         // line 253
-/* 04149C 1000A49C */ static char* B_1000A49C; // string containing "-o" arguments
-/* 0414A0 1000A4A0 */ list ddoptflags;         // line 266
+/* 041480 1000A480 */ string_list uloopflags;  // line 249
+/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments "command_line"
+/* 041490 1000A490 */ string_list uopt0flags;  // line 253
+/* 04149C 1000A49C */ static char* B_1000A49C; // string containing "-o" arguments ("output_command_line"?)
+/* 0414A0 1000A4A0 */ string_list ddoptflags;  // line 266
                                                // 0x4 padding
-/* 0414B0 1000A4B0 */ list optflags;           // line 269
+/* 0414B0 1000A4B0 */ string_list optflags;    // line 269
                                                // 0x4 padding
-/* 0414C0 1000A4C0 */ list genflags;           // line 271
+/* 0414C0 1000A4C0 */ string_list genflags;    // line 271
                                                // 0x4 padding
-/* 0414D0 1000A4D0 */ list asflags;            // line 273
+/* 0414D0 1000A4D0 */ string_list asflags;     // line 273
                                                // 0x4 padding
-/* 0414E0 1000A4E0 */ list ldflags;            // line 277
+/* 0414E0 1000A4E0 */ string_list ldflags;     // line 277
                                                // 0x4 padding
-/* 0414F0 1000A4F0 */ list as1flags;           // line 275
+/* 0414F0 1000A4F0 */ string_list as1flags;    // line 275
                                                // 0x4 padding
-/* 041500 1000A500 */ list ftocflags;          // line 282
+/* 041500 1000A500 */ string_list ftocflags;   // line 282
                                                // 0x4 padding
-/* 041510 1000A510 */ list cordflags;          // line 284
+/* 041510 1000A510 */ string_list cordflags;   // line 284
                                                // 0x4 padding
-/* 041520 1000A520 */ list srcfiles;           // line 286
+/* 041520 1000A520 */ string_list srcfiles;    // line 286
                                                // 0x4 padding
-/* 041530 1000A530 */ list ufiles;             // line 288
+/* 041530 1000A530 */ string_list ufiles;      // line 288
                                                // 0x4 padding
-/* 041540 1000A540 */ list objfiles;           // line 290
+/* 041540 1000A540 */ string_list objfiles;    // line 290
                                                // 0x4 padding
-/* 041550 1000A550 */ list feedlist;           // line 292
+/* 041550 1000A550 */ string_list feedlist;    // line 292
                                                // 0x4 padding
-/* 041560 1000A560 */ list execlist;           // line 294
+/* 041560 1000A560 */ string_list execlist;    // line 294
 /* 04156C 1000A56C */ static char B_1000A56C[0x04];
 /* 041570 1000A570 */ static char B_1000A570[0x08];
-/* 041578 1000A578 */ list dirs_for_crtn;           // line 299
-                                                    // 0x4 padding
-/* 041588 1000A588 */ list dirs_for_nonshared_crtn; // line 301
-                                                    // 0x4 padding
-/* 041598 1000A598 */ list dirs_for_abi_crtn;       // line 303
-                                                    // 0x4 padding
-/* 0415A8 1000A5A8 */ list ldZflags;                // line 305
+/* 041578 1000A578 */ string_list dirs_for_crtn;           // line 299
+                                                           // 0x4 padding
+/* 041588 1000A588 */ string_list dirs_for_nonshared_crtn; // line 301
+                                                           // 0x4 padding
+/* 041598 1000A598 */ string_list dirs_for_abi_crtn;       // line 303
+                                                           // 0x4 padding
+/* 0415A8 1000A5A8 */ string_list ldZflags;                // line 305
 /* 0415B4 1000A5B4 */ static char B_1000A5B4[0x04];
-/* 0415B8 1000A5B8 */ list pfaflags;                // line 307
+/* 0415B8 1000A5B8 */ string_list pfaflags;         // line 307
 /* 0415C4 1000A5C4 */ char* pfa;                    // line 307
 /* 0415C8 1000A5C8 */ char* libI77_mp;              // line 309
                                                     // 0x4 padding
-/* 0415D0 1000A5D0 */ list pcaflags;                // line 311
+/* 0415D0 1000A5D0 */ string_list pcaflags;         // line 311
                                                     // 0x4 padding
-/* 0415E0 1000A5E0 */ list soptflags;               // line 313
+/* 0415E0 1000A5E0 */ string_list soptflags;        // line 313
                                                     // 0x4 padding
-/* 0415F0 1000A5F0 */ list staticopts;              // line 315
+/* 0415F0 1000A5F0 */ string_list staticopts;       // line 315
                                                     // 0x4 padding
 /* 041600 1000A600 */ int __Argc;                   // line 319
 /* 041604 1000A604 */ char** __Argv;                // line 317
@@ -400,7 +426,7 @@ static const char STR_1000525C[] = "";
  */
 #define LIST_CAPACITY_INCR 20
 
-void addstr(list* arg0, char* str) {
+void addstr(string_list* arg0, string str) {
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(1, NULL, 0, "addstr()", 14174, "out of memory\n");
@@ -641,7 +667,6 @@ void addstr(list* arg0, char* str) {
 char* basename(const char*);
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/basename.s")
 
-
 /**
  * dirname
  * Address: 0x00433ED0
@@ -781,19 +806,43 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x034FB4
  * Size: 0xFC
  */
-void add_prelinker_objects(list* arg0, list* arg1) {
+// Append the `list` to `execlist`, skipping any entries that are "-B"
+void add_prelinker_objects(string_list* execlist, string_list* list) {
     int i;
 
-    for (i = 0; i < arg1->length; i++) {
-        if (arg1->entries[i][0] == '-') {
-            if (strcmp(arg1->entries[i], "-B") == 0) {
+    for (i = 0; i < list->length; i++) {
+        if (list->entries[i][0] == '-') {
+            if (same_string(list->entries[i], "-B")) {
                 i++;
             }
         } else {
-            addstr(arg0, arg1->entries[i]);
+            addstr(execlist, list->entries[i]);
         }
     }
 }
+
+/*
+ * Is "c" a character that would need quoting to the shell?
+ */
+
+#define is_shell_special(c)                                                                                           \
+    ((c) == '\'' || (c) == '|' || (c) == '&' || (c) == '*' || (c) == '?' || (c) == '[' || (c) == ']' || (c) == ';' || \
+     (c) == '!' || (c) == '(' || (c) == ')' || (c) == '^' || (c) == '<' || (c) == '>' || (c) <= ' ' || (c) == '\t' || \
+     is_shell_quote_special(c))
+
+/*
+ * Is "c" a character that would have to be \-escaped inside double-quotes?
+ *
+ * The answer to this one actually depends on the shell. Especially
+ * troublesome is '!': for csh, it *must* be \-escaped inside quotes,
+ * and for sh, it *must not* be \-escaped. sh preserves the \ if it
+ * is not quoting something significant. Sigh.
+ *
+ * However, since most "make"s and "make"-clones use /bin/sh as the shell
+ * regardless of the SHELL setting, and since system() always uses /bin/sh
+ * to execute the command, I am going to stick with whatever sh needs.
+ */
+#define is_shell_quote_special(c) ((c) == '"' || (c) == '\\' || (c) == '`' || (c) == '$')
 
 /**
  * quoted_length
@@ -801,25 +850,24 @@ void add_prelinker_objects(list* arg0, list* arg1) {
  * VROM: 0x0350B0
  * Size: 0x174
  */
-size_t quoted_length(const char* arg0, bool* arg1) {
-    size_t len = 0;
-    char ch;
+/*
+ * returns the length of the argument after inserting any required quoting
+ * characters.
+ */
+/* size_t */ int quoted_length(char* p, /* boolean */ int* quoted) {
+    /* size_t */ int len = 0;
+    char c;
 
-    *arg1 = false;
-    while (ch = *arg0++) { // != 0 does not match
-        if (!*arg1) {
-            if ((ch == '\'') || (ch == '|') || (ch == '&') || (ch == '*') || (ch == '?') || (ch == '[') ||
-                (ch == ']') || (ch == ';') || (ch == '!') || (ch == '(') || (ch == ')') || (ch == '^') || (ch == '<') ||
-                (ch == '>') || (ch <= ' ') || (ch == '\t') || (ch == '\"') || (ch == '\\') || (ch == '`') ||
-                (ch == '$')) {
-                *arg1 = true;
-                len += 2;
-            }
+    *quoted = 0;
+
+    while (c = *p++) {
+        if (!(*quoted) && is_shell_special(c)) {
+            (*quoted) = 1;
+            len += 2;
         }
-        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
+        if (is_shell_quote_special(c))
             len++;
-        }
-        len++;
+        len++; /* the character itself */
     }
     return len;
 }
@@ -830,25 +878,27 @@ size_t quoted_length(const char* arg0, bool* arg1) {
  * VROM: 0x035224
  * Size: 0x140
  */
-size_t quote_shell_arg(const char* arg0, char* arg1) {
-    char ch;
-    bool sp28 = false;
-    size_t len = quoted_length(arg0, &sp28);
+/*
+ * writes a quoted (if necessary) copy of p into the buffer pointed to
+ * by buf, and returns the length of the quoted string written.
+ */
+/* size_t */ int quote_shell_arg(/* string */ char* p, /* string */ char* buf) {
+    char c;
+    /* boolean */ int quoted = 0;
+    /* size_t */ int len;
 
-    if (sp28) {
-        *arg1++ = '"';
-    }
+    len = quoted_length(p, &quoted);
 
-    while ((ch = *arg0++)) { // != 0 does not match
-        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
-            *arg1++ = '\\';
-        }
-        *arg1++ = ch;
+    if (quoted)
+        *buf++ = '"';
+    while (c = *p++) {
+        if (is_shell_quote_special(c))
+            *buf++ = '\\';
+        *buf++ = c;
     }
+    if (quoted)
+        *buf++ = '"';
 
-    if (sp28) {
-        *arg1++ = '"';
-    }
     return len;
 }
 
@@ -859,47 +909,47 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
  * Size: 0x340
  */
 void save_off_command_line(int argc, char** argv) {
-    int sp3C = 0; // total length of most arguments
-    int sp38 = 0; // total length of "-o" arguments
-    bool sp34 = false;
+    int len = 0;   // total length of most arguments
+    int o_len = 0; // total length of "-o" arguments
+    /* boolean */ int quoted = FALSE;
     int i;
-    char* sp2C; // string pointer for most arguments
-    char* sp28; // string pointer for "-o" arguments
+    string p;   // string pointer for most arguments
+    string o_p; // string pointer for "-o" arguments
 
     // Find total length of arguments to add
     for (i = 1; i < argc; i++) {
-        if ((strcmp(argv[i], "-o") == 0) && (i < (argc - 1))) { // output file argument
-            sp38 += quoted_length(argv[i], &sp34) + 1;
-            sp38 += quoted_length(argv[i + 1], &sp34) + 1;
+        if (same_string(argv[i], "-o") && (i < (argc - 1))) { // output file argument
+            o_len += quoted_length(argv[i], &quoted) + 1;
+            o_len += quoted_length(argv[i + 1], &quoted) + 1;
             i++;
         } else {
-            sp3C += quoted_length(argv[i], &sp34) + 1;
+            len += quoted_length(argv[i], &quoted) + 1;
         }
     }
 
     // allocate strings for arguments.
-    B_1000A48C = sp2C = malloc(sp3C + 1);
-    if (sp38 != 0) {
-        B_1000A49C = malloc(sp38 + 1);
+    B_1000A48C = p = malloc(len + 1);
+    if (o_len != 0) {
+        B_1000A49C = malloc(o_len + 1);
     }
 
     // copy arguments
     for (i = 1; i < argc; i++) {
-        if ((strcmp(argv[i], "-o") == 0) && (i < (argc - 1))) {
-            sp28 = B_1000A49C; // Reset sp28 every time to only keep last "-o" argument
-            sp28 += quote_shell_arg(argv[i], sp28);
-            *sp28++ = ' ';
-            sp28 += quote_shell_arg(argv[i + 1], sp28);
-            *sp28++ = ' ';
-            *sp28 = '\0';
+        if (same_string(argv[i], "-o") && (i < (argc - 1))) {
+            o_p = B_1000A49C; // Reset `o_p` every time to only keep last "-o" argument
+            o_p += quote_shell_arg(argv[i], o_p);
+            *o_p++ = ' ';
+            o_p += quote_shell_arg(argv[i + 1], o_p);
+            *o_p++ = ' ';
+            *o_p = '\0';
             i++;
         } else {
-            sp2C += quote_shell_arg(argv[i], sp2C);
-            *sp2C++ = ' ';
+            p += quote_shell_arg(argv[i], p);
+            *p++ = ' ';
         }
     }
 
-    sp2C[-1] = '\0';
+    p[-1] = '\0';
 }
 
 /**
@@ -917,19 +967,18 @@ void save_off_command_line(int argc, char** argv) {
  * VROM: 0x035BA0
  * Size: 0x134
  */
-char* make_ii_file_name(const char* path) {
-    char* base = basename(path);
-    size_t base_len = strlen(base);
+char* make_ii_file_name(char* objname) {
+    char* base = basename(objname);
+    /* size_t */ int baselen = strlen(base);
 
     base = mkstr(base, "   ", NULL);
-    if ((base[base_len - 2] == '.') && (base[base_len - 1] == 'o')) {
-        strcpy(&base[base_len - 1], "ii");
+    if ((base[baselen - 2] == '.') && (base[baselen - 1] == 'o')) {
+        strcpy(&base[baselen - 1], "ii");
     } else {
-        strcpy(&base[base_len], ".ii");
+        strcpy(&base[baselen], ".ii");
     }
-    return mkstr(dirname(path), "/ii_files/", base, NULL);
+    return mkstr(dirname(objname), "/ii_files/", base, NULL);
 }
-
 
 /**
  * update_instantiation_info_file
