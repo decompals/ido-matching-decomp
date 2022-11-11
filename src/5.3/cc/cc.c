@@ -960,8 +960,30 @@ void set_place(string_list* list, char* str, int place) {
  * VROM: 0x030260
  * Size: 0x214
  */
-// int addlist();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/addlist.s")
+// Append the entries from `b` to `a`.
+void addlist(string_list* a, string_list* b) {
+    int i;
+
+    if ((a->length + b->length + 1) >= a->capacity) {
+
+        if ((a->entries = realloc(a->entries, (a->capacity + b->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) ==
+            NULL) {
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14332, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        a->capacity += b->capacity + LIST_CAPACITY_INCR;
+    }
+    for (i = 0; i < b->length; i++) {
+        if (b->entries[i] != NULL) {
+            a->entries[a->length] = b->entries[i];
+            a->length++;
+        }
+    }
+    a->entries[a->length] = NULL;
+}
 
 /**
  * adduldlist
