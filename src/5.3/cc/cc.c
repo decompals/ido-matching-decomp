@@ -13,7 +13,6 @@
 #include "sex.h"
 #include "unistd.h"
 
-
 /**
  * _ftext
  *
@@ -57,8 +56,6 @@
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
 
 /* Actual file starts here */
-
-
 
 typedef int UNK_TYPE;
 
@@ -544,13 +541,13 @@ static const char STR_1000061C[] = "/";
 /* 0x03734C 0x1000034C 333  */ extern UNK_TYPE excpt_flag;
 /* 0x037350 0x10000350 334  */ extern UNK_TYPE trapuv_flag;
 /* 0x037354 0x10000354 335  */ extern UNK_TYPE dmips_emit;
-/* 0x037358 0x10000358 25   */ extern UNK_TYPE Xvalues_Flag; // dynsym reorder?
-/* 0x03735C 0x1000035C 336  */ extern UNK_TYPE user_systype; // dynsym reorder?
+/* 0x037358 0x10000358 25   */ extern UNK_TYPE Xvalues_Flag;          // dynsym reorder?
+/* 0x03735C 0x1000035C 336  */ extern /* boolean */ int user_systype; // dynsym reorder?
 /* 0x037360 0x10000360 337  */ extern UNK_TYPE ddoptinfo;
 /* 0x037364 0x10000364 338  */ extern UNK_TYPE systype_seen;
 /* 0x037368 0x10000368 339  */ extern UNK_TYPE multiple_systype;
-/* 0x03736C 0x1000036C 340  */ extern UNK_TYPE systype_warn;
-/* 0x037370 0x10000370 341  */ extern UNK_TYPE svr4_systype;
+/* 0x03736C 0x1000036C 340  */ extern /* boolean */ int systype_warn;
+/* 0x037370 0x10000370 341  */ extern /* boolean */ int svr4_systype;
 /* 0x037374 0x10000374 342  */ extern UNK_TYPE c_inline;
 /* 0x037378 0x10000378 343  */ extern UNK_TYPE tfp_flag;
 /* 0x03737C 0x1000037C 344  */ extern UNK_TYPE abi_flag;
@@ -614,8 +611,82 @@ static const char STR_1000061C[] = "/";
  * VROM: 0x01BD80
  * Size: 0x570
  */
-// int process_config();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/process_config.s")
+void process_config(int argc, char** argv) {
+    register int i;
+    register char* var_s1;
+    char* sp1144 = comp_target_root;
+    char* sp1140;
+    FILE* sp113C;
+    char sp13C[0x1000]; // can be scoped
+    int sp138;
+    char* sp38[0x40];
+
+    for (i = 1; i < argc; i++) {
+        if (same_string(argv[i], "-systype")) {
+            i++;
+            if (i >= argc) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                exit(2);
+            }
+            user_systype = TRUE;
+            systype = argv[i];
+            if (same_string(systype, "svr4")) {
+                svr4_systype = TRUE;
+            } else {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
+                exit(2);
+            }
+            if (!same_string(systype, "svr4") && !same_string(systype, "bsd43") && !same_string(systype, "svr3") &&
+                !same_string(systype, "sysv") && (fopen(strcat("/", systype), "r") == NULL) && !systype_warn) {
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                      "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                systype_warn = TRUE;
+                systype = "svr3";
+            }
+            if (!svr4_systype) {
+                sp1144 = mkstr(comp_target_root, systype, "/", NULL);
+            }
+            break;
+        }
+    }
+
+    if (!user_systype) {
+        sp1144 = mkstr(comp_target_root, systype, "/", NULL);
+    }
+    user_systype = FALSE;
+    sp1140 = mkstr(sp1144, "usr/lib/", currcomp, "comp.config", NULL);
+    sp113C = fopen(sp1140, "r");
+    if (sp113C != NULL) {
+        if (1) {}
+        if (fgets(sp13C, 0x1000, sp113C) != NULL) {
+            if (sp13C[strlen(sp13C) - 1] == '\n') {
+                sp13C[strlen(sp13C) - 1] = '\0';
+            }
+            var_s1 = sp13C;
+            i = sp138 = 0;
+            while (*var_s1 != '\0') {
+                while ((*var_s1 != '\0') && ((*var_s1 == ' ') || (*var_s1 == '\t'))) {
+                    var_s1++;
+                }
+
+                if (*var_s1 != 0) {
+                    sp38[sp138] = var_s1;
+                    sp138++;
+                }
+
+                while ((*var_s1 != '\0') && (*var_s1 != ' ') && (*var_s1 != '\t')) {
+                    var_s1++;
+                }
+
+                if (*var_s1 != '\0') {
+                    *var_s1++ = '\0';
+                }
+            }
+
+            parse_command(sp138, sp38);
+        }
+    }
+}
 
 /**
  * add_info
