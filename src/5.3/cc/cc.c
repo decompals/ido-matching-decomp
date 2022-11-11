@@ -710,8 +710,59 @@ void compose_G0_libs(char* arg0) {
  * VROM: 0x02F5D8
  * Size: 0x2DC
  */
-// int compose_reg_libs();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/compose_reg_libs.s")
+void compose_reg_libs(char* arg0) {
+    for (; *arg0 != '\0'; arg0++) {
+        switch (*arg0) {
+            case 'P':
+                LibP = mkstr("libp", ".a", NULL);
+                break;
+
+            case 'E':
+                LibExc = mkstr("libexc", ".a", NULL);
+                break;
+
+            case '1':
+                LibPl1 = mkstr("libpl1", ".a", NULL);
+                break;
+
+            case 'C':
+                LibCob = mkstr("libcob", ".a", NULL);
+                break;
+
+            case 'O':
+                LibSort = mkstr("libsort", ".a", NULL);
+                break;
+
+            case 'M':
+                LibM = mkstr("libm", ".a", NULL);
+                break;
+
+            case 'F':
+                LibF77 = mkstr("libF77", ".a", NULL);
+                break;
+
+            case 'I':
+                LibI77 = mkstr("libI77", ".a", NULL);
+                break;
+
+            case 'U':
+                LibU77 = mkstr("libU77", ".a", NULL);
+                break;
+
+            case 'S':
+                LibIsam = mkstr("libisam", ".a", NULL);
+                break;
+
+            case 'n':
+                LibProf1 = mkstr("libprof", ".a", NULL);
+                break;
+
+            case 'X':
+                LibXmalloc = mkstr("libxmalloc", ".a", NULL);
+                break;
+        }
+    }
+}
 
 /**
  * mkstr
