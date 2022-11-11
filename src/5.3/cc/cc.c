@@ -57,8 +57,8 @@ typedef enum ErrorCategory {
     /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
 } ErrorCategory;
 
-// void error();
-void error(ErrorCategory category, const char* arg1, int arg2, const char* arg3, int arg4, const char* fmt, ...);
+void error(); // Called incorrectly
+// void error(ErrorCategory category, const char* arg1, int arg2, const char* arg3, int arg4, const char* fmt, ...);
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
@@ -779,6 +779,12 @@ void compose_reg_libs(char* arg0) {
     }
 }
 
+// Defines from Open64 string_utils.c. TODO: decide whether to use them.
+#define BLANK ' '
+#define DOT '.'
+#define SLASH '/'
+#define PERCENT '%'
+
 /**
  * mkstr
  * Address: 0x0042F8B4
@@ -876,8 +882,24 @@ void addspacedstr(string_list* list, char* str) {
  * VROM: 0x02FF74
  * Size: 0xA4
  */
-// int newstr();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/newstr.s")
+/**
+ * Copy a string
+ *
+ * @param s string to copy
+ * @return char* mallocked pointer to copy
+ * @note Similar to `string_copy` in Open64 `string_utils.c`
+ */
+char* newstr(char* s) {
+    char* new = malloc(strlen(s) + 1);
+
+    if (new != NULL) {
+        strcpy(new, s);
+    } else {
+        //! @bug Called incorrectly (fixed in 7.1)
+        error("newstr: unable to malloc for string %s\n", s);
+    }
+    return new;
+}
 
 /**
  * save_place
