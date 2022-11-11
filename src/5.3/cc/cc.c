@@ -1042,8 +1042,23 @@ void adduldlist(string_list* a, string_list* b, string_list* c) {
  * VROM: 0x0307F8
  * Size: 0xBC
  */
-// int nodup();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/nodup.s")
+/**
+ * Search for a string in a string_list.
+ *
+ * @return int boolean, TRUE if not found
+ */
+/* boolean */ int nodup(string_list* list, const /* string */ char* s) {
+    register int i;
+    register char* entry;
+
+    for (i = 0; i < list->length; i++) {
+        entry = list->entries[i];
+        if ((entry != NULL) && same_string(entry, s)) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
 
 /**
  * getsuf
