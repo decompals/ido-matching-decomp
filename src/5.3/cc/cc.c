@@ -939,8 +939,20 @@ int save_place(string_list* list) {
  * VROM: 0x03019C
  * Size: 0xC4
  */
-// int set_place();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/set_place.s")
+/**
+ * Set a specified entry of a string_list to a particular string
+ *
+ * @param list string_list to set entry of
+ * @param str string to set entry to
+ * @param place entry to write to
+ */
+void set_place(string_list* list, char* str, int place) {
+    if ((place < 0) || (place >= list->length)) {
+        error(ERRORCAT_INTERNAL, NULL, 0, "set_place ()", 14302, "place out of range");
+        exit(1);
+    }
+    list->entries[place] = str;
+}
 
 /**
  * addlist
