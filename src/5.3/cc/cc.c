@@ -1449,8 +1449,10 @@ void mktempstr(void) {
  * VROM: 0x033218
  * Size: 0x48
  */
-// int handler();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/handler.s")
+void handler(void) {
+    cleanup();
+    exit(3);
+}
 
 /**
  * cleanup
