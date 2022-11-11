@@ -296,7 +296,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037000 0x10000000 161  */ extern UNK_TYPE alternate_fe;
 /* 0x037004 0x10000004 162  */ extern UNK_TYPE ansichoice;
 /* 0x037008 0x10000008 163  */ extern UNK_TYPE c_compiler_choice;
-/* 0x03700C 0x1000000C 164  */ struct _struct_suffixes_0x8 suffixes[];
+/* 0x03700C 0x1000000C 164  */ extern struct _struct_suffixes_0x8 suffixes[];
 /* 0x037084 0x10000084 165  */ extern UNK_TYPE include;
 /* 0x037088 0x10000088 166  */ extern UNK_TYPE includeB;
 /* 0x03708C 0x1000008C 167  */ extern UNK_TYPE einclude;
@@ -1092,7 +1092,7 @@ void adduldlist(string_list* a, string_list* b, string_list* c) {
  * @param path path to find the extension of
  * @return char path's extension or special case (see enum)
  */
-char getsuf(const char* path) {
+char getsuf(const /* string */ char* path) {
     int basename_len = 0;
     int i;
     char ch;
@@ -1170,8 +1170,20 @@ char getsuf(const char* path) {
  * VROM: 0x030EBC
  * Size: 0x140
  */
-// int savestr();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/savestr.s")
+// Copy a string, adding extra_length bytes to the allocation.
+/* string */ char* savestr(const /* string */ char* src, int extra_length) {
+    char* dest = malloc(strlen(src) + extra_length + 1);
+
+    if (dest == NULL) {
+        error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 0x38FE, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+    }
+    strcpy(dest, src);
+    return dest;
+}
 
 /**
  * mktempstr
