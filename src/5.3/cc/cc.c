@@ -60,6 +60,22 @@ typedef enum ErrorCategory {
 void error(); // Called incorrectly
 // void error(ErrorCategory category, const char* arg1, int arg2, const char* arg3, int arg4, const char* fmt, ...);
 
+typedef enum {
+    /* 1 */ SUF_1 = 1, // PL/1
+    /* 2 */ SUF_2,     // COBOL
+    /* 3 */ SUF_3,     // ?
+    /* 4 */ SUF_4,     // ?
+    /* 5 */ SUF_5,     // ?
+    /* 6 */ SUF_6,     // C++
+    /* 7 */ SUF_7      // C
+} Suffix;
+
+// This has been totally refactored in Open64
+struct _struct_suffixes_0x8 {
+    /* 0x0 */ const char* name; // suffix as a string
+    /* 0x4 */ Suffix suffix;    // single-char code
+};                              // size = 0x8
+
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
                                                                // 0x4 padding
@@ -280,7 +296,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037000 0x10000000 161  */ extern UNK_TYPE alternate_fe;
 /* 0x037004 0x10000004 162  */ extern UNK_TYPE ansichoice;
 /* 0x037008 0x10000008 163  */ extern UNK_TYPE c_compiler_choice;
-/* 0x03700C 0x1000000C 164  */ extern UNK_TYPE suffixes;
+/* 0x03700C 0x1000000C 164  */ struct _struct_suffixes_0x8 suffixes[];
 /* 0x037084 0x10000084 165  */ extern UNK_TYPE include;
 /* 0x037088 0x10000088 166  */ extern UNK_TYPE includeB;
 /* 0x03708C 0x1000008C 167  */ extern UNK_TYPE einclude;
@@ -1066,8 +1082,78 @@ void adduldlist(string_list* a, string_list* b, string_list* c) {
  * VROM: 0x0308B4
  * Size: 0x258
  */
-// int getsuf();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/getsuf.s")
+/**
+ * Find the file extension (suffix) of a path.
+ * - Most single-letter extensions will be returned as-is (with the exception of 'C').
+ * - Most multi-letter extensions are checked in the `suffixes` table and a special value is returned.
+ * - "for" -> 'f' and "FOR" -> 'F'.
+ * - If extension is not recognised, return '\0'.
+ * .
+ * @param path path to find the extension of
+ * @return char path's extension or special case (see enum)
+ */
+char getsuf(const char* path) {
+    int basename_len = 0;
+    int i;
+    char ch;
+    const char* str = path;
+
+    // Look for the start of the path's basename and find its length.
+    while (ch = *path++) { // != '\0'
+        if (ch == '/') {
+            basename_len = 0;
+            str = path;
+        } else {
+            basename_len++;
+        }
+    }
+    // `path` now points to after the trailing '\0'
+
+    // no room for a suffix
+    if (basename_len <= 2) {
+        return '\0';
+    }
+
+    // Single-letter suffix
+    if (path[-3] == '.') {
+        if (path[-2] == 'C') { // "*.C"
+            return 6;
+        } else { // Any other single letter
+            return path[-2];
+        }
+    }
+
+    // Multi-letter suffix, look backwards through basename for the last '.'
+    for (i = basename_len - 2; i > 0; i--) {
+        if (str[i] == '.') {
+            break;
+        }
+    }
+
+    // if no '.' found, no suffix.
+    if (i == 0) {
+        return '\0';
+    }
+
+    // Search table for suffix.
+    str = &str[i + 1];
+    for (i = 0; suffixes[i].name != NULL; i++) {
+        if (same_string(str, suffixes[i].name)) {
+            return suffixes[i].suffix;
+        }
+    }
+
+    // Special case for "for"/"FOR".
+    if (same_string(str, "for")) {
+        return 'f';
+    }
+    if (same_string(str, "FOR")) {
+        return 'F';
+    }
+
+    // Suffix not recognised.
+    return '\0';
+}
 
 /**
  * mksuf
