@@ -177,7 +177,7 @@ typedef struct {
 /* 041480 1000A480 */ string_list uloopflags;  // line 249
 /* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments "command_line"
 /* 041490 1000A490 */ string_list uopt0flags;  // line 253
-/* 04149C 1000A49C */ static char* B_1000A49C; // string containing "-o" arguments ("output_command_line"?)
+/* 04149C 1000A49C */ static char* B_1000A49C; // string containing last "-o" argument ("outfile")
 /* 0414A0 1000A4A0 */ string_list ddoptflags;  // line 266
                                                // 0x4 padding
 /* 0414B0 1000A4B0 */ string_list optflags;    // line 269
@@ -406,11 +406,11 @@ static const char STR_1000061C[] = "/";
 /* 0x0372AC 0x100002AC 295  */ extern UNK_TYPE oldccomflag;
 /* 0x0372B0 0x100002B0 296  */ extern UNK_TYPE oldcflag;
 /* 0x0372B4 0x100002B4 297  */ extern UNK_TYPE oldcppflag;
-/* 0x0372B8 0x100002B8 23   */ extern UNK_TYPE fflag; // dynsym reorder?
+/* 0x0372B8 0x100002B8 23   */ extern UNK_TYPE fflag;  // dynsym reorder?
 /* 0x0372BC 0x100002BC 298  */ extern UNK_TYPE tpflag; // dynsym reorder?
 /* 0x0372C0 0x100002C0 299  */ extern UNK_TYPE ddoptflag;
 /* 0x0372C4 0x100002C4 300  */ extern UNK_TYPE uopt0flag;
-/* 0x0372C8 0x100002C8 24   */ extern UNK_TYPE protoflag; // dynsym reorder?
+/* 0x0372C8 0x100002C8 24   */ extern UNK_TYPE protoflag;   // dynsym reorder?
 /* 0x0372CC 0x100002CC 301  */ extern UNK_TYPE kminabiflag; // dynsym reorder?
 /* 0x0372D0 0x100002D0 302  */ extern UNK_TYPE kpicopt_flag;
 /* 0x0372D4 0x100002D4 303  */ extern UNK_TYPE nokpicopt_flag;
@@ -490,8 +490,8 @@ static const char STR_1000061C[] = "/";
 /* 0x037424 0x10000424 375  */ extern UNK_TYPE irix4;
 /* 0x037428 0x10000428 376  */ extern UNK_TYPE runlib;
 /* 0x03742C 0x1000042C 377  */ extern UNK_TYPE runlib_base;
-/* 0x037430 0x10000430 None */ /* static */ extern UNK_TYPE D_10000430;
-/* 0x037438 0x10000438 None */ /* static */ extern UNK_TYPE D_10000438;
+/* 0x037430 0x10000430 None */ /* static */ extern int D_10000430;
+/* 0x037438 0x10000438 None */ /* static */ extern int D_10000438; // current working directory
 /* 0x03743C 0x1000043C 378  */ extern UNK_TYPE run_sopt;
 /* 0x037440 0x10000440 None */ /* static */ extern UNK_TYPE D_10000440;
 /* 0x037444 0x10000444 None */ /* static */ extern UNK_TYPE D_10000444;
@@ -499,7 +499,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037460 0x10000460 379  */ extern UNK_TYPE prod_name;
 /* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
-/* 0x037558 0x10000558 None */ /* static */ extern UNK_TYPE D_10000558;
+/* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name
 
 /**
  * _ftext
@@ -1226,8 +1226,74 @@ char* make_ii_file_name(char* objname) {
  * VROM: 0x035CD4
  * Size: 0x5F8
  */
-// int update_instantiation_info_file();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/update_instantiation_info_file.s")
+/*
+ * The actual function that updates the instantiation information
+ * in the .ii file.
+ */
+void update_instantiation_info_file(char* objname) {
+    char* ii_file_name = make_ii_file_name(objname);
+    char* new_ii_file_name = mkstr(ii_file_name, ".NEW", NULL);
+    FILE* old_ii = fopen(ii_file_name, "r");
+    FILE* new_ii;
+    int c;
+
+    if (old_ii != NULL) {
+        /* There is an existing .ii file (may be empty) */
+        /* need to update that file! */
+
+        init_curr_dir();
+        if (vflag) {
+            fprintf(stderr, "%s: update_instantiation_info_file %s\n", D_10000558, ii_file_name);
+        }
+
+        new_ii = fopen(new_ii_file_name, "w");
+        if (new_ii == NULL) {
+            /* could not open the (new) file: permission problem in
+             * directory? */
+            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", new_ii_file_name);
+            perror(D_10000558);
+            cleanup();
+            exit(1);
+        }
+
+        /*
+         * skip over the existing control information (upto the standard
+         * separator), if any.
+         */
+        skip_old_ii_controls(old_ii);
+
+        /*
+         * Now, write out the new control information. For now, we have
+         * only two lines:
+         * CMDLINE=<compiler name> <quote-protected command-line arguments>
+         * PWD=<current working directory>
+         */
+        // Became a separate function by 7.1
+        fprintf(new_ii, "CMDLINE=%s %s%s%s\n", progname, (((srcfiles.length == 1) && (cflag == 0)) ? "-c " : ""),
+                ((((srcfiles.length == 1) && (cflag == 0)) || (B_1000A49C == NULL)) ? "" : B_1000A49C), B_1000A48C);
+        fprintf(new_ii, "PWD=%s\n", D_10000438);
+        fprintf(new_ii, "----\n");
+
+        /* Now copy over the remainder of the old file. */
+        while ((c = getc(old_ii)) != EOF) {
+            putc(c, new_ii);
+        }
+
+        /* Rename the new file to replace the existing .ii file */
+        fclose(old_ii);
+        fclose(new_ii);
+        if (rename(new_ii_file_name, ii_file_name) < 0) {
+            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", new_ii_file_name,
+                  ii_file_name);
+            perror(D_10000558);
+            cleanup();
+            exit(1);
+        }
+    }
+
+    free(ii_file_name);
+    free(new_ii_file_name);
+}
 
 /**
  * func_004362CC

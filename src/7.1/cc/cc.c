@@ -11318,7 +11318,9 @@ static void func_00431B38(int first, int count) {
 
 // function func_00431B88 # 55
 
-// arg2 is verbosity?
+// static void write_command_string_into_file(FILE *cmdfile,
+// 					   char *sourcefile,
+// 					   int for_ii_file)
 static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
     if (arg2) {
         fputs("CMDLINE=", arg0);
