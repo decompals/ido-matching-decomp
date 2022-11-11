@@ -139,6 +139,12 @@ typedef enum CCompilerChoice {
     /* 3 */ C_COMPILER_CHOICE_3  // "DCC" (Delta/C++)
 } CCompilerChoice;
 
+typedef enum EditFlag {
+    /* 0 */ EDIT_FLAG_0, //!< E
+    /* 1 */ EDIT_FLAG_1, //!< "-edit[0-9]"
+    /* 2 */ EDIT_FLAG_2  //!< "-edit[0-9]" and environment variable for EDITOR contains "emacs"
+} EditFlag;
+
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
                                                                // 0x4 padding
@@ -215,7 +221,7 @@ typedef enum CCompilerChoice {
 /* 041244 1000A244 */ int times_edited;                        // line 207
 /* 041248 1000A248 */ int edit_cnt_max;                        // line 209
 /* 04124C 1000A24C */ char srcsuf;                             // line 213
-/* 041250 1000A250 */ int tmpst;                               // line 216
+/* 041250 1000A250 */ /* boolean */ int tmpst;                 // line 216
 /* 041254 1000A254 */ char* CRTX;                              // line 198
 /* 041258 1000A258 */ char* MCRTX;                             // line 200
 /* 04125C 1000A25C */ char* comp_target_root;                  // line 222
@@ -460,7 +466,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037208 0x10000208 None */ /* static */ extern UNK_TYPE D_10000208;
 /* 0x03720C 0x1000020C None */ /* static */ extern UNK_TYPE D_1000020C;
 /* 0x037210 0x10000210 None */ /* static */ extern UNK_TYPE D_10000210;
-/* 0x037214 0x10000214 257  */ extern UNK_TYPE Eflag;
+/* 0x037214 0x10000214 257  */ extern /* boolean */ int Eflag;
 /* 0x037218 0x10000218 258  */ extern UNK_TYPE Pflag;
 /* 0x03721C 0x1000021C 259  */ extern UNK_TYPE gflag;
 /* 0x037220 0x10000220 260  */ extern UNK_TYPE pflag;
@@ -471,7 +477,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037234 0x10000234 265  */ extern UNK_TYPE vflag;
 /* 0x037238 0x10000238 266  */ extern UNK_TYPE execute_flag;
 /* 0x03723C 0x1000023C 267  */ extern /* boolean */ int Vflag;
-/* 0x037240 0x10000240 268  */ extern UNK_TYPE Kflag;
+/* 0x037240 0x10000240 268  */ extern /* boolean */ int Kflag;
 /* 0x037244 0x10000244 269  */ extern UNK_TYPE minus_M;
 /* 0x037248 0x10000248 270  */ extern UNK_TYPE anachronisms;
 /* 0x03724C 0x1000024C 271  */ extern UNK_TYPE disable_inlines;
@@ -497,7 +503,7 @@ static const char STR_1000061C[] = "/";
 /* 0x03729C 0x1000029C 291  */ extern UNK_TYPE unrollflag;
 /* 0x0372A0 0x100002A0 292  */ extern UNK_TYPE libm_spec;
 /* 0x0372A4 0x100002A4 293  */ extern UNK_TYPE libfastm_spec;
-/* 0x0372A8 0x100002A8 294  */ extern UNK_TYPE editflag;
+/* 0x0372A8 0x100002A8 294  */ extern EditFlag editflag;
 /* 0x0372AC 0x100002AC 295  */ extern UNK_TYPE oldccomflag;
 /* 0x0372B0 0x100002B0 296  */ extern UNK_TYPE oldcflag;
 /* 0x0372B4 0x100002B4 297  */ extern UNK_TYPE oldcppflag;
@@ -577,7 +583,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037404 0x10000404 367  */ extern UNK_TYPE runerror;
 /* 0x037408 0x10000408 368  */ extern UNK_TYPE uload;
 /* 0x03740C 0x1000040C 369  */ extern UNK_TYPE uldobj_place;
-/* 0x037410 0x10000410 370  */ extern UNK_TYPE tmp_uldobj;
+/* 0x037410 0x10000410 370  */ extern char* tmp_uldobj;
 /* 0x037414 0x10000414 371  */ extern UNK_TYPE chip_targ;
 /* 0x037418 0x10000418 372  */ extern UNK_TYPE nobjs;
 /* 0x03741C 0x1000041C 373  */ extern int targetsex;
@@ -1460,8 +1466,69 @@ void handler(void) {
  * VROM: 0x033260
  * Size: 0x3EC
  */
-// int cleanup();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/cleanup.s")
+void cleanup(void) {
+    // Do not delete any intermediates if "-K" passed.
+    if (Kflag) {
+        return;
+    }
+    if (passout != NULL) {
+        unlink(passout);
+    }
+    if (passin != NULL) {
+        char suf = getsuf(passin);
+
+        if ((suf == '\0') || ((suf != srcsuf) && (suf != 'm'))) {
+            if (!Eflag) {
+                unlink(passin);
+            }
+        }
+    }
+    if ((tmpst != 0) && (symtab != NULL)) {
+        unlink(symtab);
+    }
+    if (lpi_st != NULL) {
+        unlink(lpi_st);
+    }
+    if (lpi_p1 != NULL) {
+        unlink(lpi_p1);
+    }
+    if (lpi_pd != NULL) {
+        unlink(lpi_pd);
+    }
+    if (lpi_dd != NULL) {
+        unlink(lpi_dd);
+    }
+    if (uopt0str != NULL) {
+        unlink(uopt0str);
+    }
+    if (ddoptstr != NULL) {
+        unlink(ddoptstr);
+    }
+    if (optstr != NULL) {
+        unlink(optstr);
+    }
+    if (gentmp != NULL) {
+        unlink(gentmp);
+    }
+    if (binasm != NULL) {
+        unlink(binasm);
+    }
+    if (linkorder != NULL) {
+        unlink(linkorder);
+    }
+    if (tmp_uldobj != NULL) {
+        unlink(tmp_uldobj);
+    }
+    if (editflag != EDIT_FLAG_0) {
+        unlink(errout);
+        if (editflag == EDIT_FLAG_2) {
+            unlink(tempstr[25]);
+        }
+    }
+    if (compiler == COMPILER_1) {
+        unlink(tempstr[33]);
+    }
+}
 
 /**
  * whats
