@@ -10,6 +10,7 @@
 #include "string.h"
 #include "malloc.h"
 #include "sys/times.h"
+#include "sex.h"
 
 /**
  * list of strings, implemented as vector.
@@ -392,7 +393,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037274 0x10000274 281  */ extern UNK_TYPE cplusflag;
 /* 0x037278 0x10000278 282  */ extern UNK_TYPE ucodeflag;
 /* 0x03727C 0x1000027C 283  */ extern UNK_TYPE Bflag;
-/* 0x037280 0x10000280 284  */ extern UNK_TYPE fiveflag;
+/* 0x037280 0x10000280 284  */ extern /* boolean */ int fiveflag;
 /* 0x037284 0x10000284 285  */ extern UNK_TYPE automaticflag;
 /* 0x037288 0x10000288 286  */ extern UNK_TYPE emptyIflag;
 /* 0x03728C 0x1000028C 287  */ extern UNK_TYPE cordflag;
@@ -485,11 +486,11 @@ static const char STR_1000061C[] = "/";
 /* 0x037410 0x10000410 370  */ extern UNK_TYPE tmp_uldobj;
 /* 0x037414 0x10000414 371  */ extern UNK_TYPE chip_targ;
 /* 0x037418 0x10000418 372  */ extern UNK_TYPE nobjs;
-/* 0x03741C 0x1000041C 373  */ extern UNK_TYPE targetsex;
+/* 0x03741C 0x1000041C 373  */ extern int targetsex;
 /* 0x037420 0x10000420 374  */ extern UNK_TYPE default_svr4;
-/* 0x037424 0x10000424 375  */ extern UNK_TYPE irix4;
-/* 0x037428 0x10000428 376  */ extern UNK_TYPE runlib;
-/* 0x03742C 0x1000042C 377  */ extern UNK_TYPE runlib_base;
+/* 0x037424 0x10000424 375  */ extern /* boolean */ int irix4;
+/* 0x037428 0x10000428 376  */ extern char* runlib;
+/* 0x03742C 0x1000042C 377  */ extern char* runlib_base;
 /* 0x037430 0x10000430 None */ /* static */ extern int D_10000430;
 /* 0x037438 0x10000438 None */ /* static */ extern char* D_10000438; // current working directory (D_1000C1D0 in 7.1)
 /* 0x03743C 0x1000043C 378  */ extern UNK_TYPE run_sopt;
@@ -621,8 +622,23 @@ void get_host_chiptype(void) {
  * VROM: 0x02F1B0
  * Size: 0x11C
  */
-// int newrunlib();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/newrunlib.s")
+void newrunlib(void) {
+    if (fiveflag) {
+        runlib_base = "usr/5lib";
+    } else if (irix4) {
+        runlib_base = "/usr/irix4/";
+    } else {
+        runlib_base = "/";
+    }
+    if (gethostsex() == targetsex) {
+        runlib = runlib_base;
+    } else if (targetsex == BIGENDIAN) {
+        runlib = "eb/";
+    } else {
+        runlib = "el/";
+    }
+    relocate_passes("rP1EXCOnMFISU", NULL, NULL);
+}
 
 /**
  * compose_G0_libs
