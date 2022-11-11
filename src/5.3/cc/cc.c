@@ -1730,8 +1730,10 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x0341C8
  * Size: 0x40
  */
-// int add_cxx_symbol_options();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/add_cxx_symbol_options.s")
+int add_cxx_symbol_options(void) {
+    addstr(&execlist, "-cxx");
+    return 0;
+}
 
 /**
  * init_curr_dir
