@@ -13,12 +13,52 @@
 #include "sex.h"
 #include "unistd.h"
 
+
 /**
- * list of strings, implemented as vector.
+ * _ftext
  *
- * @note By Open64 the implementation had become a linked string_list. We write the type as `string_list` instead of
- * `string_list_t` to distinguish them.
+ * Not clear what this is, but it's a separate section if not a separate file
+ *
+ * Address: 0x00405550
+ * VROM: 0x005550
+ * Size: 0x10
  */
+// int _ftext();
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/_ftext.s")
+
+/**
+ * func_00405560
+ *
+ * This should be mips.STUBS
+ *
+ * Address: 0x00405560
+ * VROM: 0x005560
+ * Size: 0x400
+ */
+// /* static */ int func_00405560();
+#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
+
+/**
+ * __start
+ * Address: 0x00405960
+ * VROM: 0x005960
+ * Size: 0x108
+ */
+// int __start();
+#pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
+
+/**
+ * _mcount
+ * Address: 0x00405A68
+ * VROM: 0x005A68
+ * Size: 0xC8
+ */
+// int _mcount();
+#pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
+
+/* Actual file starts here */
+
+
 
 typedef int UNK_TYPE;
 
@@ -40,6 +80,12 @@ typedef char buffer_t[0x200];
 /* return true if sub string is contained in s string */
 #define contains_substring(s, sub) (strstr(s, sub) != NULL)
 
+/**
+ * list of strings, implemented as vector.
+ *
+ * @note By Open64 the implementation had become a linked string_list. We write the type as `string_list` instead of
+ * `string_list_t` to distinguish them.
+ */
 typedef struct {
     int capacity;
     int length;
@@ -552,50 +598,6 @@ static const char STR_1000061C[] = "/";
 /* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
 /* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name (D_1000C2F0 in 7.1)
-
-/**
- * _ftext
- *
- * Not clear what this is, but it's a separate section if not a separate file
- *
- * Address: 0x00405550
- * VROM: 0x005550
- * Size: 0x10
- */
-// int _ftext();
-// #pragma GLOBAL_ASM("asm/5.3/functions/cc/_ftext.s")
-
-/**
- * func_00405560
- *
- * This should be mips.STUBS
- *
- * Address: 0x00405560
- * VROM: 0x005560
- * Size: 0x400
- */
-// /* static */ int func_00405560();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
-
-/**
- * __start
- * Address: 0x00405960
- * VROM: 0x005960
- * Size: 0x108
- */
-// int __start();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
-
-/**
- * _mcount
- * Address: 0x00405A68
- * VROM: 0x005A68
- * Size: 0xC8
- */
-// int _mcount();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
-
-/* Actual file starts here */
 
 /**
  * main
