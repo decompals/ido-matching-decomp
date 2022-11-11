@@ -92,7 +92,7 @@ typedef struct {
 #define LIST_CAPACITY_INCR 20
 #define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
 
-typedef enum ErrorCategory {
+typedef enum {
     /* 0 */ ERRORCAT_INTERNAL, // Unused
     /* 1 */ ERRORCAT_ERROR,
     /* 2 */ ERRORCAT_WARNING,
@@ -470,7 +470,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037230 0x10000230 264  */ extern UNK_TYPE Oflag;
 /* 0x037234 0x10000234 265  */ extern UNK_TYPE vflag;
 /* 0x037238 0x10000238 266  */ extern UNK_TYPE execute_flag;
-/* 0x03723C 0x1000023C 267  */ extern UNK_TYPE Vflag;
+/* 0x03723C 0x1000023C 267  */ extern /* boolean */ int Vflag;
 /* 0x037240 0x10000240 268  */ extern UNK_TYPE Kflag;
 /* 0x037244 0x10000244 269  */ extern UNK_TYPE minus_M;
 /* 0x037248 0x10000248 270  */ extern UNK_TYPE anachronisms;
@@ -588,9 +588,9 @@ static const char STR_1000061C[] = "/";
 /* 0x037430 0x10000430 None */ /* static */ extern int D_10000430;
 /* 0x037438 0x10000438 None */ /* static */ extern char* D_10000438; // current working directory (D_1000C1D0 in 7.1)
 /* 0x03743C 0x1000043C 378  */ extern UNK_TYPE run_sopt;
-/* 0x037440 0x10000440 None */ /* static */ extern UNK_TYPE D_10000440;
-/* 0x037444 0x10000444 None */ /* static */ extern UNK_TYPE D_10000444;
-/* 0x037448 0x10000448 None */ /* static */ extern UNK_TYPE D_10000448;
+/* 0x037440 0x10000440 None */ /* static */ extern char* D_10000440;
+/* 0x037444 0x10000444 None */ /* static */ extern char* D_10000444;
+/* 0x037448 0x10000448 None */ /* static */ extern char* D_10000448; // Error category strings
 /* 0x037460 0x10000460 379  */ extern UNK_TYPE prod_name;
 /* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
@@ -739,8 +739,76 @@ void get_host_chiptype(void) {
  * VROM: 0x02AE94
  * Size: 0x3C0
  */
-// int error();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/error.s")
+// Print an error. Has to be K&R for the variadic stuff to work in other functions
+void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, argB)
+    // clang-format off
+    ErrorCategory category;
+    const char* arg1;
+    int arg2;
+    const char* arg3;
+    int arg4;
+    const char* fmt;
+    void* arg6;
+    void* arg7;
+    void* arg8;
+    void* arg9;
+    void* argA;
+    void* argB;
+// clang-format on
+{
+    int sp34;
+    int sp30;
+
+    if (!Vflag && (D_10000440 == NULL)) {
+        D_10000440 = strrchr(progname, '/');
+        if (D_10000440 == NULL) {
+            D_10000440 = progname;
+        } else {
+            D_10000440++;
+        }
+        sp34 = strlen(D_10000440);
+        D_10000444 = malloc(sp34 + 2);
+        if (D_10000444 == NULL) {
+            fprintf(stderr, "%s: Error: error (), %d: Out of memory\n", D_10000440, 0x3281);
+            if (errno < sys_nerr) {
+                fprintf(stderr, "%s: %s\n", D_10000440, sys_errlist[errno]);
+            }
+            exit(1);
+        }
+
+        for (sp30 = 0; sp30 < sp34; sp30++) {
+            D_10000444[sp30] = ' ';
+        }
+        D_10000444[sp30] = '\0';
+    }
+
+    if (category == ERRORCAT_ERRNO) {
+        //! @bug `D_10000444` is null if the previous block did not run.
+        fprintf(stderr, "%s: ", D_10000444);
+    } else {
+        fprintf(stderr, "%s: %s: ", D_10000440, D_10000448[category]);
+    }
+    if (arg1 != NULL) {
+        if (arg2 != 0) {
+            fprintf(stderr, "%s, line %d: ", arg1, arg2);
+        } else {
+            fprintf(stderr, "%s: ", arg1);
+        }
+    }
+
+    if (arg3 != NULL) {
+        if (arg4 != 0) {
+            fprintf(stderr, "%s, line %d: ", arg3, arg4);
+        } else {
+            fprintf(stderr, "%s: ", arg3);
+        }
+    }
+
+    if (fmt == NULL) {
+        fmt = "";
+    }
+    fprintf(stderr, fmt, arg6, arg7, arg8, arg9, argA, argB);
+}
 
 /**
  * relocate_passes
