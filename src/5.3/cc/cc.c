@@ -45,6 +45,21 @@ typedef struct {
     string* entries;
 } string_list;
 
+#define LIST_CAPACITY_INCR 20
+#define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
+
+typedef enum ErrorCategory {
+    /* 0 */ ERRORCAT_INTERNAL, // Unused
+    /* 1 */ ERRORCAT_ERROR,
+    /* 2 */ ERRORCAT_WARNING,
+    /* 3 */ ERRORCAT_INFO, // Unsued
+    /* 4 */ ERRORCAT_FIX,  // Unused
+    /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
+} ErrorCategory;
+
+// void error();
+void error(ErrorCategory category, const char* arg1, int arg2, const char* arg3, int arg4, const char* fmt, ...);
+
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
                                                                // 0x4 padding
@@ -779,8 +794,20 @@ void compose_reg_libs(char* arg0) {
  * VROM: 0x02FAC8
  * Size: 0x130
  */
-// int mklist();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/mklist.s")
+// Initialise a specified string_list with capacity LIST_INITIAL_CAPACITY and length 0.
+void mklist(string_list* list) {
+    if ((list->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
+        error(ERRORCAT_ERROR, NULL, 0, "mklist ()", 14140, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+    }
+
+    list->capacity = LIST_INITIAL_CAPACITY;
+    list->length = 0;
+    *list->entries = NULL;
+}
 
 /**
  * addstr
@@ -788,22 +815,21 @@ void compose_reg_libs(char* arg0) {
  * VROM: 0x02FBF8
  * Size: 0x194
  */
-#define LIST_CAPACITY_INCR 20
-
-void addstr(string_list* arg0, string str) {
-    if ((arg0->length + 1) >= arg0->capacity) {
-        if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
-            error(1, NULL, 0, "addstr()", 14174, "out of memory\n");
+// Add a single string entry to a string_list.
+void addstr(string_list* list, string str) {
+    if ((list->length + 1) >= list->capacity) {
+        if ((list->entries = realloc(list->entries, (list->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
+            error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14174, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
-        arg0->capacity += LIST_CAPACITY_INCR;
+        list->capacity += LIST_CAPACITY_INCR;
     }
-    arg0->entries[arg0->length] = str;
-    arg0->length++;
-    arg0->entries[arg0->length] = NULL;
+    list->entries[list->length] = str;
+    list->length++;
+    list->entries[list->length] = NULL;
 }
 
 /**
@@ -812,8 +838,37 @@ void addstr(string_list* arg0, string str) {
  * VROM: 0x02FD8C
  * Size: 0x1E8
  */
-// int addspacedstr();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/addspacedstr.s")
+/**
+ * Add a space-separated string to a string_list, dividing it up into separate entries by space characters (' ')
+ *
+ * @param list List to add the entries to
+ * @param str Space-separated string to add
+ */
+void addspacedstr(string_list* list, char* str) {
+    char* str_end = str;
+
+    do {
+        str_end = strchr(str_end, ' ');
+        if (str_end != NULL) {
+            *str_end = '\0';
+            str_end++;
+        }
+        if ((list->length + 1) >= list->capacity) {
+            if ((list->entries = realloc(list->entries, (list->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) ==
+                NULL) {
+                error(ERRORCAT_ERROR, NULL, 0, "addspacedstr()", 14218, "out of memory\n");
+                if (errno < sys_nerr) {
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                }
+                exit(1);
+            }
+            list->capacity += LIST_CAPACITY_INCR;
+        }
+        list->entries[list->length] = str;
+        list->length++;
+        list->entries[list->length] = NULL;
+    } while ((str = str_end) != NULL);
+}
 
 /**
  * newstr
@@ -1423,7 +1478,8 @@ void update_instantiation_info_file(char* objname) {
         if (new_ii == NULL) {
             /* could not open the (new) file: permission problem in
              * directory? */
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", new_ii_file_name);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n",
+                  new_ii_file_name);
             perror(D_10000558);
             cleanup();
             exit(1);
@@ -1456,8 +1512,8 @@ void update_instantiation_info_file(char* objname) {
         fclose(old_ii);
         fclose(new_ii);
         if (rename(new_ii_file_name, ii_file_name) < 0) {
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", new_ii_file_name,
-                  ii_file_name);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n",
+                  new_ii_file_name, ii_file_name);
             perror(D_10000558);
             cleanup();
             exit(1);
