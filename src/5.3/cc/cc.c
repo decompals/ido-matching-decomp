@@ -543,6 +543,8 @@ static const char STR_1000061C[] = "/";
 // int _mcount();
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
 
+/* Actual file starts here */
+
 /**
  * main
  * Address: 0x00405B30
@@ -592,8 +594,8 @@ static const char STR_1000525C[] = "";
  * VROM: 0x02AE80
  * Size: 0x14
  */
-// int get_host_chiptype();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/get_host_chiptype.s")
+void get_host_chiptype(void) {
+}
 
 /**
  * error
