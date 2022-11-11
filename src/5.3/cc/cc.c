@@ -907,8 +907,31 @@ char* newstr(char* s) {
  * VROM: 0x030018
  * Size: 0x184
  */
-// int save_place();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/save_place.s")
+/**
+ * Add one new uninitialised entry to a string_list
+ *
+ * @param list string_list to add it to
+ * @return int index of new entry
+ */
+int save_place(string_list* list) {
+    int new_entry_index;
+
+    if ((list->length + 1) >= list->capacity) {
+
+        if ((list->entries = realloc(list->entries, (list->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
+            error(ERRORCAT_ERROR, NULL, 0, "save_place()", 14271, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        list->capacity += LIST_CAPACITY_INCR;
+    }
+    new_entry_index = list->length;
+    list->length++;
+    list->entries[list->length] = NULL;
+    return new_entry_index;
+}
 
 /**
  * set_place
