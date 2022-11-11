@@ -11,6 +11,7 @@
 #include "malloc.h"
 #include "sys/times.h"
 #include "sex.h"
+#include "unistd.h"
 
 /**
  * list of strings, implemented as vector.
@@ -75,6 +76,25 @@ struct _struct_suffixes_0x8 {
     /* 0x0 */ const char* name; // suffix as a string
     /* 0x4 */ Suffix suffix;    // single-char code
 };                              // size = 0x8
+
+typedef enum Compiler {
+    /* 1 */ COMPILER_1 = 1, // C
+    /* 2 */ COMPILER_2,     // Pascal
+    /* 3 */ COMPILER_3,     // FORTRAN
+    /* 4 */ COMPILER_4,     // Assembler
+    /* 5 */ COMPILER_5,     // PL1
+    /* 6 */ COMPILER_6      // COBOL
+} Compiler;
+
+//! TODO: check
+typedef enum CCompilerChoice {
+    /* 0 */ C_COMPILER_CHOICE_0, // default, presumably "cc"
+    /* 1 */ C_COMPILER_CHOICE_1, // "ncc" (NCC but for C?)
+    /* 2 */ C_COMPILER_CHOICE_2, // "CC.eh", (C++ compiler with exception handling)
+                                 // "CC", (Ordinary C++ compiler)
+                                 // "NCC" (32-bit native C++ compiler, apparently just "CC -32")
+    /* 3 */ C_COMPILER_CHOICE_3  // "DCC" (Delta/C++)
+} CCompilerChoice;
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ int time0;                               // line 174
@@ -187,7 +207,7 @@ struct _struct_suffixes_0x8 {
 /* 041340 1000A340 */ char* compdirs[7];                       // line 251
                                                                // 0x4 padding
 /* 041360 1000A360 */ string_list eflflags;                    // line 231
-/* 04136C 1000A36C */ int compiler;                            // line 264
+/* 04136C 1000A36C */ Compiler compiler;                       // line 264
 /* 041370 1000A370 */ string_list ratforflags;                 // line 233
                                                                // 0x4 padding
 /* 041380 1000A380 */ char* tempstr[34];                       // line 268
@@ -295,7 +315,7 @@ static const char STR_1000061C[] = "/";
 
 /* 0x037000 0x10000000 161  */ extern UNK_TYPE alternate_fe;
 /* 0x037004 0x10000004 162  */ extern UNK_TYPE ansichoice;
-/* 0x037008 0x10000008 163  */ extern UNK_TYPE c_compiler_choice;
+/* 0x037008 0x10000008 163  */ extern CCompilerChoice c_compiler_choice;
 /* 0x03700C 0x1000000C 164  */ extern struct _struct_suffixes_0x8 suffixes[];
 /* 0x037084 0x10000084 165  */ extern UNK_TYPE include;
 /* 0x037088 0x10000088 166  */ extern UNK_TYPE includeB;
@@ -328,12 +348,12 @@ static const char STR_1000061C[] = "/";
 /* 0x0370F4 0x100000F4 193  */ extern UNK_TYPE btou;
 /* 0x0370F8 0x100000F8 194  */ extern UNK_TYPE utob;
 /* 0x0370FC 0x100000FC 195  */ extern UNK_TYPE patch;
-/* 0x037100 0x10000100 196  */ extern UNK_TYPE filter;
+/* 0x037100 0x10000100 196  */ extern /* string */ char* filter;
 /* 0x037104 0x10000104 197  */ extern UNK_TYPE prelinker;
 /* 0x037108 0x10000108 198  */ extern UNK_TYPE smart_build;
 /* 0x03710C 0x1000010C 199  */ extern UNK_TYPE sbrepos;
 /* 0x037110 0x10000110 200  */ extern UNK_TYPE no_prelink;
-/* 0x037114 0x10000114 201  */ extern UNK_TYPE nofilt;
+/* 0x037114 0x10000114 201  */ extern /* boolean */ int nofilt;
 /* 0x037118 0x10000118 202  */ extern UNK_TYPE force_prelink;
 /* 0x03711C 0x1000011C 203  */ extern UNK_TYPE verbose_prelink;
 /* 0x037120 0x10000120 204  */ extern UNK_TYPE auto_template_include;
@@ -1191,8 +1211,49 @@ char getsuf(const /* string */ char* path) {
  * VROM: 0x030FFC
  * Size: 0x930
  */
-// int mktempstr();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/mktempstr.s")
+void mktempstr(void) {
+    tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", NULL));
+    tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", NULL));
+    tempstr[2] = mktemp(mkstr(tmpdir, "ctmpXXXXXX", NULL));
+    tempstr[3] = mktemp(mkstr(tmpdir, "ctmfXXXXXX", NULL));
+    tempstr[4] = mktemp(mkstr(tmpdir, "ctmluXXXXXX", NULL));
+    tempstr[5] = mktemp(mkstr(tmpdir, "ctmsXXXXXX", NULL));
+    tempstr[6] = mktemp(mkstr(tmpdir, "ctmmXXXXXX", NULL));
+    tempstr[7] = mktemp(mkstr(tmpdir, "ctmoXXXXXX", NULL));
+    tempstr[8] = mktemp(mkstr(tmpdir, "ctmosXXXXXX", NULL));
+    tempstr[9] = mktemp(mkstr(tmpdir, "ctmcbXXXXXX", NULL));
+    tempstr[10] = mktemp(mkstr(tmpdir, "ctmcXXXXXX", NULL));
+    tempstr[11] = mktemp(mkstr(tmpdir, "ctmaXXXXXX", NULL));
+    tempstr[12] = mktemp(mkstr(tmpdir, "ctmbXXXXXX", NULL));
+    tempstr[13] = mktemp(mkstr(tmpdir, "ctmlXXXXXX", NULL));
+    tempstr[14] = mktemp(mkstr(tmpdir, "ctmm4XXXXXX", NULL));
+    tempstr[15] = mktemp(mkstr(tmpdir, "ctmgtXXXXXX", NULL));
+    tempstr[16] = mktemp(mkstr(tmpdir, "ctmilXXXXXX", NULL));
+    tempstr[17] = mktemp(mkstr(tmpdir, "ctmltXXXXXX", NULL));
+    tempstr[18] = mktemp(mkstr(tmpdir, "ctmp1XXXXXX", NULL));
+    tempstr[20] = mktemp(mkstr(tmpdir, "ctmpdXXXXXX", NULL));
+    tempstr[19] = mktemp(mkstr(tmpdir, "ctmddXXXXXX", NULL));
+    tempstr[21] = mktemp(mkstr(tmpdir, "ctmloXXXXXX", NULL));
+    tempstr[22] = mktemp(mkstr(tmpdir, "ctmciXXXXXX", NULL));
+    tempstr[23] = mktemp(mkstr(tmpdir, "ctmvXXXXXX", NULL));
+    tempstr[24] = mktemp(mkstr(tmpdir, "ctmerrXXXXXX", NULL));
+    tempstr[25] = mktemp(mkstr(tmpdir, "ctmemXXXXXX", NULL));
+    tempstr[26] = mktemp(mkstr(tmpdir, "ctmeXXXXXX", NULL));
+    tempstr[27] = mktemp(mkstr(tmpdir, "ctmdXXXXXX", NULL));
+    tempstr[28] = mktemp(mkstr(tmpdir, "ctmqXXXXXX", NULL));
+    tempstr[29] = mktemp(mkstr(tmpdir, "ctmqsXXXXXX", NULL));
+    tempstr[30] = mktemp(mkstr(tmpdir, "ctmelfXXXXX", NULL));
+    tempstr[31] = mktemp(mkstr(tmpdir, "ctmkXXXXXX", NULL));
+    tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", NULL));
+
+    if ((compiler == COMPILER_1) &&
+        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && !nofilt &&
+        (access(filter, EX_OK) == 0)) {
+        tempstr[32] = mktemp(mkstr(tmpdir, "ctmfiltXXXXXX", NULL));
+    } else {
+        tempstr[32] = NULL;
+    }
+}
 
 /**
  * run
