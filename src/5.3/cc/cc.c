@@ -491,7 +491,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037428 0x10000428 376  */ extern UNK_TYPE runlib;
 /* 0x03742C 0x1000042C 377  */ extern UNK_TYPE runlib_base;
 /* 0x037430 0x10000430 None */ /* static */ extern int D_10000430;
-/* 0x037438 0x10000438 None */ /* static */ extern int D_10000438; // current working directory
+/* 0x037438 0x10000438 None */ /* static */ extern char* D_10000438; // current working directory (D_1000C1D0 in 7.1)
 /* 0x03743C 0x1000043C 378  */ extern UNK_TYPE run_sopt;
 /* 0x037440 0x10000440 None */ /* static */ extern UNK_TYPE D_10000440;
 /* 0x037444 0x10000444 None */ /* static */ extern UNK_TYPE D_10000444;
@@ -499,7 +499,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037460 0x10000460 379  */ extern UNK_TYPE prod_name;
 /* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
-/* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name
+/* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name (D_1000C2F0 in 7.1)
 
 /**
  * _ftext
@@ -1001,8 +1001,25 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x034208
  * Size: 0x158
  */
-// int init_curr_dir();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/init_curr_dir.s")
+void init_curr_dir(void) {
+    if (D_10000558 == NULL) {
+        D_10000558 = strrchr(progname, '/');
+        if (D_10000558 == NULL) {
+            D_10000558 = progname;
+        } else {
+            D_10000558++;
+        }
+    }
+    if (D_10000438 == 0) {
+        D_10000438 = getcwd(NULL, 0x400);
+        if (D_10000438 == NULL) {
+            fprintf(stderr, "%s: ", D_10000558);
+            perror("full_path");
+            cleanup();
+            exit(1);
+        }
+    }
+}
 
 /**
  * full_path
@@ -1010,8 +1027,18 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x034360
  * Size: 0x90
  */
-// int full_path();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/full_path.s")
+// Make a full path name from a base file name.
+/* string */ char* full_path(/* string */ char* base) {
+    /* string */ char* path;
+
+    init_curr_dir();
+    if (*base == '/') {
+        path = mkstr(base, NULL);
+    } else {
+        path = mkstr(D_10000438, "/", base, NULL);
+    }
+    return path;
+}
 
 /**
  * add_static_opt
