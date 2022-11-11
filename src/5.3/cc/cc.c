@@ -991,8 +991,50 @@ void addlist(string_list* a, string_list* b) {
  * VROM: 0x030474
  * Size: 0x384
  */
-// int adduldlist();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/adduldlist.s")
+/**
+ * Adds entries from `b` and `c` onto the end of `a`:
+ * - up to the first NULL from `c`,
+ * - then everything from `b`,
+ * - then the rest of `c`.
+ */
+void adduldlist(string_list* a, string_list* b, string_list* c) {
+    int ic;
+    int ib;
+
+    if ((a->length + b->length + c->length + 1) >= a->capacity) {
+
+        if ((a->entries = realloc(a->entries, ((a->capacity + b->capacity + c->capacity) + LIST_CAPACITY_INCR) *
+                                                  sizeof(char*))) == NULL) {
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14371, "out of memory\n");
+            if (errno < sys_nerr) {
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            }
+            exit(1);
+        }
+        a->capacity += b->capacity + c->capacity + LIST_CAPACITY_INCR;
+    }
+
+    for (ic = 0; (ic < c->length) && (c->entries[ic] != NULL); ic++) {
+        a->entries[a->length] = c->entries[ic];
+        a->length++;
+    }
+
+    for (ib = 0; ib < b->length; ib++) {
+        if (b->entries[ib] != NULL) {
+            a->entries[a->length] = b->entries[ib];
+            a->length++;
+        }
+    }
+
+    for (; ic < c->length; ic++) {
+        if (c->entries[ic] != NULL) {
+            a->entries[a->length] = c->entries[ic];
+            a->length++;
+        }
+    }
+
+    a->entries[a->length] = NULL;
+}
 
 /**
  * nodup
