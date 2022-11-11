@@ -308,19 +308,19 @@ static const char STR_1000061C[] = "/";
 /* 0x037120 0x10000120 204  */ extern UNK_TYPE auto_template_include;
 /* 0x037124 0x10000124 205  */ extern UNK_TYPE nocode;
 /* 0x037128 0x10000128 206  */ extern UNK_TYPE nocompileneeded;
-/* 0x03712C 0x1000012C 207  */ extern UNK_TYPE LibM;
-/* 0x037130 0x10000130 208  */ extern UNK_TYPE LibP;
-/* 0x037134 0x10000134 209  */ extern UNK_TYPE LibF77;
-/* 0x037138 0x10000138 210  */ extern UNK_TYPE LibI77;
-/* 0x03713C 0x1000013C 211  */ extern UNK_TYPE LibU77;
-/* 0x037140 0x10000140 212  */ extern UNK_TYPE LibIsam;
-/* 0x037144 0x10000144 213  */ extern UNK_TYPE LibExc;
-/* 0x037148 0x10000148 214  */ extern UNK_TYPE LibDw;
-/* 0x03714C 0x1000014C 215  */ extern UNK_TYPE LibPl1;
-/* 0x037150 0x10000150 216  */ extern UNK_TYPE LibCob;
-/* 0x037154 0x10000154 217  */ extern UNK_TYPE LibSort;
-/* 0x037158 0x10000158 218  */ extern UNK_TYPE LibProf1;
-/* 0x03715C 0x1000015C 219  */ extern UNK_TYPE LibXmalloc;
+/* 0x03712C 0x1000012C 207  */ extern char* LibM;
+/* 0x037130 0x10000130 208  */ extern char* LibP;
+/* 0x037134 0x10000134 209  */ extern char* LibF77;
+/* 0x037138 0x10000138 210  */ extern char* LibI77;
+/* 0x03713C 0x1000013C 211  */ extern char* LibU77;
+/* 0x037140 0x10000140 212  */ extern char* LibIsam;
+/* 0x037144 0x10000144 213  */ extern char* LibExc;
+/* 0x037148 0x10000148 214  */ extern char* LibDw;
+/* 0x03714C 0x1000014C 215  */ extern char* LibPl1;
+/* 0x037150 0x10000150 216  */ extern char* LibCob;
+/* 0x037154 0x10000154 217  */ extern char* LibSort;
+/* 0x037158 0x10000158 218  */ extern char* LibProf1;
+/* 0x03715C 0x1000015C 219  */ extern char* LibXmalloc;
 /* 0x037160 0x10000160 220  */ extern UNK_TYPE LibMld;
 /* 0x037164 0x10000164 221  */ extern UNK_TYPE crtx;
 /* 0x037168 0x10000168 222  */ extern UNK_TYPE crtn;
@@ -646,8 +646,63 @@ void newrunlib(void) {
  * VROM: 0x02F2CC
  * Size: 0x30C
  */
-// int compose_G0_libs();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/compose_G0_libs.s")
+void compose_G0_libs(char* arg0) {
+    for (; *arg0 != 0; arg0++) {
+        switch (*arg0) {
+            case 'P':
+                LibP = mkstr(LibP, "_G0", NULL);
+                break;
+
+            case 'E':
+                LibExc = mkstr(LibExc, "_G0", NULL);
+                break;
+
+            case '1':
+                LibPl1 = mkstr(LibPl1, "_G0", NULL);
+                break;
+
+            case 'C':
+                LibCob = mkstr(LibCob, "_G0", NULL);
+                break;
+
+            case 'O':
+                LibSort = mkstr(LibSort, "_G0", NULL);
+                break;
+
+            case 'M':
+                LibM = mkstr(LibM, "_G0", NULL);
+                break;
+
+            case 'F':
+                LibF77 = mkstr(LibF77, "_G0", NULL);
+                break;
+
+            case 'I':
+                LibI77 = mkstr(LibI77, "_G0", NULL);
+                break;
+
+            case 'U':
+                LibU77 = mkstr(LibU77, "_G0", NULL);
+                break;
+
+            case 'S':
+                LibIsam = mkstr(LibIsam, "_G0", NULL);
+                break;
+
+            case 'W':
+                LibDw = mkstr(LibDw, "_G0", NULL);
+                break;
+
+            case 'X':
+                LibXmalloc = mkstr(LibXmalloc, "_G0", NULL);
+                break;
+
+            case 'n':
+                LibProf1 = mkstr(LibProf1, "_G0", NULL);
+                break;
+        }
+    }
+}
 
 /**
  * compose_reg_libs
