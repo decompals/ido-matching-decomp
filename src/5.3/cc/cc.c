@@ -580,7 +580,7 @@ static const char STR_1000061C[] = "/";
 /* 0x0373F8 0x100003F8 364  */ extern UNK_TYPE edison_cpp;
 /* 0x0373FC 0x100003FC 365  */ extern UNK_TYPE edison_type;
 /* 0x037400 0x10000400 366  */ extern UNK_TYPE Gnum;
-/* 0x037404 0x10000404 367  */ extern UNK_TYPE runerror;
+/* 0x037404 0x10000404 367  */ extern int runerror;
 /* 0x037408 0x10000408 368  */ extern UNK_TYPE uload;
 /* 0x03740C 0x1000040C 369  */ extern UNK_TYPE uldobj_place;
 /* 0x037410 0x10000410 370  */ extern char* tmp_uldobj;
@@ -1536,8 +1536,24 @@ void cleanup(void) {
  * VROM: 0x03364C
  * Size: 0x1C0
  */
-// int whats();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/whats.s")
+void whats(void) {
+    int sp24 = runerror;
+
+    if (compiler == COMPILER_2) {
+        printf("%s  (%s)\n", progname, "pc");
+    } else if (compiler == COMPILER_4) {
+        printf("%s  (%s)\n", progname, "as");
+    } else if (compiler == COMPILER_3) {
+        printf("%s  (%s)\n", progname, "f77");
+    } else if (compiler == COMPILER_5) {
+        printf("%s  (%s)\n", progname, "pl1");
+    } else if (compiler == COMPILER_6) {
+        printf("%s  (%s)\n", progname, "cobol");
+    } else {
+        printf("%s  (%s)\n", progname, "cc");
+    }
+    printf("\tMips Computer Systems %d.%d\n", 3, 19);
+}
 
 /**
  * settimes
