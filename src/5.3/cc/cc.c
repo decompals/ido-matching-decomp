@@ -694,8 +694,19 @@ void process_config(int argc, char** argv) {
  * VROM: 0x01C2F0
  * Size: 0x12C
  */
-// int add_info();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/add_info.s")
+void add_info(char* s) {
+    addstr(&upasflags, s);
+    addstr(&fcomflags, s);
+    addstr(&ulpiflags, s);
+    addstr(&uopt0flags, s);
+    addstr(&ddoptflags, s);
+    addstr(&optflags, s);
+    addstr(&umergeflags, s);
+    addstr(&uloopflags, s);
+    addstr(&genflags, s);
+    addstr(&asflags, s);
+    addstr(&ldflags, s);
+}
 
 /**
  * parse_command
@@ -1634,6 +1645,20 @@ void add_prelinker_objects(string_list* execlist, string_list* list) {
         }
     }
 }
+
+/*
+ * The mechanism for updating the template instantiation info file for
+ * the current object file.
+ *
+ * We base the .ii filename on the object file name by creating a name
+ * as follows: dirname(obj)/ii_files/basename(obj,.o).ii.
+ *
+ * If this file exists, we look for a terminator (a line with the contents
+ * "----"), and replace everything before that line with updated information
+ * about the command-line used to compile the object file, and the working
+ * directory from where the command was issued. If the terminator is missing,
+ * it is prepended to the file.
+ */
 
 /*
  * Is "c" a character that would need quoting to the shell?
