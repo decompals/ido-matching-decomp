@@ -1198,8 +1198,30 @@ void save_off_command_line(int argc, char** argv) {
  * VROM: 0x0356A4
  * Size: 0x4FC
  */
-// int skip_old_ii_controls();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/skip_old_ii_controls.s")
+/*
+ * Skip over leading lines upto and including the terminator (a line that
+ * starts with ----). If the terminator is not found, rewind back to start.
+ */
+void skip_old_ii_controls(FILE* f) {
+    int c;
+    int terminator_found = 0;
+
+    c = getc(f);
+    while (c != EOF) {
+        if (c == '-' && (c = getc(f)) == '-' && (c = getc(f)) == '-' && (c = getc(f)) == '-') {
+            terminator_found = 1;
+        }
+        while (c != '\n' && c != EOF)
+            c = getc(f);
+        if (terminator_found)
+            break;
+        if (c == '\n')
+            c = getc(f);
+    }
+
+    if (c == EOF)
+        rewind(f);
+}
 
 /**
  * make_ii_file_name
