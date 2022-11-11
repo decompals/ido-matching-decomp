@@ -146,7 +146,7 @@ typedef enum EditFlag {
 } EditFlag;
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
-/* 040C10 10009C10 */ int time0;                               // line 174
+/* 040C10 10009C10 */ clock_t time0;                           // line 174
                                                                // 0x4 padding
 /* 040C18 10009C18 */ struct tms tm0;                          // line 176
 /* 040C28 10009C28 */ char perr_msg[0x100];                    // char perr_msg[0x100]; // line 124
@@ -1455,7 +1455,11 @@ void mktempstr(void) {
  * VROM: 0x033218
  * Size: 0x48
  */
+/*
+ * Handler () is used for catching signals.
+ */
 void handler(void) {
+    // error added in Open64
     cleanup();
     exit(3);
 }
@@ -1555,14 +1559,20 @@ void whats(void) {
     printf("\tMips Computer Systems %d.%d\n", 3, 19);
 }
 
+/* this code is copied from csh, for printing times */
+
 /**
  * settimes
  * Address: 0x0043380C
  * VROM: 0x03380C
  * Size: 0x3C
  */
-// int settimes();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/settimes.s")
+// clock_t time0;
+// struct tms tm0;
+
+void settimes(void) {
+    time0 = times(&tm0);
+}
 
 /**
  * dotime
@@ -1570,8 +1580,25 @@ void whats(void) {
  * VROM: 0x033848
  * Size: 0x180
  */
-// int dotime();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/dotime.s")
+#define HZ 100
+
+void dotime(void) {
+    clock_t time1;
+    clock_t wtime;
+    int pad[2]; // removed by 7.1
+    double utime;
+    double stime;
+    struct tms tm1;
+
+    time1 = times(&tm1);
+    utime = (double)(tm1.tms_utime + tm1.tms_cutime - tm0.tms_utime - tm0.tms_cutime) / (double)HZ;
+    stime = (double)(tm1.tms_stime + tm1.tms_cstime - tm0.tms_stime - tm0.tms_cstime) / (double)HZ;
+    wtime = time1 - time0;
+
+    // phase time and program name added by 7.1
+    fprintf(stderr, "%.2fu %.2fs %u:%04.1f %.0f%%\n", utime, stime, wtime / (60 * HZ), (wtime % (60 * HZ)) / (double)HZ,
+            (utime + stime) / ((double)wtime / (double)HZ) * 100.0);
+}
 
 /**
  * func_004339C8
