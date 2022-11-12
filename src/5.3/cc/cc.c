@@ -9,6 +9,7 @@
 #include "errno.h"
 #include "string.h"
 #include "malloc.h"
+#include "sys/stat.h"
 #include "sys/times.h"
 #include "sex.h"
 #include "unistd.h"
@@ -1640,8 +1641,19 @@ void dotime(void) {
  * VROM: 0x033D3C
  * Size: 0x7C
  */
-// int regular_file();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/regular_file.s")
+int regular_file(const char* path) {
+    int st;
+    struct stat sbuf;
+
+    st = stat(path, &sbuf);
+    if (st == -1) {
+        return -1;
+    }
+    if (!S_ISREG(sbuf.st_mode)) {
+        return 0;
+    }
+    return 1;
+}
 
 /**
  * basename
