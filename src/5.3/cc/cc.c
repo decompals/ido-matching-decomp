@@ -156,6 +156,7 @@ void addstr(string_list* list, string str);
 void cleanup(void);
 char* mkstr();
 /* string */ char* savestr(const /* string */ char* src, size_t extra_length);
+void func_00436680(void);
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ clock_t time0;                           // line 174
@@ -282,40 +283,40 @@ char* mkstr();
                                                                // 0x4 padding
 /* 041448 1000A448 */ string_list uldflags;                    // line 243
                                                                // 0x4 padding
-/* 041458 1000A458 */ static char B_1000A458[0x08];
-/* 041460 1000A460 */ string_list usplitflags; // line 245
-                                               // 0x4 padding
-/* 041470 1000A470 */ string_list umergeflags; // line 247
-                                               // 0x4 padding
-/* 041480 1000A480 */ string_list uloopflags;  // line 249
-/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments "command_line"
-/* 041490 1000A490 */ string_list uopt0flags;  // line 253
-/* 04149C 1000A49C */ static char* B_1000A49C; // string containing last "-o" argument ("outfile")
-/* 0414A0 1000A4A0 */ string_list ddoptflags;  // line 266
-                                               // 0x4 padding
-/* 0414B0 1000A4B0 */ string_list optflags;    // line 269
-                                               // 0x4 padding
-/* 0414C0 1000A4C0 */ string_list genflags;    // line 271
-                                               // 0x4 padding
-/* 0414D0 1000A4D0 */ string_list asflags;     // line 273
-                                               // 0x4 padding
-/* 0414E0 1000A4E0 */ string_list ldflags;     // line 277
-                                               // 0x4 padding
-/* 0414F0 1000A4F0 */ string_list as1flags;    // line 275
-                                               // 0x4 padding
-/* 041500 1000A500 */ string_list ftocflags;   // line 282
-                                               // 0x4 padding
-/* 041510 1000A510 */ string_list cordflags;   // line 284
-                                               // 0x4 padding
-/* 041520 1000A520 */ string_list srcfiles;    // line 286
-                                               // 0x4 padding
-/* 041530 1000A530 */ string_list ufiles;      // line 288
-                                               // 0x4 padding
-/* 041540 1000A540 */ string_list objfiles;    // line 290
-                                               // 0x4 padding
-/* 041550 1000A550 */ string_list feedlist;    // line 292
-                                               // 0x4 padding
-/* 041560 1000A560 */ string_list execlist;    // line 294
+/* 041458 1000A458 */ static int B_1000A458[2];                // Pipe
+/* 041460 1000A460 */ string_list usplitflags;                 // line 245
+                                                               // 0x4 padding
+/* 041470 1000A470 */ string_list umergeflags;                 // line 247
+                                                               // 0x4 padding
+/* 041480 1000A480 */ string_list uloopflags;                  // line 249
+/* 04148C 1000A48C */ static char* B_1000A48C;                 // string containing most arguments "command_line"
+/* 041490 1000A490 */ string_list uopt0flags;                  // line 253
+/* 04149C 1000A49C */ static char* B_1000A49C;                 // string containing last "-o" argument ("outfile")
+/* 0414A0 1000A4A0 */ string_list ddoptflags;                  // line 266
+                                                               // 0x4 padding
+/* 0414B0 1000A4B0 */ string_list optflags;                    // line 269
+                                                               // 0x4 padding
+/* 0414C0 1000A4C0 */ string_list genflags;                    // line 271
+                                                               // 0x4 padding
+/* 0414D0 1000A4D0 */ string_list asflags;                     // line 273
+                                                               // 0x4 padding
+/* 0414E0 1000A4E0 */ string_list ldflags;                     // line 277
+                                                               // 0x4 padding
+/* 0414F0 1000A4F0 */ string_list as1flags;                    // line 275
+                                                               // 0x4 padding
+/* 041500 1000A500 */ string_list ftocflags;                   // line 282
+                                                               // 0x4 padding
+/* 041510 1000A510 */ string_list cordflags;                   // line 284
+                                                               // 0x4 padding
+/* 041520 1000A520 */ string_list srcfiles;                    // line 286
+                                                               // 0x4 padding
+/* 041530 1000A530 */ string_list ufiles;                      // line 288
+                                                               // 0x4 padding
+/* 041540 1000A540 */ string_list objfiles;                    // line 290
+                                                               // 0x4 padding
+/* 041550 1000A550 */ string_list feedlist;                    // line 292
+                                                               // 0x4 padding
+/* 041560 1000A560 */ string_list execlist;                    // line 294
 /* 04156C 1000A56C */ static char B_1000A56C[0x04];
 /* 041570 1000A570 */ static char B_1000A570[0x08];
 /* 041578 1000A578 */ string_list dirs_for_crtn;           // line 299
@@ -2593,8 +2594,21 @@ int func_004362CC(pid_t pid) {
  * VROM: 0x0365B8
  * Size: 0xC8
  */
-// /* static */ int func_004365B8();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_004365B8.s")
+// Test reading from Pipe.
+// Temp is removed in Open64.
+// my_psema
+void func_004365B8(void) {
+    char c;
+    int failure;
+
+    close(B_1000A458[1]);
+    failure = (read(B_1000A458[0], &c, 1) != 1);
+    if (failure) {
+        perror("read on pipe failed");
+        exit(1);
+    }
+    close(B_1000A458[0]);
+}
 
 /**
  * func_00436680
@@ -2602,8 +2616,18 @@ int func_004362CC(pid_t pid) {
  * VROM: 0x036680
  * Size: 0xBC
  */
-// /* static */ int func_00436680();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00436680.s")
+// Test writing to Pipe
+// my_vsema
+void func_00436680(void) {
+    char c;
+
+    close(B_1000A458[0]);
+    if (write(B_1000A458[1], &c, 1) != 1) {
+        perror("write on pipe failed");
+        exit(1);
+    }
+    close(B_1000A458[1]);
+}
 
 /**
  * func_0043673C
