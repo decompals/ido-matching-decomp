@@ -9772,7 +9772,7 @@ va_dcl // K&R syntax
 
     ret = malloc(len);
     if (ret == NULL) {
-        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 14524, "out of memory\n");
         if (errno < sys_nerr) {
             error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }

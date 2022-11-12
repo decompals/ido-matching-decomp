@@ -13,6 +13,7 @@
 #include "sys/times.h"
 #include "fcntl.h"
 #include "sex.h"
+#include "varargs.h"
 #include "unistd.h"
 
 /**
@@ -150,6 +151,7 @@ typedef enum EditFlag {
 int regular_file(const char*);
 void addstr(string_list* list, string str);
 void cleanup(void);
+char* mkstr();
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ clock_t time0;                           // line 174
@@ -989,14 +991,51 @@ void compose_reg_libs(char* arg0) {
 #define SLASH '/'
 #define PERCENT '%'
 
+#define _VA_INIT_STATE 1
 /**
  * mkstr
  * Address: 0x0042F8B4
  * VROM: 0x02F8B4
  * Size: 0x214
  */
-// int mkstr();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/mkstr.s")
+// Actual prototype is char* mkstr(const char*, ...);
+#ifndef PERMUTER
+// Return the concatenation of the passed strings. Arguments are a NULL-terminated list of const char*.
+char* mkstr(va_alist)
+    // clang-format off
+va_dcl // K&R syntax
+// clang-format on
+{
+    register char* ret;
+    register const char* arg;
+    register size_t len = 1;
+    va_list args;
+
+    va_start(args);
+    while ((arg = va_arg(args, const char*)) != NULL) {
+        len += strlen(arg);
+    }
+    va_end(args);
+
+    ret = malloc(len);
+    if (ret == NULL) {
+        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 14103, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+    }
+    *ret = 0;
+
+    va_start(args);
+    while ((arg = va_arg(args, const char*)) != NULL) {
+        strcat(ret, arg);
+    }
+    va_end(args);
+
+    return ret;
+}
+#endif
 
 /**
  * mklist
