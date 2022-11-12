@@ -1590,8 +1590,108 @@ void mktempstr(void) {
  * VROM: 0x032B5C
  * Size: 0x5B0
  */
-// int get_lino();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/get_lino.s")
+#define GET_LINO_BUF_SIZE 0x800
+/**
+ * Extract the printed line number of an error from `errout`. The strings to search for depend on the `mode` set. In
+ * terms of regular expressions,
+ * - 1/2 look for errors of the form "Error: <filename>, line: (\d{0,10})"
+ * - 3 looks for "Error on line (\d{0,10})"
+ * - 5/6 look for "ERROR .* LINE (\d{0,10})"
+ *
+ * @param[out] lino Found line number as a string, preceded by '+'.
+ * @param[in] path Name of file to search for errors from. Only used in modes 1 and 2.
+ * @param[in] mode Which format to look for.
+ */
+void get_lino(char* lino, const char* path, int mode) {
+    int erroutid;                // fd of errout // sp83C
+    int buf_len;                 // number of chars read // sp838
+    char* lino_p = lino;         // sp834
+    char* p;                     // iterator over buffer // sp830
+    char buf[GET_LINO_BUF_SIZE]; // sp30
+
+    *lino = '+';
+    lino_p++;
+
+    erroutid = open(errout, O_RDONLY);
+    buf_len = read(erroutid, &buf, GET_LINO_BUF_SIZE);
+    close(erroutid);
+
+    // 0-terminate buffer
+    if (buf_len < GET_LINO_BUF_SIZE) {
+        buf[buf_len] = '\0';
+    } else {
+        buf[GET_LINO_BUF_SIZE - 1] = '\0';
+    }
+
+    switch (mode) {
+        case 1:
+        case 2:
+            // Look through buffer for first ": Error: ".
+            // If found, find the next comma,
+            // check if the chunk before the comma matches `path`,
+            // and the chunk after is ", line "
+            // then copy the number following to lino via lino_p (max 10 digits).
+            for (p = buf; p < buf + buf_len; p++) {
+                if (strncmp(p, ": Error: ", 9) == 0) {
+                    p = strchr(p, ',');
+                    if ((p != NULL) && same_string_prefix(p - strlen(path), path) && (strncmp(p, ", line ", 7) == 0)) {
+                        p += 7;
+                        while (isdigit(*p) && ((lino_p - lino) <= 10)) {
+                            *lino_p++ = *p++;
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+
+        case 3:
+            // look for first "Error on line " and copy the number following to lino (max 10 digits).
+            for (p = buf; p < buf + buf_len; p++) {
+                if (strncmp(p, "Error on line ", 14) == 0) {
+                    p += 14;
+                    while (isdigit(*p) && ((lino_p - lino) <= 10)) {
+                        *lino_p++ = *p++;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        case 5:
+        case 6:
+            // Look for first "ERROR ".
+            for (p = buf; p < buf + buf_len; p++) {
+                if (strncmp(p, "ERROR ", 6) == 0) {
+                    p += 6;
+                    break;
+                }
+            }
+            // Then look for first subsequent " LINE " and copy the number following.
+            for (; p < buf + buf_len; p++) {
+                if (strncmp(p, " LINE ", 6) == 0) {
+                    p += 6;
+                    while (isdigit(*p) && ((lino_p - lino) <= 10)) {
+                        *lino_p++ = *p++;
+                    }
+                    break;
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    // 0-terminate lino
+    if ((lino + 1) < lino_p) {
+        lino_p[0] = '\0';
+    } else { // No digits found
+        lino_p[0] = '1';
+        lino_p[1] = '\0';
+    }
+}
+#undef GET_LINO_BUF_SIZE
 
 /**
  * show_err
@@ -1616,7 +1716,7 @@ void show_err(const char* path) {
     }
     fprintf(stderr, "%s\n", buf);
 }
-#undef BUF_SIZE
+#undef SHOW_ERR_BUF_SIZE
 
 /**
  * handler
