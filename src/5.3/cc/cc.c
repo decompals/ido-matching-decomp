@@ -11,6 +11,7 @@
 #include "string.h"
 #include "malloc.h"
 #include "sys/file.h"
+#include "sys/procfs.h"
 #include "sys/stat.h"
 #include "sys/times.h"
 #include "fcntl.h"
@@ -2091,7 +2092,7 @@ void init_curr_dir(void) {
  * VROM: 0x0343F0
  * Size: 0x54
  */
-void add_static_opt(const char* opt) {
+void add_static_opt(/* string */ char* opt) {
     if (!D_1000020C) {
         addstr(&staticopts, opt);
     }
@@ -2541,8 +2542,50 @@ void update_instantiation_info_file(char* objname) {
  * VROM: 0x0362CC
  * Size: 0x2EC
  */
-// /* static */ int func_004362CC();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_004362CC.s")
+// stop_on_exit in Open64
+int func_004362CC(pid_t pid) {
+    int procid;          // sp29C
+    char procname[20];   // sp288
+    prstatus_t pstatus;  // sp68
+    long modeFlags = 0;  // sp64
+    sysset_t syscallSet; // sp24
+
+    sprintf(procname, "/proc/%-d", pid);
+    if ((procid = open(procname, O_RDWR | O_EXCL)) == -1) {
+        perror("Opening /proc");
+        kill(pid, SIGKILL);
+        exit(1);
+    }
+    premptyset(&syscallSet);
+    praddset(&syscallSet, 2); // SYS_exit in Open64, but does not line up
+
+    if (ioctl(procid, PIOCSENTRY, &syscallSet) < 0) {
+        perror("PIOCSENTRY");
+        kill(pid, SIGKILL);
+        exit(1);
+    }
+    func_00436680();
+    if (ioctl(procid, PIOCWSTOP, &pstatus) < 0) {
+        perror("PIOCWSTOP");
+        kill(pid, SIGKILL);
+        exit(1);
+    }
+    if (pstatus.pr_why != PR_SYSENTRY) {
+        perror("program halted prematurely");
+        kill(pid, SIGKILL);
+        exit(1);
+    }
+    if (pstatus.pr_what != 2) { // SYS_exit in Open64, but does not line up
+        perror("program halted in wrong system call");
+        kill(pid, SIGKILL);
+        exit(1);
+    }
+    if (pstatus.pr_errno != 0) {
+        perror("unknown problem\n");
+        exit(1);
+    }
+    return procid;
+}
 
 /**
  * func_004365B8
