@@ -1729,6 +1729,7 @@ void whats(void) {
 }
 
 /* this code is copied from csh, for printing times */
+// No evidence of this code in anything resembling this form in csh
 
 /**
  * settimes
@@ -2546,19 +2547,22 @@ void update_instantiation_info_file(char* objname) {
     free(new_ii_file_name);
 }
 
+/* code used to handle the -showm */
+
 /**
  * func_004362CC
  * Address: 0x004362CC
  * VROM: 0x0362CC
  * Size: 0x2EC
  */
-// stop_on_exit in Open64
-static int func_004362CC(pid_t pid) {
-    int procid;          // sp29C
-    char procname[20];   // sp288
-    prstatus_t pstatus;  // sp68
-    long modeFlags = 0;  // sp64
-    sysset_t syscallSet; // sp24
+// stop_on_exit
+static int func_004362CC(pid_t pid) { /* sets a child process to stop on exit */
+#ifndef linux
+    int procid; /* fd for process */            // sp29C
+    char procname[20]; /* name - /proc/<pid> */ // sp288
+    prstatus_t pstatus;                         // sp68
+    long modeFlags = 0;                         // sp64
+    sysset_t syscallSet;                        // sp24
 
     sprintf(procname, "/proc/%-d", pid);
     if ((procid = open(procname, O_RDWR | O_EXCL)) == -1) {
@@ -2566,6 +2570,18 @@ static int func_004362CC(pid_t pid) {
         kill(pid, SIGKILL);
         exit(1);
     }
+
+// The following code from Open64 is included based on `modeflags` existing but being unused
+#if 0
+    /* set it so it wont trace child */
+    modeFlags = PR_FORK;
+    if (ioctl(procid, PIOCRESET, &modeFlags) < 0) {
+        perror("PIOCRESET");
+        kill(pid, SIGKILL);
+        return 0;
+    }
+#endif
+
     premptyset(&syscallSet);
     praddset(&syscallSet, 2); // SYS_exit in Open64, but does not line up
 
@@ -2574,12 +2590,15 @@ static int func_004362CC(pid_t pid) {
         kill(pid, SIGKILL);
         exit(1);
     }
+
     func_00436680();
+
     if (ioctl(procid, PIOCWSTOP, &pstatus) < 0) {
         perror("PIOCWSTOP");
         kill(pid, SIGKILL);
         exit(1);
     }
+
     if (pstatus.pr_why != PR_SYSENTRY) {
         perror("program halted prematurely");
         kill(pid, SIGKILL);
@@ -2594,7 +2613,12 @@ static int func_004362CC(pid_t pid) {
         perror("unknown problem\n");
         exit(1);
     }
+
+    /* at this point the child is stopped on exit */
     return procid;
+#else
+    return 0;
+#endif
 }
 
 /**
