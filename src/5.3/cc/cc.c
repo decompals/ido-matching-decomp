@@ -152,6 +152,7 @@ int regular_file(const char*);
 void addstr(string_list* list, string str);
 void cleanup(void);
 char* mkstr();
+/* string */ char* savestr(const /* string */ char* src, size_t extra_length);
 
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ clock_t time0;                           // line 174
@@ -1388,8 +1389,98 @@ char getsuf(const /* string */ char* path) {
  * VROM: 0x030B0C
  * Size: 0x3B0
  */
-// int mksuf();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/mksuf.s")
+/**
+ * Given a file path and a value, returns a basename with an extension specified by the value.
+ *
+ * @param path Path to start with
+ * @param value Value of suffix. Values smaller than 8 will be looked up in the `suffixes` table
+ * @return char* basename of `path` with extension attached
+ */
+char* mksuf(const char* path, char value) {
+    int i;                      // sp54, also basename length
+    int k;                      // sp50
+    size_t new_suf_length;      // sp4C
+    char* sp48;                 // Iterator used to find start of new basename
+    char* sp44;                 // various uses: pointing to end of new copy of `path`, used for return
+    char* sp40;                 // Start of copied basename, then start of copied extension
+    const char* new_suf = NULL; // sp3C
+    char ch;                    // sp38
+
+    if (value < 8) { // Special cases covered by the table
+        for (i = 0; suffixes[i].name != NULL; i++) {
+            if (suffixes[i].suffix == value) {
+                new_suf = suffixes[i].name;
+                break;
+            }
+        }
+
+        if (new_suf == NULL) {
+            error(ERRORCAT_INTERNAL, NULL, 0, "mksuf ()", 14514, "passed an unknown suffix value: %s\n", value);
+            exit(4);
+        }
+        new_suf_length = strlen(new_suf);
+    } else {
+        new_suf_length = 0;
+    }
+
+    i = 0;
+    sp40 = sp44 = sp48 = savestr(path, new_suf_length);
+
+    // Look for the start of the (copied) path's basename
+    while (ch = *sp44++) {
+        if (ch == '/') {
+            i = 0;
+            sp40 = sp44;
+        } else {
+            i++;
+        }
+    }
+    // `sp40` now points to start of basename,
+    // `sp44` to after the trailing '\0',
+    // `i` is basename length
+
+    if ((i >= 3) && (sp44[-3] == '.')) { // Path currently has a single-letter extension
+        if (value < 8) {                 // Copy extension from table
+            strcpy(sp44 - 2, new_suf);
+        } else { // set single-letter extension from `value`
+            sp44[-2] = value;
+            sp44[-1] = 0;
+        }
+    } else { // no extension or a longer one
+             // Look backwards through basename for last '.'
+        for (k = i - 2; k > 0; k--) {
+            if (sp40[k] == '.') {
+                break;
+            }
+        }
+
+        // If no extension, error out
+        if (k == 0) {
+            error(ERRORCAT_ERROR, NULL, 0, "mksuf ()", 14553, "Bad file name, no suffix: %s\n", path);
+            exit(4);
+        }
+
+        // move to start of current extension
+        sp40 = &sp40[k + 1];
+        // Replace extension
+        if (value < 8) { // Copy from table
+            strcpy(sp40, new_suf);
+        } else { // set single-letter extension from `value`
+            sp40[0] = value;
+            sp40[1] = 0;
+        }
+    }
+
+    sp44 = sp48; // sp44 to start of copied path
+    // Find start of new basename
+    while (*sp48 != '\0') {
+        if (*sp48++ == '/') {
+            sp44 = sp48;
+        }
+    }
+    // return new basename
+    return sp44;
+}
 
 /**
  * savestr
@@ -1398,7 +1489,7 @@ char getsuf(const /* string */ char* path) {
  * Size: 0x140
  */
 // Copy a string, adding extra_length bytes to the allocation.
-/* string */ char* savestr(const /* string */ char* src, int extra_length) {
+/* string */ char* savestr(const /* string */ char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
 
     if (dest == NULL) {
