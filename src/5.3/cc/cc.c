@@ -145,12 +145,15 @@ typedef enum EditFlag {
     /* 2 */ EDIT_FLAG_2  //!< "-edit[0-9]" and environment variable for EDITOR contains "emacs"
 } EditFlag;
 
+void addstr(string_list* list, string str);
+void cleanup(void);
+
 /* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
 /* 040C10 10009C10 */ clock_t time0;                           // line 174
                                                                // 0x4 padding
 /* 040C18 10009C18 */ struct tms tm0;                          // line 176
 /* 040C28 10009C28 */ char perr_msg[0x100];                    // char perr_msg[0x100]; // line 124
-/* 040D28 10009D28 */ static char B_10009D28[0x400];           // equivalent of B_1000E5E0
+/* 040D28 10009D28 */ static char B_10009D28[0x400];           // "dirbuf"/"basebuf", likely declared above `basename`
 /* 041128 1000A128 */ int plain_g;                             // line 127
 /* 04112C 1000A12C */ int plain_O;                             // line 128
 /* 041130 1000A130 */ int noaliasokflag;                       // line 129
@@ -597,7 +600,11 @@ static const char STR_1000061C[] = "/";
 /* 0x037440 0x10000440 None */ /* static */ extern char* D_10000440;
 /* 0x037444 0x10000444 None */ /* static */ extern char* D_10000444;
 /* 0x037448 0x10000448 None */ /* static */ extern char* D_10000448; // Error category strings
-/* 0x037460 0x10000460 379  */ extern UNK_TYPE prod_name;
+/* 0x037460 0x10000460 379  */ extern struct {
+    /* 0x0 */ const char* basename;  // name of executable
+    /* 0x4 */ const char* full_path; // full path of executable
+    /* 0x8 */ const char* product;   // package/product executable is part of
+} prod_name[20];                     // Declared above func_00434094
 /* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
 /* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name (D_1000C2F0 in 7.1)
@@ -1642,8 +1649,28 @@ void dotime(void) {
  * VROM: 0x033DB8
  * Size: 0x118
  */
-char* basename(const char*);
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/basename.s")
+// Almost identical in Open64
+char* basename(char* const s) {
+    register char* p;
+    register char* const t = B_10009D28;
+
+    if ((s == NULL) || (*s == '\0')) {
+        return strcpy(t, ".");
+    } else {
+        p = strcpy(t, s);
+        p += strlen(p);
+        while (p != t && *--p == '/') { /* skip trailing /s */
+            *p = '\0';
+        }
+
+        while (p != t) {
+            if (*--p == '/') {
+                return ++p;
+            }
+        }
+        return p;
+    }
+}
 
 /**
  * dirname
@@ -1651,8 +1678,37 @@ char* basename(const char*);
  * VROM: 0x033ED0
  * Size: 0x1C4
  */
-char* dirname(const char*);
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/dirname.s")
+// Almost identical in Open64
+char* dirname(char* const s) {
+    register char* p;
+    register char* const t = B_10009D28;
+
+    if ((s == NULL) || (*s == '\0')) {
+        return strcpy(t, ".");
+    } else {
+        p = strcpy(t, s);
+        p += strlen(p);
+        while ((p != t) && (*--p == '/')) {} /* skip trailing /s */
+
+        if ((p == t) && (*p == '/')) {
+            return strcpy(t, "/");
+        }
+
+        while (p != t) {
+            if (*--p == '/') {
+                if (p == t) {
+                    return strcpy(t, "/");
+                }
+                while (*p == '/') {
+                    p--;
+                }
+                *++p = '\0';
+                return t;
+            }
+        }
+        return strcpy(t, ".");
+    }
+}
 
 static const char STR_10006754[] = "accom";
 static const char STR_1000675C[] = "/usr/lib/accom";
@@ -1721,8 +1777,42 @@ static const char STR_10006A18[] = "Delta C++";
  * VROM: 0x034094
  * Size: 0x134
  */
-// /* static */ int func_00434094();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00434094.s")
+// obvious name suggestion would be `get_product` or similar?
+/**
+ * Looks for `path` in the `prod_name` table and returns the name of the corresponding product/package.
+ *
+ * @param path name of executable to look for, either basename or full path
+ * @param check_full_path Check for basename if FALSE, full path if TRUE.
+ * @return const char* name of product containing the executable (NULL if not found).
+ */
+static const char* func_00434094(const char* path, int check_full_path) {
+    int i;
+    int prod_count;
+    const char* check_path;
+    const char* prod_path;
+
+    if (check_full_path) {
+        check_path = path;
+    } else {
+        check_path = strrchr(path, '/');
+        if (check_path != NULL) {
+            check_path++;
+        }
+    }
+
+    prod_count = 20;
+    for (i = 0; i < prod_count; i++) {
+        if (check_full_path) {
+            prod_path = prod_name[i].full_path;
+        } else {
+            prod_path = prod_name[i].basename;
+        }
+        if (same_string(check_path, prod_path)) {
+            return prod_name[i].product;
+        }
+    }
+    return NULL;
+}
 
 /**
  * add_cxx_symbol_options

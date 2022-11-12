@@ -10902,9 +10902,9 @@ const char* dirname(const char* path) {
 }
 
 struct {
-    /* 0x0 */ const char* unk0; // name?
-    /* 0x4 */ const char* unk4; // full path?
-    /* 0x8 */ const char* unk8; // description?
+    /* 0x0 */ const char* basename; // name of executable
+    /* 0x4 */ const char* full_path; // full path of executable
+    /* 0x8 */ const char* product; // package/product executable is part of
 } // size = 0xC
 prod_name[] = {
     { "accom", "/usr/lib/accom", "ANSI C" },
@@ -10948,12 +10948,12 @@ static const char* func_00430414(char* arg0, int arg1) {
     sp28 = 20;
     for (i = 0; i < sp28; i++) {
         if (arg1 != 0) {
-            sp20 = prod_name[i].unk4;
+            sp20 = prod_name[i].full_path;
         } else {
-            sp20 = prod_name[i].unk0;
+            sp20 = prod_name[i].basename;
         }
         if (strcmp(sp24, sp20) == 0) {
-            return prod_name[i].unk8;
+            return prod_name[i].product;
         }
     }
     return NULL;
