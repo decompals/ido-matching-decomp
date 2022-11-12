@@ -1616,8 +1616,38 @@ void dotime(void) {
  * VROM: 0x0339C8
  * Size: 0x260
  */
-// /* static */ int func_004339C8();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_004339C8.s")
+// Search through a NULL-terminated array of directory names for a library. If not found there, use an appropriate
+// subdir of `usr/lib` instead.
+char* func_004339C8(char* name, char** dirs) {
+    int fd;
+    char* path;
+
+    for (; *dirs != NULL; dirs++) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+            fd = open(path = mkstr(*dirs, "/DCC", runlib, name, NULL), O_RDONLY, 0);
+            if (fd >= 0) {
+                close(fd);
+                return path;
+            }
+        }
+
+        fd = open(path = mkstr(*dirs, runlib, name, NULL), O_RDONLY, 0);
+        if (fd >= 0) {
+            close(fd);
+            return path;
+        }
+    }
+
+    if (abi_flag != 0) {
+        path = mkstr("/", "usr/lib/abi", runlib, name, NULL);
+    } else if (non_shared) {
+        path = mkstr("/", "usr/lib/nonshared", runlib, name, NULL);
+    } else {
+        path = mkstr("/", "usr/lib", runlib, name, NULL);
+    }
+    return path;
+}
 
 /**
  * isdir
@@ -1652,7 +1682,7 @@ int regular_not_writeable(const char* path) {
     if (regular_file(path) != 1) {
         return 0;
     }
-    fd = open(path, 2, 0666);
+    fd = open(path, O_RDWR, 0666);
     if (fd >= 0) {
         close(fd);
         return 0;
