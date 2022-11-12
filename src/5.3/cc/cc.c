@@ -5,10 +5,12 @@
  * This file incorporates code from Open64's Osprey driver, version 0.13.0, licensed under GPL Version 2
  */
 #include "sys/types.h"
+#include "ctype.h"
 #include "stdio.h"
 #include "errno.h"
 #include "string.h"
 #include "malloc.h"
+#include "sys/file.h"
 #include "sys/stat.h"
 #include "sys/times.h"
 #include "fcntl.h"
@@ -471,8 +473,8 @@ static const char STR_1000061C[] = "/";
 /* 0x0371F8 0x100001F8 256  */ extern UNK_TYPE copt;
 /* 0x0371FC 0x100001FC None */ /* static */ extern UNK_TYPE D_100001FC;
 /* 0x037200 0x10000200 None */ /* static */ extern UNK_TYPE D_10000200;
-/* 0x037204 0x10000204 None */ /* static */ extern UNK_TYPE D_10000204;
-/* 0x037208 0x10000208 None */ /* static */ extern UNK_TYPE D_10000208;
+/* 0x037204 0x10000204 None */ /* static */ extern char* D_10000204;
+/* 0x037208 0x10000208 None */ /* static */ extern char* D_10000208;
 /* 0x03720C 0x1000020C None */ /* static */ extern /* boolean */ int D_1000020C;
 /* 0x037210 0x10000210 None */ /* static */ extern UNK_TYPE D_10000210;
 /* 0x037214 0x10000214 257  */ extern /* boolean */ int Eflag;
@@ -611,8 +613,8 @@ static const char STR_1000061C[] = "/";
     /* 0x4 */ const char* full_path; // full path of executable
     /* 0x8 */ const char* product;   // package/product executable is part of
 } prod_name[20];                     // Declared above func_00434094
-/* 0x037550 0x10000550 None */ /* static */ extern UNK_TYPE D_10000550;
-/* 0x037554 0x10000554 None */ /* static */ extern UNK_TYPE D_10000554;
+/* 0x037550 0x10000550 None */ /* static */ extern char* D_10000550;
+/* 0x037554 0x10000554 None */ /* static */ extern char* D_10000554;
 /* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name (D_1000C2F0 in 7.1)
 
 /**
@@ -2071,7 +2073,7 @@ void init_curr_dir(void) {
  * Size: 0x90
  */
 // Make a full path name from a base file name.
-/* string */ char* full_path(/* string */ char* base) {
+/* string */ char* full_path(const /* string */ char* base) {
     /* string */ char* path;
 
     init_curr_dir();
@@ -2089,20 +2091,130 @@ void init_curr_dir(void) {
  * VROM: 0x0343F0
  * Size: 0x54
  */
-void add_static_opt(char* opt) {
+void add_static_opt(const char* opt) {
     if (!D_1000020C) {
         addstr(&staticopts, opt);
     }
 }
 
+#define CONTENTS_BUF_SIZE 0x2800
 /**
  * record_static_fileset
  * Address: 0x00434444
  * VROM: 0x034444
  * Size: 0x9F4
  */
-// int record_static_fileset();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/record_static_fileset.s")
+void record_static_fileset(const char* arg0) {
+    int sp28E4;                           // multipurpose
+    FILE* temp_file;                      // sp28E0
+    FILE* file;                           // sp28DC
+    int fd;                               // sp28D8
+    char contents_buf[CONTENTS_BUF_SIZE]; // spD8
+    char* fullpath;                       // spD4
+    size_t path_length;                   // spD0
+    char pid_buf[20];                     // spBC
+    struct stat sbuf;                     // sp34
+
+    sprintf(pid_buf, ".%d", getpid());
+    if (D_10000204 == NULL) {
+        D_10000204 = "";
+    }
+    if (D_10000208 == NULL) {
+        D_10000208 = mkstr("cvstatic.fileset", NULL);
+    }
+    if ((D_10000208[0] == '/') || (D_10000204[0] == '\0')) {
+        D_10000550 = mkstr(D_10000208, NULL);
+    } else {
+        D_10000550 = mkstr(D_10000204, D_10000208, NULL);
+    }
+    D_10000554 = mkstr(tmpdir, "cvstatic.fileset", pid_buf, NULL);
+
+    fullpath = full_path(arg0);
+    path_length = strlen(fullpath);
+
+    if (vflag) {
+        fprintf(stderr, "Static fileset: %s %s", fullpath, D_10000558);
+        for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
+            fprintf(stderr, " %s", staticopts.entries[sp28E4]);
+        }
+        fprintf(stderr, "\n");
+    }
+
+    temp_file = fopen(D_10000554, "w+");
+    if (temp_file == NULL) {
+        error(1, NULL, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n", D_10000554);
+        perror(D_10000558);
+        cleanup();
+        exit(1);
+    }
+
+    fd = open(D_10000550, O_RDWR | O_CREAT, 0666);
+    if (fd < 0) {
+        error(1, NULL, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n",
+              D_10000550);
+        perror(D_10000558);
+        unlink(D_10000554);
+        cleanup();
+        exit(1);
+    }
+    if (flock(fd, LOCK_EX) < 0) {
+        error(1, NULL, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n", D_10000550);
+        perror(D_10000558);
+        unlink(D_10000554);
+        cleanup();
+        exit(1);
+    }
+    if (fstat(fd, &sbuf) < 0) {
+        error(1, NULL, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n", D_10000550);
+        perror(D_10000558);
+        unlink(D_10000554);
+        cleanup();
+        exit(1);
+    }
+    if (sbuf.st_size == 0) {
+        fprintf(temp_file, "-cvstatic\n");
+    }
+
+    file = fdopen(fd, "r+");
+    if (file == NULL) {
+        error(1, NULL, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n", D_10000550);
+        perror(D_10000558);
+        unlink(D_10000554);
+        cleanup();
+        exit(1);
+    }
+    while (fgets(contents_buf, CONTENTS_BUF_SIZE, file) != NULL) {
+        if ((strncmp(contents_buf, fullpath, path_length) != 0) || !isspace(contents_buf[path_length])) {
+            fputs(contents_buf, temp_file);
+        }
+    }
+    fprintf(temp_file, "%s %s", fullpath, D_10000558);
+    for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
+        fprintf(temp_file, " %s", staticopts.entries[sp28E4]);
+    }
+
+    fprintf(temp_file, "\n");
+    free(fullpath);
+    rewind(file);
+    rewind(temp_file);
+    ftruncate(file->_file, 0);
+
+    while ((sp28E4 = fread(contents_buf, 1, CONTENTS_BUF_SIZE, temp_file)) > 0) {
+        if (fwrite(&contents_buf, 1, sp28E4, file) != sp28E4) {
+            error(1, NULL, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n", D_10000550);
+            perror(D_10000558);
+            unlink(D_10000554);
+            cleanup();
+            exit(1);
+        }
+    }
+    fclose(file);
+    fclose(temp_file);
+    unlink(D_10000554);
+    free(D_10000550);
+    free(D_10000554);
+}
+#undef CONTENTS_BUF_SIZE
 
 /**
  * touch
