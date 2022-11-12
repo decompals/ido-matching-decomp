@@ -483,7 +483,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037228 0x10000228 262  */ extern UNK_TYPE cflag;
 /* 0x03722C 0x1000022C 263  */ extern UNK_TYPE Sflag;
 /* 0x037230 0x10000230 264  */ extern UNK_TYPE Oflag;
-/* 0x037234 0x10000234 265  */ extern UNK_TYPE vflag;
+/* 0x037234 0x10000234 265  */ extern /* boolean */ int vflag;
 /* 0x037238 0x10000238 266  */ extern UNK_TYPE execute_flag;
 /* 0x03723C 0x1000023C 267  */ extern /* boolean */ int Vflag;
 /* 0x037240 0x10000240 268  */ extern /* boolean */ int Kflag;
@@ -2110,8 +2110,26 @@ void add_static_opt(char* opt) {
  * VROM: 0x034E38
  * Size: 0x17C
  */
-// int touch();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/touch.s")
+int touch(const char* path) {
+    time_t curtime = time(NULL);
+    struct utimbuf times;
+    char* err_str;
+
+    init_curr_dir();
+    if (vflag) {
+        fprintf(stderr, "%s: touch %s\n", D_10000558, path);
+    }
+    times.modtime = curtime;
+    times.actime = curtime;
+    if (utime(path, &times) < 0) {
+        err_str = malloc(strlen(path) + strlen(D_10000558) + 10);
+        sprintf(err_str, "%s: touch %s", D_10000558, path);
+        perror(err_str);
+        free(err_str);
+        return -1;
+    }
+    return 0;
+}
 
 /**
  * add_prelinker_objects
