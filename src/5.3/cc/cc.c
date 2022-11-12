@@ -16,6 +16,7 @@
 #include "sys/times.h"
 #include "fcntl.h"
 #include "sex.h"
+#include "wait.h"
 #include "varargs.h"
 #include "unistd.h"
 
@@ -231,7 +232,7 @@ static void func_0043673C(char* phase, int num_maps);
 /* 041234 1000A234 */ FILE* ldw_file;                          // line 199
 /* 041238 1000A238 */ FILE* tmpsfile;                          // line 201
 /* 04123C 1000A23C */ char* editor;                            // line 203
-/* 041240 1000A240 */ int xserver;                             // line 205
+/* 041240 1000A240 */ char* xserver;                           // line 205
 /* 041244 1000A244 */ int times_edited;                        // line 207
 /* 041248 1000A248 */ int edit_cnt_max;                        // line 209
 /* 04124C 1000A24C */ char srcsuf;                             // line 213
@@ -1581,8 +1582,82 @@ void mktempstr(void) {
  * VROM: 0x032660
  * Size: 0x4FC
  */
-// int edit_src();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/edit_src.s")
+/**
+ * Open the source file in `program` at the line indicated by the first error.
+ *
+ * @param program Editor to run.
+ * @param srcpath Path of source file to open.
+ * @param lino_mode Mode to use to find the error @see get_lino().
+ * @return int ?
+ */
+int edit_src(const char* program, const char* srcpath, int lino_mode) {
+    char lino[0x10]; // buffer for lino (need only be 12 long) // sp58
+    pid_t forkpid;   // sp54
+    int waitpid;     // sp50
+    int termsig;     // sp4C
+    int sigterm;     // sp48
+    int sigint;      // sp44
+    int waitstatus;  // sp40
+
+    forkpid = fork();
+    if (forkpid == (pid_t)-1) { // fork failed
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fork to edit failed\n");
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        return -1;
+    }
+    if (forkpid == (pid_t)0) {
+        /* child */
+        if (editflag == EDIT_FLAG_2) {
+            get_lino(lino, srcpath, lino_mode);
+            execlp(program, program, lino, srcpath, "-l", tempstr[25], "-f", "err-window", NULL);
+        } else if (xserver == NULL) {
+            execlp(program, program, "+1", errout, srcpath, NULL);
+        } else {
+            execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", program, "+1", errout, srcpath, NULL);
+        }
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "failed to exec: %s\n", program);
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+        }
+        exit(1);
+        /* NOTREACHED */
+    } else {
+        /* parent */
+        sigint = sigset(SIGINT, SIG_IGN);
+        sigterm = sigset(SIGTERM, SIG_IGN);
+
+        while ((waitpid = wait(&waitstatus)) != forkpid) {
+            if (waitpid == -1) {
+                return -1;
+            }
+        }
+
+        (void)sigset(SIGINT, sigint);
+        (void)sigset(SIGTERM, sigterm);
+
+        termsig = waitstatus & 0xFF;
+        if ((termsig != 0) && (termsig != SIGINT)) {
+            fprintf(stderr, "Fatal error in: %s ", program);
+            printf(" Signal %d ", termsig);
+            if (waitstatus & WCOREFLAG) {
+                fprintf(stderr, "- core dumped\n");
+            } else {
+                fprintf(stderr, "\n");
+            }
+            cleanup();
+            exit(termsig);
+            /* NOTREACHED */
+        }
+        if (termsig == SIGINT) {
+            cleanup();
+            exit(3);
+            /* NOTREACHED */
+        }
+        return waitstatus & 0xFF00;
+    }
+}
 
 /**
  * get_lino

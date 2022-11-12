@@ -10456,7 +10456,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
 // function edit_src # 27
 int edit_src(const char* arg0, const char* arg1, int arg2) {
-    char sp58[16];
+    char sp58[0x10];
     pid_t forkPid;
     pid_t sp50;
     int temp_t7; // sp4C
@@ -10501,8 +10501,9 @@ int edit_src(const char* arg0, const char* arg1, int arg2) {
             sp50 = wait(&stat_loc);
         }
 
-        sigset(SIGINT, sp44);
-        sigset(SIGTERM, sp48);
+        (void)sigset(SIGINT, sp44);
+        (void)sigset(SIGTERM, sp48);
+
         temp_t7 = stat_loc & 0xFF;
         if ((temp_t7 != 0) && (temp_t7 != 2)) {
             fprintf(stderr, "Fatal error in: %s ", arg0);
