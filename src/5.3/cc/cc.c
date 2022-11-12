@@ -834,7 +834,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
         sp34 = strlen(D_10000440);
         D_10000444 = malloc(sp34 + 2);
         if (D_10000444 == NULL) {
-            fprintf(stderr, "%s: Error: error (), %d: Out of memory\n", D_10000440, 0x3281);
+            fprintf(stderr, "%s: Error: error (), %d: Out of memory\n", D_10000440, 12929);
             if (errno < sys_nerr) {
                 fprintf(stderr, "%s: %s\n", D_10000440, sys_errlist[errno]);
             }
@@ -2218,6 +2218,7 @@ char* mksuf(const char* path, char value) {
         }
 
         if (new_suf == NULL) {
+            //! @bug: %s used for printing a char.
             error(ERRORCAT_INTERNAL, NULL, 0, "mksuf ()", 14514, "passed an unknown suffix value: %s\n", value);
             exit(4);
         }
@@ -2296,7 +2297,7 @@ char* mksuf(const char* path, char value) {
     char* dest = malloc(strlen(src) + extra_length + 1);
 
     if (dest == NULL) {
-        error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 0x38FE, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 14590, "out of memory\n");
         if (errno < sys_nerr) {
             error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
