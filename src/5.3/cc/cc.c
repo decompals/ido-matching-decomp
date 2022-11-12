@@ -1625,8 +1625,19 @@ void dotime(void) {
  * VROM: 0x033C28
  * Size: 0x7C
  */
-// int isdir();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/isdir.s")
+boolean isdir(const char* path) {
+    int st;
+    struct stat sbuf;
+
+    st = stat(path, &sbuf);
+    if (st == -1) {
+        return FALSE;
+    } else if (S_ISDIR(sbuf.st_mode)) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
 
 /**
  * regular_not_writeable
@@ -1662,11 +1673,11 @@ int regular_file(const char* path) {
     st = stat(path, &sbuf);
     if (st == -1) {
         return -1;
-    }
-    if (!S_ISREG(sbuf.st_mode)) {
+    } else if (!S_ISREG(sbuf.st_mode)) {
         return 0;
+    } else {
+        return 1;
     }
-    return 1;
 }
 
 /**
