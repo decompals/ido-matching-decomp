@@ -1586,8 +1586,24 @@ void mktempstr(void) {
  * VROM: 0x03310C
  * Size: 0x10C
  */
-// int show_err();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/show_err.s")
+#define SHOW_ERR_BUF_SIZE 0x10000
+void show_err(const char* path) {
+    int fd;
+    int bytes_read;
+    char buf[SHOW_ERR_BUF_SIZE];
+
+    fd = open(path, O_RDONLY);
+    bytes_read = read(fd, buf, SHOW_ERR_BUF_SIZE);
+    close(fd);
+
+    if (bytes_read < SHOW_ERR_BUF_SIZE) {
+        buf[bytes_read] = '\0';
+    } else {
+        buf[SHOW_ERR_BUF_SIZE - 1] = '\0';
+    }
+    fprintf(stderr, "%s\n", buf);
+}
+#undef BUF_SIZE
 
 /**
  * handler
