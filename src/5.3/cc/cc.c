@@ -156,9 +156,10 @@ void addstr(string_list* list, string str);
 void cleanup(void);
 char* mkstr();
 /* string */ char* savestr(const /* string */ char* src, size_t extra_length);
-void func_00436680(void);
+static void func_00436680(void);
+static void func_0043673C(char* phase, int num_maps);
 
-/* 03F310 10008310 */ static char B_10008310[0x1900];          // equivalent of B_1000CAC0
+/* 03F310 10008310 */ static prmap_sgi_t B_10008310[100];      // equivalent of B_1000CAC0, "mapbuf"
 /* 040C10 10009C10 */ clock_t time0;                           // line 174
                                                                // 0x4 padding
 /* 040C18 10009C18 */ struct tms tm0;                          // line 176
@@ -618,6 +619,14 @@ static const char STR_1000061C[] = "/";
 /* 0x037550 0x10000550 None */ /* static */ extern char* D_10000550;
 /* 0x037554 0x10000554 None */ /* static */ extern char* D_10000554;
 /* 0x037558 0x10000558 None */ /* static */ extern char* D_10000558; // program_name (D_1000C2F0 in 7.1)
+
+// static int Pipe[2]; /* for implementing semaphore */
+#ifndef linux
+// static prmap_sgi_t mapbuf[100]; // B_10008310
+// static prmap_sgi_arg_t mapbuf_desc = { (char *) mapbuf, sizeof (mapbuf)} ;
+#define DATA_ADDRESS ((char*)0x10000000)
+#define TEXT_ADDRESS ((char*)0x400000)
+#endif
 
 /**
  * main
@@ -1768,7 +1777,7 @@ void dotime(void) {
  */
 // Search through a NULL-terminated array of directory names for a library. If not found there, use an appropriate
 // subdir of `usr/lib` instead.
-char* func_004339C8(char* name, char** dirs) {
+static char* func_004339C8(char* name, char** dirs) {
     int fd;
     char* path;
 
@@ -2544,7 +2553,7 @@ void update_instantiation_info_file(char* objname) {
  * Size: 0x2EC
  */
 // stop_on_exit in Open64
-int func_004362CC(pid_t pid) {
+static int func_004362CC(pid_t pid) {
     int procid;          // sp29C
     char procname[20];   // sp288
     prstatus_t pstatus;  // sp68
@@ -2594,10 +2603,10 @@ int func_004362CC(pid_t pid) {
  * VROM: 0x0365B8
  * Size: 0xC8
  */
+// my_psema
 // Test reading from Pipe.
 // Temp is removed in Open64.
-// my_psema
-void func_004365B8(void) {
+static void func_004365B8(void) {
     char c;
     int failure;
 
@@ -2616,9 +2625,9 @@ void func_004365B8(void) {
  * VROM: 0x036680
  * Size: 0xBC
  */
-// Test writing to Pipe
 // my_vsema
-void func_00436680(void) {
+// Test writing to Pipe
+static void func_00436680(void) {
     char c;
 
     close(B_1000A458[0]);
@@ -2635,5 +2644,101 @@ void func_00436680(void) {
  * VROM: 0x03673C
  * Size: 0x844
  */
-// /* static */ int func_0043673C();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_0043673C.s")
+// print_mem
+// Very similar in Open64, which uses `pr_size` instead of `pr_vsize * pagesize` and has an extra check.
+static void func_0043673C(char* phase, int num_maps) {
+#ifndef linux
+    int i, identified;
+    ulong_t mflags;
+    int pagesize;
+    size_t text_size, data_size, brk_size, stack_size, so_text_size, so_data_size, so_brk_size, mmap_size;
+    int verbose = (memory_flag > 1);
+
+    text_size = data_size = brk_size = stack_size = so_text_size = so_data_size = so_brk_size = mmap_size = 0;
+
+    pagesize = getpagesize();
+
+    /* now print out the maps obtained */
+    for (i = 0; i < num_maps; i++) {
+        identified = 0;
+        mflags = B_10008310[i].pr_mflags & ((1 << MA_REFCNT_SHIFT) - 1);
+        if (mflags == (MA_READ | MA_SHARED | MA_EXEC | MA_PRIMARY)) {
+            /* program text */
+            text_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if (mflags == (MA_READ | MA_SHARED | MA_EXEC)) {
+            /* .so text */
+            so_text_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if (mflags == (MA_COW | MA_READ | MA_WRITE) && B_10008310[i].pr_vaddr < DATA_ADDRESS) {
+            /* .so  data */
+            so_data_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if ((mflags == (MA_READ | MA_WRITE) || mflags == (MA_READ) || mflags == (MA_READ | MA_WRITE | MA_SHARED) ||
+             mflags == (MA_READ | MA_SHARED)) &&
+            B_10008310[i].pr_vaddr < DATA_ADDRESS) {
+            /* some sort of mmap region */
+            mmap_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        mflags &= ~MA_PRIMARY;
+        if (mflags == (MA_COW | MA_READ | MA_WRITE) && B_10008310[i].pr_vaddr >= DATA_ADDRESS) {
+            /* data space */
+            data_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if (mflags == (MA_COW | MA_READ | MA_WRITE | MA_BREAK) && B_10008310[i].pr_vaddr >= DATA_ADDRESS) {
+            /* brk space */
+            brk_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if (mflags == (MA_STACK | MA_READ | MA_WRITE)) { // Open64 has extra check,
+                                                         // || mflags==(MA_STACK|MA_READ|MA_WRITE|MA_COW)
+            /* stack space */
+            stack_size += B_10008310[i].pr_vsize * pagesize;
+            identified = 1;
+        }
+        if (identified == 0) {
+            fprintf(stderr, "-showm: Unidentified: segment %d\n", i);
+        }
+        if (verbose || identified == 0) {
+            fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, B_10008310[i].pr_vaddr);
+            fprintf(stderr, "pr_size[%d]= %lx\n", i, B_10008310[i].pr_size);
+            fprintf(stderr, "pr_off[%d]= %lx\n", i, B_10008310[i].pr_off);
+            fprintf(stderr, "pr_mflags[%d]= %lx\n", i, B_10008310[i].pr_mflags);
+            fprintf(stderr, "pr_vsize[%d]= %lx\n", i, B_10008310[i].pr_vsize);
+            fprintf(stderr, "pr_psize[%d]= %lx\n", i, B_10008310[i].pr_psize);
+            fprintf(stderr, "pr_wsize[%d]= %lx\n", i, B_10008310[i].pr_wsize);
+            fprintf(stderr, "pr_rsize[%d]= %lx\n", i, B_10008310[i].pr_rsize);
+            fprintf(stderr, "pr_msize[%d]= %lx\n", i, B_10008310[i].pr_msize);
+            fprintf(stderr, "pr_dev[%d]= %lx\n", i, B_10008310[i].pr_dev);
+            fprintf(stderr, "pr_ino[%d]= %lx\n", i, B_10008310[i].pr_ino);
+            fprintf(stderr, "\n");
+        }
+    }
+    fprintf(stderr, "%s phase mem: %ldT %ldD %ldB %ldS %ldt %ldd %ldb %ldm= %ldK\n", phase, text_size / 0x400,
+            data_size / 0x400, brk_size / 0x400, stack_size / 0x400, so_text_size / 0x400, so_data_size / 0x400,
+            so_brk_size / 0x400, mmap_size / 0x400,
+            (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
+                0x400);
+    if (verbose) {
+        fprintf(stderr, "text_size= %ld Kbytes\n", text_size / 0x400);
+        fprintf(stderr, "data_size= %ld Kbytes\n", data_size / 0x400);
+        fprintf(stderr, "brk_size= %ld Kbytes\n", brk_size / 0x400);
+        fprintf(stderr, "stack_size= %ld Kbytes\n", stack_size / 0x400);
+        fprintf(stderr, "so_text_size= %ld Kbytes\n", so_text_size / 0x400);
+        fprintf(stderr, "so_data_size= %ld Kbytes\n", so_data_size / 0x400);
+        fprintf(stderr, "so_brk_size= %ld Kbytes\n", so_brk_size / 0x400);
+        fprintf(stderr, "mmap_size= %ld Kbytes\n", mmap_size / 0x400);
+        fprintf(
+            stderr, "TOTAL_SIZE= %ld Kbytes\n",
+            (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
+                0x400);
+    }
+#else
+    fprintf(stderr, "-showm not implemented under linux\n");
+#endif
+}
