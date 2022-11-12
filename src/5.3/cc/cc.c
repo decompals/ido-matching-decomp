@@ -11,6 +11,7 @@
 #include "malloc.h"
 #include "sys/stat.h"
 #include "sys/times.h"
+#include "fcntl.h"
 #include "sex.h"
 #include "unistd.h"
 
@@ -146,6 +147,7 @@ typedef enum EditFlag {
     /* 2 */ EDIT_FLAG_2  //!< "-edit[0-9]" and environment variable for EDITOR contains "emacs"
 } EditFlag;
 
+int regular_file(const char*);
 void addstr(string_list* list, string str);
 void cleanup(void);
 
@@ -1632,8 +1634,20 @@ void dotime(void) {
  * VROM: 0x033CA4
  * Size: 0x98
  */
-// int regular_not_writeable();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/regular_not_writeable.s")
+// Looks boolean, but not treated as one.
+int regular_not_writeable(const char* path) {
+    int fd;
+
+    if (regular_file(path) != 1) {
+        return 0;
+    }
+    fd = open(path, 2, 0666);
+    if (fd >= 0) {
+        close(fd);
+        return 0;
+    }
+    return 1;
+}
 
 /**
  * regular_file
