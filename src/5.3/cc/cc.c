@@ -876,7 +876,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
 }
 
 // Macros for common selections of these three programs
-#define CPP_MACRO (((cppchoice != 1) && (cppchoice != 3)) ? "cpp" : "acpp")
+#define CPP_MACRO (((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3)) ? "cpp" : "acpp")
 #define CCOM_MACRO ((ansichoice != ANSICHOICE_KR) ? "accom" : "ccom")
 #define CFE_MACRO                                                                             \
     (((c_compiler_choice != C_COMPILER_CHOICE_0) || ((compiler == COMPILER_3) && D_100001FC)) \
@@ -888,6 +888,46 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
  * Address: 0x0042B254
  * VROM: 0x02B254
  * Size: 0x3F5C
+ */
+/**
+ * List of letters used and programs affected
+ * h: include, einclude, includeB
+ * p: cpp
+ * f: mpc, ccom, cfe, upas, fcom, upl1 (pl1fe), ucob (cobfe)
+ * e: pl1err (pl1error)
+ * k: ulpi
+ * j: ujoin
+ * u: uld
+ * s: usplit
+ * m: umerge
+ * v: uloop
+ * o: opt (uopt)
+ * d: ddopt
+ * q: uopt0
+ * c: gen (ugen)
+ * a: as0
+ * b: as1
+ * l: ld, patch (c++patch), filter (c++filt)
+ * y: ftoc
+ * z: cord
+ * r: crtx, cxx_init, delta_init, crtn
+ * P: lipb, libp_b
+ * 1: libpl1, libpl1_b
+ * E: libexc, libmld
+ * W: libdw, libdw_path, libdw_b
+ * X: libxmalloc, libxmalloc_b
+ * C: -
+ * O: libsort, libsort_b
+ * n: libprof
+ * M: libm, libm_b
+ * F: libF77, libF77_b, libftn
+ * I: libI77, libI77_b
+ * S: libisam, libisam_b
+ * U: libU77, libU77_b
+ * t: btou, utob
+ * K: fopt, copt, pfa, pca
+ * Y: libI77_mp, libc_mp
+ * w: prelinker (edg_prelink)
  */
 void relocate_passes(char* arg0, char* arg1, char* arg2) {
     register int pad;
