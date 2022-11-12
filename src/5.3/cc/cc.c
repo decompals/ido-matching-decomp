@@ -1581,33 +1581,44 @@ void mktempstr(void) {
  * VROM: 0x03192C
  * Size: 0xD34
  */
-int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
-    char* const* spA4;
-    int spA0;
-    int sp9C;
-    int sp98;
-    int sp94;
-    int sp90;
-    int sp8C;
-    int sp88;
-    int sp84;
-    int sp80;
-    int sp7C;
-    const char* sp78;
-    int sp74;
-    sysset_t sp34;
 
-    if (vflag != 0) {
-        fprintf(stderr, "%s ", arg0);
-        spA4 = arg1 + 1;
-        while (*spA4 != NULL) {
-            fprintf(stderr, "%s ", *spA4++);
+/**
+ * Run a program, possibly duplicating stdin/stdout/stderr, and with the option of running memory analysis.
+ *
+ * @param name Name of program to run.
+ * @param argv Arguments to pass (as an `argv`-style string list).
+ * @param input File to dup `stdin` to.
+ * @param output File to dup `stdout` to.
+ * @param err_output File to dup `stderr` to.
+ * @return int 0 on success, -1 on failure.
+ *
+ * @remark This was clearly used as a basis for Open64's `run_phase`.
+ */
+int run(char* name, char* const argv[], char* input, char* output, char* err_output) {
+    char* const* p;       // spA4
+    int forkpid;          // spA0
+    int waitpid;          // sp9C
+    int termsig;          // sp98
+    int fdin;             // sp94
+    int fdout;            // sp90
+    int fderr;            // sp8C
+    int sigterm;          // sp88
+    int sigint;           // sp84
+    int waitstatus;       // sp80
+    int num_maps;         // sp7C
+    const char* prodname; // sp78
+
+    if (vflag) {
+        fprintf(stderr, "%s ", name);
+        p = argv + 1;
+        while (*p != NULL) {
+            fprintf(stderr, "%s ", *p++);
         }
-        if (arg2 != NULL) {
-            fprintf(stderr, "< %s ", arg2);
+        if (input != NULL) {
+            fprintf(stderr, "< %s ", input);
         }
-        if (arg3 != 0) {
-            fprintf(stderr, "> %s ", arg3);
+        if (output != 0) {
+            fprintf(stderr, "> %s ", output);
         }
         fprintf(stderr, "\n");
         settimes();
@@ -1617,150 +1628,163 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         return 0;
     }
 
-    if ((memory_flag != 0) && (pipe(B_1000A458) < 0)) {
-        error(1, NULL, 0, NULL, 0, "pipe failed for -showm");
-        return -1;
+    if (memory_flag != 0) {
+        if (pipe(B_1000A458) < 0) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "pipe failed for -showm");
+            return -1;
+        }
     }
 
-    spA0 = fork();
-    if (spA0 == -1) {
-        error(1, NULL, 0, NULL, 0, "no more processes\n");
+    forkpid = fork();
+    if (forkpid == -1) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no more processes\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         return -1;
     }
 
-    if (spA0 == 0) {
-        if (memory_flag != 0) {
+    if (forkpid == 0) {
+        /* child */
+        /* if we want memory stats, we have to wait for
+           parent to connect to our /proc */
+        if (memory_flag) {
             func_004365B8();
         }
 
-        if (arg2 != NULL) {
-            sp94 = open(arg2, 0);
-            if (sp94 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
+        if (input != NULL) {
+            if ((fdin = open(input, O_RDONLY)) == -1) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't open input file: %s\n", input);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
+                /* NOTREACHED */
             }
-            dup2(sp94, fileno(stdin));
+            dup2(fdin, fileno(stdin));
         }
 
-        if (arg3 != 0) {
-            sp90 = creat(arg3, 0666);
-            if (sp90 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
+        if (output != NULL) {
+            fdout = creat(output, 0666);
+            if (fdout == -1) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create output file: %s\n", output);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
+                /* NOTREACHED */
             }
-            dup2(sp90, fileno(stdout));
+            dup2(fdout, fileno(stdout));
         }
 
-        if (arg4 != 0) {
-            sp8C = creat(arg4, 0666);
-            if (sp8C == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
+        if (err_output != NULL) {
+            fderr = creat(err_output, 0666);
+            if (fderr == -1) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create error file: %s\n", err_output);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
+                /* NOTREACHED */
             }
-            dup2(sp8C, fileno(stderr));
+            dup2(fderr, fileno(stderr));
         }
 
-        execvp(arg0, arg1);
-        sp78 = func_00434094(arg0, 1);
-        if ((errno == 2) && (sp78 != 0)) {
-            error(1, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
+        execvp(name, argv);
+        prodname = func_00434094(name, TRUE);
+        if ((errno == ENOENT) && (prodname != NULL)) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", prodname, name);
         } else {
-            sp78 = func_00434094(arg0, 0);
-            if ((errno == 2) && (sp78 != NULL)) {
-                error(1, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
+            prodname = func_00434094(name, FALSE);
+            if ((errno == ENOENT) && (prodname != NULL)) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", prodname,
+                      name);
             } else {
-                error(1, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't find or exec: %s\n", name);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
             }
         }
         cleanup();
         exit(1);
+        /* NOTREACHED */
     } else {
-        sp84 = sigset(2, 1);
-        sp88 = sigset(0xF, 1);
+        /* parent */
+        int procid; /* id of the /proc file */ // sp74
+        sysset_t syscallSet;                   // sp34
+
+        /* copy this wait stuff from old driver */
+        // old being this one?
+        sigint = sigset(SIGINT, SIG_IGN);
+        sigterm = sigset(SIGTERM, SIG_IGN);
+        /* if we are interested in memory statistics, we need to
+           set a stop-on-exit for the child */
         if (memory_flag != 0) {
-            sp74 = func_004362CC(spA0);
-            sp7C = ioctl(sp74, 0x71F9, &D_10000430);
-            if (sp7C < 0) {
+            procid = func_004362CC(forkpid);
+            if ((num_maps = ioctl(procid, PIOCMAP_SGI, &D_10000430)) < 0) {
                 perror("PIOCMAP_SGI");
-                kill(spA0, 9);
+                kill(forkpid, SIGKILL);
                 return -1;
             }
 
-            premptyset(&sp34);
-
-            if (ioctl(sp74, 0x7114, &sp34) < 0) {
+            premptyset(&syscallSet);
+            if (ioctl(procid, PIOCSEXIT, &syscallSet) < 0) {
                 perror("PIOCSEXIT");
-                kill(spA0, SIGKILL);
+                kill(forkpid, SIGKILL);
                 return -1;
             }
-            ioctl(sp74, 0x7104, 0);
-            close(sp74);
+            /* continue the process */
+            ioctl(procid, PIOCRUN, NULL);
+            close(procid);
         }
 
-        while ((sp9C = wait(&sp80)) != spA0) {
-            if (sp9C == -1) {
+        while ((waitpid = wait(&waitstatus)) != forkpid) {
+            if (waitpid == -1) {
                 return -1;
             }
         }
 
-        sigset(2, sp84);
-        sigset(0xF, sp88);
-        if (vflag != 0) {
+        (void)sigset(SIGINT, sigint);
+        (void)sigset(SIGTERM, sigterm);
+        if (vflag) {
             dotime();
         }
         if (memory_flag != 0) {
-            func_0043673C(arg0, sp7C);
+            func_0043673C(name, num_maps);
         }
 
-        if (WIFSTOPPED(sp80)) {
-            sp98 = WSTOPSIG(sp80);
-            fprintf(stderr, "STOPPED signal received from: %s ", arg0);
-            fprintf(stderr, " (Signal %d) ", sp98);
-            fprintf(stderr, " Process  %d abandoned\n", sp9C);
-            return sp98;
-        }
-        if (WIFEXITED(sp80)) {
-            return WEXITSTATUS(sp80);
-        }
-
-        if (WIFSIGNALED(sp80)) {
-            sp98 = WTERMSIG(sp80);
-            fprintf(stderr, "Fatal error in: %s ", arg0);
-            printf(" child died due to signal %d.\n", sp98);
-            if (sp98 == SIGKILL) {
+        if (WIFSTOPPED(waitstatus)) {
+            termsig = WSTOPSIG(waitstatus);
+            fprintf(stderr, "STOPPED signal received from: %s ", name);
+            fprintf(stderr, " (Signal %d) ", termsig);
+            fprintf(stderr, " Process  %d abandoned\n", waitpid);
+            return termsig;
+        } else if (WIFEXITED(waitstatus)) {
+            return WEXITSTATUS(waitstatus);
+        } else if (WIFSIGNALED(waitstatus)) {
+            termsig = WTERMSIG(waitstatus);
+            fprintf(stderr, "Fatal error in: %s ", name);
+            printf(" child died due to signal %d.\n", termsig);
+            if (termsig == SIGKILL) {
                 printf("Probably caused by running out of swap space -- check /usr/adm/SYSLOG.\n");
-                exit(sp98);
+                exit(termsig);
             }
-            if (sp98 == SIGINT) {
+            if (termsig == SIGINT) {
                 cleanup();
                 exit(3);
             }
-            fprintf(stderr, "Fatal error in: %s ", arg0);
-            fprintf(stderr, " Signal %d ", sp98);
-            if (sp80 & WCOREFLAG) {
+            fprintf(stderr, "Fatal error in: %s ", name);
+            fprintf(stderr, " Signal %d ", termsig);
+            if (waitstatus & WCOREFLAG) {
                 fprintf(stderr, "- core dumped\n");
             } else {
                 fprintf(stderr, "\n");
             }
-            exit(sp98);
+            exit(termsig);
         } else {
             return 0;
         }
@@ -2520,7 +2544,8 @@ void record_static_fileset(const char* arg0) {
 
     temp_file = fopen(D_10000554, "w+");
     if (temp_file == NULL) {
-        error(1, NULL, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n", D_10000554);
+        error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n",
+              D_10000554);
         perror(D_10000558);
         cleanup();
         exit(1);
@@ -2528,22 +2553,24 @@ void record_static_fileset(const char* arg0) {
 
     fd = open(D_10000550, O_RDWR | O_CREAT, 0666);
     if (fd < 0) {
-        error(1, NULL, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n",
-              D_10000550);
+        error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0,
+              "could not open or create cvstatic fileset file %s\n", D_10000550);
         perror(D_10000558);
         unlink(D_10000554);
         cleanup();
         exit(1);
     }
     if (flock(fd, LOCK_EX) < 0) {
-        error(1, NULL, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n", D_10000550);
+        error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n",
+              D_10000550);
         perror(D_10000558);
         unlink(D_10000554);
         cleanup();
         exit(1);
     }
     if (fstat(fd, &sbuf) < 0) {
-        error(1, NULL, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n", D_10000550);
+        error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n",
+              D_10000550);
         perror(D_10000558);
         unlink(D_10000554);
         cleanup();
@@ -2555,7 +2582,8 @@ void record_static_fileset(const char* arg0) {
 
     file = fdopen(fd, "r+");
     if (file == NULL) {
-        error(1, NULL, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n", D_10000550);
+        error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n",
+              D_10000550);
         perror(D_10000558);
         unlink(D_10000554);
         cleanup();
@@ -2579,7 +2607,8 @@ void record_static_fileset(const char* arg0) {
 
     while ((sp28E4 = fread(contents_buf, 1, CONTENTS_BUF_SIZE, temp_file)) > 0) {
         if (fwrite(&contents_buf, 1, sp28E4, file) != sp28E4) {
-            error(1, NULL, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n", D_10000550);
+            error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n",
+                  D_10000550);
             perror(D_10000558);
             unlink(D_10000554);
             cleanup();
