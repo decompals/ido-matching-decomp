@@ -473,7 +473,7 @@ static const char STR_1000061C[] = "/";
 /* 0x037200 0x10000200 None */ /* static */ extern UNK_TYPE D_10000200;
 /* 0x037204 0x10000204 None */ /* static */ extern UNK_TYPE D_10000204;
 /* 0x037208 0x10000208 None */ /* static */ extern UNK_TYPE D_10000208;
-/* 0x03720C 0x1000020C None */ /* static */ extern UNK_TYPE D_1000020C;
+/* 0x03720C 0x1000020C None */ /* static */ extern /* boolean */ int D_1000020C;
 /* 0x037210 0x10000210 None */ /* static */ extern UNK_TYPE D_10000210;
 /* 0x037214 0x10000214 257  */ extern /* boolean */ int Eflag;
 /* 0x037218 0x10000218 258  */ extern UNK_TYPE Pflag;
@@ -2089,8 +2089,11 @@ void init_curr_dir(void) {
  * VROM: 0x0343F0
  * Size: 0x54
  */
-// int add_static_opt();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/add_static_opt.s")
+void add_static_opt(char* opt) {
+    if (!D_1000020C) {
+        addstr(&staticopts, opt);
+    }
+}
 
 /**
  * record_static_fileset
