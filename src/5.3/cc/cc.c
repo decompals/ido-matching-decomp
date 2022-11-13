@@ -17,6 +17,7 @@
 #include "fcntl.h"
 #include "signal.h"
 #include "sex.h"
+#include "termios.h"
 #include "wait.h"
 #include "varargs.h"
 #include "unistd.h"
@@ -100,6 +101,11 @@ typedef struct {
 #define LIST_CAPACITY_INCR 20
 #define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
 
+typedef struct {
+    const char* unk_0;
+    unsigned int unk_4;
+} struct_mpflags;
+
 typedef enum {
     /* 0 */ ERRORCAT_INTERNAL, // Unused
     /* 1 */ ERRORCAT_ERROR,
@@ -175,6 +181,33 @@ typedef enum {
     /* 3 */ CPP_CHOICE_3  // Other ANSICHOICE_
 } CppChoice;
 
+typedef enum {
+    /* 0 */ MIPS_ABI_0, // ?. Set by IRIX4 flags and environment variable
+    /* 1 */ MIPS_ABI_1, // O32. Default, also set by "-32bit", "-32", "-o32"
+    /* 2 */ MIPS_ABI_2  // N64, not set
+} MipsAbi;
+
+typedef enum {
+    /* 0 */ COMP_CHOICE_0,
+    /* 1 */ COMP_CHOICE_1,
+    /* 2 */ COMP_CHOICE_2,
+    /* 3 */ COMP_CHOICE_3,
+    /* 4 */ COMP_CHOICE_4
+} CompChoice;
+
+typedef enum {
+    /* 1 */ EDISON_TYPE_1 = 1,
+    /* 2 */ EDISON_TYPE_2,
+    /* 3 */ EDISON_TYPE_3
+} EdisonType;
+
+void parse_command(int argc, char** argv);
+void relocate_passes(char* arg0, char* arg1, char* arg2);
+void newrunlib(void);
+char getsuf(const /* string */ char* path);
+char* mksuf(const char* path, char value);
+/* string */ char* full_path(const /* string */ char* base);
+void add_static_opt(/* string */ char* opt);
 void compose_G0_libs(char* arg0);
 int regular_file(const char*);
 void addstr(string_list* list, string str);
@@ -351,8 +384,8 @@ static void func_004365B8(void);
 /* 041550 1000A550 */ string_list feedlist;                    // line 292
                                                                // 0x4 padding
 /* 041560 1000A560 */ string_list execlist;                    // line 294
-/* 04156C 1000A56C */ static char B_1000A56C[0x04];
-/* 041570 1000A570 */ static char B_1000A570[0x08];
+/* 04156C 1000A56C */ static int B_1000A56C;
+/* 041570 1000A570 */ static int B_1000A570;
 /* 041578 1000A578 */ string_list dirs_for_crtn;           // line 299
                                                            // 0x4 padding
 /* 041588 1000A588 */ string_list dirs_for_nonshared_crtn; // line 301
@@ -360,7 +393,7 @@ static void func_004365B8(void);
 /* 041598 1000A598 */ string_list dirs_for_abi_crtn;       // line 303
                                                            // 0x4 padding
 /* 0415A8 1000A5A8 */ string_list ldZflags;                // line 305
-/* 0415B4 1000A5B4 */ static char B_1000A5B4[0x04];
+/* 0415B4 1000A5B4 */ static int B_1000A5B4;
 /* 0415B8 1000A5B8 */ string_list pfaflags;         // line 307
 /* 0415C4 1000A5C4 */ char* pfa;                    // line 307
 /* 0415C8 1000A5C8 */ char* libI77_mp;              // line 309
@@ -413,9 +446,9 @@ static const char STR_1000061C[] = "/";
 /* 0x037004 0x10000004 162  */ extern AnsiChoice ansichoice;
 /* 0x037008 0x10000008 163  */ extern CCompilerChoice c_compiler_choice;
 /* 0x03700C 0x1000000C 164  */ extern struct _struct_suffixes_0x8 suffixes[];
-/* 0x037084 0x10000084 165  */ extern UNK_TYPE include;
+/* 0x037084 0x10000084 165  */ extern char* include;
 /* 0x037088 0x10000088 166  */ extern char* includeB;
-/* 0x03708C 0x1000008C 167  */ extern UNK_TYPE einclude;
+/* 0x03708C 0x1000008C 167  */ extern char* einclude;
 /* 0x037090 0x10000090 168  */ extern char* eincludeB;
 /* 0x037094 0x10000094 169  */ extern char* cpp;
 /* 0x037098 0x10000098 170  */ extern char* ccom;
@@ -446,14 +479,14 @@ static const char STR_1000061C[] = "/";
 /* 0x0370FC 0x100000FC 195  */ extern char* patch;
 /* 0x037100 0x10000100 196  */ extern /* string */ char* filter;
 /* 0x037104 0x10000104 197  */ extern char* prelinker;
-/* 0x037108 0x10000108 198  */ extern UNK_TYPE smart_build;
-/* 0x03710C 0x1000010C 199  */ extern UNK_TYPE sbrepos;
-/* 0x037110 0x10000110 200  */ extern UNK_TYPE no_prelink;
+/* 0x037108 0x10000108 198  */ extern /* boolean */ int smart_build;
+/* 0x03710C 0x1000010C 199  */ extern char* sbrepos;
+/* 0x037110 0x10000110 200  */ extern /* boolean */ int no_prelink;
 /* 0x037114 0x10000114 201  */ extern /* boolean */ int nofilt;
-/* 0x037118 0x10000118 202  */ extern UNK_TYPE force_prelink;
-/* 0x03711C 0x1000011C 203  */ extern UNK_TYPE verbose_prelink;
-/* 0x037120 0x10000120 204  */ extern UNK_TYPE auto_template_include;
-/* 0x037124 0x10000124 205  */ extern UNK_TYPE nocode;
+/* 0x037118 0x10000118 202  */ extern /* boolean */ int force_prelink;
+/* 0x03711C 0x1000011C 203  */ extern int verbose_prelink; // pseudoboolean
+/* 0x037120 0x10000120 204  */ extern /* boolean */ int auto_template_include;
+/* 0x037124 0x10000124 205  */ extern /* boolean */ int nocode;
 /* 0x037128 0x10000128 206  */ extern UNK_TYPE nocompileneeded;
 /* 0x03712C 0x1000012C 207  */ extern char* LibM;
 /* 0x037130 0x10000130 208  */ extern char* LibP;
@@ -502,145 +535,145 @@ static const char STR_1000061C[] = "/";
 /* 0x0371DC 0x100001DC 249  */ extern char* libxmalloc_b;
 /* 0x0371E0 0x100001E0 250  */ extern UNK_TYPE cpp_stdflag;
 /* 0x0371E4 0x100001E4 251  */ extern char* libmld;
-/* 0x0371E8 0x100001E8 252  */ extern UNK_TYPE crtn_required;
+/* 0x0371E8 0x100001E8 252  */ extern /* boolean */ int crtn_required;
 /* 0x0371EC 0x100001EC 253  */ extern char* pca;
 /* 0x0371F0 0x100001F0 254  */ extern char* libc_mp;
 /* 0x0371F4 0x100001F4 255  */ extern char* fopt;
 /* 0x0371F8 0x100001F8 256  */ extern char* copt;
 /* 0x0371FC 0x100001FC None */ /* static */ extern /* boolean */ int D_100001FC;
-/* 0x037200 0x10000200 None */ /* static */ extern UNK_TYPE D_10000200;
+/* 0x037200 0x10000200 None */ /* static */ extern /* boolean */ int D_10000200;
 /* 0x037204 0x10000204 None */ /* static */ extern char* D_10000204;
 /* 0x037208 0x10000208 None */ /* static */ extern char* D_10000208;
 /* 0x03720C 0x1000020C None */ /* static */ extern /* boolean */ int D_1000020C;
 /* 0x037210 0x10000210 None */ /* static */ extern /* boolean */ int D_10000210;
 /* 0x037214 0x10000214 257  */ extern /* boolean */ int Eflag;
-/* 0x037218 0x10000218 258  */ extern UNK_TYPE Pflag;
-/* 0x03721C 0x1000021C 259  */ extern UNK_TYPE gflag;
+/* 0x037218 0x10000218 258  */ extern int Pflag; // pseudoboolean
+/* 0x03721C 0x1000021C 259  */ extern int gflag;
 /* 0x037220 0x10000220 260  */ extern int pflag;
-/* 0x037224 0x10000224 261  */ extern UNK_TYPE jflag;
-/* 0x037228 0x10000228 262  */ extern UNK_TYPE cflag;
-/* 0x03722C 0x1000022C 263  */ extern UNK_TYPE Sflag;
-/* 0x037230 0x10000230 264  */ extern UNK_TYPE Oflag;
+/* 0x037224 0x10000224 261  */ extern int jflag; // pseudoboolean
+/* 0x037228 0x10000228 262  */ extern int cflag; // pseudoboolean
+/* 0x03722C 0x1000022C 263  */ extern int Sflag; // pseudoboolean
+/* 0x037230 0x10000230 264  */ extern int Oflag;
 /* 0x037234 0x10000234 265  */ extern /* boolean */ int vflag;
-/* 0x037238 0x10000238 266  */ extern UNK_TYPE execute_flag;
+/* 0x037238 0x10000238 266  */ extern /* boolean */ int execute_flag;
 /* 0x03723C 0x1000023C 267  */ extern /* boolean */ int Vflag;
 /* 0x037240 0x10000240 268  */ extern /* boolean */ int Kflag;
-/* 0x037244 0x10000244 269  */ extern UNK_TYPE minus_M;
-/* 0x037248 0x10000248 270  */ extern UNK_TYPE anachronisms;
-/* 0x03724C 0x1000024C 271  */ extern UNK_TYPE disable_inlines;
-/* 0x037250 0x10000250 272  */ extern UNK_TYPE cfront_compatible;
-/* 0x037254 0x10000254 273  */ extern UNK_TYPE make_edison_shlib;
-/* 0x037258 0x10000258 274  */ extern UNK_TYPE plusIflag;
-/* 0x03725C 0x1000025C 275  */ extern UNK_TYPE signedcharflag;
-/* 0x037260 0x10000260 276  */ extern UNK_TYPE Lflag;
-/* 0x037264 0x10000264 277  */ extern UNK_TYPE set_loop_unroll;
-/* 0x037268 0x10000268 278  */ extern UNK_TYPE mflag;
-/* 0x03726C 0x1000026C 279  */ extern UNK_TYPE Fflag;
-/* 0x037270 0x10000270 280  */ extern UNK_TYPE stdflag;
-/* 0x037274 0x10000274 281  */ extern UNK_TYPE cplusflag;
-/* 0x037278 0x10000278 282  */ extern UNK_TYPE ucodeflag;
-/* 0x03727C 0x1000027C 283  */ extern UNK_TYPE Bflag;
+/* 0x037244 0x10000244 269  */ extern int minus_M; // pseudoboolean
+/* 0x037248 0x10000248 270  */ extern /* boolean */ int anachronisms;
+/* 0x03724C 0x1000024C 271  */ extern /* boolean */ int disable_inlines;
+/* 0x037250 0x10000250 272  */ extern /* boolean */ int cfront_compatible;
+/* 0x037254 0x10000254 273  */ extern int make_edison_shlib; // pseudoboolean
+/* 0x037258 0x10000258 274  */ extern /* boolean */ int plusIflag;
+/* 0x03725C 0x1000025C 275  */ extern /* boolean */ int signedcharflag;
+/* 0x037260 0x10000260 276  */ extern /* boolean */ int Lflag;
+/* 0x037264 0x10000264 277  */ extern /* boolean */ int set_loop_unroll;
+/* 0x037268 0x10000268 278  */ extern int mflag; // pseudoboolean
+/* 0x03726C 0x1000026C 279  */ extern int Fflag; // pseudoboolean
+/* 0x037270 0x10000270 280  */ extern int stdflag;
+/* 0x037274 0x10000274 281  */ extern /* boolean */ int cplusflag;
+/* 0x037278 0x10000278 282  */ extern /* boolean */ int ucodeflag;
+/* 0x03727C 0x1000027C 283  */ extern /* boolean */ int Bflag;
 /* 0x037280 0x10000280 284  */ extern /* boolean */ int fiveflag;
-/* 0x037284 0x10000284 285  */ extern UNK_TYPE automaticflag;
-/* 0x037288 0x10000288 286  */ extern UNK_TYPE emptyIflag;
-/* 0x03728C 0x1000028C 287  */ extern UNK_TYPE cordflag;
-/* 0x037290 0x10000290 288  */ extern UNK_TYPE ansiflag;
-/* 0x037294 0x10000294 289  */ extern UNK_TYPE lpilockflag;
-/* 0x037298 0x10000298 290  */ extern UNK_TYPE nolockflag;
-/* 0x03729C 0x1000029C 291  */ extern UNK_TYPE unrollflag;
-/* 0x0372A0 0x100002A0 292  */ extern UNK_TYPE libm_spec;
-/* 0x0372A4 0x100002A4 293  */ extern UNK_TYPE libfastm_spec;
+/* 0x037284 0x10000284 285  */ extern /* boolean */ int automaticflag;
+/* 0x037288 0x10000288 286  */ extern int emptyIflag; // pseudoboolean
+/* 0x03728C 0x1000028C 287  */ extern /* boolean */ int cordflag;
+/* 0x037290 0x10000290 288  */ extern /* boolean */ int ansiflag;
+/* 0x037294 0x10000294 289  */ extern /* boolean */ int lpilockflag;
+/* 0x037298 0x10000298 290  */ extern /* boolean */ int nolockflag;
+/* 0x03729C 0x1000029C 291  */ extern /* boolean */ int unrollflag;
+/* 0x0372A0 0x100002A0 292  */ extern /* boolean */ int libm_spec;
+/* 0x0372A4 0x100002A4 293  */ extern /* boolean */ int libfastm_spec;
 /* 0x0372A8 0x100002A8 294  */ extern EditFlag editflag;
-/* 0x0372AC 0x100002AC 295  */ extern UNK_TYPE oldccomflag;
-/* 0x0372B0 0x100002B0 296  */ extern UNK_TYPE oldcflag;
-/* 0x0372B4 0x100002B4 297  */ extern UNK_TYPE oldcppflag;
-/* 0x0372B8 0x100002B8 23   */ extern UNK_TYPE fflag;  // dynsym reorder?
-/* 0x0372BC 0x100002BC 298  */ extern UNK_TYPE tpflag; // dynsym reorder?
-/* 0x0372C0 0x100002C0 299  */ extern UNK_TYPE ddoptflag;
-/* 0x0372C4 0x100002C4 300  */ extern UNK_TYPE uopt0flag;
-/* 0x0372C8 0x100002C8 24   */ extern UNK_TYPE protoflag;   // dynsym reorder?
-/* 0x0372CC 0x100002CC 301  */ extern UNK_TYPE kminabiflag; // dynsym reorder?
-/* 0x0372D0 0x100002D0 302  */ extern UNK_TYPE kpicopt_flag;
-/* 0x0372D4 0x100002D4 303  */ extern UNK_TYPE nokpicopt_flag;
-/* 0x0372D8 0x100002D8 304  */ extern UNK_TYPE elfflag;
-/* 0x0372DC 0x100002DC 305  */ extern UNK_TYPE coff_spec;
-/* 0x0372E0 0x100002E0 306  */ extern UNK_TYPE elf_spec;
+/* 0x0372AC 0x100002AC 295  */ extern /* boolean */ int oldccomflag;
+/* 0x0372B0 0x100002B0 296  */ extern /* boolean */ int oldcflag;
+/* 0x0372B4 0x100002B4 297  */ extern /* boolean */ int oldcppflag;
+/* 0x0372B8 0x100002B8 23   */ extern /* boolean */ int fflag;  // dynsym reorder?
+/* 0x0372BC 0x100002BC 298  */ extern /* boolean */ int tpflag; // dynsym reorder?
+/* 0x0372C0 0x100002C0 299  */ extern /* boolean */ int ddoptflag;
+/* 0x0372C4 0x100002C4 300  */ extern /* boolean */ int uopt0flag;
+/* 0x0372C8 0x100002C8 24   */ extern /* boolean */ int protoflag;   // dynsym reorder?
+/* 0x0372CC 0x100002CC 301  */ extern /* boolean */ int kminabiflag; // dynsym reorder?
+/* 0x0372D0 0x100002D0 302  */ extern /* boolean */ int kpicopt_flag;
+/* 0x0372D4 0x100002D4 303  */ extern /* boolean */ int nokpicopt_flag;
+/* 0x0372D8 0x100002D8 304  */ extern /* boolean */ int elfflag;
+/* 0x0372DC 0x100002DC 305  */ extern /* boolean */ int coff_spec;
+/* 0x0372E0 0x100002E0 306  */ extern /* boolean */ int elf_spec;
 /* 0x0372E4 0x100002E4 307  */ extern /* boolean */ int compose_first_G0;
-/* 0x0372E8 0x100002E8 308  */ extern UNK_TYPE mips1_spec_flag;
-/* 0x0372EC 0x100002EC 309  */ extern UNK_TYPE mips1flag;
-/* 0x0372F0 0x100002F0 310  */ extern UNK_TYPE mips2flag;
-/* 0x0372F4 0x100002F4 311  */ extern UNK_TYPE mips3flag;
-/* 0x0372F8 0x100002F8 312  */ extern UNK_TYPE ignore_unresolved_flag;
-/* 0x0372FC 0x100002FC 313  */ extern UNK_TYPE no_unresolved_flag;
-/* 0x037300 0x10000300 314  */ extern UNK_TYPE swopcodeflag;
-/* 0x037304 0x10000304 315  */ extern UNK_TYPE dwopcodeflag;
-/* 0x037308 0x10000308 316  */ extern UNK_TYPE sixty4bit_spec;
-/* 0x03730C 0x1000030C 317  */ extern UNK_TYPE sixty4bitflag;
-/* 0x037310 0x10000310 318  */ extern UNK_TYPE thirty2bitflag;
-/* 0x037314 0x10000314 319  */ extern UNK_TYPE fullasoptflag;
-/* 0x037318 0x10000318 320  */ extern UNK_TYPE old_non_shared;
-/* 0x03731C 0x1000031C 321  */ extern UNK_TYPE non_shared_emitted;
-/* 0x037320 0x10000320 322  */ extern UNK_TYPE longlong_emitted;
+/* 0x0372E8 0x100002E8 308  */ extern /* boolean */ int mips1_spec_flag;
+/* 0x0372EC 0x100002EC 309  */ extern /* boolean */ int mips1flag;
+/* 0x0372F0 0x100002F0 310  */ extern /* boolean */ int mips2flag;
+/* 0x0372F4 0x100002F4 311  */ extern /* boolean */ int mips3flag;
+/* 0x0372F8 0x100002F8 312  */ extern /* boolean */ int ignore_unresolved_flag;
+/* 0x0372FC 0x100002FC 313  */ extern /* boolean */ int no_unresolved_flag;
+/* 0x037300 0x10000300 314  */ extern /* boolean */ int swopcodeflag;
+/* 0x037304 0x10000304 315  */ extern /* boolean */ int dwopcodeflag;
+/* 0x037308 0x10000308 316  */ extern /* boolean */ int sixty4bit_spec;
+/* 0x03730C 0x1000030C 317  */ extern /* boolean */ int sixty4bitflag;
+/* 0x037310 0x10000310 318  */ extern /* boolean */ int thirty2bitflag;
+/* 0x037314 0x10000314 319  */ extern /* boolean */ int fullasoptflag;
+/* 0x037318 0x10000318 320  */ extern /* boolean */ int old_non_shared;
+/* 0x03731C 0x1000031C 321  */ extern /* boolean */ int non_shared_emitted;
+/* 0x037320 0x10000320 322  */ extern /* boolean */ int longlong_emitted;
 /* 0x037324 0x10000324 323  */ extern /* boolean */ int non_shared;
-/* 0x037328 0x10000328 324  */ extern UNK_TYPE Gseen_flag;
-/* 0x03732C 0x1000032C 325  */ extern UNK_TYPE transitive_link;
-/* 0x037330 0x10000330 326  */ extern UNK_TYPE full_transitive_link;
-/* 0x037334 0x10000334 327  */ extern UNK_TYPE no_transitive_link;
-/* 0x037338 0x10000338 328  */ extern UNK_TYPE quickstart_info;
-/* 0x03733C 0x1000033C 329  */ extern UNK_TYPE force_rm_dead_code;
-/* 0x037340 0x10000340 330  */ extern UNK_TYPE kpic_flag;
-/* 0x037344 0x10000344 331  */ extern UNK_TYPE kpic_spec;
-/* 0x037348 0x10000348 332  */ extern UNK_TYPE call_shared;
-/* 0x03734C 0x1000034C 333  */ extern UNK_TYPE excpt_flag;
-/* 0x037350 0x10000350 334  */ extern UNK_TYPE trapuv_flag;
-/* 0x037354 0x10000354 335  */ extern UNK_TYPE dmips_emit;
-/* 0x037358 0x10000358 25   */ extern UNK_TYPE Xvalues_Flag;          // dynsym reorder?
+/* 0x037328 0x10000328 324  */ extern /* boolean */ int Gseen_flag;
+/* 0x03732C 0x1000032C 325  */ extern /* boolean */ int transitive_link;
+/* 0x037330 0x10000330 326  */ extern /* boolean */ int full_transitive_link;
+/* 0x037334 0x10000334 327  */ extern /* boolean */ int no_transitive_link;
+/* 0x037338 0x10000338 328  */ extern /* boolean */ int quickstart_info;
+/* 0x03733C 0x1000033C 329  */ extern /* boolean */ int force_rm_dead_code;
+/* 0x037340 0x10000340 330  */ extern /* boolean */ int kpic_flag;
+/* 0x037344 0x10000344 331  */ extern /* boolean */ int kpic_spec;
+/* 0x037348 0x10000348 332  */ extern /* boolean */ int call_shared;
+/* 0x03734C 0x1000034C 333  */ extern /* boolean */ int excpt_flag;
+/* 0x037350 0x10000350 334  */ extern /* boolean */ int trapuv_flag;
+/* 0x037354 0x10000354 335  */ extern int dmips_emit;
+/* 0x037358 0x10000358 25   */ extern int Xvalues_Flag;               // dynsym reorder?
 /* 0x03735C 0x1000035C 336  */ extern /* boolean */ int user_systype; // dynsym reorder?
-/* 0x037360 0x10000360 337  */ extern UNK_TYPE ddoptinfo;
-/* 0x037364 0x10000364 338  */ extern UNK_TYPE systype_seen;
-/* 0x037368 0x10000368 339  */ extern UNK_TYPE multiple_systype;
+/* 0x037360 0x10000360 337  */ extern /* boolean */ int ddoptinfo;
+/* 0x037364 0x10000364 338  */ extern /* boolean */ int systype_seen;
+/* 0x037368 0x10000368 339  */ extern /* boolean */ int multiple_systype;
 /* 0x03736C 0x1000036C 340  */ extern /* boolean */ int systype_warn;
 /* 0x037370 0x10000370 341  */ extern /* boolean */ int svr4_systype;
-/* 0x037374 0x10000374 342  */ extern UNK_TYPE c_inline;
-/* 0x037378 0x10000378 343  */ extern UNK_TYPE tfp_flag;
+/* 0x037374 0x10000374 342  */ extern /* boolean */ int c_inline;
+/* 0x037378 0x10000378 343  */ extern /* boolean */ int tfp_flag;
 /* 0x03737C 0x1000037C 344  */ extern int abi_flag;
-/* 0x037380 0x10000380 345  */ extern UNK_TYPE memory_flag;
-/* 0x037384 0x10000384 346  */ extern UNK_TYPE default_call_shared;
-/* 0x037388 0x10000388 347  */ extern UNK_TYPE haspascal;
-/* 0x03738C 0x1000038C 348  */ extern UNK_TYPE hasfortran;
-/* 0x037390 0x10000390 349  */ extern UNK_TYPE lmflag;
-/* 0x037394 0x10000394 350  */ extern UNK_TYPE srcexists;
-/* 0x037398 0x10000398 351  */ extern UNK_TYPE w1flag;
-/* 0x03739C 0x1000039C None */ /* static */ extern UNK_TYPE D_1000039C;
-/* 0x0373A0 0x100003A0 352  */ extern UNK_TYPE prototype_checking_on;
-/* 0x0373A4 0x100003A4 353  */ extern UNK_TYPE showdirt_flag;
-/* 0x0373A8 0x100003A8 354  */ extern UNK_TYPE mp_prepass_count;
-/* 0x0373AC 0x100003AC 355  */ extern UNK_TYPE mpflags;
-/* 0x0373C4 0x100003C4 356  */ extern UNK_TYPE cmpflags;
-/* 0x0373DC 0x100003DC 357  */ extern UNK_TYPE acpp;
-/* 0x0373E0 0x100003E0 358  */ extern UNK_TYPE mips_abi;
-/* 0x0373E4 0x100003E4 359  */ extern UNK_TYPE compchoice;
+/* 0x037380 0x10000380 345  */ extern int memory_flag;
+/* 0x037384 0x10000384 346  */ extern /* boolean */ int default_call_shared;
+/* 0x037388 0x10000388 347  */ extern /* boolean */ int haspascal;
+/* 0x03738C 0x1000038C 348  */ extern /* boolean */ int hasfortran;
+/* 0x037390 0x10000390 349  */ extern int lmflag; // pseudoboolean
+/* 0x037394 0x10000394 350  */ extern int srcexists;
+/* 0x037398 0x10000398 351  */ extern int w1flag;
+/* 0x03739C 0x1000039C None */ /* static */ extern int D_1000039C;
+/* 0x0373A0 0x100003A0 352  */ extern /* boolean */ int prototype_checking_on;
+/* 0x0373A4 0x100003A4 353  */ extern /* boolean */ int showdirt_flag;
+/* 0x0373A8 0x100003A8 354  */ extern int mp_prepass_count;
+/* 0x0373AC 0x100003AC 355  */ extern struct_mpflags mpflags[];
+/* 0x0373C4 0x100003C4 356  */ extern struct_mpflags cmpflags[];
+/* 0x0373DC 0x100003DC 357  */ extern /* boolean */ int acpp;
+/* 0x0373E0 0x100003E0 358  */ extern MipsAbi mips_abi;
+/* 0x0373E4 0x100003E4 359  */ extern CompChoice compchoice;
 /* 0x0373E8 0x100003E8 360  */ extern CppChoice cppchoice;
-/* 0x0373EC 0x100003EC 361  */ extern UNK_TYPE acpp_traditional;
-/* 0x0373F0 0x100003F0 362  */ extern UNK_TYPE G_flag;
-/* 0x0373F4 0x100003F4 363  */ extern UNK_TYPE dn_flag;
-/* 0x0373F8 0x100003F8 364  */ extern UNK_TYPE edison_cpp;
-/* 0x0373FC 0x100003FC 365  */ extern UNK_TYPE edison_type;
+/* 0x0373EC 0x100003EC 361  */ extern int acpp_traditional; // pseudoboolean
+/* 0x0373F0 0x100003F0 362  */ extern /* boolean */ int G_flag;
+/* 0x0373F4 0x100003F4 363  */ extern /* boolean */ int dn_flag;
+/* 0x0373F8 0x100003F8 364  */ extern int edison_cpp;
+/* 0x0373FC 0x100003FC 365  */ extern EdisonType edison_type;
 /* 0x037400 0x10000400 366  */ extern char* Gnum;
 /* 0x037404 0x10000404 367  */ extern int runerror;
-/* 0x037408 0x10000408 368  */ extern UNK_TYPE uload;
-/* 0x03740C 0x1000040C 369  */ extern UNK_TYPE uldobj_place;
+/* 0x037408 0x10000408 368  */ extern /* boolean */ int uload;
+/* 0x03740C 0x1000040C 369  */ extern int uldobj_place;
 /* 0x037410 0x10000410 370  */ extern char* tmp_uldobj;
 /* 0x037414 0x10000414 371  */ extern ChipTarget chip_targ;
-/* 0x037418 0x10000418 372  */ extern UNK_TYPE nobjs;
+/* 0x037418 0x10000418 372  */ extern int nobjs; // pseudoboolean
 /* 0x03741C 0x1000041C 373  */ extern int targetsex;
-/* 0x037420 0x10000420 374  */ extern UNK_TYPE default_svr4;
+/* 0x037420 0x10000420 374  */ extern /* boolean */ int default_svr4;
 /* 0x037424 0x10000424 375  */ extern /* boolean */ int irix4;
 /* 0x037428 0x10000428 376  */ extern char* runlib;
 /* 0x03742C 0x1000042C 377  */ extern char* runlib_base;
 /* 0x037430 0x10000430 None */ /* static */ extern int D_10000430;
 /* 0x037438 0x10000438 None */ /* static */ extern char* D_10000438; // current working directory (D_1000C1D0 in 7.1)
-/* 0x03743C 0x1000043C 378  */ extern UNK_TYPE run_sopt;
+/* 0x03743C 0x1000043C 378  */ extern /* boolean */ int run_sopt;
 /* 0x037440 0x10000440 None */ /* static */ extern char* D_10000440;
 /* 0x037444 0x10000444 None */ /* static */ extern char* D_10000444;
 /* 0x037448 0x10000448 None */ /* static */ extern char* D_10000448; // Error category strings
@@ -779,8 +812,3359 @@ void add_info(char* s) {
  * VROM: 0x01C41C
  * Size: 0xEA64
  */
-// int parse_command();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/parse_command.s")
+/**
+Notes on stack:
+sp54, sp58, sp5C are in the same place
+sp60 gone
+sp64 -> 60
+sp68 -> 64
+sp6C -> 68
+sp70 -> 6C
+sp74 -> 70
+spFC -> F8
+sp100 -> FC
+sp104 gone
+sp108 -> 100
+sp10C -> 104
+sp110 -> 108
+sp114 -> 10C
+sp118 gone
+sp11C -> 110
+sp120 -> 114
+sp120/sp124 new
+sp128 -> 118
+sp12C gone
+sp130 gone
+sp134 -> 11C
+sp140 + 2 pads gone
+sp144 -> 128
+sp148 -> 12C
+sp14C -> 130
+sp154 -> 134
+sp158 -> 138
+sp15C -> 13C
+*/
+void parse_command(int argc, char** argv) {
+    register int var_s0;   // option index
+    register char var_s1;  // file suffix, multipurpose?
+    register char* var_s2; // multipurpose string pointer
+    register char* var_s3; // used for -G?
+    char* sp15C = NULL;    // related to -MD? // sp13C
+    char* sp158 = NULL;    // sp138
+    char* sp154 = NULL;    // target // sp134
+    // char sp153 = 0;     // unused
+    int sp14C = 1;                     // Treat bad options as errors // sp130
+    char* sp148 = getenv("SGI_IRIX4"); // sp12C
+
+    if (sp148 != NULL) {
+        irix4 = TRUE;
+        comp_host_root = "/usr/irix4/";
+        systype = "";
+        elfflag = FALSE;
+        svr4_systype = FALSE;
+        call_shared = FALSE;
+        non_shared = FALSE;
+        old_non_shared = FALSE;
+        default_call_shared = FALSE;
+        Gnum = "8";
+        kpic_flag = FALSE;
+        mips_abi = MIPS_ABI_0;
+        runlib = "/usr/irix4/";
+        relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
+    }
+
+    for (var_s0 = 0; var_s0 < argc; var_s0++) {
+        if ((argv[var_s0][0] == '-')
+            // && (!NoMoreOptions || (strchr(argv[var_s0], '.') == NULL))
+        ) {
+            switch (argv[var_s0][1]) { /* switch 1 */
+                case '#':              /* switch 1 */
+                                       //! @bug Should end in '\n'.
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-# is not supported. Use -v to see compiler passesn");
+                    break;
+
+                case '1': /* switch 1 */
+                    if ((compiler == COMPILER_3) && (argv[var_s0][2] == '\0')) {
+                        mp_onetripflag = TRUE;
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case '3': /* switch 1 */
+                    if ((strcmp(argv[var_s0], "-32bit") == 0) || (strcmp(argv[var_s0], "-32") == 0)) {
+                        thirty2bitflag = TRUE;
+                        mips_abi = MIPS_ABI_1;
+                    }
+                    break;
+
+                case '5': /* switch 1 */
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-5 not supported\n");
+                    if (argv[var_s0][2] == '\0') {
+                        if (Bflag) {
+                            if (!fiveflag) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
+                                exit(2);
+                            }
+                        } else {
+                            fiveflag++;
+                            include = mkstr(comp_target_root, "usr/5include", NULL);
+                            if (Bstring != NULL) {
+                                relocate_passes("h", NULL, Bstring);
+                            }
+                            newrunlib();
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case '6': /* switch 1 */
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-66") == 0)) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-64bit") == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                              "-64bit option is not yet implemented for ucode compilers, ignore\n");
+                        sixty4bit_spec = TRUE;
+                        if (swopcodeflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-64bit can not be used with -swopcode for ucode compilers\n");
+                            exit(2);
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'A': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&objfiles, "-A");
+                            addstr(&objfiles, argv[var_s0]);
+                            break;
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
+                            exit(2);
+                        }
+                    }
+                    if (strcmp(argv[var_s0], "-AutoGnum") == 0) {
+                        addstr(&uldflags, argv[var_s0]);
+                        if (strcmp(Gnum, "0") != 0) {
+                            Gnum = "0";
+                        }
+                        break;
+                    }
+                    // -AA[cpp flag]
+                    if (argv[var_s0][1] == 'A') {
+                        addstr(&cppflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-A-") == 0) {
+                        addstr(&cppflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'B': /* switch 1 */
+                          // clang-format off
+                    if ((argv[var_s0][2] == '\0') && (var_s0 < (argc - 1)) &&
+                        ((strcmp(argv[var_s0 + 1], "static") == 0) 
+                        || (strcmp(argv[var_s0 + 1], "dynamic") == 0) 
+                        || (strcmp(argv[var_s0 + 1], "symbolic") == 0))) {
+                          // clang-format on
+                        addstr(&objfiles, argv[var_s0]);
+                        var_s0++;
+                        addstr(&objfiles, argv[var_s0]);
+                    } else {
+                        char* sp144;
+
+                        Bflag = TRUE;
+                        sp144 = argv[var_s0] + 2;
+                        relocate_passes(tstring, hstring, sp144);
+                        if (tstring == NULL) {
+                            Bstring = sp144;
+                        }
+                    }
+                    break;
+
+                case 'C': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (compiler == COMPILER_3) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            break;
+                        }
+                        if (compiler == COMPILER_2) {
+                            addstr(&upasflags, argv[var_s0]);
+                            break;
+                        }
+                        if (compiler == COMPILER_1) {
+                            addstr(&cppflags, argv[var_s0]);
+                            break;
+                        }
+                    }
+                    //! @note Only checks for "-CG_E"
+                    if (strncmp(argv[var_s0], "-CG_EMIT:", 5) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-CG_EMIT options are ignored\n");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'D': /* switch 1 */
+                    // Has changed completely
+                    // if (strncmp(argv[var_s0], "-DEFAULT:", strlen("-DEFAULT:")) == 0) {
+                    //     break;
+                    // }
+                    if (argv[var_s0][2] == '\0') {
+                        if (default_svr4 != 0) {
+                            addstr(&undefineflags, strcat("-D", argv[var_s0 + 1]));
+                            add_static_opt(argv[var_s0]);
+                            var_s0++;
+                            break;
+                        }
+                        if (((var_s0 + 1) < argc)) {
+                            unsigned long sp124;
+                            char* sp120;
+                            sp124 = strtoul(argv[var_s0 + 1], &sp120, 16);
+                            if (((sp120 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
+                                ((sp124 == 0) && (argv[var_s0 + 1] == sp120)) || (argv[var_s0 + 1][0] == '-') ||
+                                (argv[var_s0 + 1][0] == '+')) {
+                                error(2, 0, 0, 0, 0, "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
+                                break;
+                            }
+                        }
+                        // if ((var_s0 + 1) < argc) {
+                        //     char* sp140;
+                        //     // TODO: work out where these should actually go
+                        //     // int pad[2];
+
+                        //     if (0) {
+                        //         (void)"-D taken as empty cpp -D, not ld(1) -D hexnum\n";
+                        //         (void)"-D";
+                        //         (void)"ld requires -D to have an argument\n";
+                        //     }
+                        //     sp140 = malloc(strlen(argv[var_s0 + 1]) + 3);
+                        //     sp140[0] = '-';
+                        //     sp140[1] = 'D';
+                        //     sp140[2] = '\0';
+                        //     addstr(&undefineflags, strcat(sp140, argv[var_s0 + 1]));
+                        //     add_static_opt(mkstr(argv[var_s0], argv[var_s0 + 1], NULL));
+                        // }
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-D");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        } else {
+                            error(1, 0, 0, 0, 0, "ld requires -D to have an argument\n");
+                            exit(2);
+                        }
+                    }
+                    addstr(&undefineflags, argv[var_s0]);
+                    add_static_opt(argv[var_s0]);
+                    break;
+
+                case 'E': /* switch 1 */
+                    // -E
+                    if (argv[var_s0][2] == '\0') {
+                        Eflag++;
+                        docpp = TRUE;
+                        break;
+                    }
+                    // -EB/-EL (Endian)
+                    if ((argv[var_s0][3] == '\0') && ((argv[var_s0][2] == 'B') || (argv[var_s0][2] == 'L'))) {
+                        if (argv[var_s0][2] == 'B') {
+                            if (Bflag && (targetsex != BIGENDIAN)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-EB or -EL must precede any -B flags for ucode compilers\n");
+                                exit(2);
+                            }
+                            targetsex = BIGENDIAN;
+                        } else {
+                            if (Bflag && (targetsex != LITTLEENDIAN)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-EB or -EL must precede any -B flags for ucode compilers\n");
+                                exit(2);
+                            }
+                            targetsex = LITTLEENDIAN;
+                        }
+                        newrunlib();
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'F': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (compiler == COMPILER_3) {
+                            Fflag++;
+                        } else if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                                (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                            cflag = TRUE;
+                            Fflag = TRUE;
+                            default_template_instantiation_mode = 1;
+                        } else {
+                            addstr(&ldflags, argv[var_s0]);
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'G': /* switch 1 */
+                    if (strncmp(argv[var_s0], "-GCM:", 5) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-GCM options are ignored\n");
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        if (default_svr4) {
+                            if (dn_flag) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
+                                exit(2);
+                            }
+                            G_flag = TRUE;
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G requires a decimal number argument\n");
+                            exit(2);
+                        }
+                        if (Oflag < 3) {
+                            Gnum = argv[var_s0];
+                        } else {
+                            Gnum = "0";
+                        }
+                    } else {
+                        if (default_svr4) {
+                            break;
+                        }
+                        if (Oflag < 3) {
+                            Gnum = argv[var_s0] + 2;
+                        } else {
+                            Gnum = "0";
+                        }
+                    }
+                    for (var_s2 = Gnum; *var_s2 != '\0'; var_s2++) {
+                        if (!isdigit(*var_s2)) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", Gnum);
+                            exit(2);
+                        }
+                    }
+                    if (!Gseen_flag) {
+                        relocate_passes(tstring, hstring, NULL);
+                        Gseen_flag = TRUE;
+                    }
+                    break;
+
+                case 'H': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&cppflags, argv[var_s0]);
+                        Eflag++;
+                        break;
+                    }
+                    if (argv[var_s0][3] == '\0') {
+                        if (1) {} // FAKE
+                        Hchar = argv[var_s0][2];
+
+                        for (var_s2 = "fKMdkjusmocab"; (*var_s2 != '\0' && *var_s2 != Hchar); var_s2++) {}
+
+                        if (*var_s2 == '\0') {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            exit(2);
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'I': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (((argv[var_s0 + 1] != NULL) && (*argv[var_s0 + 1] == '-')) ||
+                            (isdir(argv[var_s0 + 1]) == 0)) {
+                            emptyIflag++;
+                        } else {
+                            char* sp134;
+
+                            var_s0++;
+                            sp134 = mkstr("-I", argv[var_s0], NULL);
+                            addstr(&cppflags, sp134);
+                            addstr(&cpp2flags, sp134);
+                            add_static_opt(mkstr("-I", full_path(argv[var_s0]), NULL));
+                        }
+                    } else {
+                        addstr(&cppflags, argv[var_s0]);
+                        addstr(&cpp2flags, argv[var_s0]);
+                        // addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(mkstr("-I", full_path(argv[var_s0] + 2), NULL));
+                    }
+                    break;
+
+                case 'J': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-Jsfm") == 0) {
+                        break;
+                    }
+                    // if (strcmp(argv[var_s0], "-J") == 0) {
+                    //     char* sp130;
+                    //     char* sp12C = argv[var_s0 + 1];
+
+                    //     for (sp130 = sp12C; *sp130 != 0; sp130++) {
+                    //         if (!isdigit(*sp130)) {
+                    //             error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
+                    //             exit(2);
+                    //         }
+                    //     }
+                    //     addstr(&prelinkerflags, argv[var_s0]);
+                    //     addstr(&prelinkerflags, sp12C);
+                    //     var_s0++;
+                    //     break;
+                    // }
+                    //! @bug fallthrough means -K options can also be specified with -J
+                case 'K': /* switch 1 */
+                    if (default_svr4) {
+                        Kpass = argv[var_s0] + 2;
+                        if (*Kpass == '\0') {
+                            Kpass = argv[var_s0] + 3;
+                        }
+
+                        while ((*Kpass != '\0') || (*Kpass == ',')) {
+                            //! @bug Specifying a long argument to "-K" will overwrite subsequent bss variables.
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++, var_s2++) {
+                                Karg[j] = *var_s2;
+                            }
+
+                            Kpass = var_s2;
+
+                            if (strncmp(Karg, "minabi", 6) == 0) {
+                                kminabiflag = TRUE;
+                            } else if (strncmp(Karg, "fpe", 3) == 0) {
+                                addstr(&ldflags, "-Kfpe");
+                            } else if (strncmp(Karg, "sd", 2) == 0) {
+                                addstr(&ldflags, "-Ksd");
+                            } else if (strncmp(Karg, "sz", 2) == 0) {
+                                addstr(&ldflags, "-Ksz");
+                            } else if (strncmp(Karg, "mau", 3) == 0) {
+                                addstr(&ldflags, "-Kmau");
+                            } else if (strncmp(Karg, "PIC", 3) == 0) {
+                                if (non_shared) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                          "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                    kpic_flag = FALSE;
+                                } else {
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
+                                }
+                            } else {
+                                goto bad_option;
+                            }
+
+                            for (j = 0; j < strlen(Karg); j++) {
+                                Karg[j] = ' ';
+                            }
+
+                            while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
+                                Kpass++;
+                            }
+                        }
+                        break;
+                    }
+                    if (svr4_systype) {
+                        Kpass = argv[var_s0] + 2;
+                        if (*Kpass == '\0') {
+                            Kflag++;
+                            addstr(&fcomflags, argv[var_s0]);
+                        }
+
+                        while ((*Kpass != '\0') || (*Kpass == ',')) {
+                            //! @bug Specifying a long argument to "-K" will overwrite subsequent bss variables.
+                            for (j = 0, var_s2 = Kpass; (*var_s2 != ',' && *var_s2 != '\0'); j++, var_s2++) {
+                                Karg[j] = *var_s2;
+                            }
+
+                            Kpass = var_s2;
+
+                            if (strncmp(Karg, "minabi", 6) == 0) {
+                                kminabiflag = TRUE;
+                            } else if (strncmp(Karg, "fpe", 3) == 0) {
+                                addstr(&ldflags, "-Kfpe");
+                            } else if (strncmp(Karg, "sd", 2) == 0) {
+                                addstr(&ldflags, "-Ksd");
+                            } else if (strncmp(Karg, "sz", 2) == 0) {
+                                addstr(&ldflags, "-Ksz");
+                            } else if (strncmp(Karg, "mau", 3) == 0) {
+                                addstr(&ldflags, "-Kmau");
+                            } else if (strncmp(Karg, "PIC", 3) == 0) {
+                                if (non_shared) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                          "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                    kpic_flag = FALSE;
+                                } else {
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
+                                }
+                            } else {
+                                goto bad_option;
+                            }
+
+                            for (j = 0; j < strlen(Karg); j++) {
+                                Karg[j] = ' ';
+                            }
+
+                            while ((Kpass != NULL) && (*Kpass == ',') && (*Kpass != '\0')) {
+                                Kpass++;
+                            }
+                        }
+                        break;
+                    }
+                    if (argv[var_s0][2] != '\0') {
+                        if (strcmp(argv[var_s0], "-KPIC") == 0) {
+                            if (non_shared) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                kpic_flag = FALSE;
+                            } else {
+                                kpic_flag = TRUE;
+                                kpic_spec = TRUE;
+                            }
+                            break;
+                        } else {
+                            addstr(&ldflags, argv[var_s0]);
+                        }
+                    } else {
+                        Kflag++;
+                        addstr(&fcomflags, argv[var_s0]);
+                    }
+
+                    break;
+
+                case 'L': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][0] != '-') && isdir(argv[var_s0 + 1])) {
+                            char* sp128;
+
+                            var_s0++;
+                            sp128 = mkstr(argv[var_s0 - 1], argv[var_s0], NULL);
+                            addstr(&ldflags, sp128);
+                            // addstr(&prelinkerflags, sp128);
+                            Lflag = TRUE;
+                            break;
+                        } else {
+                            // addstr(&prelinkerflags, mkstr("-YB", NULL));
+                        }
+                    }
+                    Lflag = TRUE;
+                    addstr(&ldflags, argv[var_s0]);
+                    // addstr(&prelinkerflags, argv[var_s0]);
+                    break;
+
+                case 'M':                         /* switch 1 */
+                    if (argv[var_s0][2] == 'D') { // -MD
+                        if (strcmp(argv[var_s0] + 3, "update") == 0) {
+                            sp15C = argv[var_s0 + 1];
+                        } else if (strcmp(argv[var_s0] + 3, "ignore") == 0) {
+                            addstr(&ldflags, argv[var_s0]);
+                            addstr(&ldflags, argv[var_s0 + 1]);
+                        } else if (strcmp(argv[var_s0] + 3, "ignoredir") == 0) {
+                            addstr(&ldflags, argv[var_s0]);
+                            addstr(&ldflags, argv[var_s0 + 1]);
+                        } else if (strcmp(argv[var_s0] + 3, "target") == 0) {
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                                sp154 = argv[var_s0 + 1];
+                            } else {
+                                addstr(&cppflags, argv[var_s0]);
+                                addstr(&cppflags, argv[var_s0 + 1]);
+                            }
+                        } else {
+                            goto bad_option;
+                        }
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must be followed by a file name\n",
+                                  argv[var_s0 - 1]);
+                            exit(2);
+                        }
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        if (1) {} // FAKE
+                        addstr(&cppflags, argv[var_s0]);
+                        Eflag++;
+                        minus_M++;
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'N': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (compiler == COMPILER_3) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'O': /* switch 1 */
+                    plain_O = FALSE;
+                    if (argv[var_s0][2] == '\0') {
+                        //! @bug var_s1 possibly used uninitialised
+                        // if (xpg_flag && (var_s1 == 'f')) {
+                        //     fprintf(stderr, "Error: optlevel should be specified\n");
+                        //     exit(1);
+                        // }
+                        Oflag = 2;
+                        plain_O = TRUE;
+                        if (plain_g) {
+                            Oflag = 1;
+                        }
+                        // if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][1] == '\0') && (*argv[var_s0 + 1] >= '0') &&
+                        //     (*argv[var_s0 + 1] <= '4')) {
+                        //     char* sp124 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
+                        //     sp124[0] = '-';
+                        //     sp124[1] = 'O';
+                        //     sp124[2] = 0;
+                        //     Oflag = *argv[var_s0 + 1] - '0'; // '0' -> 0, '1' -> 1, etc.
+                        //     addstr(&fcomflags, strcat(sp124, argv[var_s0 + 1]));
+                        //     var_s0++;
+                        // }
+                        break;
+                    }
+                    if (argv[var_s0][3] == '\0') {
+                        if ((argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '4')) {
+                            Oflag = argv[var_s0][2] - '0';
+                            if (Oflag == 3) {
+                                char* sp120 = "-Olimit";
+                                char* sp11C = "5000";
+
+                                Gnum = "0";
+                                addstr(&umergeflags, sp120);
+                                addstr(&umergeflags, sp11C);
+
+                                addstr(&optflags, sp120);
+                                addstr(&optflags, sp11C);
+
+                                addstr(&ddoptflags, sp120);
+                                addstr(&ddoptflags, sp11C);
+
+                                addstr(&uopt0flags, sp120);
+                                addstr(&uopt0flags, sp11C);
+
+                                addstr(&olimitflags, sp120);
+                                addstr(&olimitflags, sp11C);
+                            }
+                            if ((Oflag >= 3) && !jflag) {
+                                uload = TRUE;
+                            }
+                            break;
+                        }
+                        goto bad_option;
+                    }
+                    if (strcmp(argv[var_s0], "-Olimit") == 0) {
+                        addstr(&umergeflags, argv[var_s0]);
+                        addstr(&optflags, argv[var_s0]);
+                        addstr(&ddoptflags, argv[var_s0]);
+                        addstr(&uopt0flags, argv[var_s0]);
+                        addstr(&olimitflags, argv[var_s0]);
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-Olimit must have an argument\n");
+                            exit(2);
+                        }
+                        for (var_s2 = argv[var_s0]; *var_s2 != 0; var_s2++) {
+                            if (!isdigit(*var_s2)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n",
+                                      argv[var_s0]);
+                                exit(2);
+                            }
+                        }
+                        addstr(&umergeflags, argv[var_s0]);
+                        addstr(&optflags, argv[var_s0]);
+                        addstr(&ddoptflags, argv[var_s0]);
+                        addstr(&uopt0flags, argv[var_s0]);
+                        addstr(&olimitflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-OPT:", 5) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-OPT options are ignored\n");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'P': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (1) {} // FAKE
+                        docpp = TRUE;
+                        addstr(&cppflags, argv[var_s0]);
+                        if (!Eflag) {
+                            Pflag++;
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'Q': /* switch 1 */
+                    if ((strcmp(argv[var_s0], "-Qy") != 0) && (strcmp(argv[var_s0], "-Qn") != 0)) {
+                        addstr(&cppflags, argv[var_s0]);
+                    }
+                    break;
+
+                case 'R': /* switch 1 */
+                    if (compiler == COMPILER_3) {
+                        addstr(&ratforflags, argv[var_s0] + 2);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'S': /* switch 1 */
+                    if (strncmp(argv[var_s0], "-SWP:", 5) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-SWP options are ignored\n");
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        Sflag++;
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'T': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-T");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
+                        exit(2);
+                    }
+                    if (strncmp(argv[var_s0], "-TARG:", 6) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TARG options are ignored\n");
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-TENV:", 6) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TENV options are ignored\n");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'U': /* switch 1 */
+                    if ((compiler == COMPILER_3) && (argv[var_s0][2] == '\0')) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        mp_caseflag = 1;
+                        break;
+                    }
+                    // if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
+                    //     char* sp118 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
+                    //     sp118[0] = '-';
+                    //     sp118[1] = 'U';
+                    //     sp118[2] = 0;
+                    //     addstr(&undefineflags, strcat(sp118, argv[var_s0 + 1]));
+                    //     var_s0++;
+                    //     break;
+                    // }
+                    addstr(&undefineflags, argv[var_s0]);
+                    add_static_opt(argv[var_s0]);
+                    break;
+
+                case 'V': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-V is not supported.\n");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-VS") == 0) {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-VS");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
+                        exit(2);
+                    }
+                    goto bad_option;
+
+                case 'W': /* switch 1 */
+                    // Options to pass on to subsequent programs Use as -W[letter],option1,option2,...
+                    Wpass = argv[var_s0] + 2;
+                    if (*Wpass != '\0') {
+                        if (1) {} // FAKE
+                        Warg = argv[var_s0] + 3;
+
+                        while (*Warg != ',') {
+                            if (*Warg++ == '\0') {
+                                goto bad_option;
+                            }
+                        }
+                        while (*Warg == ',') {
+                            *Warg = '\0';
+                            Warg++;
+                            for (var_s2 = Wpass; *var_s2 != '\0'; var_s2++) {
+                                switch (*var_s2) { /* switch 2 */
+                                    case 'p':      /* switch 2 */
+                                        addstr(&cppflags, Warg);
+                                        break;
+
+                                    case 'K': /* switch 2 */
+                                        if (compiler == COMPILER_3) {
+                                            addstr(&pfaflags, Warg);
+                                        } else if (compiler == COMPILER_1) {
+                                            addstr(&pcaflags, Warg);
+                                        } else {
+                                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                  "-WK only valid in FORTRAN or C compilations.\n");
+                                            exit(2);
+                                        }
+                                        break;
+
+                                    case '0': /* switch 2 */
+                                    case 'f': /* switch 2 */
+                                        switch (compiler) {
+                                            case COMPILER_2:
+                                                addstr(&upasflags, Warg);
+                                                break;
+                                            case COMPILER_3:
+                                                addstr(&fcomflags, Warg);
+                                                break;
+                                            case COMPILER_5:
+                                                addstr(&upl1flags, Warg);
+                                                break;
+                                            case COMPILER_6:
+                                                addstr(&ucobflags, Warg);
+                                                break;
+                                            default: // COMPILER_1, COMPILER_4
+                                                addstr(&ccomflags, Warg);
+                                                addstr(&edisonflags, Warg);
+                                                break;
+                                        }
+                                        break;
+
+                                    case 'w': /* switch 2 */
+                                        addstr(&prelinkerflags, Warg);
+                                        break;
+
+                                    case 'k': /* switch 2 */
+                                        addstr(&ulpiflags, Warg);
+                                        break;
+
+                                    case 'j': /* switch 2 */
+                                        addstr(&ujoinflags, Warg);
+                                        break;
+
+                                    case 'u': /* switch 2 */
+                                        addstr(&uldflags, Warg);
+                                        break;
+
+                                    case 's': /* switch 2 */
+                                        addstr(&usplitflags, Warg);
+                                        break;
+
+                                    case 'm': /* switch 2 */
+                                        addstr(&umergeflags, Warg);
+                                        break;
+
+                                    case 'q': /* switch 2 */
+                                        addstr(&uopt0flags, Warg);
+                                        break;
+
+                                    case 'd': /* switch 2 */
+                                        addstr(&ddoptflags, Warg);
+                                        break;
+
+                                    case '2': /* switch 2 */
+                                        addstr(&optflags, Warg);
+                                        break;
+
+                                    case 'o': /* switch 2 */
+                                        addstr(&optflags, Warg);
+                                        if (strstr(Warg, "loopunroll") != NULL) {
+                                            set_loop_unroll = TRUE;
+                                        }
+                                        break;
+
+                                    case 'c': /* switch 2 */
+                                        addstr(&genflags, Warg);
+                                        break;
+
+                                    case 'a': /* switch 2 */
+                                        addstr(&asflags, Warg);
+                                        break;
+
+                                    case 'b': /* switch 2 */
+                                        addstr(&asflags, Warg);
+                                        break;
+
+                                    case 'l': /* switch 2 */
+                                        addstr(&ldflags, Warg);
+                                        break;
+
+                                    case 'y': /* switch 2 */
+                                        addstr(&ftocflags, Warg);
+                                        break;
+
+                                    case 'z': /* switch 2 */
+                                        addstr(&cordflags, Warg);
+                                        break;
+
+                                    case 'M': /* switch 2 */
+                                        addstr(&mpcflags, Warg);
+                                        break;
+
+                                    case 'x':              /* switch 2 */
+                                        switch (Warg[1]) { /* switch 3 */
+                                            case 'G':      /* switch 3 */
+                                                if (Warg[2] == '\0') {
+                                                    var_s0++;
+                                                    if (var_s0 >= argc) {
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                              "-G requires a decimal number argument\n");
+                                                        exit(2);
+                                                    }
+                                                    if (Oflag < 3) {
+                                                        Gnum = argv[var_s0];
+                                                    } else {
+                                                        Gnum = "0";
+                                                    }
+                                                } else if (Oflag < 3) {
+                                                    Gnum = Warg + 2;
+                                                } else {
+                                                    Gnum = "0";
+                                                }
+                                                for (var_s3 = Gnum; ((*var_s3 != ',') && (*var_s3 != 0));) {
+                                                    if (!isdigit(*var_s3)) {
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                              "non-digit character in -G %s\n", Gnum);
+                                                        exit(2);
+                                                    }
+                                                    if (*var_s3 != ',') {
+                                                        var_s3++;
+                                                    }
+                                                }
+                                                if (!Gseen_flag) {
+                                                    Gseen_flag = TRUE;
+                                                    relocate_passes(tstring, hstring, NULL);
+                                                }
+                                                Warg = var_s3;
+                                                break;
+
+                                            case 'v': /* switch 3 */
+                                                // -Wxv
+                                                if ((Warg[2] == '\0') || (Warg[2] == ',')) {
+                                                    vflag = TRUE;
+                                                    if (getenv("ROOTDIR") != NULL) {
+                                                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                                              "ROOTDIR env var ignored, use COMP_TARGET_ROOT and "
+                                                              "COMP_HOST_ROOT\n");
+                                                    }
+                                                }
+                                                break;
+
+                                            case 'D': /* switch 3 */
+                                                // -WxD
+                                                if (argv[var_s0][2] == '\0') {
+                                                    if ((var_s0 + 1) < argc) {
+                                                        unsigned long sp114;
+                                                        char* sp110;
+
+                                                        sp114 = strtoul(argv[var_s0 + 1], &sp110, 16);
+                                                        if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
+                                                            ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
+                                                            (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
+                                                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                                                  "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    var_s0++;
+                                                    if (var_s0 < argc) {
+                                                        addstr(&ldflags, "-D");
+                                                        addstr(&ldflags, argv[var_s0]);
+                                                        break;
+                                                    } else {
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                              "ld requires -D to have an argument\n");
+                                                        exit(2);
+                                                    }
+                                                }
+                                                // fallthrough
+                                            case 'b': /* switch 3 */
+                                                if ((Warg[2] == '\0') || (Warg[2] == ',')) {
+                                                    addstr(&ldflags, mkstr(argv[var_s0], ",", Warg, NULL));
+                                                }
+                                                break;
+
+                                            case 'K': /* switch 3 */
+                                                if (strcmp(Warg, "-K") != 0) {
+                                                    addstr(&ldflags, mkstr(argv[var_s0], ",", Warg, NULL));
+                                                } else {
+                                                    Kflag++;
+                                                }
+                                                break;
+
+                                            case 'A': /* switch 3 */
+                                                if (Warg[2] == 0) {
+                                                    var_s0++;
+                                                    if (var_s0 < argc) {
+                                                        addstr(&objfiles, "-A");
+                                                    }
+                                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                          "ld requires -A to have an argument\n");
+                                                    exit(2);
+                                                }
+                                                break;
+                                        }
+                                        break;
+
+                                    default: /* switch 2 */
+                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown pass character in %s\n",
+                                              argv[var_s0]);
+                                        exit(2);
+                                        break;
+                                }
+                            }
+                            while ((*Warg != ',') && (*Warg != '\0')) {
+                                Warg++;
+                            }
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'X': /* switch 1 */
+                    if (compiler == COMPILER_1) {
+                        if (strcmp(argv[var_s0], "-Xcpluscomm") == 0) {
+                            addstr(&ccomflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-Xt") == 0) {
+                            stdflag = 0;
+                            addstr(&ccomflags, "-std0");
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-Xc") == 0) {
+                            stdflag = 1;
+                            addstr(&ccomflags, "-std1");
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-Xa") == 0) {
+                            stdflag = 1;
+                            addstr(&ccomflags, "-std");
+                            break;
+                        }
+                    }
+                    if (strcmp(argv[var_s0], "-Xprototypes") == 0) {
+                        addstr(&ccomflags, argv[var_s0]);
+                        break;
+                    }
+                    addstr(&ldflags, argv[var_s0]);
+                    if ((strcmp(argv[var_s0], "-Xndlocaldata") == 0) || (strcmp(argv[var_s0], "-Xlocaldata") == 0) ||
+                        (strcmp(argv[var_s0], "-Xndblock") == 0) || (strcmp(argv[var_s0], "-Xblock") == 0) ||
+                        (strcmp(argv[var_s0], "-Xalignbss") == 0) || (strcmp(argv[var_s0], "-Xnoalignbss") == 0) ||
+                        (strcmp(argv[var_s0], "-Xcachesize") == 0) || (strcmp(argv[var_s0], "-Xcachelinesize") == 0) ||
+                        (strcmp(argv[var_s0], "-Xdefmovemax") == 0) || (strcmp(argv[var_s0], "-Xsetalign") == 0) ||
+                        (strcmp(argv[var_s0], "-Xblockrange") == 0)) {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, argv[var_s0]);
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                        }
+                    }
+                    break;
+
+                case 'a': /* switch 1 */
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-all") == 0)) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                        (strcmp(argv[var_s0], "-auto_include") == 0)) {
+                        auto_template_include = TRUE;
+                        break;
+                    }
+                    // if ((compiler == COMPILER_1) &&
+                    //     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                    //     (strcmp(argv[var_s0], "-anach") == 0)) {
+                    //     anachronisms = TRUE;
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-ansi") == 0) {
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
+                        }
+                        ansichoice = ANSICHOICE_ANSI;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_3;
+                        }
+                        relocate_passes("p", NULL, NULL);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ansiposix") == 0) {
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
+                        }
+                        ansichoice = ANSICHOICE_ANSIPOSIX;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_3;
+                        }
+                        relocate_passes("p", NULL, NULL);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-abi") == 0) {
+                        abi_flag = 1;
+                        addstr(&cppflags, "-D_ABI_SOURCE");
+                        addstr(&asflags, "-abi");
+                        addstr(&ldflags, "-abi");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-acpp") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            cppchoice = CPP_CHOICE_1;
+                            acpp = TRUE;
+                            relocate_passes("p", NULL, NULL);
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align8") == 0) {
+                        align = 8;
+                        if (compiler == COMPILER_3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align16") == 0) {
+                        align = 0x10;
+                        if (compiler == COMPILER_3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align32") == 0) {
+                        align = 0x20;
+                        if (compiler == COMPILER_3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align64") == 0) {
+                        align = 0x40;
+                        if (compiler == COMPILER_3) {
+                            align_common++;
+                        }
+                    } else if (strcmp(argv[var_s0], "-align_common") == 0) {
+                        align_common = 1;
+                        break;
+                    }
+                    if (compiler == COMPILER_3) {
+                        if ((strcmp(argv[var_s0], "-align8") == 0) || (strcmp(argv[var_s0], "-align16") == 0) ||
+                            (strcmp(argv[var_s0], "-align32") == 0) || (strcmp(argv[var_s0], "-align64") == 0)) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            addstr(&genflags, argv[var_s0]);
+                            addstr(&asflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-automatic") == 0) {
+                            automaticflag = TRUE;
+                            break;
+                        }
+                    }
+                    if ((compiler == COMPILER_6) && (strcmp(argv[var_s0], "-ansi") == 0)) {
+                        ansiflag = TRUE;
+                        break;
+                    }
+                    if ((compiler == COMPILER_2) && (strcmp(argv[var_s0], "-apc") == 0)) {
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align8") == 0) {
+                        align = 8;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align16") == 0) {
+                        align = 0x10;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align32") == 0) {
+                        align = 0x20;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-align64") == 0) {
+                        align = 0x40;
+                        alignarg = savestr(argv[var_s0], 0);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ajeop") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&cordflags, "-no_r4000_fix");
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'b': /* switch 1 */
+                    if ((argv[var_s0][2] == '\0') || (strcmp(argv[var_s0], "-bestGnum") == 0)) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-bytereclen") == 0) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-backslash") == 0) {
+                        mp_backslashflag = 1;
+                        // docpp = 0;
+                    }
+                    addstr(&fcomflags, argv[var_s0]);
+                    add_static_opt(argv[var_s0]);
+                    break;
+
+                case 'c': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        cflag++;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cckr") == 0) {
+                        ansichoice = ANSICHOICE_KR;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_2;
+                        }
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cfe") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            compchoice = COMP_CHOICE_3;
+                            relocate_passes("p", NULL, NULL);
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-common") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            addstr(&accomflags, "-Xcommon");
+                        }
+                        break;
+                    }
+                    // if ((compiler == COMPILER_1) &&
+                    //     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                    //     (strcmp(argv[var_s0], "-cfront") == 0)) {
+                    //     cfront_compatible = TRUE;
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-cachesz") == 0) {
+                        addstr(&ddoptflags, argv[var_s0]);
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-cachesz must have an argument\n");
+                            exit(2);
+                        }
+
+                        for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
+                            if (!isdigit(*var_s2)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                exit(2);
+                            }
+                        }
+
+                        addstr(&ddoptflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cplus") == 0) {
+                        cplusflag = TRUE;
+                        addstr(&ccomflags, "-cplus");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cpp") == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-cpp is default\n");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-cord") == 0) {
+                        cordflag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-coff") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        coff_spec = TRUE;
+                        if (default_call_shared == TRUE) {
+                            if (!non_shared) {
+                                old_non_shared = TRUE;
+                                non_shared = TRUE;
+                            }
+                            default_call_shared = FALSE;
+                            call_shared = FALSE;
+                        }
+                        break;
+                    }
+                    //! @bug Impossible to satisfy this conditional
+                    if ((strcmp(argv[var_s0], "-call_shared") == 0) &&
+                        ((strcmp(argv[var_s0], "-count") == 0) || (strcmp(argv[var_s0], "-countall") == 0))) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-call_shared") == 0) {
+                        non_shared = FALSE;
+                        call_shared = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-crt0") == 0) {
+                        CRTX = "crt0.o";
+                        MCRTX = "mcrt0.o";
+                        crtn_required = FALSE;
+                        relocate_passes("r", NULL, NULL);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-crt1") == 0) {
+                        if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
+                            CRTX = "acrt1.o";
+                        } else {
+                            CRTX = "crt1.o";
+                        }
+                        MCRTX = "mcrt1.o";
+                        crtn_required = TRUE;
+                        relocate_passes("r", NULL, NULL);
+                        break;
+                    }
+                    if ((compiler == COMPILER_2) && (strcmp(argv[var_s0], "-casesense") == 0)) {
+                        addstr(&upasflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-change_const") == 0)) {
+                        addstr(&fcomflags, "-change_const");
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) &&
+                        ((strcmp(argv[var_s0], "-col120") == 0) || (strcmp(argv[var_s0], "-col72") == 0) ||
+                         (strcmp(argv[var_s0], "-charargv") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
+                         (strcmp(argv[var_s0], "-check_bounds") == 0))) {
+                        if (strcmp(argv[var_s0], "-col120") == 0) {
+                            mp_col120flag = TRUE;
+                        }
+                        if (strcmp(argv[var_s0], "-check_bounds") == 0) {
+                            addstr(&fcomflags, "-C");
+                        } else if (strncmp(argv[var_s0], "-chunk=", strlen("-chunk=")) == 0) {
+                            char* sp10C = argv[var_s0] + strlen("-chunk=");
+
+                            while (*sp10C != '\0') {
+                                *sp10C = TO_LOWER(*sp10C);
+                                sp10C++;
+                            }
+                            addstr(&fcomflags, mkstr("-mp_chunk=", argv[var_s0] + strlen("-chunk="), NULL));
+                        } else {
+                            addstr(&fcomflags, argv[var_s0]);
+                            if (strncmp(argv[var_s0], "-col", 4) == 0) {
+                                add_static_opt(argv[var_s0]);
+                            }
+                        }
+                        break;
+                    }
+                    if ((compiler == COMPILER_6) && (strcmp(argv[var_s0], "-comp_trunc") == 0)) {
+                        addstr(&ucobflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-check_registry") == 0)) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
+                            exit(2);
+                        }
+                        addstr(&ldflags, argv[var_s0 - 1]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'd': /* switch 1 */
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-dollar") == 0)) {
+                        addstr(&pcaflags, "-dollar");
+                        addstr(&mpcflags, "-dollar");
+                        addstr(&soptflags, "-dollar");
+                        addstr(&cfeflags, "-Xdollar");
+                        add_static_opt(argv[var_s0]);
+                        dollar_sign++;
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ddoptinfo") == 0) {
+                        ddoptinfo = TRUE;
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
+                        if (G_flag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
+                            exit(2);
+                        }
+                        dn_flag = TRUE;
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ddopt") == 0) {
+                        ddoptflag = TRUE;
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-d_lines") == 0)) {
+                        mp_dlinesflag = TRUE;
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_5) && (strcmp(argv[var_s0], "-defext") == 0)) {
+                        addstr(&ulpiflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_6) &&
+                        ((strcmp(argv[var_s0], "-dline") == 0) || (strcmp(argv[var_s0], "-defext") == 0))) {
+                        addstr(&ucobflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-delay_load") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-default_delay_load") == 0)) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'e': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-excpt") == 0) {
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
+                        exit(2);
+                    }
+                    if (compiler == COMPILER_1) {
+                        if (strcmp(argv[var_s0], "-elf") == 0) {
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        if ((strcmp(argv[var_s0], "-export") == 0) || (strcmp(argv[var_s0], "-exports") == 0)) {
+                            addstr(&objfiles, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exported_symbol") == 0) {
+                            var_s0++;
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-exported_symbol requires a symbol argument\n");
+                                exit(2);
+                            }
+                            addstr(&ldflags, argv[var_s0 - 1]);
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exports_file") == 0) {
+                            var_s0++;
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
+                                exit(2);
+                            }
+                            addstr(&ldflags, argv[var_s0 - 1]);
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-exclude") == 0) {
+                            var_s0++;
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
+                                exit(2);
+                            }
+                            addstr(&objfiles, argv[var_s0 - 1]);
+                            addstr(&objfiles, argv[var_s0]);
+                            break;
+                        }
+                        // if ((compiler == COMPILER_1) &&
+                        //     ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                        //      (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                        //     (strcmp(argv[var_s0], "-exceptions") == 0)) {
+                        //     if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
+                        //         exception_handling = TRUE;
+                        //         relocate_passes("f", NULL, NULL);
+                        //         if (access(cfe, EX_OK) == -1) {
+                        //             exception_handling = FALSE;
+                        //             relocate_passes("f", NULL, NULL);
+                        //         } else {
+                        //             break;
+                        //         }
+                        //     }
+                        //     goto bad_option;
+                        // }
+                    }
+
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-e");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -e to have an argument\n");
+                            exit(2);
+                        }
+                    }
+
+                    if (strcmp(argv[var_s0], "-exact_version") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-elf") == 0) {
+                        elfflag = TRUE;
+                        elf_spec = TRUE;
+                        addstr(&asflags, argv[var_s0]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-extend_source") == 0)) {
+                        mp_extendflag = 1;
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-expand_include") == 0)) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-edit", 5) == 0) {
+                        pid_t sp108; // process group id
+
+                        if (argv[var_s0][5] == '\0') {
+                            edit_cnt_max = 0x100;
+                        } else if (isdigit(argv[var_s0][5]) && (argv[var_s0][6] == '\0')) {
+                            edit_cnt_max = argv[var_s0][5] - '0';
+                        } else {
+                            //! @remark typo of "syntax"
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
+                            exit(2);
+                        }
+                        editflag = EDIT_FLAG_1;
+                        editor = getenv("EDITOR");
+                        if (editor != NULL) {
+                            for (var_s2 = editor; strlen(var_s2) >= 5; var_s2++) {
+                                if (strncmp(var_s2, "emacs", 5) == 0) {
+                                    editflag = EDIT_FLAG_2;
+                                    break;
+                                }
+                            }
+                        }
+                        if ((editflag == EDIT_FLAG_1) && (editor == NULL)) {
+                            editor = "vi";
+                        }
+
+                        xserver = getenv("DISPLAY");
+                        if ((ioctl(2, TIOCGPGRP, &sp108) == 0) && (getpgrp() == sp108) && (xserver == 0)) {
+                            editflag = EDIT_FLAG_0;
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "%s ignored for background compile in non-X environment\n", argv[var_s0]);
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'f': /* switch 1 */
+                          // Accounts for a misspelling?
+                    if ((strcmp(argv[var_s0], "-full_transtive_link") == 0)
+                        // || (strcmp(argv[var_s0], "-full_transitive_link") == 0)
+                    ) {
+                        full_transitive_link = TRUE;
+                        transitive_link = FALSE;
+                        no_transitive_link = FALSE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-feedback") == 0) {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&feedlist, argv[var_s0]);
+                            break;
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-feedback must have an argument\n");
+                            exit(2);
+                        }
+                    }
+
+                    if (strcmp(argv[var_s0], "-fullasopt") == 0) {
+                        fullasoptflag = 1;
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-force_load") == 0)) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-fullwarn") == 0) && (fullwarn = TRUE, (compiler == COMPILER_1))) {
+                        addstr(&accomflags, "-Xfullwarn");
+                        addstr(&cfeflags, "-verbose");
+                        addstr(&cfeflags, "-wimplicit");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-framepointer") == 0) {
+                        if (compiler == COMPILER_1) {
+                            addstr(&ccomflags, argv[var_s0]);
+                            break;
+                        }
+                        if (compiler == COMPILER_2) {
+                            addstr(&upasflags, argv[var_s0]);
+                            break;
+                        }
+                        if (compiler == COMPILER_3) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            break;
+                        }
+                        goto bad_option;
+                    }
+
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-float") == 0)) {
+                        addstr(&pcaflags, "-float");
+                        addstr(&soptflags, "-float");
+                        addstr(&ccomflags, "-Xfloat");
+                        break;
+                    }
+                    if (((compiler == COMPILER_4) || (compiler == COMPILER_2)) &&
+                        (strcmp(argv[var_s0], "-float") == 0)) {
+                        break;
+                    }
+                    if (compiler == COMPILER_6) {
+                        if (strcmp(argv[var_s0], "-fsc74") == 0) {
+                            addstr(&ucobflags, argv[var_s0]);
+                            break;
+                        }
+                        if (argv[var_s0][2] == '\0') {
+                            var_s0++;
+                            if ((var_s0 < argc) && (addstr(&ucobflags, "-f"), (argv[var_s0][1] == '\0')) &&
+                                (argv[var_s0][0] >= '1') && (argv[var_s0][0] <= '4')) {
+                                addstr(&ucobflags, argv[var_s0]);
+                                break;
+                            } else {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
+                                exit(2);
+                            }
+                        } else {
+                            goto bad_option;
+                        }
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-f");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
+                        exit(2);
+                    }
+                    goto bad_option;
+
+                case 'g': /* switch 1 */
+                    plain_g = FALSE;
+                    // "-g" , which is converted to "-g2 -O1"
+                    if (argv[var_s0][2] == '\0') {
+                        gflag = 2;
+                        plain_g = TRUE;
+                        if (plain_O) {
+                            Oflag = 1;
+                        }
+                        break;
+                    }
+                    // "-gN" for N in 0,1,2,3
+                    if ((argv[var_s0][3] == '\0') && (argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '3')) {
+                        gflag = argv[var_s0][2] - '0';
+                        if (gflag == 2) {
+                            plain_g = TRUE;
+                            if (plain_O) {
+                                Oflag = 1;
+                            }
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'h': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-hostcache") == 0) {
+                        addstr(&ddoptflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-help", 5) == 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-help is ignored.\n");
+                        break;
+                    }
+                    if (compiler == COMPILER_1) {
+                        if (strcmp(argv[var_s0], "-hides") == 0) {
+                            addstr(&objfiles, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-hidden_symbol") == 0) {
+                            var_s0++;
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
+                                exit(2);
+                            }
+                            addstr(&ldflags, argv[var_s0 - 1]);
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-hides_file") == 0) {
+                            var_s0++;
+                            if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
+                                exit(2);
+                            }
+                            addstr(&ldflags, argv[var_s0 - 1]);
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        }
+                    }
+                    hstring = argv[var_s0] + 2;
+                    if (hstring[strlen(hstring) - 1] != '/') {
+                        hstring = mkstr(hstring, "/", NULL);
+                    }
+                    break;
+
+                case 'i': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            addstr(&ldflags, "-i");
+                            addstr(&ldflags, argv[var_s0]);
+                            break;
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -i to have an argument\n");
+                            exit(2);
+                        }
+                    }
+
+                    if (strcmp(argv[var_s0], "-inline_to") == 0) {
+                        addstr(&umergeflags, argv[var_s0]);
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-inline_to must have an argument\n");
+                            exit(2);
+                        }
+                        for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
+                            if (!isdigit(*var_s2)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                exit(2);
+                            }
+                        }
+                        addstr(&umergeflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ignore_unresolved") == 0) {
+                        ignore_unresolved_flag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-ignore_minor") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-irix4") == 0) {
+                        irix4 = TRUE;
+                        comp_host_root = "/usr/irix4/";
+                        Gnum = "8";
+                        systype = "";
+                        elfflag = FALSE;
+                        svr4_systype = FALSE;
+                        kpic_flag = FALSE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        non_shared = FALSE;
+                        old_non_shared = FALSE;
+                        mips_abi = MIPS_ABI_0;
+                        relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (((compiler == COMPILER_3) &&
+                         ((strcmp(argv[var_s0], "-i2") == 0) || (strcmp(argv[var_s0], "-i4") == 0))) ||
+                        (strcmp(argv[var_s0], "-i8") == 0)) {
+                        if ((argv[var_s0][2] == '2') || (argv[var_s0][2] == '8')) {
+                            mp_i2flag = TRUE;
+                        }
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (compiler == COMPILER_5) {
+                        if (strcmp(argv[var_s0], "-ipath") == 0) {
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&upl1flags, "-ipath");
+                                addstr(&upl1flags, argv[var_s0]);
+                                break;
+                            } else {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ipath must have an argument\n");
+                                exit(2);
+                            }
+                        }
+                        if (strcmp(argv[var_s0], "-isuffix") == 0) {
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&upl1flags, "-isuffix");
+                                addstr(&upl1flags, argv[var_s0]);
+                                break;
+                            } else {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
+                                exit(2);
+                            }
+                        }
+                    }
+                    goto bad_option;
+
+                case 'j': /* switch 1 */
+                          // "-j"
+                    if (argv[var_s0][2] == '\0') {
+                        jflag++;
+                        uload = FALSE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-jalr") == 0) {
+                        addstr(&genflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-jmpopt") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'k': /* switch 1 */
+                    // if (strcmp(argv[var_s0], "-keep") == 0) {
+                    //     Kflag++;
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-kpicopt") == 0) {
+                        kpicopt_flag = TRUE;
+                        break;
+                    }
+                    switch (argv[var_s0][2]) { /* switch 7; irregular */
+                        case 'o':              /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                uoutfile = argv[var_s0];
+                                var_s1 = getsuf(uoutfile);
+                                if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
+                                    (var_s1 == 'r') || (var_s1 == 'e') || (var_s1 == 6) || (var_s1 == 's') ||
+                                    (var_s1 == 1) || (var_s1 == 2)) {
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
+                                    exit(2);
+                                }
+                            }
+                            break;
+
+                        case 'p': /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&uldflags, "-kp");
+                                addstr(&uldflags, argv[var_s0]);
+                            }
+                            break;
+
+                        case 'u': /* switch 7 */
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&uldflags, "-ku");
+                                addstr(&uldflags, argv[var_s0]);
+                            }
+                            break;
+
+                        default: /* switch 7 */
+                            addstr(&ufiles, argv[var_s0]);
+                            break;
+                    }
+                    break;
+
+                case 'l': /* switch 1 */
+                    if (strcmp("isting", argv[var_s0] + 2) == 0) {
+                        addstr(&fcomflags, argv[var_s0]);
+                    } else {
+                        if ((argv[var_s0][2] == 'm') && (argv[var_s0][3] == '\0')) {
+                            lmflag++;
+                        }
+                        // else if ((argv[var_s0][2] == '\0') && ((var_s0 + 1) < argc)) {
+                        //     char* sp104 = malloc(strlen(argv[var_s0 + 1]) + 3);
+
+                        //     sp104[0] = '-';
+                        //     sp104[1] = 'l';
+                        //     sp104[2] = '\0';
+                        //     if (xpg_flag) {
+                        //         addstr(&dashlfiles, strcat(sp104, argv[var_s0 + 1]));
+                        //     } else {
+                        //         addstr(&objfiles, strcat(sp104, argv[var_s0 + 1]));
+                        //     }
+                        //     var_s0++;
+                        //     break;
+                        // }
+                        // if (xpg_flag) {
+                        //     addstr(&dashlfiles, argv[var_s0]);
+                        // } else {
+                        addstr(&objfiles, argv[var_s0]);
+                        // }
+                        if (strcmp(argv[var_s0], "-lgl_s") == 0) {
+                            B_1000A56C++;
+                            addstr(&objfiles, "-lX11_s");
+                        }
+                        if (strcmp(argv[var_s0], "-lc_s") == 0) {
+                            B_1000A570++;
+                        }
+                    }
+                    break;
+
+                case 'm': /* switch 1 */
+                    // if (strcmp(argv[var_s0], "-multigot") == 0) {
+                    //     addstr(&nldflags, argv[var_s0]);
+                    //     break;
+                    // }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-mp") == 0)) {
+                        cmp_flag |= 0x10008;
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "'-mp' must preceed any -B flags.\n");
+                            exit(2);
+                        }
+                        relocate_passes("fY", NULL, NULL);
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        if ((compiler == COMPILER_4) || (compiler == COMPILER_3)) {
+                            mflag++;
+                        } else {
+                            addstr(&ldflags, argv[var_s0]);
+                        }
+                        if (compiler == COMPILER_3) {
+                            add_static_opt(argv[var_s0]);
+                        }
+                        break;
+                    }
+                    if (compiler == COMPILER_6) {
+                        if (strcmp(argv[var_s0], "-mfext") == 0) {
+                            addstr(&ucobflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-map") == 0) {
+                            addstr(&ucobflags, argv[var_s0]);
+                            break;
+                        }
+                    }
+                    if (strcmp(argv[var_s0], "-mips1") == 0) {
+                        chip_targ = CHIP_TARGET_MIPS1;
+                        // mips1flag = TRUE;
+                        // mips2flag = FALSE;
+                        if (dwopcodeflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
+                            exit(2);
+                        }
+                        mips1_spec_flag = TRUE;
+                        // if (mips2_spec_flag) {
+                        //     error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                        //           "-mips1 conflicts with -mips2; using last value (mips1)\n");
+                        //     mips2_spec_flag = FALSE;
+                        // }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-mips2") == 0) {
+                        mips1flag = FALSE;
+                        mips2flag = TRUE;
+                        if (mips1_spec_flag || mips3flag) {
+                            // error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                            //       "-mips2 conflicts with -mips1; using last value (mips2)\n");
+                            error(ERRORCAT_ERROR, 0, 0, 0, 0, "can't mix -mips2 with -mips[1,3]\n");
+                            exit(2);
+                        }
+                        // mips2_spec_flag = TRUE;
+                        relocate_passes("M", NULL, NULL);
+
+                        addstr(&ccomflags, argv[var_s0]);
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&fcomflags, argv[var_s0]);
+                        addstr(&upl1flags, argv[var_s0]);
+                        addstr(&ucobflags, argv[var_s0]);
+                        addstr(&ulpiflags, argv[var_s0]);
+                        addstr(&eflflags, argv[var_s0]);
+                        addstr(&ratforflags, argv[var_s0]);
+                        addstr(&ujoinflags, argv[var_s0]);
+                        addstr(&usplitflags, argv[var_s0]);
+                        addstr(&umergeflags, argv[var_s0]);
+                        addstr(&uloopflags, argv[var_s0]);
+                        addstr(&optflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        addstr(&asflags, argv[var_s0]);
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&ftocflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-mips3") == 0) {
+                        mips1flag = FALSE;
+                        // mips2flag = FALSE;
+                        // if (mips2_spec_flag) {
+                        if (mips1_spec_flag || mips2flag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
+                            exit(2);
+                        }
+                        if ((compiler == COMPILER_4) || (compiler == COMPILER_1)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips3 should not be used for ucode 32-bit compiles\n");
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-mips3 cannot be used for ucode 32-bit compiles\n");
+                            exit(2);
+                        }
+                        chip_targ = CHIP_TARGET_MIPS3;
+                        mips3flag = TRUE;
+                        dwopcodeflag = TRUE;
+                        relocate_passes("M", NULL, NULL);
+                        if (!non_shared_emitted) {
+                            addstr(&ldflags, "-non_shared");
+                            addstr(&cfeflags, "-non_shared");
+                            non_shared_emitted = TRUE;
+                        }
+                        addstr(&ccomflags, argv[var_s0]);
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&fcomflags, argv[var_s0]);
+                        addstr(&upl1flags, argv[var_s0]);
+                        addstr(&ucobflags, argv[var_s0]);
+                        addstr(&ulpiflags, argv[var_s0]);
+                        addstr(&eflflags, argv[var_s0]);
+                        addstr(&ratforflags, argv[var_s0]);
+                        addstr(&ddoptflags, argv[var_s0]);
+                        addstr(&optflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        addstr(&asflags, argv[var_s0]);
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&ftocflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-mips4") == 0) {
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips4 cannot be used for ucode 32-bit compiles\n");
+                        exit(2);
+                    }
+                    if (compiler == COMPILER_3) {
+                        if ((argv[var_s0][2] == 'p') && (argv[var_s0][3] == '\0')) {
+                            mp_flag |= 0x10000;
+                            break;
+                        }
+                        if (strncmp(argv[var_s0], "-mp_keep", strlen("-mp_keep")) == 0) {
+                            if (argv[var_s0][8] != '\0') {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, " Unknown flag: %s\n", argv[var_s0]);
+                                exit(2);
+                            }
+                            mp_flag |= 0x10000;
+                            showdirt_flag = TRUE;
+                            break;
+                        }
+                        if (strncmp(argv[var_s0], "-mp_schedtype=", strlen("-mp_schedtype=")) == 0) {
+                            char* sp100 = argv[var_s0] + strlen("-mp_schedtype=");
+
+                            while (*sp100 != 0) {
+                                *sp100 = TO_LOWER(*sp100);
+                                sp100++;
+                            }
+                            addstr(&fcomflags, argv[var_s0]);
+                            break;
+                        }
+                    }
+                    goto bad_option;
+
+                case 'n': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-nokpicopt") == 0) {
+                        nokpicopt_flag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-no_unresolved") == 0) {
+                        no_unresolved_flag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-no_transitive_link") == 0) {
+                        transitive_link = FALSE;
+                        full_transitive_link = FALSE;
+                        no_transitive_link = TRUE;
+                        break;
+                    }
+                    // if ((compiler == COMPILER_1) &&
+                    //     ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                    //     (strcmp(argv[var_s0], "-no_exceptions") == 0)) {
+                    //     if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
+                    //         exception_handling = FALSE;
+                    //         relocate_passes("f", NULL, NULL);
+                    //         break;
+                    //     }
+                    //     goto bad_option;
+                    // }
+                    // if (strcmp(argv[var_s0], "-new_ld") == 0) {
+                    //     if (D_1000BF94) {
+                    //         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
+                    //         exit(2);
+                    //     } else if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                    //         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
+                    //         exit(2);
+                    //     } else {
+                    //         LD = "ld";
+                    //         D_1000BF90 = FALSE;
+                    //     }
+                    //     relocate_passes("l", NULL, NULL);
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-noinline") == 0) {
+                        addstr(&umergeflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-nouopt0") == 0) {
+                        uopt0flag = FALSE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-noaliasok") == 0) {
+                        noaliasokflag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-nostdinc") == 0) {
+                        emptyIflag = TRUE;
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-nostdlib") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        // addstr(&prelinkerflags, mkstr("-YB", NULL));
+                        break;
+                    }
+                    // if (strcmp(argv[var_s0], "-nodeflib") == 0) {
+                    //     nodeflib = TRUE;
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-noprototypes") == 0) {
+                        prototype_checking_on = FALSE;
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '\0') || (strcmp(argv[var_s0], "-nocount") == 0) ||
+                        (strcmp(argv[var_s0], "-nN") == 0) || (strcmp(argv[var_s0], "-nojmpopt") == 0)) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-non_shared") == 0) {
+                        old_non_shared = FALSE;
+                        non_shared = TRUE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        kpic_flag = FALSE;
+                        if (!non_shared_emitted) {
+                            addstr(&ldflags, "-non_shared");
+                            addstr(&cfeflags, "-non_shared");
+                            non_shared_emitted = TRUE;
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-no_archive") == 0) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-no_mpc") == 0) {
+                        B_1000A5B4 = 1;
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) &&
+                        (
+                            // (strcmp(argv[var_s0], "-noextend_source") == 0) ||
+                            (strcmp(argv[var_s0], "-noi4") == 0) || (strcmp(argv[var_s0], "-noisam") == 0) ||
+                            (strcmp(argv[var_s0], "-noexpopt") == 0) || (strcmp(argv[var_s0], "-noequivauto") == 0) ||
+                            (strcmp(argv[var_s0], "-nof77") == 0))) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (compiler == COMPILER_6) {
+                        if (strcmp(argv[var_s0], "-nolock") == 0) {
+                            nolockflag = TRUE;
+                            break;
+                        }
+                        if ((strcmp(argv[var_s0], "-nomfdata") == 0) || (strcmp(argv[var_s0], "-normdata") == 0)) {
+                            addstr(&ucobflags, argv[var_s0]);
+                            break;
+                        }
+                        goto bad_option;
+                    }
+                    if (strcmp(argv[var_s0], "-nocpp") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            docpp = FALSE;
+                            add_static_opt(argv[var_s0]);
+                        }
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) ||
+                        ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0))) {
+                        if (strcmp(argv[var_s0], "-nocode") == 0) {
+                            nocode = TRUE;
+                            cflag = TRUE;
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-no_prelink") == 0) {
+                            no_prelink = TRUE;
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-no_auto_include") == 0) {
+                            auto_template_include = FALSE;
+                            add_static_opt(argv[var_s0]);
+                            break;
+                        }
+                    }
+                    if (strcmp(argv[var_s0], "-none") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                        (strcmp(argv[var_s0], "-nofilt") == 0)) {
+                        nofilt = TRUE;
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3) &&
+                        (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
+                        char* spFC;
+
+                        if (argv[var_s0][9] == '\0') {
+                            spFC = "-YDN";
+                        } else if (strcmp(argv[var_s0] + 9, "_expr") == 0) {
+                            spFC = "-YDE";
+                        } else if (strcmp(argv[var_s0] + 9, "_include") == 0) {
+                            spFC = "-YDI";
+                        } else {
+                            spFC = NULL;
+                        }
+                        if (spFC != NULL) {
+                            if (var_s0 >= (argc - 1)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0]);
+                                exit(2);
+                            }
+                            var_s0++;
+                            if (argv[var_s0][0] == '-') {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                                exit(2);
+                            }
+                            addstr(&edisonflags, mkstr(spFC, argv[var_s0], NULL));
+                            add_static_opt(argv[var_s0 - 1]);
+                            add_static_opt(argv[var_s0]);
+                            break;
+                        }
+                    }
+                    goto bad_option;
+
+                case 'o': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-old_rl") == 0) {
+                        addstr(&fcomflags, "-old_rl");
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-oldcpp") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            oldcppflag = TRUE;
+                            if ((compiler == COMPILER_1) && tpflag) {
+                                relocate_passes(tstring, hstring, Bstring);
+                            }
+                        }
+                        break;
+                    }
+                    // if (strcmp(argv[var_s0], "-old_ld") == 0) {
+                    //     if (D_1000BF94) {
+                    //         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -old_ld\n");
+                    //         exit(2);
+                    //     } else {
+                    //         LD = "old_ld";
+                    //         relocate_passes("l", NULL, NULL);
+                    //     }
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-o32") == 0) {
+                        thirty2bitflag = TRUE;
+                        mips_abi = 1;
+                        // if (var_s0 >= (argc - MIPS_ABI_1)) {
+                        //     func_00431B38(var_s0 + 1, 1);
+                        // }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-objectlist") == 0) {
+                        if ((argv[var_s0 + 1] != 0) && (argv[var_s0 + 1][0] != '-')) {
+                            addstr(&objfiles, argv[var_s0]);
+                            var_s0++;
+                            addstr(&objfiles, argv[var_s0]);
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-objectlist must be given a file argument\n");
+                        }
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            struct stat sp74;
+
+                            outfile = argv[var_s0];
+                            var_s1 = getsuf(outfile);
+                            if (((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
+                                 (var_s1 == 'r') || (var_s1 == 'e') ||
+                                 ((compiler == COMPILER_1) &&
+                                  ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                   (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                                  (var_s1 == 6)) ||
+                                 (var_s1 == 's') || (var_s1 == 1) || (var_s1 == 2)) &&
+                                (stat(outfile, &sp74) == 0)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-o %s resembles the name of a source file, disallowed\n", argv[var_s0]);
+                                exit(2);
+                            }
+                            // B_1000ECCC = mkstr(outfile, NULL);
+                            // func_00431B38(var_s0, 2);
+                            break;
+                        } else {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-o must have an argument\n");
+                            exit(2);
+                        }
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-onetrip") == 0)) {
+                        addstr(&fcomflags, "-1");
+                        mp_onetripflag = TRUE;
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'p': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-prototypes") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            prototype_checking_on = TRUE;
+                        }
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-pedantic") == 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            addstr(&acppflags, "-p");
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-pfa") == 0) {
+                        mp_flag |= 0x10001;
+                        if ((var_s0 + 1) < argc) {
+                            struct_mpflags* sp70 = mpflags;
+
+                            while ((sp70->unk_0 != NULL) && (strcmp(argv[var_s0 + 1], sp70->unk_0) != 0)) {
+                                sp70++;
+                            }
+                            if (sp70->unk_0 != NULL) {
+                                if (1) {} // FAKE
+                                var_s0++;
+                                mp_flag |= sp70->unk_4;
+                            }
+                        }
+                        break;
+                    }
+                    if (strncmp(argv[var_s0], "-pfaprepass,", 12) == 0) {
+                        mp_flag |= 0x10001;
+                        mp_prepass_count++;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-pca") == 0) {
+                        cmp_flag |= 0x10001;
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-pca must preceed any -B flags.\n");
+                            exit(2);
+                        }
+                        relocate_passes("fKY", NULL, NULL);
+                        if ((var_s0 + 1) < argc) {
+                            struct_mpflags* sp6C = cmpflags;
+
+                            while ((sp6C->unk_0 != NULL) && (strcmp(argv[var_s0 + 1], sp6C->unk_0) != 0)) {
+                                sp6C++;
+                            }
+
+                            if (sp6C->unk_0 != NULL) {
+                                if (1) {} // FAKE
+                                var_s0++;
+                                cmp_flag |= sp6C->unk_4;
+                            }
+                        }
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                        if (strncmp(argv[var_s0], "-pt", 3) == 0) {
+                            char* sp68 = argv[var_s0] + 3;
+
+                            if (strcmp(sp68, "v") == 0) {
+                                verbose_prelink++;
+                            } else if (strcmp(sp68, "none") == 0) {
+                                default_template_instantiation_mode = 0;
+                            } else if (strcmp(sp68, "used") == 0) {
+                                default_template_instantiation_mode = 1;
+                            } else if ((strcmp(sp68, "a") == 0) || (strcmp(sp68, "all") == 0)) {
+                                default_template_instantiation_mode = 2;
+                            } else if (*sp68 == 'e') {
+                                if ((strcmp(sp68 + 1, ".c") != 0) && (strcmp(sp68 + 1, ".cc") != 0) &&
+                                    (strcmp(sp68 + 1, ".c++") != 0) && (strcmp(sp68 + 1, ".C") != 0) &&
+                                    (strcmp(sp68 + 1, ".cxx") != 0) && (strcmp(sp68 + 1, ".CXX") != 0) &&
+                                    (strcmp(sp68 + 1, ".cpp") != 0) && (strcmp(sp68 + 1, ".CPP") != 0)) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "unsupported suffix in %s\n",
+                                          argv[var_s0]);
+                                }
+                            } else {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "ignored unsupported option %s\n",
+                                      argv[var_s0]);
+                            }
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-prelink") == 0) {
+                            force_prelink = TRUE;
+                            break;
+                        }
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        pflag = 1;
+                        // } else if (strcmp(argv[var_s0], "-pg") == 0) {
+                        //     pflag = 1;
+                        //     pgflag = 1;
+                    } else if (argv[var_s0][3] == '\0') {
+                        if (1) {} // FAKE
+                        if ((argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '3')) {
+                            pflag = argv[var_s0][2] - '0';
+                        } else {
+                            goto bad_option;
+                        }
+                    } else {
+                        goto bad_option;
+                    }
+                    if ((pflag == 0) || (pflag == 1)) {
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-p0 or -p1 must precede any -B flags\n");
+                            exit(2);
+                        }
+                    } else {
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s has been superseded, see prof (1) and pixie (1)\n",
+                              argv[var_s0]);
+                        exit(2);
+                    }
+                    relocate_passes("rn", NULL, NULL);
+                    break;
+
+                case 'q': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-quickstart_info") == 0) {
+                        quickstart_info = TRUE;
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-ql") == 0) || (strcmp(argv[var_s0], "-qp") == 0)) {
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'r': /* switch 1 */
+                    if ((strcmp(argv[var_s0], "-r4000") == 0) || (strcmp(argv[var_s0], "-r6000") == 0)) {
+                        addstr(&asflags, argv[var_s0]);
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-require_minor") == 0) {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-rm_dead_code") == 0) {
+                        force_rm_dead_code = TRUE;
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-rpath") == 0) && (argv[var_s0 + 1] != 0) &&
+                        (argv[var_s0 + 1][0] != '-')) {
+                        addstr(&ldflags, argv[var_s0]);
+                        var_s0++;
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((strcmp(argv[var_s0], "-rdata_shared") == 0) ||
+                        (strcmp(argv[var_s0], "-rdata_writable") == 0)) {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-r8") == 0)) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_6) &&
+                        ((strcmp(argv[var_s0], "-range") == 0) || (strcmp(argv[var_s0], "-rmansi") == 0) ||
+                         (strcmp(argv[var_s0], "-rmext") == 0))) {
+                        addstr(&ucobflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 's': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        // if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                        //                                  (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                        //     do_strip = TRUE;
+                        //     break;
+                        // }
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-strictIEEE") == 0) {
+                        addstr(&optflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
+                        (strncmp(argv[var_s0], "-sa", 3) == 0) &&
+                        ((argv[var_s0][3] == '\0') || (argv[var_s0][3] == ','))) {
+                        D_100001FC = TRUE;
+                        if ((argv[var_s0][3] == ',') && (argv[var_s0][4] != '\0')) {
+                            char* sp64;
+
+                            for (sp64 = strtok(argv[var_s0] + 4, ","); sp64 != NULL; sp64 = strtok(NULL, ",")) {
+                                if (strcmp(sp64, "nosrc") == 0) {
+                                    D_10000200 = TRUE;
+                                } else if (D_10000204 != NULL) {
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                          "Static analysis directory already specified\n");
+                                } else {
+                                    D_10000204 = sp64;
+                                    if (sp64[strlen(sp64) - 1] != '/') {
+                                        D_10000204 = mkstr(sp64, "/", NULL);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
+                        (strncmp(argv[var_s0], "-sa_fs", 6) == 0) &&
+                        ((argv[var_s0][6] == '\0') || (argv[var_s0][6] == ','))) {
+                        D_10000208 =
+                            (argv[var_s0][6] == ',') ? mkstr(argv[var_s0] + 7, NULL) : mkstr("cvstatic.fileset", NULL);
+                        D_1000020C++;
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-set_version") == 0)) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-set_version requires an argument\n");
+                            exit(2);
+                        }
+                        addstr(&ldflags, argv[var_s0 - 1]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-soname") == 0)) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-soname requires an argument\n");
+                            exit(2);
+                        }
+                        addstr(&ldflags, argv[var_s0 - 1]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-systype") == 0) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                            exit(2);
+                        }
+                        if (user_systype) {                           // systype already specified via an argument
+                            if (strcmp(systype, argv[var_s0]) != 0) { // Different systype from previous
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one -systype option allowed\n");
+                                exit(2);
+                            } else {
+                                multiple_systype = TRUE;
+                            }
+                        }
+                        systype = argv[var_s0];
+                        user_systype = TRUE;
+                        if (Bflag && !systype_seen) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
+                            exit(2);
+                        } else {
+                            systype_seen = TRUE;
+                        }
+                        if (!multiple_systype) {
+                            if (strcmp(systype, "svr4") == 0) {
+                                svr4_systype = TRUE;
+                                if (!elfflag) {
+                                    addstr(&asflags, "-elf");
+                                    addstr(&ldflags, "-elf");
+                                }
+                                elfflag = TRUE;
+                            } else {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
+                                exit(2);
+                            }
+                            if ((strcmp(systype, "svr4") != 0) && (strcmp(systype, "bsd43") != 0) &&
+                                (strcmp(systype, "svr3") != 0) && (strcmp(systype, "sysv") != 0) &&
+                                (fopen(strcat("/", systype), "r") == NULL)) {
+                                if (!systype_warn) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                          "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                                }
+                                systype = "svr3";
+                            }
+                            if (!svr4_systype) {
+                                comp_target_root = mkstr(comp_target_root, systype, "/", NULL);
+                            }
+                            if (fiveflag) {
+                                include = mkstr(comp_target_root, "usr/5include", NULL);
+                            } else {
+                                einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
+                                include = mkstr(comp_target_root, "usr/include", NULL);
+                            }
+                            if (Bstring != NULL) {
+                                relocate_passes("h", NULL, Bstring);
+                            }
+                            newrunlib();
+                        }
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-swopcode") == 0) {
+                        if (dwopcodeflag || sixty4bitflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-swopcode can not be used with -dwopcode/-64bit\n");
+                            exit(2);
+                        }
+                        swopcodeflag = TRUE;
+                        break;
+                    }
+                    if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) { // "-sopt"
+                        if ((compiler != COMPILER_1) && (compiler != COMPILER_3)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-sopt only available with Fortran and C; option ignored.\n");
+                        } else if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            Warg = argv[var_s0] + 5;
+                            while (*Warg == ',') {
+                                *Warg++ = 0;
+                                addstr(&soptflags, Warg);
+                                while ((*Warg != ',') && (*Warg != 0)) {
+                                    Warg++;
+                                }
+                            }
+                            run_sopt = TRUE;
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-show") == 0) {
+                        vflag = TRUE;
+                        break;
+                    }
+                    // if (strcmp(argv[var_s0], "-showt") == 0) {
+                    //     time_flag = TRUE;
+                    //     break;
+                    // }
+                    if (strcmp(argv[var_s0], "-show0") == 0) {
+                        vflag = TRUE;
+                        execute_flag = FALSE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-showm") == 0) {
+                        memory_flag++;
+                        break;
+                    }
+                    // if (strcmp(argv[var_s0], "-show_defaults") == 0) {
+                    //     execute_flag = FALSE;
+                    //     exit(0);
+                    //     break;
+                    // }
+                    if (compiler == COMPILER_1) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
+                            (strncmp(argv[var_s0], "-smart", 6) == 0)) {
+                            if ((argv[var_s0][6] == ',') && (argv[var_s0][7] != 0)) {
+                                sbrepos = argv[var_s0] + 7;
+                            } else {
+                                sbrepos = NULL;
+                            }
+                            add_static_opt(argv[var_s0]);
+                            smart_build = TRUE;
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-shared") == 0) {
+                            call_shared = FALSE;
+                            make_edison_shlib++;
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-std0") == 0) {
+                            stdflag = 0;
+                            addstr(&ccomflags, argv[var_s0]);
+                            break;
+                        }
+                        if ((strcmp(argv[var_s0], "-std") == 0) || (strcmp(argv[var_s0], "-std1") == 0)) {
+                            stdflag = 1;
+                            addstr(&ccomflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-signed") == 0) {
+                            addstr(&pcaflags, "-signed");
+                            addstr(&soptflags, "-signed");
+                            addstr(&ccomflags, "-Xsigned");
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                                signedcharflag = TRUE;
+                            }
+                            break;
+                        }
+                    }
+                    if ((compiler == COMPILER_4) &&
+                        ((strcmp(argv[var_s0], "-std") == 0) || (strcmp(argv[var_s0], "-std0") == 0) ||
+                         (strcmp(argv[var_s0], "-std1") == 0))) {
+                        stdflag = 1;
+                        addstr(&ccomflags, argv[var_s0]);
+                        break;
+                    }
+                    if (compiler == COMPILER_3) {
+                        if (strcmp(argv[var_s0], "-std") == 0) {
+                            addstr(&fcomflags, argv[var_s0]);
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-static") == 0) {
+                            automaticflag = FALSE;
+                            break;
+                        }
+                        if (strncmp(argv[var_s0], "-share_", 7) == 0) {
+                            if (strcmp(argv[var_s0] + 7, "io") == 0) {
+                                D_1000039C = 1;
+                                break;
+                            }
+                            if (strcmp(argv[var_s0] + 7, "all") == 0) {
+                                D_1000039C = 2;
+                                break;
+                            }
+                        }
+                    }
+                    if ((compiler == COMPILER_2) && (strcmp(argv[var_s0], "-std") == 0)) {
+                        stdflag = 1;
+                        addstr(&upasflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_6) &&
+                        ((strcmp(argv[var_s0], "-supp_cob85") == 0) || (strcmp(argv[var_s0], "-supp_cod") == 0) ||
+                         (strcmp(argv[var_s0], "-supp_rm") == 0))) {
+                        addstr(&ucobflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_4) && (strcmp(argv[var_s0], "-signed") == 0)) {
+                        break;
+                    }
+                    goto bad_option;
+
+                case 't': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-transitive_link") == 0) {
+                        full_transitive_link = FALSE;
+                        transitive_link = TRUE;
+                        no_transitive_link = FALSE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-trapuv") == 0) {
+                        trapuv_flag = TRUE;
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&fcomflags, argv[var_s0]);
+                        addstr(&upl1flags, argv[var_s0]);
+                        addstr(&ucobflags, argv[var_s0]);
+                        addstr(&ulpiflags, argv[var_s0]);
+                        addstr(&eflflags, argv[var_s0]);
+                        addstr(&ratforflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        addstr(&asflags, argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-tfp") == 0) {
+                        tfp_flag = TRUE;
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-traditional") == 0) {
+                        acpp_traditional++;
+                        break;
+                    }
+                    tstring = argv[var_s0] + 2;
+                    strcat(alltstring, tstring);
+                    break;
+
+                case 'Z':                      /* switch 1 */
+                    switch (argv[var_s0][2]) { /* switch 4 */
+                        case 'A':              /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'C': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'F': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'N': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'P': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'U': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'f': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'i': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'R': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        case 'G': /* switch 4 */
+                            addstr(&ldZflags, "-ZG");
+                            break;
+
+                        case 'q': /* switch 4 */
+                            // -Zq
+                            vflag = TRUE;
+                            break;
+
+                        case 'g': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zg is obsolete and is ignored.\n");
+                            if (compiler == COMPILER_1) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "perhaps replace -Zg with -lgl_s. See your graphics documentation.\n");
+                            }
+                            if (hasfortran || (compiler == COMPILER_3)) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
+                            }
+                            if (haspascal || (compiler == COMPILER_2)) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "perhaps replace -Zg with -lpgl /usr/lib/p2cstr.o -lgl_s  See pc(1).\n");
+                            }
+                            break;
+
+                        case 'r': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zr is obsolete and is ignored.\n");
+                            break;
+
+                        case 'v': /* switch 4 */
+                            stdflag = 1;
+                            addstr(&ccomflags, "-std");
+                            addstr(&upasflags, "-std");
+                            addstr(&fcomflags, "-std");
+                            addstr(&upl1flags, "-std");
+                            addstr(&ucobflags, "-std");
+                            break;
+
+                        case 'z': /* switch 4 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            break;
+
+                        default: /* switch 4 */
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            exit(2);
+                            break;
+                    }
+                    break;
+
+                case '-': /* switch 1 */
+                    // if (argv[var_s0][2] == '\0') {
+                    //     if (xpg_flag) {
+                    //         NoMoreOptions++;
+                    //     }
+                    //     break;
+                    // }
+                    switch (argv[var_s0][2]) { /* switch 8; irregular */
+                        case 'n':              /* switch 8 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                            break;
+                        case 'x': /* switch 8 */
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                            break;
+                        default:
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            exit(2);
+                            break;
+                    }
+
+                    break;
+
+                case 'u': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-uopt0") == 0) {
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        if (compiler == COMPILER_3) {
+                            mp_uflag = TRUE;
+                            addstr(&fcomflags, argv[var_s0]);
+                            add_static_opt(argv[var_s0]);
+                            break;
+                        } else {
+                            var_s0++;
+                            if (var_s0 < argc) {
+                                addstr(&objfiles, "-u");
+                                addstr(&objfiles, argv[var_s0]);
+                                break;
+                            } else {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
+                                exit(2);
+                            }
+                        }
+                    }
+
+                    if (strcmp(argv[var_s0], "-unroll") == 0) {
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "This flag is no longer supported\n");
+                        exit(2);
+                    } else if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-usefpidx") == 0)) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+
+                    if (strcmp(argv[var_s0], "-use_readwrite_const") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            addstr(&edisonflags, "-Yr0");
+                        } else {
+                            addstr(&accomflags, "-use_readwrite_const");
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-use_readonly_const") == 0) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            addstr(&edisonflags, "-Yr1");
+                        } else {
+                            addstr(&accomflags, "-use_readonly_const");
+                        }
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-update_registry") == 0)) {
+                        var_s0++;
+                        if (var_s0 >= argc) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
+                            exit(2);
+                        }
+                        addstr(&ldflags, argv[var_s0 - 1]);
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'v': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        if (!default_svr4) {
+                            vflag = TRUE;
+                            // time_flag = TRUE;
+                        }
+                        break;
+                    }
+                    if (compiler == COMPILER_1) {
+                        if (strcmp(argv[var_s0], "-volatile") == 0) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-volatile is no longer supported; use the volatile qualifier instead\n");
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-varargs") == 0) {
+                            addstr(&ccomflags, "-Xvarargs");
+                            break;
+                        }
+                        if (strcmp(argv[var_s0], "-verbose") == 0) {
+                            addstr(&ccomflags, "-verbose");
+                            break;
+                        }
+                    }
+                    if ((compiler == COMPILER_3) &&
+                        ((strncmp(argv[var_s0], "-vms", 4) == 0) || (strcmp(argv[var_s0], "-varargs") == 0))) {
+                        addstr(&fcomflags, argv[var_s0]);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                        (strcmp(argv[var_s0], "-v2") == 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        }
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'w': /* switch 1 */
+                    if ((compiler == COMPILER_1) && (strncmp(argv[var_s0], "-wlint", 6) == 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
+                        } else {
+                            addstr(&ccomflags, argv[var_s0]);
+                        }
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-woff") == 0) {
+                        var_s0++;
+                        if (var_s0 < argc) {
+                            if (strcmp(argv[var_s0], "options") == 0) {
+                                sp14C = 0;
+                                break;
+                            }
+                            if ((argv[var_s0][0] < '0') || (argv[var_s0][0] > '9')) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "-woff requires a comma-separated list of error numbers - ignored\n");
+                                var_s0--;
+                                break;
+                            }
+                            addstr(&accomflags, mkstr("-Xwoff", argv[var_s0], NULL));
+                            addstr(&edisonflags, mkstr("-YW", argv[var_s0], NULL));
+                            break;
+                        }
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                              "-woff requires a warning number (or a list of them)\n");
+                        exit(2);
+                    }
+                    if ((argv[var_s0][2] == '1') && (argv[var_s0][3] == '\0')) {
+                        if (compiler != COMPILER_3) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                        } else {
+                            w1flag = 1;
+                        }
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '0') && (argv[var_s0][3] == '\0')) {
+                        if (compiler != COMPILER_3) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                        } else {
+                            w1flag = 0;
+                        }
+                        break;
+                    }
+                    if (argv[var_s0][2] == '6') {
+                        if ((compiler == COMPILER_3) && (argv[var_s0][2] == '6')) {
+                            mp_66flag = TRUE;
+                        }
+                        addstr(&fcomflags, argv[var_s0]);
+                        break;
+                    }
+                    if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) &&
+                        (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
+                        break;
+                    }
+                    if ((argv[var_s0][2] == '\0') ||
+                        ((argv[var_s0][3] == '\0') &&
+                         ((argv[var_s0][2] == '1') || (argv[var_s0][2] == '2') || (argv[var_s0][2] == '3')))) {
+                        addstr(&cppflags, argv[var_s0]);
+                        addstr(&ccomflags, argv[var_s0]);
+                        addstr(&edisonflags, argv[var_s0]);
+                        w1flag = 2;
+                        addstr(&upasflags, argv[var_s0]);
+                        addstr(&upl1flags, argv[var_s0]);
+                        addstr(&ucobflags, argv[var_s0]);
+                        addstr(&ulpiflags, argv[var_s0]);
+                        addstr(&uldflags, argv[var_s0]);
+                        addstr(&uopt0flags, argv[var_s0]);
+                        addstr(&ddoptflags, argv[var_s0]);
+                        addstr(&uloopflags, argv[var_s0]);
+                        addstr(&optflags, argv[var_s0]);
+                        addstr(&genflags, argv[var_s0]);
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&asflags, argv[var_s0]);
+                        addstr(&ldflags, argv[var_s0]);
+                        addstr(&ftocflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'y': /* switch 1 */
+                    if (argv[var_s0][2] != '\0') {
+                        addstr(&objfiles, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'x': /* switch 1 */
+                    if (strcmp(argv[var_s0], "-xansi") == 0) {
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
+                        }
+                        ansichoice = ANSICHOICE_XANSI;
+                        cppchoice = CPP_CHOICE_3;
+                        relocate_passes("p", NULL, NULL);
+                        add_static_opt(argv[var_s0]);
+                        break;
+                    }
+                    if (strcmp(argv[var_s0], "-xgot") == 0) {
+                        addstr(&asflags, "-big_got");
+                        break;
+                    }
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                case 'z': /* switch 1 */
+                    if (argv[var_s0][2] == '\0') {
+                        addstr(&ldflags, argv[var_s0]);
+                        break;
+                    }
+                    goto bad_option;
+
+                default:
+                    goto bad_option;
+            }
+            continue;
+        } else if ((argv[var_s0][0] == '+') && (compiler == COMPILER_1) &&
+                   ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+            switch (argv[var_s0][1]) { /* switch 5 */
+                case 'p':              /* switch 5 */
+                    if (argv[var_s0][2] == '\0') {
+                        anachronisms = FALSE;
+                    } else if (argv[var_s0][2] == 'p') {
+                        anachronisms = FALSE;
+                        cfront_compatible = FALSE;
+                    } else if (argv[var_s0][2] == 'a') {
+                        anachronisms = FALSE;
+                    } else if (argv[var_s0][2] == 'c') {
+                        cfront_compatible = FALSE;
+                    }
+                    add_static_opt(argv[var_s0]);
+                    break;
+
+                case 'w': /* switch 5 */
+                    fullwarn = TRUE;
+                    break;
+
+                case 'v': /* switch 5 */
+                    vflag = TRUE;
+                    break;
+
+                case 'd': /* switch 5 */
+                    disable_inlines = TRUE;
+                    break;
+
+                case 'e': /* switch 5 */
+                    if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
+                        break;
+                    }
+
+                case 'I': /* switch 5 */
+                    cflag = TRUE;
+                    plusIflag = TRUE;
+                    Fflag = TRUE;
+                    default_template_instantiation_mode = 1;
+                    break;
+
+                case 'a':
+                case 'L':
+                    break;
+
+                default: /* switch 5 */
+                    goto bad_option;
+            }
+            continue;
+        }
+
+        var_s1 = getsuf(argv[var_s0]);
+        if (var_s1 == 'm') {
+            var_s1 = 'f';
+        }
+        if (var_s1 == 'p') {
+            haspascal = TRUE;
+        }
+        if (var_s1 == 'f') {
+            hasfortran = TRUE;
+        }
+        if (var_s1 == SUF_1) {
+            haspl1 = TRUE;
+        }
+        if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
+            (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
+            (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
+            (var_s1 == SUF_1) || (var_s1 == 'D') || (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == 'u') ||
+            (var_s1 == SUF_6) || ((compiler == COMPILER_1) && nocode && D_100001FC && (var_s1 == 'h')) || Eflag ||
+            (compiler == COMPILER_4)) {
+            // int sp60; // number of '-' on the end?
+            int sp5C; // option index
+
+            srcexists++;
+            // if ((argv[var_s0][0] == '-') && !NoMoreOptions) {
+            //     sp60 = 1;
+            //     while (argv[var_s0][sp60] == '-') {
+            //         sp60++;
+            //     }
+            //     argv[var_s0] += sp60;
+            // }
+            for (sp5C = 1; sp5C < argc; sp5C++) {
+                if ((argv[sp5C][1] == 'j') && (strcmp(argv[sp5C], "-j") == 0)) {
+                    jflag++;
+                }
+            }
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag &&
+                ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
+                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == SUF_1) ||
+                 (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == SUF_6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
+                if (var_s1 != 'u') {
+                    addstr(&srcfiles, argv[var_s0]);
+                    var_s2 = mksuf(argv[var_s0], 'u');
+                } else {
+                    var_s2 = argv[var_s0];
+                }
+                uload = TRUE;
+                if (uldobj_place == -1) {
+                    uldobj_place = save_place(&objfiles);
+                }
+                if (nodup(&ufiles, var_s2) != 0) {
+                    addstr(&ufiles, var_s2);
+                }
+                var_s2 = mksuf(argv[var_s0], 'o');
+                if (nodup(&objfiles, var_s2) != 0) {
+                    sp158 = var_s2;
+                }
+            } else if (!Eflag && (compiler != COMPILER_4)) {
+                addstr(&srcfiles, argv[var_s0]);
+                var_s2 = mksuf(argv[var_s0], 'o');
+                if (nodup(&objfiles, var_s2) != 0) {
+                    addstr(&objfiles, var_s2);
+                    sp158 = var_s2;
+                    nobjs++;
+                }
+            } else {
+                addstr(&srcfiles, argv[var_s0]);
+            }
+        } else if (var_s1 == 'b') {
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag) {
+                if (uldobj_place == -1) {
+                    uldobj_place = save_place(&objfiles);
+                }
+                addstr(&ufiles, argv[var_s0]);
+                uload = TRUE;
+            }
+        } else {
+            addstr(&objfiles, argv[var_s0]);
+            if (var_s1 == 'o') {
+                nobjs++;
+            }
+        }
+        // func_00431B38(var_s0 + 1, 1);
+        continue;
+
+    bad_option:
+        if (sp14C != 0) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+            exit(2);
+        } else {
+            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+        }
+    } /* end of loop */
+
+    if (sp15C != NULL) {
+        char* sp58; // name of source file if there is only one
+
+        if (srcfiles.length == 1) {
+            sp58 = strdup(srcfiles.entries[0]);
+            if (sp58 == NULL) {
+                sp58 = sp158;
+            } else {
+                int sp54 = strlen(sp58); // length of single source file's name
+
+                if ((sp54 >= 3) && (sp58[sp54 - 2] == '.')) {
+                    if (Eflag) {
+                        sp58[sp54 - 1] = 'i';
+                    } else if (Sflag) {
+                        sp58[sp54 - 1] = 's';
+                    } else if (jflag) {
+                        sp58[sp54 - 1] = 'u';
+                    } else {
+                        sp58[sp54 - 2] = '\0';
+                    }
+                }
+            }
+        }
+
+        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+            ((compiler == COMPILER_3) && D_100001FC)) {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
+                addstr(&ldflags, "-MDignore");
+                addstr(&ldflags, sp158);
+            }
+            addstr(&cppflags, mkstr("-YM", sp15C, NULL));
+            if (sp154 != NULL) {
+                addstr(&cppflags, mkstr("-Yt", sp154, NULL));
+            }
+            addstr(&ldflags, "-MDupdate");
+            addstr(&ldflags, sp15C);
+        } else {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
+                addstr(&cppflags, "-MDtarget");
+                if (outfile != NULL) {
+                    addstr(&cppflags, outfile);
+                } else { // if no outfile specified, default to name of input file with suffix replaced
+                    addstr(&cppflags, sp58);
+                }
+                addstr(&ldflags, "-MDignore");
+                addstr(&ldflags, sp158);
+            }
+            addstr(&cppflags, "-MDupdate");
+            addstr(&cppflags, sp15C);
+            if (Oflag == 3) {
+                addstr(&uldflags, "-MDtarget");
+                if (outfile != NULL) {
+                    addstr(&uldflags, outfile);
+                } else if (cflag) {
+                    addstr(&uldflags, "u.out.o");
+                } else {
+                    addstr(&uldflags, "a.out");
+                }
+                addstr(&uldflags, "-MDupdate");
+                addstr(&uldflags, sp15C);
+            } else {
+                addstr(&ldflags, "-MDupdate");
+                addstr(&ldflags, sp15C);
+            }
+        }
+    }
+
+    // if (mips2flag) {
+    //     addstr(&ccomflags, "-mips2");
+    //     addstr(&upasflags, "-mips2");
+    //     addstr(&fcomflags, "-mips2");
+    //     addstr(&upl1flags, "-mips2");
+    //     addstr(&ucobflags, "-mips2");
+    //     addstr(&ulpiflags, "-mips2");
+    //     addstr(&eflflags, "-mips2");
+    //     addstr(&ratforflags, "-mips2");
+    //     addstr(&ujoinflags, "-mips2");
+    //     addstr(&usplitflags, "-mips2");
+    //     addstr(&umergeflags, "-mips2");
+    //     addstr(&uloopflags, "-mips2");
+    //     addstr(&optflags, "-mips2");
+    //     addstr(&genflags, "-mips2");
+    //     addstr(&asflags, "-mips2");
+    //     addstr(&ldflags, "-mips2");
+    //     addstr(&ftocflags, "-mips2");
+    // }
+}
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/parse_command.s")
 
 static const char STR_10005234[] = "Internal";
 static const char STR_10005240[] = "Error";
@@ -3697,8 +7081,8 @@ void update_instantiation_info_file(char* objname) {
          * PWD=<current working directory>
          */
         // Became a separate function by 7.1
-        fprintf(new_ii, "CMDLINE=%s %s%s%s\n", progname, (((srcfiles.length == 1) && (cflag == 0)) ? "-c " : ""),
-                ((((srcfiles.length == 1) && (cflag == 0)) || (B_1000A49C == NULL)) ? "" : B_1000A49C), B_1000A48C);
+        fprintf(new_ii, "CMDLINE=%s %s%s%s\n", progname, (((srcfiles.length == 1) && !cflag) ? "-c " : ""),
+                ((((srcfiles.length == 1) && !cflag) || (B_1000A49C == NULL)) ? "" : B_1000A49C), B_1000A48C);
         fprintf(new_ii, "PWD=%s\n", D_10000438);
         fprintf(new_ii, "----\n");
 
