@@ -1,3 +1,8 @@
+/**
+ * @file cc.c
+ * @brief Compiler driver for IDO 7.1.
+ */
+
 /* Handwritten */
 
 // function __start # 0
@@ -31,10 +36,8 @@
 #define FALSE 0
 #endif
 
-
-
 #ifndef _UINTPTR_T
-typedef unsigned long int	uintptr_t;
+typedef unsigned long int uintptr_t;
 #define _UINTPTR_T
 #endif
 
@@ -113,53 +116,57 @@ void record_static_fileset(const char* arg0);
 int touch(const char* arg0);
 void add_prelinker_objects(list* arg0, list* arg1);
 
-
 typedef int UNK_TYPE;
+
+//! @note a pseudoboolean is something that usually looks like a boolean type but is occasionally not treated as one,
+//! e.g. if something increments it.
 
 // bss
 static prmap_sgi_t B_1000CAC0[100];
 char perr_msg[0x100];
-static int B_1000E4C0;
-static char** B_1000E4C4;
-int plain_g;
-int plain_O;
-int noaliasokflag;
-int haspl1;
-UNK_TYPE p2cstr;
-int align;
-int align_common;
-char* alignarg;
-int use_real_fp;
-int dollar_sign;
+static int B_1000E4C0;    //!< argc
+static char** B_1000E4C4; //!< argv
+int plain_g;              //!< flag, boolean. Indicates that "-g" was passed (= "-O1 -g2")
+int plain_O;              //!< flag, boolean. Indicates that "-O" was passed (= "-O1")
+int noaliasokflag;        //!< flag, boolean. "-noaliasok"
+int haspl1;               //?< flag, boolean. Argument has a suffix corresponding to a PL/I program
+                          //!< TODO: confirm
+UNK_TYPE p2cstr;          // Unused
+int align;                //!< alignment, set using "-align8", "-align16", "-align32" or "-align64". Set but not used.
+int align_common; //!< flag, pseudoboolean. Set by "-align-common" and other alignment flags under certain conditions
+                  //!< TODO: which conditions?
+char* alignarg;   //!< alignment argument passed on to `execlist`.
+int use_real_fp;  //!< Never set, but checked.
+int dollar_sign;  //!< flag, pseudoboolean, set by "-dollar"
 int default_template_instantiation_mode;
-int mp_flag;
-int mp_onetripflag;
-UNK_TYPE mp_staticflag;
-int mp_dlinesflag;
-int mp_caseflag;
-UNK_TYPE efl;
-int mp_66flag;
-char* ratfor;
-int mp_i2flag;
-char* m4;
-int mp_col120flag;
-int mp_extendflag;
-int mp_uflag;
-int mp_backslashflag;
-UNK_TYPE mp_uniq_specified;
-UNK_TYPE mp_passes_relocated;
-int cmp_flag;
-int fullwarn;
-char* aligndir;
-int docpp;
-int default_nocpp;
-unsigned int j; // ?
-char* tstring;
-char* hstring;
-char* Bstring;
-const char* allBstring;
-static UNK_TYPE B_1000E55C; // Unused
-char alltstring[20];
+int mp_flag;                  //!< Set of flags, 1, 2, 4, and 0x10000 are used
+int mp_onetripflag;           //!< Set by "-onetrip"
+UNK_TYPE mp_staticflag;       // Unused
+int mp_dlinesflag;            //!< flag, boolean. Set by "-d_lines"
+int mp_caseflag;              //!< flag, boolean. Set by "-U"
+UNK_TYPE efl;                 // Unused
+int mp_66flag;                //!< flag, boolean. Set by "-6"
+char* ratfor;                 //!< Always set to "/usr/bin/ratfor" in main()
+int mp_i2flag;                //!< flag, boolean. Set by "-i2" or "-i8"
+char* m4;                     //!< Always set to "/usr/bin/m4" in main()
+int mp_col120flag;            //!< flag, boolean. Set by "-col120"
+int mp_extendflag;            //!< flag, boolean. Set by "-extend_source"
+int mp_uflag;                 //!< flag, boolean. Set by "-u"
+int mp_backslashflag;         //!< flag, boolean. Set by "-backslash"
+UNK_TYPE mp_uniq_specified;   // Unused
+UNK_TYPE mp_passes_relocated; // Unused
+int cmp_flag;                 //!< Set of flags, 1, 2, 4, 0x10000 used
+int fullwarn;                 //!< flag, boolean. Set by "-fullwarn"
+char* aligndir;               //!< Set to comp_host_root + "lib/align" and not used
+int docpp;                    //!< flag, boolean. Whether to use the preprocessor?
+int default_nocpp;            //!< flag, boolean
+unsigned int j;               // Looks like a normal index variable, but is global bss for some reason
+char* tstring;                //!< Used as the first argument of relocate_passes()
+char* hstring;                //!< Used as the second argument of relocate_passes()
+char* Bstring;                //!< Used as the third argument of relocate_passes()
+const char* allBstring;       //!< Sometimes set in relocate_passes()
+static UNK_TYPE B_1000E55C;   // Unused
+char alltstring[20];          //!< Used in relocate_passes()
 char* Warg;
 char* Wpass;
 char* Kpass;  // Start of current "-K" argument
@@ -238,7 +245,7 @@ char* tmpdir;
 list uldflags;
 char* rls_id_object;
 list usplitflags;
-char* progname;
+char* progname; //!< Path of this executable, used to determine `compiler`
 list umergeflags;
 char* currcomp;
 list uloopflags;
@@ -248,20 +255,19 @@ static UNK_TYPE B_1000EB9C; // Unused
 list uopt0flags;
 
 typedef enum Compiler {
-    /* 0 */ COMPILER_0,
-    /* 1 */ COMPILER_1, // C
-    /* 2 */ COMPILER_2, // Pascal
-    /* 3 */ COMPILER_3, // FORTRAN
-    /* 4 */ COMPILER_4, // Assembler
-    /* 5 */ COMPILER_5, // PL1
-    /* 6 */ COMPILER_6  // COBOL
+    /* 1 */ COMPILER_1 = 1, // C
+    /* 2 */ COMPILER_2,     // Pascal
+    /* 3 */ COMPILER_3,     // FORTRAN
+    /* 4 */ COMPILER_4,     // Assembler
+    /* 5 */ COMPILER_5,     // PL1
+    /* 6 */ COMPILER_6      // COBOL
 } Compiler;
 
 int compiler;
 
 list ddoptflags;
 static UNK_TYPE B_1000EBBC; // Unused
-char* tempstr[34];
+char* tempstr[34];          // Possibly a struct?
 list optflags;
 static UNK_TYPE B_1000EC54; // Unused
 list genflags;
@@ -310,31 +316,58 @@ list soptflags;
 static UNK_TYPE B_1000EDAC; // Unused
 list staticopts;
 static UNK_TYPE B_1000EDBC; // Unused
-char** __Argv;
-UNK_TYPE __rld_obj_head;
-int __Argc; // Unused
-
-// data
+char** __Argv;              // Unused
+UNK_TYPE __rld_obj_head;    // Unused
+int __Argc;                 // Unused
 
 // data
 char* LD = "ld";
-int ansichoice = 3;
-int c_compiler_choice = 0;
+
+typedef enum AnsiChoice {
+    /* 0 */ ANSICHOICE_KR,
+    /* 1 */ ANSICHOICE_ANSI,
+    /* 2 */ ANSICHOICE_ANSIPOSIX,
+    /* 3 */ ANSICHOICE_XANSI
+} AnsiChoice;
+
+int ansichoice = ANSICHOICE_XANSI;
+
+typedef enum CCompilerChoice {
+    /* 0 */ C_COMPILER_CHOICE_0, // default, presumably "cc"
+    /* 1 */ C_COMPILER_CHOICE_1, // "ncc" (NCC but for C?)
+    /* 2 */ C_COMPILER_CHOICE_2, // "CC.eh", (C++ compiler with exception handling)
+                                 // "CC", (Ordinary C++ compiler)
+                                 // "NCC" (32-bit native C++ compiler, apparently just "CC -32")
+    /* 3 */ C_COMPILER_CHOICE_3  // "DCC" (Delta/C++)
+} CCompilerChoice;
+
+int c_compiler_choice = C_COMPILER_CHOICE_0;
 
 struct _struct_suffixes_0x8 {
     /* 0x0 */ const char* unk0; // name
     /* 0x4 */ int unk4;         // language?
 };                              // size = 0x8
 
-// For various languages' files?
+typedef enum Suffix {
+    /* 1 */ SUF_1 = 1, // PL/1
+    /* 2 */ SUF_2,     // COBOL
+    /* 3 */ SUF_3,     // ?
+    /* 4 */ SUF_4,     // ?
+    /* 5 */ SUF_5,     // ?
+    /* 6 */ SUF_6,     // C++
+    /* 7 */ SUF_7      // C
+} Suffix;
+
+// Special suffixes
 struct _struct_suffixes_0x8 suffixes[] = {
-    { "pl1", 1 }, { "pli", 1 },                                                                     // PL/1?
-    { "cob", 2 },                                                                                   // COBOL
-    { "il", 3 },                                                                                    // ?
-    { "st", 4 },                                                                                    // ?
-    { "anl", 5 },                                                                                   // ?
-    { "c++", 6 }, { "cc", 6 },  { "cxx", 6 }, { "C", 6 }, { "cpp", 6 }, { "CXX", 6 }, { "CPP", 6 }, // C++
-    { ".c", 7 },                                                                                    // C
+    { "pl1", SUF_1 }, { "pli", SUF_1 }, // PL/1?
+    { "cob", SUF_2 },                   // COBOL
+    { "il", SUF_3 },                    // ?
+    { "st", SUF_4 },                    // ?
+    { "anl", SUF_5 },                   // ?
+    { "c++", SUF_6 }, { "cc", SUF_6 },  { "cxx", SUF_6 }, { "C", SUF_6 },
+    { "cpp", SUF_6 }, { "CXX", SUF_6 }, { "CPP", SUF_6 }, // C++
+    { ".c", SUF_7 },                                      // C
     { NULL, 0 },
 };
 
@@ -342,28 +375,30 @@ char* include = NULL;
 char* includeB = NULL;
 char* einclude = NULL;
 char* eincludeB = NULL;
-char* cpp = NULL;
+
+//! Program paths
+char* cpp = NULL; //!< K&R preprocessor
 char* ccom = NULL;
 char* mpc = NULL;
-char* cfe = NULL;
-char* upas = NULL;
-char* fcom = NULL;
-char* upl1 = NULL;
+char* cfe = NULL;  //!< C frontend
+char* upas = NULL; //!< Pascal frontend
+char* fcom = NULL; //!< FORTRAN frontend
+char* upl1 = NULL; //!< PL/I frontend
 char* pl1err = NULL;
 char* ulpi = NULL;
 char* ucob = NULL;
 char* ujoin = NULL;
 char* usplit = NULL;
-char* uld = NULL;
+char* uld = NULL; //!< ucode loader
 char* umerge = NULL;
 char* uloop = NULL;
 char* uopt0 = NULL;
 char* ddopt = NULL;
-char* opt = NULL;
-char* gen = NULL;
-char* as0 = NULL;
-char* as1 = NULL;
-char* ld = NULL;
+char* opt = NULL; //!< optimiser, `uopt`
+char* gen = NULL; //!< code generator, `ugen`
+char* as0 = NULL; //!< Assembler for handwritten ".s" files
+char* as1 = NULL; //!< Assembler used for generated ".s" files
+char* ld = NULL;  //!< linker
 char* ftoc = NULL;
 char* cord = NULL;
 char* btou = NULL;
@@ -372,16 +407,28 @@ char* strip = NULL;
 char* patch = NULL;
 char* filter = NULL;
 char* prelinker = NULL;
-int smart_build = 0;
-char* sbrepos = NULL;
-int do_strip = 0;
-int no_prelink = 0;
-int nofilt = 0;
-int force_prelink = 0;
-int verbose_prelink = 0;
-int auto_template_include = 1;
-int nocode = 0;
-int nocompileneeded = 0;
+
+int smart_build = FALSE; //!< flag, boolean. Set by "-smart". Passed on to `cfe` as "-YR".
+char* sbrepos = NULL;    //!< argument of "-YR". @see smart_build
+
+int do_strip = FALSE;   //!< flag, boolean. For C++ compilers, whether to run strip (for C passed on to `ld` as "-s"
+                        //!< instead). Set by "-s".
+int no_prelink = FALSE; //! flag, boolean. For C++ compilers, whether to not run the prelinker, `edg_prelink` (used for
+                        //! ".ii" files containing template instantiation information). Set by "-no_prelink". @see
+                        //! force_prelink, default_template_instantiation_mode
+int nofilt = FALSE; //!< flag, boolean. For C++ compilers, whether to not run the filter, `c++filt`. Set by "-nofilt".
+int force_prelink =
+    FALSE; //!< flag, boolean. Whether to force prelinking, also requires nonzero default_template_instantiation_mode.
+           //!< Set by "-prelink". @see no_prelink, default_template_instantiation_mode
+int verbose_prelink = FALSE;      //!< flag, pseudoboolean. For C++ compilers, whether to pass "-v" to prelinker. Set by
+                                  //!< "-ptv". Passed on to prelinker as "-v". @see vflag
+int auto_template_include = TRUE; //!< flag, boolean. For C++ compilers. Set by "-auto_include" and unset by
+                                  //!< "-no_auto_include", last takes priority. Passed on to `cfe` as "-B" when not set.
+int nocode = FALSE; //!< flag, boolean. Whether to *not* create object files (used for e.g. static analysis). Set by
+                    //!< "-nocode". Passed to `cfe` as "-n", `fcom` as "-nocode". @see cflag
+int nocompileneeded = FALSE; //!< boolean. Whether to continue compilation after preprocessing. Set by return of `cfe`
+                             //!< being 0xFA if smart_build is enabled.
+
 char* LibM = " -lm";
 char* LibP = " -lp";
 char* LibF77 = " -lF77";
@@ -397,10 +444,13 @@ char* LibProf1 = " -lprof";
 char* LibGProf1 = " -lgprof";
 char* LibXmalloc = " -lxmalloc";
 char* LibMld = " -lmld";
+
 char* crtx = NULL;
 char* crtn = NULL;
+
 char* cxx_init = NULL;
 char* delta_init = NULL;
+
 char* libp = NULL;
 char* libp_b = NULL;
 char* libm = NULL;
@@ -429,130 +479,200 @@ char* libprof = NULL;
 char* libgprof = NULL;
 char* libxmalloc = NULL;
 char* libxmalloc_b = NULL;
+
 char* cpp_stdflag = NULL;
 char* libmld = NULL;
-char* xpg_env = NULL;
-int xpg_flag = 0;
-int crtn_required = 1;
+
+char* xpg_env = NULL; //!< value of `_XPG` environment variable
+int xpg_flag = FALSE; //!< boolean. Whether `_XPG` environment variable has been specified.
+int crtn_required =
+    TRUE; //!< flag, boolean. On by default, unset by "-crt0", set by "-crt1", ANSICHOICE_ANSI and ANSICHOICE_ANSIPOSIX
 char* pca = NULL;
 char* libc_mp = NULL;
 char* fopt = NULL;
 char* copt = NULL;
-static int D_1000BF74 = 0;
-static int D_1000BF78 = 0;
-static int D_1000BF7C = 1;
-static char* D_1000BF80 = NULL;
-static char* D_1000BF84 = NULL;
-static int D_1000BF88 = 0;
-static int D_1000BF8C = 1;
-static int D_1000BF90 = 0;
-static int D_1000BF94 = 0;
 
-int Eflag = 0; // only preprocess
-int Pflag = 0;
-int gflag = 0;
-int pflag = 0;
-int pgflag = 0;
-int jflag = 0; // only process to ucode
-int cflag = 0;
-int Sflag = 0; // only compile to assembly
-int Oflag = 1;
-int vflag = 0;
-int time_flag = 0;
-int execute_flag = 1;
-int Vflag = 0;
-int Kflag = 0;
-int nodeflib = 0;
-int minus_M = 0;
-int anachronisms = 1;
-int disable_inlines = 0;
-int cfront_compatible = 1;
-int make_edison_shlib = 0;
-int plusIflag = 0;
-int signedcharflag = 0;
-int Lflag = 0;
-int set_loop_unroll = 0;
-int mflag = 0;
-int Fflag = 0;
-int stdflag = 0;
-int cplusflag = 0;
-int ucodeflag = 0;
-int Bflag = 0;
-int fiveflag = 0;
-int automaticflag = 1;
-int emptyIflag = 0;
-int cordflag = 0;
-int ansiflag = 0;
-int lpilockflag = 0;
-int nolockflag = 0;
-int unrollflag = 0;
-int libm_spec = 0;
-int libfastm_spec = 0;
-int editflag = 0;
-int oldccomflag = 0;
-int oldcflag = 0;
-int oldcppflag = 0;
-int fflag = 0; // Unused
-int tpflag = 0;
-int ddoptflag = 0;
-int uopt0flag = 0;
-int protoflag = 0; // Unused
-int kminabiflag = 0;
-int kpicopt_flag = 0;
-int nokpicopt_flag = 0;
-int elfflag = 1;
-int coff_spec = 0;
-int elf_spec = 0;
-int compose_first_G0 = 0;
-int mips2_spec_flag = 0;
-int mips1flag = 0;
-int mips2flag = 1;
-int mips3flag = 0;
-int ignore_unresolved_flag = 0;
-int no_unresolved_flag = 0;
-int swopcodeflag = 0;
-int dwopcodeflag = 0;
-int sixty4bit_spec = 0;
-int sixty4bitflag = 0;
-int thirty2bitflag = 0;
-int fullasoptflag = 0;
-int old_non_shared = 0;
-int non_shared_emitted = 0;
-int longlong_emitted = 0;
-int non_shared = 0;
-int Gseen_flag = 0;
-int transitive_link = 0;
-int full_transitive_link = 0;
-int no_transitive_link = 0;
-int quickstart_info = 0;
-int force_rm_dead_code = 0;
-int kpic_flag = 1;
-int kpic_spec = 0;
-int call_shared = 0;
-int excpt_flag = 0;
-int trapuv_flag = 0;
+static int D_1000BF74 = FALSE;  //!< flag, boolean. Whether to perform static analysis. Set by "-sa".
+static int D_1000BF78 = FALSE;  //!< flag, boolean. Static analysis, no source. Set by "-sa,nosrc".
+static int D_1000BF7C = TRUE;   //!< boolean. Related to exception handling, used in force_use_cfront().
+static char* D_1000BF80 = NULL; //!< Static analysis directory
+static char* D_1000BF84 = NULL; //!< Static fileset
+static int D_1000BF88 =
+    FALSE; //!< flag, pseudoboolean. Disables adding to `staticopt` with add_static_opt(). Set by "-sa_fs"
+
+static int D_1000BF8C = TRUE; //!< flag, boolean. For C++ compilers, whether to use "usr/lib/DCC/" paths for `uopt`,
+                              //!< `ugen`, `as1`. Set by enabling environment variable "DCC_STD_PATHS"
+static int D_1000BF90 =
+    FALSE; //!< boolean. Related to unused warnings. Set by using "DCC" compiler, unset by `D_1000BF8C` off, "-old_ld".
+static int D_1000BF94 = FALSE; //!< boolean. Disables use of "-new_ld" or "-old_ld". Never set.
+
+int Eflag = FALSE; //!< flag, pseudoboolean. Only preprocess, do not run subsequent passes, output to stdout. Set by
+                   //!< "-E", "-H", "-M".
+int Pflag = FALSE; //!< flag, pseudoboolean. Only preprocess, do not run subsequent passes, output to file with
+                   //!< extension replaced by ".i". Set by "-P".
+
+int gflag = 0; //!< Option. Debugging level, 0 by default. Set by "-gN", N one of 0,1,2,3, or "-g". Interacts with
+               //!< `Oflag`, see parse_command() for details.
+
+int pflag = 0;  //!< Option. Enabled profiling level. Set to 1 by "-p" or "-pg".
+int pgflag = 0; //!< Option. Related to profiling. Set to 1 by "-pg".
+
+int jflag = FALSE; //!< flag, pseudoboolean. Only process to ucode, do not run subsequent passes, output to file with
+                   //!< extension replaced by ".u". Set by "-j".
+int cflag = FALSE; //!< flag, pseudoboolean. Compile a single file to a ".o", do not link. Set by "-c", "-nocode", "+I",
+                   //!< and "-F" for C++ compilers.
+int Sflag = FALSE; //! flag, pseudoboolean. only compile to assembly, do not assemble, output to file with extension
+                   //! replaced by ".s". Set by "-S".
+
+int Oflag = 1; //! Option. Optimisation level, 1 by default. Set by "-ON", N one of 0,1,2,3, or "-O". Interacts with
+               //! `gflag`, see parse_command() for details.
+
+int vflag = FALSE; //! flag, boolean. Whether to print verbose output of compilation steps including program arguments.
+                   //! Set by "-show", "-v", "-Wxv", "-Zq", "+v" Passed to other programs. "-v" also sets `time_flag`
+                   //! @see time_flag
+int time_flag =
+    FALSE; //! flag, boolean. Whether to print execution times for called programs. Set by "-showt" and "-v".
+int execute_flag =
+    TRUE; //! flag, boolean. Whether to execute the programs called. Unset by "-show0" and "-show_defaults".
+
+int Vflag = FALSE;    //! flag, boolean. Should print version information, but is disabled, see 'V' in parse_command().
+int Kflag = FALSE;    //! flag, pseudoboolean. Whether to keep intermediate files from compilation. These have the same
+                      //! filename but change the extension based on pass. Set by "-K" and "-keep".
+                      //! TODO: document extensions
+int nodeflib = FALSE; //! flag, boolean. Do not use libraries? Set by "-nodeflib"
+int minus_M = FALSE;  //! flag, pseudoboolean. Whether to use preprocessor to generate dependencies for `make`, write to
+                      //! stdout, do not run subsequent passes. Set by "-M".
+int anachronisms = TRUE; //!< flag, boolean. Adds "-O" to `execlist`
+int disable_inlines =
+    FALSE; //!< flag, boolean. Whether to disable inlining? Set by "+d". Passed to preprocessor as "-YJ"
+int cfront_compatible =
+    TRUE; //! flag, boolean. Set by "-cfront", unset by "+pp", "+pc", and using "CC.eh". Passed to preprocessor as "-b"
+int make_edison_shlib = FALSE; //!< flag, pseudoboolean. Set by "-shared"
+int plusIflag = FALSE;         //! flag, boolean. Changes suffix for output of preprocessor? Set by "+I".
+int signedcharflag = FALSE;  //!< flag, boolean. Use signed chars, only effective on non-default C_COMPILER_CHOICEs. Set
+                             //!< by "-signed" passed on to `cfe` as "-s".
+int Lflag = FALSE;           //! flag, boolean. Whether a library directory has been specified. Set by "-L[dir]".
+int set_loop_unroll = FALSE; //! flag, boolean. Set by "-Wo,loopunroll".
+int mflag = FALSE;           //! flag, pseudoboolean.  Set by "-m"
+int Fflag = FALSE;           //! flag, pseudoboolean. Set by "-F" and "+I"
+int stdflag = 0;             //! flag. Set to 0 by "-std0" and 1 by "-std" and "-std1".
+int cplusflag = FALSE;       //! flag, boolean. Set by "-cplus". Unused
+int ucodeflag = FALSE;       //! flag, boolean. Never set.
+int Bflag = FALSE;           //! boolean. Set by any "-B" flag apart from "static", "dynamic", and "symbolic"
+int fiveflag = FALSE;        //!< flag, pseudoboolean. Set by passing "-5".
+int automaticflag = TRUE;    //! flag, boolean. For FORTRAN. Set by "-automatic", unset by "-static". Passes appropriate
+                             //! option on to `fcom`.
+int emptyIflag = FALSE;      //! flag, pseudoboolean. Set by "-I" on its own, and "-nostdinc".
+int cordflag = FALSE;        //! flag, boolean. Whether to run `cord`. Set by "-cord".
+int ansiflag = FALSE;        //! flag, boolean. Set by "-ansi" when using the COBOL compiler. Unused.
+int lpilockflag = FALSE;     //! flag, boolean. Not set by anything. Cannot be used with `nolockflag`.
+int nolockflag = FALSE;      //! flag, boolean. Set by "-nolock". Cannot be used with `lpilockflag`.
+int unrollflag = FALSE;      //! flag, boolean. Whether to run `uloop` pass. Not set by anything.
+int libm_spec = 0;           //! flag, boolean. Add "-lm" to `uld. Not set.
+int libfastm_spec = 0;       //! flag, boolean. Add "-lfastm" to `uld. Not set.
+
+typedef enum EditFlag {
+    /* 0 */ EDIT_FLAG_0, //!< E
+    /* 1 */ EDIT_FLAG_1, //!< "-edit[0-9]"
+    /* 2 */ EDIT_FLAG_2  //!< "-edit[0-9]" and environment variable for EDITOR contains "emacs"
+} EditFlag;
+
+int editflag = EDIT_FLAG_0; //!< Option. Set by "-edit[0-9]".
+
+int oldccomflag = FALSE; //!< flag, boolean. Purpose unclear, sets @see oldcflag. Never set to `TRUE`.
+int oldcflag = FALSE;    //!< flag, boolean. Purpose unclear, related to preprocessing. Never set to `TRUE`.
+int oldcppflag = FALSE;  //!< flag, boolean. Use a different preprocessor from the one built in to `cfe`, `acpp` in ANSI
+                         //!< modes and `cpp` in ANSICHOICE_KR. (`cfe` is run with "-nocpp" passed.). Set by "-oldcpp".
+int fflag = 0;           // Unused
+int tpflag = FALSE;      //!< flag, boolean. Never set. Related to "-oldcpp".
+int ddoptflag =
+    FALSE; //!< flag, boolean. Whether to run `ddopt`. Set by "-ddopt". Passed on to `as1` as "-e [source file]".
+int uopt0flag = FALSE;      //!< flag, boolean. Whether to run `uopt0`. Unset by "-nouopt0", never set.
+int protoflag = FALSE;      // Unused
+int kminabiflag = FALSE;    //!< flag, boolean. Set by "-Kminabi". Not checked.
+int kpicopt_flag = FALSE;   //!< flag, boolean. Set by "-kpicopt". Passed on to `uopt` as "-kpicopt".
+int nokpicopt_flag = FALSE; //!< flag, boolean. Set by "-nokpicopt". Passed on to `uopt` as "-nokpicopt".
+int elfflag = TRUE; //!< flag, boolean. Whether to assemble/link an ELF. On by default, off for irix4, and set by
+                    //!< "-elf" or "-systype svr4". @see elf_spec.
+int coff_spec =
+    FALSE; //!< flag, boolean. Whether "-coff" has been passed explicitly. Passed on to other programs as "-coff"
+int elf_spec = FALSE;         //!< boolean. Whether "-elf" has been passed explicitly. Never checked. @see elfflag.
+int compose_first_G0 = FALSE; //!< flag, boolean. Never set except in a dead block.
+
+//! Flags relating to the specified MIPS ISA
+int mips2_spec_flag =
+    FALSE; //!< flag, boolean. Whether "-mips2" has been passed explicitly (and not overridden). Set by "-mips2".
+//! Only one of the following can be set at once.
+int mips1flag = FALSE; //!< flag, boolean. Set by "-mips1".
+int mips2flag = TRUE;  //!< flag, boolean. Set by "-mips2". @see mips2_spec_flag
+int mips3flag = FALSE; //!< flag, boolean. Set by "-mips3" and in several other places.
+
+//! Flags associated to resolving symbols. `ignore_unresolved_flag` takes precedence.
+int ignore_unresolved_flag =
+    FALSE; //!< flag, boolean. Set by passing "-ignore_unresolved". Passed on to `ld` as "-ignore_unresolved"
+int no_unresolved_flag =
+    FALSE; //!< flag, boolean. Set by passing "-no_unresolved". Passed on to `ld` as "-no_unresolved"
+
+int swopcodeflag =
+    FALSE; //!< flag, boolean. Set by passing "-swopcode". Errors if used with 64-bit, otherwise no effect.
+int dwopcodeflag = FALSE; //!< flag, boolean. Set by passing "-mips3". Passed on to other programs as "-dwopcode".
+                          //!< Cannot be used with "-mips1" or "-mips2"
+
+int sixty4bit_spec = FALSE;     //!< boolean. Set by passing "-64bit". Unused.
+int sixty4bitflag = FALSE;      //!< flag, boolean. Always 0
+int thirty2bitflag = FALSE;     //!< flag, boolean
+int fullasoptflag = FALSE;      //!< flag, boolean. Whether full assembler optimisation is enabled. Set by "-fullasopt".
+                                //!< Passed on as "-noglobal" when not set
+int old_non_shared = FALSE;     //!< flag, boolean. Set in (most of) the same places as `non_shared`.
+int non_shared_emitted = FALSE; //!< flag, boolean. Whether non_shared code will be emitted in this pass?
+int longlong_emitted = FALSE;   //!< boolean. Set when passing on "-D_LONGLONG"
+int non_shared = FALSE; //!< flag, boolean. Produce a static executable (non-PIC, incompatible with -KPIC, -shared,
+                        //!< etc.) Set by "-non_shared".
+int Gseen_flag =
+    FALSE; //!< boolean. Whether a "-G" argument has been parsed yet, triggers a relocate_passes() call if not.
+
+//! Flags associated to transitive linking. Only one may be `TRUE` at a time: the last will take precedence.
+int transitive_link = FALSE; //!< flag, boolean. Set by "-transitive_link". Passed on to `ld` as "-transitive_link"
+int full_transitive_link =
+    FALSE; //!< flag, boolean. Set by "-full_transitive_link". Passed on to `ld` as "-full_transitive_link"
+int no_transitive_link =
+    FALSE; //!< flag, boolean. Set by "-no_transitive_link". Passed on to `ld` as "-no_transitive_link"
+
+int quickstart_info = FALSE;    //!< flag, boolean. Set by "-quickstart_info". Passed on to `ld` as "-quickstart_info".
+int force_rm_dead_code = FALSE; //!< flag, boolean. Whether `uld` should remove dead code? Set by "-rm_dead_code",
+                                //!< passed on as "-preserve_dead_code" if not set.
+int kpic_flag = TRUE;    //!< flag, boolean. Whether to emit Position-Independent Code. On by default, set by "-KPIC",
+                         //!< unset by IRIX4 and "-non_shared"
+int kpic_spec = FALSE;   //!< flag, boolean. Whether "-KPIC" has been passed explicitly?
+int call_shared = FALSE; //!< flag, boolean. Allows created object to call shared library code. Set by "-call_shared".
+int excpt_flag = FALSE; //!< flag, boolean. Set by "-excpt". Purpose unclear, not passed on, not useable with "-shared".
+int trapuv_flag =
+    FALSE; //!< flag, boolean. Whether to compile with trapping for uninitialised variables. Set by "-trapuv".
 int dmips_emit = 0;
-int Xvalues_Flag = 0; // Unused
-int user_systype = 0;
-int ddoptinfo = 0;
-int systype_seen = 0;
-int multiple_systype = 0;
-int systype_warn = 0;
-int svr4_systype = 0;
-int c_inline = 0;
-int tfp_flag = 0;
+int Xvalues_Flag = 0;     // Unused
+int user_systype = FALSE; //!< boolean. Whether user has specified a `-systype` argument.
+int ddoptinfo = FALSE;    //!< flag, boolean. Set by "-ddoptinfo". Passed on to `ddopt` as "-e", inter alia.
+int systype_seen = FALSE; //!< boolean. Whether a "-systype" argument has been parsed yet, used to confirm that it
+                          //!< precedes any "-B" arguments.
+int multiple_systype =
+    FALSE;                //!< boolean. Disables some systype checking. Set by passing multiple "-systype" arguments.
+int systype_warn = FALSE; //!< flag, boolean. Warned about unrecongized argument to "-systype".
+int svr4_systype = FALSE; //!< flag, boolean. Set by main() as default, unset by IRIX4, set by "-systype svr4"
+int c_inline = FALSE; //!< flag, boolean. Whether to run `umerge`. Set by `cfe`/`fcom` returning `0xFF`. Passes on to
+                      //!< `umerge` as "-c_inline".
+int tfp_flag = FALSE; //!< flag, boolean. Set by "-tfp"
 int abi_flag = 0;
-int NoMoreOptions = 0;
-int memory_flag = 0;
-int default_call_shared = 1;
-int haspascal = 0;
-int hasfortran = 0;
-int lmflag = 0;
-int srcexists = 0;
-int w1flag = 1;
-static int D_1000C130 = 0;
-int prototype_checking_on = 0;
-int showdirt_flag = 0;
+int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
+int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
+int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
+int haspascal = FALSE;          //!< flag, boolean. If file is Pascal, set by file extension ".p"
+int hasfortran = FALSE;         //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
+int lmflag = FALSE;             //!< flag, pseudoboolean, set and not used
+int srcexists = 0;              // Number of source code files present? Set in the main loop of parse_command()
+int w1flag = 1;                 //!< flag, values 0,1,2 used
+static int D_1000C130 = 0;      // values 0,1,2 used
+int prototype_checking_on = FALSE; //!< flag, boolean. Set on by "-prototypes" and off by "-noprototypes"
+int showdirt_flag = FALSE;         //!< flag, boolean. Set by "-mp_keep"
 int mp_prepass_count = 0;
 
 // not sure about this struct
@@ -562,50 +682,128 @@ typedef struct {
 } struct_mpflags;
 
 struct_mpflags mpflags[] = {
-    { "list", 0x00010003 },
-    { "keep", 0x00010007 },
+    { "list", 0x10003 },
+    { "keep", 0x10007 },
     { 0 },
 };
 struct_mpflags cmpflags[] = {
-    { "list", 0x00010003 },
-    { "keep", 0x00010007 },
+    { "list", 0x10003 },
+    { "keep", 0x10007 },
     { 0 },
 };
 
-int acpp = 0;
-int mips_abi = 1;
-int compchoice = 0;
-int cppchoice = 0;
-int acpp_traditional = 0;
-int G_flag = 0;
-int dn_flag = 0;
-int edison_cpp = 1;
-char* edison_type = (char*)1;
-int exception_handling = 0;
-char* Gnum = "0";
-int runerror = 0;
-int uload = 0;
-int uldobj_place = -1;
+int acpp = FALSE; //! flag, boolean. Set by "-acpp"
+
+// Ought to be related to the _MIPS_SIM defines, but is not
+typedef enum MipsAbi {
+    /* 0 */ MIPS_ABI_0, // ?. Set by IRIX4 flags and environment variable
+    /* 1 */ MIPS_ABI_1, // O32. Default, also set by "-32bit", "-32", "-o32"
+    /* 2 */ MIPS_ABI_2  // N64, not set
+} MipsAbi;
+
+int mips_abi = MIPS_ABI_1;
+
+typedef enum CompChoice {
+    /* 0 */ COMP_CHOICE_0,
+    /* 1 */ COMP_CHOICE_1,
+    /* 2 */ COMP_CHOICE_2,
+    /* 3 */ COMP_CHOICE_3,
+    /* 4 */ COMP_CHOICE_4
+} CompChoice;
+
+int compchoice = COMP_CHOICE_0; //!< ?. Uses `CompChoice` enum.
+
+typedef enum CppChoice {
+    /* 0 */ CPP_CHOICE_0,
+    /* 1 */ CPP_CHOICE_1,
+    /* 2 */ CPP_CHOICE_2, // ANSICHOICE_KR
+    /* 3 */ CPP_CHOICE_3  // Other ANSICHOICE_
+} CppChoice;
+
+int cppchoice = CPP_CHOICE_0; //!< Preprocessor selection? Uses `CppChoice` enum. CPP_CHOICE_1 and CPP_CHOICE_3 use
+                              //!< `acpp`, rest use `cpp`?
+
+int acpp_traditional = FALSE; //!< flag, pseudoboolean. (Could be increased by being passed several times)
+int G_flag = FALSE;           //!< flag, boolean. Whether "-G" has been passed
+int dn_flag = FALSE;          //!< flag, boolean. Enable static linking over the default dynamic linking. Set by "-dn"
+int edison_cpp = 1;           //!< set and not used
+
+typedef enum EdisonType {
+    /* 1 */ EDISON_TYPE_1 = 1,
+    /* 2 */ EDISON_TYPE_2,
+    /* 3 */ EDISON_TYPE_3
+} EdisonType;
+
+int edison_type = EDISON_TYPE_1; //!< Uses `EdisonType` enum. Set based on `ansichoice`.
+
+int exception_handling = FALSE; //!< flag, boolean. Whether to use exception handling in C++.
+char* Gnum = "0";               //!< argument to pass with "-G"
+int runerror = 0;               //!< number of errors triggered
+int uload = FALSE;              //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
+int uldobj_place = -1;          //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
-int chip_targ = -1;
-int nobjs = 0;
-int targetsex = BIGENDIAN;
-int default_svr4 = 0;
-int irix4 = 0;
+
+typedef enum ChipTarget {
+    /* -1 */ CHIP_TARGET_UNSET = -1,
+    /*  0 */ CHIP_TARGET_MIPS1,
+    /*  1 */ CHIP_TARGET_MIPS2,
+    /*  2 */ CHIP_TARGET_MIPS3
+} ChipTarget;
+
+int chip_targ = CHIP_TARGET_UNSET; //!< "Chip target", uses `ChipTarget` enum.
+
+int nobjs = 0;             //!< Number of output objects?
+int targetsex = BIGENDIAN; //!< Endianness, constants from sex.h (yes really).
+int default_svr4 = FALSE;  //!< flag, boolean. Set by environment variable "SGI_SVR4"
+int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or environment variable
+                   //!< "SGI_IRIX4"
 char* runlib = "/";
 char* runlib_base = "/";
 static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, 0x1900 };
 static char* D_1000C1D0 = NULL; // full path of current working directory
-int run_sopt = 0;
+int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
 static char* D_1000C1D8 = NULL;
 static char* D_1000C1DC = NULL;
 
-#if 0
-// rodata padding to make jtbl offsets in main match
-const char rodata_pad[] = "abcdefghijklmnopqrst";
-#endif
+typedef enum ErrorCategory {
+    /* 0 */ ERRORCAT_INTERNAL, // Unused
+    /* 1 */ ERRORCAT_ERROR,
+    /* 2 */ ERRORCAT_WARNING,
+    /* 3 */ ERRORCAT_INFO, // Unsued
+    /* 4 */ ERRORCAT_FIX,  // Unused
+    /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
+} ErrorCategory;
 
 // function main # 2
+/**
+ * Main fuction for `cc`. Structure is roughly
+ * 1. Argument parsing
+ *   a. Environment variable parsing. The `compiler` (overall set of programs to run for compilation) is determined from
+ * the name of the executable (for example `cc` for the default C compiler, `pc` for Pascal).
+ *   b. Initial pass through options, presumably to pick up the most important ones.
+ *   c. Preliminary uses of relocate_passes().
+ *   d. process_config() and parse_command() to parse and store all remaining options.
+ *   e. End of initial option parsing, including setting endianness, propagating debugging and optimisation arguments,
+ * etc.
+ *   .
+ * 2. Main loop for parsing files: looks through all the input file arguments one by one, follows a complex graph of
+ * options depending on the type of file present and various options. The file type is determined by its suffix, both
+ * for input/output and internally between the various stages. Most of this loop is composed of blocks that
+ *   a. Check flags, both for whether to carry out the compilation step in the first place, and what options to add for
+ * that program.
+ *   b. actually run the external program for that pass using run().
+ *   c. based on the output, either clean up and error out, or clean up and continue to the next stage, or the next loop
+ * iteration.
+ *   .
+ *   Assuming success, files will emerge from this loop as unlinked ".o" files.
+ * 3. Execute linking
+ *   a. Post-loop cleanup.
+ *   b. If enabled, run prelinking.
+ *   c. link with `ld`.
+ *   d. If enabled, run supplementary programs: `filter`, `patch`, and `strip`.
+ *   .
+ * 4. Final cleanup and exit
+ */
 int main(int argc, char** argv) {
     register int i;
     register char* var_s1;
@@ -646,8 +844,10 @@ int main(int argc, char** argv) {
     sp148 = 0;
     sp144 = NULL;
     sp140 = NULL;
-    progname = *argv;
-    if ((ansichoice == 1) || (ansichoice == 2)) {
+
+    progname = argv[0];
+
+    if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
         CRTX = "acrt1.o";
     } else {
         CRTX = "crt1.o";
@@ -655,10 +855,12 @@ int main(int argc, char** argv) {
     MCRTX = "mcrt1.o";
     m4 = "/usr/bin/m4";
     ratfor = "/usr/bin/ratfor";
+
     xpg_env = getenv("_XPG");
     if (xpg_env != NULL) {
-        xpg_flag = 1;
+        xpg_flag = TRUE;
     }
+
     mklist(&undefineflags);
     mklist(&cppflags);
     mklist(&ccomflags);
@@ -712,10 +914,12 @@ int main(int argc, char** argv) {
     compdirs[6] = mkstr("cobol", "/", NULL);
 
     call_shared = default_call_shared;
+
     sp13C = getenv("SGI_SVR4");
     if (sp13C != NULL) {
-        default_svr4 = 1;
+        default_svr4 = TRUE;
     }
+
     sp138 = getenv("SGI_CC");
     if (sp138 != NULL) {
         while (isspace(*sp138)) {
@@ -723,32 +927,32 @@ int main(int argc, char** argv) {
         }
         sp130 = strlen(sp138);
         if (sp130 <= 0) {
-            error(2, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
+            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Environment variable SGI_CC is empty: ignored\n");
         } else {
             sp134 = sp130 + sp138 - 1;
             while (isspace(*sp134)) {
                 sp134--;
             }
             sp134++;
-            sp134[0] = 0;
+            *sp134 = '\0';
             if (strcmp(sp138, "-cckr") == 0) {
-                ansichoice = 0;
-                cppchoice = 2;
+                ansichoice = ANSICHOICE_KR;
+                cppchoice = CPP_CHOICE_2;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-ansi") == 0) {
-                ansichoice = 1;
-                cppchoice = 3;
+                ansichoice = ANSICHOICE_ANSI;
+                cppchoice = CPP_CHOICE_3;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-xansi") == 0) {
-                ansichoice = 3;
-                cppchoice = 3;
+                ansichoice = ANSICHOICE_XANSI;
+                cppchoice = CPP_CHOICE_3;
                 relocate_passes("p", NULL, NULL);
             } else if (strcmp(sp138, "-ansiposix") == 0) {
-                ansichoice = 2;
-                cppchoice = 3;
+                ansichoice = ANSICHOICE_ANSIPOSIX;
+                cppchoice = CPP_CHOICE_3;
                 relocate_passes("p", NULL, NULL);
             } else {
-                error(2, NULL, 0, NULL, 0,
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                       "Environment variable SGI_CC contents unrecognizable and ignored; \"%s\" not one of: -cckr -ansi "
                       "-xansi -ansiposix\n",
                       sp138);
@@ -756,89 +960,100 @@ int main(int argc, char** argv) {
             }
         }
     }
-    compiler = 1;
+    compiler = COMPILER_1;
 
+    // Find the basename of the executable (look for the last '/' in the program name. If there is no '/', progname is
+    // the basename, otherwise basename starts 1 char past the found '/'.
     var_s1 = strrchr(progname, '/');
     var_s1 = (var_s1 == NULL) ? progname : var_s1 + 1;
+
     compdirs[0] = mkstr(var_s1, "/", NULL);
 
-    if (strncmp(var_s1, "cc", strlen("cc")) == 0) {
-        compiler = 1;
+    // Determine compiler based on basename of executable
+    if (strncmp(var_s1, "cc", strlen("cc")) == 0) { // C
+        compiler = COMPILER_1;
         Bstring = var_s1 + strlen("cc");
-    } else if (strncmp(var_s1, "pc", strlen("pc")) == 0) {
-        compiler = 2;
+    } else if (strncmp(var_s1, "pc", strlen("pc")) == 0) { // Pascal
+        compiler = COMPILER_2;
         Bstring = var_s1 + strlen("pc");
-    } else if (strncmp(var_s1, "f77", strlen("f77")) == 0) {
-        compiler = 3;
+    } else if (strncmp(var_s1, "f77", strlen("f77")) == 0) { // FORTRAN 77
+        compiler = COMPILER_3;
         Bstring = var_s1 + strlen("f77");
-    } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) {
-        error(1, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
+    } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) { // Fortran 90
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
         exit(2);
-    } else if (strncmp(var_s1, "as", strlen("as")) == 0) {
-        compiler = 4;
+    } else if (strncmp(var_s1, "as", strlen("as")) == 0) { // (MIPS) Assembly
+        compiler = COMPILER_4;
         Bstring = var_s1 + strlen("as");
         strcpy(compdirs[0], compdirs[1]);
-    } else if (strncmp(var_s1, "pl1", strlen("pl1")) == 0) {
-        compiler = 5;
+    } else if (strncmp(var_s1, "pl1", strlen("pl1")) == 0) { // PL/I
+        compiler = COMPILER_5;
         Bstring = var_s1 + strlen("pl1");
-    } else if (strncmp(var_s1, "cobol", strlen("cobol")) == 0) {
-        compiler = 6;
+    } else if (strncmp(var_s1, "cobol", strlen("cobol")) == 0) { // COBOL
+        compiler = COMPILER_6;
         Bstring = var_s1 + strlen("cobol");
     } else if (strncmp(var_s1, "ncc", strlen("ncc")) == 0) {
-        compiler = 1;
-        c_compiler_choice = 1;
+        compiler = COMPILER_1;
+        c_compiler_choice = C_COMPILER_CHOICE_1;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("ncc");
     } else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
-        compiler = 1;
-        c_compiler_choice = 2;
+        compiler = COMPILER_1;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
-        anachronisms = 0;
-        cfront_compatible = 0;
-        D_1000BF7C = 0;
-        exception_handling = 1;
-        Bstring = var_s1 + strlen("CC");
+        anachronisms = FALSE;
+        cfront_compatible = FALSE;
+        D_1000BF7C = FALSE;
+        exception_handling = TRUE;
+        Bstring = var_s1 + strlen("CC"); //! @bug too short?
     } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
-        compiler = 1;
-        c_compiler_choice = 2;
+        compiler = COMPILER_1;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
-        D_1000BF7C = 0;
+        D_1000BF7C = FALSE;
         Bstring = var_s1 + strlen("CC");
     } else if (strncmp(var_s1, "NCC", strlen("NCC")) == 0) {
-        compiler = 1;
-        c_compiler_choice = 2;
+        compiler = COMPILER_1;
+        c_compiler_choice = C_COMPILER_CHOICE_2;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("NCC");
     } else if (strncmp(var_s1, "DCC", strlen("DCC")) == 0) {
-        compiler = 1;
-        c_compiler_choice = 3;
+        compiler = COMPILER_1;
+        c_compiler_choice = C_COMPILER_CHOICE_3;
         edison_cpp = 1;
         Bstring = var_s1 + strlen("DCC");
-        D_1000BF90 = 1;
+        D_1000BF90 = TRUE;
     }
-    Bstring = NULL;
+    Bstring = NULL; // This appears to make the `Bstring` operations done in the above code useless?
+
     comp_target_root = getenv("COMP_TARGET_ROOT");
     if (comp_target_root == NULL) {
         comp_target_root = "/";
     } else if (comp_target_root[strlen(comp_target_root) - 1] != '/') {
         comp_target_root = mkstr(comp_target_root, "/", NULL);
     }
+
     comp_host_root = getenv("TOOLROOT");
     if (comp_host_root == NULL) {
         comp_host_root = "/";
     } else if (comp_host_root[strlen(comp_host_root) - 1] != '/') {
         comp_host_root = mkstr(comp_host_root, "/", NULL);
     }
+
     aligndir = mkstr(comp_host_root, "lib/align", NULL);
+
     sp12C = getenv("DCC_STD_PATHS");
-    D_1000BF8C = sp12C == NULL || *sp12C == 0 || *sp12C == '0';
-    if (D_1000BF8C == 0) {
+    D_1000BF8C = (sp12C == NULL) || (sp12C[0] == '\0') || sp12C[0] == '0';
+    if (!D_1000BF8C) {
         D_1000BF90 = D_1000BF8C;
     }
+
     if (force_use_cfront(argc, argv)) {
         exec_OCC(argc, argv);
     }
+
     func_00431A3C(argc, argv);
+
     tmpdir = getenv("TMPDIR");
     if (tmpdir == NULL) {
         tmpdir = "/tmp/";
@@ -855,95 +1070,97 @@ int main(int argc, char** argv) {
         fclose(tmpsfile);
         unlink(passout);
     }
+
     rls_id_object = getenv("RLS_ID_OBJECT");
 
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-non_shared") == 0) {
-            non_shared = 1;
+            non_shared = TRUE;
             if (Oflag < 3) {
                 Gnum = "8";
             }
         } else if (strcmp(argv[i], "-irix4") == 0) {
-            irix4 = 1;
+            irix4 = TRUE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-coff") == 0) {
             LD = "old_ld";
-            coff_spec = 1;
-            kpic_flag = 0;
+            coff_spec = TRUE;
+            kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-mips3") == 0) {
-            mips3flag = 1;
+            mips3flag = TRUE;
             Gnum = "8";
-            kpic_flag = 0;
+            kpic_flag = FALSE;
         } else if (strcmp(argv[i], "-excpt") == 0) {
-            excpt_flag = 1;
-            kpic_flag = 0;
+            excpt_flag = TRUE;
+            kpic_flag = FALSE;
             Gnum = "8";
         } else if (strcmp(argv[i], "-abi") == 0) {
             abi_flag = 1;
-            mips1flag = 1;
-            mips2flag = 0;
+            mips1flag = TRUE;
+            mips2flag = FALSE;
         } else if (strcmp(argv[i], "-O3") == 0) {
             Oflag = 3;
         } else if (strcmp(argv[i], "-old_ld") == 0) {
             LD = "old_ld";
-            D_1000BF90 = 0;
+            D_1000BF90 = FALSE;
         }
     }
 
-    if ((compiler == 1) || (compiler == 2) || (compiler == 3) || (compiler == 4)) {
-        docpp = 1;
-        default_nocpp = 0;
+    if ((compiler == COMPILER_1) || (compiler == COMPILER_2) || (compiler == COMPILER_3) || (compiler == COMPILER_4)) {
+        docpp = TRUE;
+        default_nocpp = FALSE;
     } else {
-        docpp = 0;
-        default_nocpp = 1;
+        docpp = FALSE;
+        default_nocpp = TRUE;
     }
+
     currcomp = compdirs[0];
     mklist(&dirs_for_nonshared_crtn);
     mklist(&dirs_for_abi_crtn);
     mklist(&dirs_for_crtn);
 
     for (i = 1; i < argc; i++) {
-        if (argv[i][0] == 0x2D) {
+        if (argv[i][0] == '-') {
             if (strcmp(argv[i], "-nostdlib") == 0) {
                 sp148 = 1;
             } else {
                 switch (argv[i][1]) {
-                    case 0x45:
-                        if ((argv[i][3] == 0) && ((argv[i][2] == 0x42) || (argv[i][2] == 0x4C))) {
-                            if (argv[i][2] == 0x42) {
-                                if ((Bflag != 0) && (targetsex != 0)) {
-                                    error(1, NULL, 0, NULL, 0,
+                    case 'E':
+                        if ((argv[i][3] == '\0') && ((argv[i][2] == 'B') || (argv[i][2] == 'L'))) {
+                            if (argv[i][2] == 'B') {
+                                if (Bflag && (targetsex != BIGENDIAN)) {
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                           "-EB or -EL must precede any -B flags for ucode compilers.\n");
                                     exit(2);
                                 }
-                                targetsex = 0;
-                            } else {
-                                if ((Bflag != 0) && (targetsex != 1)) {
-                                    error(1, NULL, 0, NULL, 0,
+                                targetsex = BIGENDIAN;
+                            } else { // argv[i][2] == 'L'
+                                if (Bflag && (targetsex != LITTLEENDIAN)) {
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                           "-EB or -EL must precede any -B flags for ucode compilers.\n");
                                     exit(2);
                                 }
-                                targetsex = 1;
+                                targetsex = LITTLEENDIAN;
                             }
                             newrunlib();
                         }
                         break;
-                    case 0x4C:
-                        if (argv[i][2] == 0) {
-                            if (((i + 1) >= argc) || (argv[i + 1][0] == 0x2D) ||
-                                (isdir(argv[i + 1]) == 0)) {
+
+                    case 'L':
+                        if (argv[i][2] == '\0') {
+                            if (((i + 1) >= argc) || (argv[i + 1][0] == '-') || !isdir(argv[i + 1])) {
                                 sp148 = 1;
                                 break;
                             } else {
-                                i += 1;
+                                i++;
                                 sp128 = mkstr(argv[i], NULL);
                             }
                         } else {
                             sp128 = mkstr(argv[i] + 2, NULL);
                         }
-                        if (sp128[strlen(sp128) - 1] == 0x2F) {
-                            sp128[strlen(sp128) - 1] = 0;
+                        if (sp128[strlen(sp128) - 1] == '/') {
+                            sp128[strlen(sp128) - 1] = '\0';
                         }
                         addstr(&dirs_for_crtn, sp128);
                         addstr(&dirs_for_nonshared_crtn, sp128);
@@ -952,11 +1169,10 @@ int main(int argc, char** argv) {
                 }
             }
         }
-    done:;
     }
 
     if (sp148 == 0) {
-        if ((non_shared != 0) || (coff_spec != 0) || (mips3flag != 0) || (excpt_flag != 0)) {
+        if (non_shared || coff_spec || mips3flag || excpt_flag) {
             addstr(&dirs_for_nonshared_crtn, mkstr(comp_target_root, "usr/lib/nonshared", NULL));
         } else if (abi_flag != 0) {
             addstr(&dirs_for_abi_crtn, mkstr(comp_target_root, "usr/lib/abi", NULL));
@@ -965,43 +1181,51 @@ int main(int argc, char** argv) {
             addstr(&dirs_for_crtn, mkstr(comp_target_root, "lib", NULL));
         }
     }
+
     relocate_passes(tstring, NULL, Bstring);
     relocate_passes("h", NULL, Bstring);
+
     if (strcmp("/", comp_target_root) != 0) {
         einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
         include = mkstr(comp_target_root, "usr/include", NULL);
     }
-    if (compiler == 1) {
-        oldcflag = 0;
+
+    if (compiler == COMPILER_1) {
+        oldcflag = FALSE;
     } else {
         cpp_stdflag = "-std0";
     }
+
     systype = "svr4";
-    svr4_systype = 1;
+    svr4_systype = TRUE;
+
     process_config(argc, argv);
     parse_command(argc - 1, argv + 1);
+
     func_00431DD8();
-    if (D_1000BF74 != 0) {
+
+    if (D_1000BF74) {
         if (D_1000BF80 == NULL) {
             D_1000BF80 = "";
         }
-        sp144 = mkstr(D_1000BF78 != 0 ? "-YSv" : "-YSz", D_1000BF80, NULL);
-        if (compiler == 1) {
+        sp144 = mkstr((D_1000BF78 ? "-YSv" : "-YSz"), D_1000BF80, NULL);
+        if (compiler == COMPILER_1) {
             addstr(&edisonflags, sp144);
         } else {
-            if (D_1000BF78 != 0) {
+            if (D_1000BF78) {
                 sp140 = "-cvs_nosrc";
             } else {
                 sp140 = "-cvs";
             }
-            if (D_1000BF80[0] != 0) {
+            if (D_1000BF80[0] != '\0') {
                 sp140 = mkstr(sp140, ",", D_1000BF80, NULL);
             }
             addstr(&fcomflags, sp140);
         }
     }
-    if (user_systype == 0) {
-        if (fiveflag != 0) {
+
+    if (!user_systype) {
+        if (fiveflag) {
             include = mkstr(comp_target_root, "usr/5include", NULL);
         } else {
             einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
@@ -1012,85 +1236,101 @@ int main(int argc, char** argv) {
         }
         newrunlib();
     }
-    if (((mips2flag != 0) || (mips3flag != 0) || (sixty4bitflag != 0)) && (kpic_flag == 0) &&
-        ((non_shared != 0) || (call_shared != 0) || (default_call_shared != 0))) {
-        if (non_shared == 0) {
-            non_shared = 1;
-            old_non_shared = 1;
+
+    if ((mips2flag || mips3flag || sixty4bitflag) && !kpic_flag && (non_shared || call_shared || default_call_shared)) {
+        if (!non_shared) {
+            non_shared = TRUE;
+            old_non_shared = TRUE;
         }
-        default_call_shared = 0;
-        call_shared = 0;
-        if (non_shared_emitted == 0) {
+        default_call_shared = FALSE;
+        call_shared = FALSE;
+        if (!non_shared_emitted) {
             addstr(&ldflags, "-non_shared");
             addstr(&cfeflags, "-non_shared");
-            non_shared_emitted = 1;
+            non_shared_emitted = TRUE;
         }
     }
-    if ((non_shared != 0) && (non_shared_emitted == 0)) {
+    if (non_shared && !non_shared_emitted) {
         addstr(&ldflags, "-non_shared");
         addstr(&cfeflags, "-non_shared");
-        non_shared_emitted = 1;
-    } else if (call_shared != 0) {
+        non_shared_emitted = TRUE;
+    } else if (call_shared) {
         addstr(&ldflags, "-call_shared");
         addstr(&cfeflags, "-call_shared");
     }
-    if ((Vflag == 0) && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
-        error(1, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
+
+    if (!Vflag && (srcfiles.length == 0) && (objfiles.length == 0) && (ufiles.length == 0)) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source, object or ucode file specified\n");
         exit(2);
     }
+
     if (w1flag == 1) {
         addstr(&fcomflags, "-w1");
     } else if (w1flag == 2) {
         addstr(&fcomflags, "-w");
     }
-    if ((srcexists == 0) && ((cflag != 0) || (Sflag != 0))) {
-        error(1, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
+
+    if ((srcexists == 0) && (cflag || Sflag)) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
         exit(4);
     }
-    if ((mp_flag != 0) && (gflag != 0) && (mp_flag & 1)) {
+
+    if (mp_flag && (gflag != 0) && (mp_flag & 1)) {
         mp_flag |= 4;
     }
     if ((cmp_flag != 0) && (gflag != 0) && (cmp_flag & 1)) {
         cmp_flag |= 4;
     }
-    if ((ansichoice == 1) || (ansichoice == 2)) {
+
+    if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
         CRTX = "acrt1.o";
-        crtn_required = 1;
+        crtn_required = TRUE;
     }
+
     relocate_passes("r", NULL, NULL);
-    if ((B_1000ED30 != 0) && (compiler == 1) && ((ansichoice == 1) || (ansichoice == 2))) {
-        error(2, NULL, 0, NULL, 0,
+
+    if ((B_1000ED30 != 0) && (compiler == COMPILER_1) &&
+        ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX))) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "'-lc_s' specified. Shared version of C library does not conform to ANSI X3.159-1989.\n");
     }
-    // The second and third comparison of this if check are fake and optimized out
+
+    //! FAKE: The second and third comparison of this if check are fake and optimized out
     if (Oflag >= 3 && Oflag >= 3 && Oflag >= 3) {}
-    if ((kpic_flag != 0) && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
-        error(2, NULL, 0, NULL, 0,
+
+    if (kpic_flag && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
         Gnum = "0";
     }
-    if ((abi_flag != 0) && (non_shared != 0)) {
-        error(2, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
-        non_shared = 0;
-        kpic_flag = 1;
+
+    if ((abi_flag != 0) && non_shared) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+              "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
+        non_shared = FALSE;
+        kpic_flag = TRUE;
         Gnum = "0";
     }
-    if ((Oflag >= 3) && (compiler == 4)) {
-        error(2, NULL, 0, NULL, 0,
+
+    if ((Oflag >= 3) && (compiler == COMPILER_4)) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-O3 is not supported for assembly compiles for ucode compilers; changing to -O2.\n");
         Oflag = 2;
-        uload = 0;
+        uload = FALSE;
     }
+
     get_host_chiptype();
-    if (targetsex == 0) {
+
+    if (targetsex == BIGENDIAN) {
         addstr(&cppflags, "-D_MIPSEB");
-        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+        if ((compiler != COMPILER_1) || (ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&cppflags, "-DMIPSEB");
         }
-        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+        if ((compiler == COMPILER_1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) ||
+                                         ((ansichoice == ANSICHOICE_XANSI) && !irix4))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
-        if ((compiler == 1) && (ansichoice == 2)) {
+        if ((compiler == COMPILER_1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
             addstr(&cppflags, "-D_POSIX_SOURCE=1");
         }
         addstr(&ccomflags, "-EB");
@@ -1106,13 +1346,14 @@ int main(int argc, char** argv) {
     } else {
         addstr(&cppflags, "-D_MIPSEL");
         addstr(&cppflags, "-D_MIPSEL");
-        if ((compiler != 1) || (ansichoice == 0) || (ansichoice == 3)) {
+        if ((compiler != COMPILER_1) || (ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&cppflags, "-DMIPSEL");
         }
-        if ((compiler == 1) && ((ansichoice == 1) || (ansichoice == 2) || ((ansichoice == 3) && (irix4 == 0)))) {
+        if ((compiler == COMPILER_1) && ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX) ||
+                                         ((ansichoice == ANSICHOICE_XANSI) && !irix4))) {
             addstr(&cppflags, "-D__STDC__=1");
         }
-        if ((compiler == 1) && (ansichoice == 2)) {
+        if ((compiler == COMPILER_1) && (ansichoice == ANSICHOICE_ANSIPOSIX)) {
             addstr(&cppflags, "-D_POSIX_SOURCE=1");
         }
         addstr(&ccomflags, "-EL");
@@ -1127,6 +1368,8 @@ int main(int argc, char** argv) {
         addstr(&asflags, "-EL");
         addstr(&ldflags, "-EL");
     }
+
+    // Propagate `gFlag`
     switch (gflag) {
         case 0:
             addstr(&ccomflags, "-Xg0");
@@ -1141,115 +1384,128 @@ int main(int argc, char** argv) {
             addstr(&genflags, "-g0");
             addstr(&asflags, "-g0");
             addstr(&ldflags, "-g0");
-            if (nocode == 0) {
+            if (!nocode) {
                 addstr(&edisonflags, "-Zg0");
             }
             break;
+
         case 1:
             addstr(&edisonflags, "-Zg1");
             addstr(&ccomflags, "-Xg1");
             add_info("-g1");
             break;
+
         case 2:
             addstr(&edisonflags, "-Zg2");
             addstr(&ccomflags, "-Xg2");
             add_info("-g2");
             break;
+
         case 3:
-            gflag += 1;
+            gflag++;
             addstr(&edisonflags, "-Zg3");
             addstr(&ccomflags, "-Xg3");
             add_info("-g3");
             break;
     }
-    if ((mp_flag != 0) && (ddoptflag != 0)) {
-        error(1, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
+
+    if (mp_flag && ddoptflag) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't use -mp/-pfa with -ddopt\n");
         exit(2);
     }
-    if ((mips3flag != 0) && (thirty2bitflag == 0)) {
-        error(1, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
+    if (mips3flag && !thirty2bitflag) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
         exit(2);
     }
-    if ((irix4 != 0) && (compiler == 1) && (c_compiler_choice != 0)) {
-        error(1, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
+    if (irix4 && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "IRIX4 not supported in Delta-C++\n");
         exit(2);
     }
-    if ((irix4 != 0) && (compiler == 3) && (D_1000BF74 != 0)) {
-        error(1, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
+    if (irix4 && (compiler == COMPILER_3) && D_1000BF74) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "IRIX4 and -sa not supported together\n");
         exit(2);
     }
-    if (((cflag != 0) || (Sflag != 0) || (nocode != 0) || (Eflag != 0) || (Pflag != 0)) && (make_edison_shlib != 0)) {
-        error(1, NULL, 0, NULL, 0,
+    if ((cflag || Sflag || nocode || Eflag || Pflag) && make_edison_shlib) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
               "-shared can be specified only when a link is to be performed for ucode compilers\n");
         exit(2);
     }
-    if ((cflag == 0) && (nocode == 0) && (srcfiles.length == 1) && (objfiles.length == 1)) {
+
+    if (!cflag && !nocode && (srcfiles.length == 1) && (objfiles.length == 1)) {
         default_template_instantiation_mode = 1;
     }
-    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (Fflag != 0) &&
-        (smart_build != 0)) {
-        error(2, NULL, 0, NULL, 0, "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
-        smart_build = 0;
+    if ((compiler == COMPILER_1) &&
+        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && Fflag &&
+        smart_build) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+              "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
+        smart_build = FALSE;
     }
-    if ((default_template_instantiation_mode != 0) && (force_prelink == 0)) {
-        no_prelink = 1;
+    if ((default_template_instantiation_mode != 0) && !force_prelink) {
+        no_prelink = TRUE;
     }
-    if ((compiler == 1) && (c_compiler_choice == 3)) {
+
+    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
         sp124 = getenv("DCC_FORCE_OPT");
         sp120 = 1;
         if (Oflag >= 3) {
             Oflag = 2;
-            uload = 0;
+            uload = FALSE;
         }
         if (sp124 != NULL) {
-            // temp_t6 = sp124->unk_0;
-            if ((sp124[0] >= 0x30) && (sp124[0] < 0x34) && (sp124[1] == 0)) {
-                sp120 = sp124[0] - 0x30;
+            if ((sp124[0] >= '0') && (sp124[0] <= '3') && (sp124[1] == '\0')) {
+                sp120 = sp124[0] - '0';
             }
         }
         if (Oflag > sp120) {
             Oflag = sp120;
         }
     }
+
     addstr(&execlist, "-Dunix");
+
     if (dmips_emit == 0) {
-        if (mips2flag != 0) {
-            if (dwopcodeflag != 0) {
-                error(1, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
+        if (mips2flag) {
+            if (dwopcodeflag) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
                 exit(2);
             }
             addstr(&execlist, "-Dmips=2");
         }
-        if (mips3flag != 0) {
+        if (mips3flag) {
             addstr(&execlist, "-Dmips=3");
         } else {
             addstr(&execlist, "-Dmips=1");
         }
     }
+
     addstr(&execlist, "-Dhost_mips");
-    if (sixty4bitflag != 0) {
+
+    if (sixty4bitflag) {
         addstr(&ccomflags, "-64bit");
         add_info("-64bit");
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
-        if (mips3flag == 0) {
-            chip_targ = 2;
-            mips3flag = 1;
+        if (!mips3flag) {
+            chip_targ = CHIP_TARGET_MIPS3;
+            mips3flag = TRUE;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
             relocate_passes("M", NULL, NULL);
         }
-    } else if (dwopcodeflag != 0) {
+    } else if (dwopcodeflag) {
         addstr(&ccomflags, "-dwopcode");
         add_info("-dwopcode");
-        if (mips3flag == 0) {
-            chip_targ = 2;
-            mips3flag = 1;
+        if (!mips3flag) {
+            chip_targ = CHIP_TARGET_MIPS3;
+            mips3flag = TRUE;
             addstr(&ccomflags, "-mips3");
             add_info("-mips3");
             relocate_passes("M", NULL, NULL);
         }
     }
+
+    // Propagate `Oflag`
     switch (Oflag) { /* switch 1 */
         case 0:      /* switch 1 */
             var_s1 = "-O0";
@@ -1280,68 +1536,78 @@ int main(int argc, char** argv) {
     addstr(&uloopflags, var_s1);
     addstr(&genflags, var_s1);
     addstr(&asflags, var_s1);
-    if (compiler == 3) {
-        if (automaticflag != 0) {
+
+    if (compiler == COMPILER_3) {
+        if (automaticflag) {
             addstr(&fcomflags, "-automatic");
         } else {
             addstr(&fcomflags, "-static");
             addstr(&optflags, "-static");
         }
     }
-    if (Vflag != 0) {
+    if (Vflag) {
         whats();
     }
     if (runerror != 0) {
         exit(1);
     }
-    if (sigset(2, (void (*)())1) != (void (*)())1) {
-        sigset(2, handler);
+    if (sigset(SIGINT, SIG_IGN) != SIG_IGN) {
+        sigset(SIGINT, handler);
     }
-    if (sigset(0xF, (void (*)())1) != (void (*)())1) {
-        sigset(0xF, handler);
+    if (sigset(SIGTERM, SIG_IGN) != SIG_IGN) {
+        sigset(SIGTERM, handler);
     }
-    if (sigset(0xD, (void (*)())1) != (void (*)())1) {
-        sigset(0xD, handler);
+    if (sigset(SIGPIPE, SIG_IGN) != SIG_IGN) {
+        sigset(SIGPIPE, handler);
     }
-    if ((compiler == 6) && (nolockflag != 0) && (lpilockflag != 0)) {
-        error(1, NULL, 0, NULL, 0,
+
+    if ((compiler == COMPILER_6) && nolockflag && lpilockflag) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
               "Conflicting flags; -nolock and -lpilock can't both be specified for ucode compilers\n");
         exit(2);
     }
-    if ((Oflag >= 3) && (cflag != 0) && (srcfiles.length == 1)) {
-        error(2, NULL, 0, NULL, 0,
+
+    if ((Oflag >= 3) && cflag && (srcfiles.length == 1)) {
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
               "-c should not be used with ucode -O3 -o32 on a single file; use -j instead to get inter-module "
               "optimization.\n");
     }
-    if ((srcfiles.length >= 2) && (compiler == 4) && (Eflag == 0) && (Pflag == 0)) {
-        error(1, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n", "as");
+
+    if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && !Eflag && !Pflag) {
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n",
+              "as");
         exit(2);
     }
+
     mktempstr();
-    for (i = 0; (i < srcfiles.length) || (uload != 0); i++) {
-        nocompileneeded = 0;
+
+    // Main loop for program execution, runs per source file
+    for (i = 0; (i < srcfiles.length) || uload; i++) {
+        nocompileneeded = FALSE;
         sp118 = NULL;
-        longlong_emitted = 0;
+        longlong_emitted = FALSE;
         sp11C = D_1000BF74;
+
+        // Finished srcfiles, `uload` on.
         if (i == srcfiles.length) {
-            uload = 0;
-            if ((runerror == 0) && (Eflag == 0) && (Pflag == 0)) {
+            uload = FALSE;
+            if ((runerror == 0) && !Eflag && !Pflag) {
                 if (uoutfile == NULL) {
                     addstr(&srcfiles, "u.out.?");
-                } else if (getsuf(uoutfile) != 0) {
-                    addstr(&srcfiles, mksuf(uoutfile, 0x3F));
+                } else if (getsuf(uoutfile) != '\0') {
+                    addstr(&srcfiles, mksuf(uoutfile, '?'));
                 } else {
                     addstr(&srcfiles, mkstr(uoutfile, ".?", NULL));
                 }
-                srcsuf = 0x3F;
-                if ((Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x63) || (Kflag != 0)) {
-                    symtab = mksuf(srcfiles.entries[i], 0x54);
+                srcsuf = '?';
+                if ((Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'c') || Kflag) {
+                    symtab = mksuf(srcfiles.entries[i], 'T');
                     tmpst = 0;
                 } else {
                     symtab = tempstr[0];
                     tmpst = 1;
                 }
-                goto c8d8;
+                goto phase_uld;
             }
             continue;
         }
@@ -1349,252 +1615,289 @@ int main(int argc, char** argv) {
         if (srcfiles.length >= 2) {
             fprintf(stderr, "%s:\n", srcfiles.entries[i]);
         }
-        if ((NoMoreOptions != 0) && (*srcfiles.entries[i] == 0x2D)) {
+        if (NoMoreOptions && (*srcfiles.entries[i] == '-')) {
             passin = func_00433534(srcfiles.entries[i]);
         } else {
             passin = srcfiles.entries[i];
         }
-        if (compiler != 4) {
+        if (compiler != COMPILER_4) {
             srcsuf = getsuf(srcfiles.entries[i]);
-            if (srcsuf == 0x6D) {
-                srcsuf = 0x66;
+            if (srcsuf == 'm') {
+                srcsuf = 'f';
             }
         } else {
-            srcsuf = 0x73;
+            srcsuf = 's';
         }
-        if ((Hchar == 0x66) || (Hchar == 0x73) || (Hchar == 0x6D) || (Hchar == 0x6F) || (Hchar == 0x6B) ||
-            (Hchar == 0x63) || (Kflag != 0) || (srcsuf == 0x42) || (srcsuf == 0x55) || (srcsuf == 0x4F) ||
-            (srcsuf == 0x47) || (srcsuf == 0x53) || (srcsuf == 0x4D) || (srcsuf == 0x56) || (srcsuf == 0x44) ||
-            (srcsuf == 0x51)) {
+        if ((Hchar == 'f') || (Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'k') || (Hchar == 'c') ||
+            Kflag || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') || (srcsuf == 'S') ||
+            (srcsuf == 'M') || (srcsuf == 'V') || (srcsuf == 'D') || (srcsuf == 'Q')) {
             tmpst = 0;
-            if ((compiler == 4) && (getsuf(srcfiles.entries[i]) == 0)) {
+            if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == '\0')) {
                 symtab = mkstr(srcfiles.entries[i], ".T", NULL);
             } else {
-                symtab = mksuf(srcfiles.entries[i], 0x54);
+                symtab = mksuf(srcfiles.entries[i], 'T');
             }
         } else {
             tmpst = 1;
             symtab = tempstr[0];
         }
+
         switch (srcsuf) { /* switch 11 */
-            case 0x73:    /* switch 11 */
-                if ((compiler == 1) && (compdirs[0] != currcomp)) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+            case 's':     /* switch 11 */
+                if (compiler == COMPILER_1) {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 /* fallthrough */
-            case 0x69: /* switch 11 */
-                if ((compiler == 1) && (compdirs[0] != currcomp)) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+            case 'i': /* switch 11 */
+                if (compiler == COMPILER_1) {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 /* fallthrough */
-            case 0x6:  /* switch 11 */
-            case 0x63: /* switch 11 */
-                if (compiler != 1) {
+            case SUF_6: /* switch 11 */
+            case 'c':   /* switch 11 */
+                if (compiler != COMPILER_1) {
                     if (compdirs[1] != currcomp) {
                         currcomp = compdirs[1];
                         relocate_passes("pKfjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pKfjsmvocabtyz", NULL, NULL);
+                    }
                 }
-                compchoice = 0;
+                compchoice = COMP_CHOICE_0;
                 break;
-            case 0x70: /* switch 11 */
-                if (compiler != 2) {
+
+            case 'p': /* switch 11 */
+                if (compiler != COMPILER_2) {
                     if (compdirs[2] != currcomp) {
                         currcomp = compdirs[2];
                         relocate_passes("pfjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 break;
-            case 0x46: /* switch 11 */
-            case 0x66: /* switch 11 */
-                if (compiler != 3) {
+
+            case 'F': /* switch 11 */
+            case 'f': /* switch 11 */
+                if (compiler != COMPILER_3) {
                     if (compdirs[3] != currcomp) {
                         currcomp = compdirs[3];
                         relocate_passes("pfjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 break;
-            case 0x1: /* switch 11 */
-                if (compiler != 5) {
+
+            case SUF_1: /* switch 11 */
+                if (compiler != COMPILER_5) {
                     if (compdirs[5] != currcomp) {
                         currcomp = compdirs[5];
                         relocate_passes("pfekjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 break;
-            case 0x2: /* switch 11 */
-                if (compiler != 6) {
+
+            case SUF_2: /* switch 11 */
+                if (compiler != COMPILER_6) {
                     if (compdirs[6] != currcomp) {
                         currcomp = compdirs[6];
                         relocate_passes("pfekjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pfekjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 break;
-            case 0x3: /* switch 11 */
-                if ((compiler != 1) && (compiler != 5) && (compiler != 6)) {
+
+            case SUF_3: /* switch 11 */
+                if ((compiler != COMPILER_1) && (compiler != COMPILER_5) && (compiler != COMPILER_6)) {
                     if ((compdirs[1] != currcomp) && (compdirs[5] != currcomp) && (compdirs[6] != currcomp)) {
                         currcomp = compdirs[1];
                         relocate_passes("pekjsmvocabtyz", NULL, NULL);
                     }
-                } else if (compdirs[0] != currcomp) {
-                    currcomp = compdirs[0];
-                    relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                } else {
+                    if (compdirs[0] != currcomp) {
+                        currcomp = compdirs[0];
+                        relocate_passes("pfjsmvocabtyz", NULL, NULL);
+                    }
                 }
                 break;
         }
-        if ((compiler == 3) && (D_1000BF74 != 0) && (srcsuf != 0x66) && (srcsuf != 0x46)) {
-            D_1000BF74 = 0;
+
+        if ((compiler == COMPILER_3) && D_1000BF74 && (srcsuf != 'f') && (srcsuf != 'F')) {
+            D_1000BF74 = FALSE;
             relocate_passes("f", NULL, NULL);
         }
-        if ((D_1000BF74 != 0) && ((compiler == 3) || ((compiler == 1) && (c_compiler_choice != 0)))) {
+        if (D_1000BF74 &&
+            ((compiler == COMPILER_3) || ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)))) {
             record_static_fileset(srcfiles.entries[i]);
         }
-        if ((compiler == 1) && (c_compiler_choice == 1)) {
+
+        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_1)) {
             switch (ansichoice) {
-                case 1:
-                case 2:
-                    edison_type = (char*)2;
+                case ANSICHOICE_ANSI:
+                case ANSICHOICE_ANSIPOSIX:
+                    edison_type = EDISON_TYPE_2;
                     break;
-                case 3:
-                    edison_type = (char*)1;
+                case ANSICHOICE_XANSI:
+                    edison_type = EDISON_TYPE_1;
                     break;
                 default:
-                case 0:
-                    edison_type = (char*)3;
+                case ANSICHOICE_KR:
+                    edison_type = EDISON_TYPE_3;
                     break;
             }
         }
 
-repeat_after_edit:
-        if (compchoice == 0) {
-            if (irix4 != 0) {
-                if (ansichoice == 0) {
-                    compchoice = 1;
+    repeat_after_edit:
+        if (compchoice == COMP_CHOICE_0) {
+            if (irix4) {
+                if (ansichoice == ANSICHOICE_KR) {
+                    compchoice = COMP_CHOICE_1;
                 } else {
-                    compchoice = 2;
+                    compchoice = COMP_CHOICE_2;
                 }
-            } else if (ansichoice == 0) {
-                compchoice = 3;
             } else {
-                compchoice = 3;
+                if (ansichoice == ANSICHOICE_KR) {
+                    compchoice = COMP_CHOICE_3;
+                } else {
+                    compchoice = COMP_CHOICE_3;
+                }
             }
         }
-        if ((Eflag == 0) || (srcsuf == 0x61)) {
+
+        if (!Eflag || (srcsuf == 'a')) {
             switch (srcsuf) { /* switch 19 */
-                case 0x6:     /* switch 19 */
-                case 0x63:    /* switch 19 */
-                    if (oldccomflag != 1) {
-                        oldcflag = 0;
+                case SUF_6:   /* switch 19 */
+                case 'c':     /* switch 19 */
+                    if (oldccomflag != TRUE) {
+                        oldcflag = FALSE;
                     }
-                    if (docpp == 0) {
-                        if (default_nocpp != 0) {
-                            goto block_531;
-                        }
-                        goto block_940;
+                    if (docpp || default_nocpp) {
+                        goto block_531;
                     }
-                    goto block_531;
-                case 0x69:              /* switch 19 */
+                    goto phase_copt;
+
+                case 'i': /* switch 19 */
+                    // 'i' is a preprocessed file so does not convey a specific compiler by itself
                     switch (compiler) {
-                        case 1:
-                            goto block_940;
-                        case 2:
-                            goto block_1341;
-                        case 3:
-                            goto block_1505;
-                        case 4:
+                        case COMPILER_1:
+                            goto phase_copt;
+                        case COMPILER_2:
+                            goto phase_upas;
+                        case COMPILER_3:
+                            goto phase_fopt;
+                        case COMPILER_4:
                             goto block_512;
-                        case 5:
-                            goto block_1388;
-                        case 6:
-                            goto block_1453;
+                        case COMPILER_5:
+                            goto phase_upl1;
+                        case COMPILER_6:
+                            goto phase_ucob;
                     }
                     // fallthrough
-                case 0x70: /* switch 19 */
+                case 'p': /* switch 19 */
                 block_512:
-                    if (stdflag == 0) {
-                        if ((docpp == 0) && (default_nocpp == 0)) {
-                            goto block_1341;
-                        }
+                    if (stdflag != 0 || (!docpp && !default_nocpp)) {
+                        goto phase_upas;
+                    }
+                    goto block_531;
+
+                case 'f': /* switch 19 */
+                    if (docpp) {
                         goto block_531;
                     }
-                    goto block_1341;
-                case 0x66: /* switch 19 */
-                    if (docpp != 0) {
+                    goto phase_fopt;
+
+                case SUF_1: /* switch 19 */
+                    if (docpp) {
                         goto block_531;
                     }
-                    goto block_1505;
-                case 0x1: /* switch 19 */
-                    if (docpp != 0) {
+                    goto phase_upl1;
+
+                case SUF_2: /* switch 19 */
+                    if (docpp) {
                         goto block_531;
                     }
-                    goto block_1388;
-                case 0x2: /* switch 19 */
-                    if (docpp != 0) {
-                        goto block_531;
-                    }
-                    goto block_1453;
-                case 0x3: /* switch 19 */
-                    goto block_1417;
-                case 0x55: /* switch 19 */
+                    goto phase_ucob;
+
+                case SUF_3: /* switch 19 */
+                    goto phase_ulpi;
+
+                case 'U': /* switch 19 */
                     execlist.length = 0;
                     addstr(&execlist, "utob");
                     addstr(&execlist, srcfiles.entries[i]);
-                    if (Kflag != 0) {
-                        passout = mksuf(srcfiles.entries[i], 0x42);
+                    if (Kflag) {
+                        passout = mksuf(srcfiles.entries[i], 'B');
                     } else {
                         passout = tempstr[1];
                     }
                     if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                        error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                              passout);
                         exit(2);
                     }
                     addstr(&execlist, passout);
                     if (run(utob, execlist.entries, NULL, NULL, NULL) != 0) {
-                        runerror += 1;
-                        if (Kflag == 0) {
+                        runerror++;
+                        if (!Kflag) {
                             unlink(passout);
                         }
                         continue;
                     }
                     passin = passout;
-                    goto block_1729;
-                case 0x65: /* switch 19 */
-                case 0x72: /* switch 19 */
-                case 0x73: /* switch 19 */
-                    goto block_A;
-                case 0x75: /* switch 19 */
-                    goto block_1896;
-                case 0x42: /* switch 19 */
-                    goto block_1729;
-                case 0x53: /* switch 19 */
-                    goto block_1913;
-                case 0x4D: /* switch 19 */
-                    goto block_1933;
-                case 0x47: /* switch 19 */
-                    goto block_2159;
-                case 0x44: /* switch 19 */
-                case 0x51: /* switch 19 */
-                case 0x56: /* switch 19 */
-                    goto block_2015;
-                case 0x4F: /* switch 19 */
-                    goto block_2068;
+                    goto phase_ujoin;
+
+                case 'e': /* switch 19 */
+                case 'r': /* switch 19 */
+                case 's': /* switch 19 */
+                    goto phase_m4;
+
+                case 'u': /* switch 19 */
+                    goto phase_usplit;
+
+                case 'B': /* switch 19 */
+                    goto phase_ujoin;
+
+                case 'S': /* switch 19 */
+                    goto phase_umerge;
+
+                case 'M': /* switch 19 */
+                    goto phase_uloop;
+
+                case 'G': /* switch 19 */
+                    goto phase_as1;
+
+                case 'D': /* switch 19 */
+                case 'Q': /* switch 19 */
+                case 'V': /* switch 19 */
+                    goto phase_uopt;
+
+                case 'O': /* switch 19 */
+                    goto phase_ugen;
             }
         }
 
@@ -1603,49 +1906,54 @@ repeat_after_edit:
         execlist.length = 0;
         sp114 = cppchoice;
         execlist.length = 0;
-        if ((Eflag != 0) && (irix4 == 0)) {
-            compchoice = 3;
-        } else if (srcsuf == 0x73) {
-            compchoice = 4;
+
+        if (Eflag && !irix4) {
+            compchoice = COMP_CHOICE_3;
+        } else if (srcsuf == 's') {
+            compchoice = COMP_CHOICE_4;
         }
-        if ((srcsuf == 0x63) || (srcsuf == 6) ||
-            ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 0x68))) {
-            if ((cppchoice != 2) || ((oldcppflag != 0) && (ansichoice != 0))) {
-                cppchoice = 1;
+
+        if ((srcsuf == 'c') || (srcsuf == SUF_6) ||
+            ((compiler == COMPILER_1) && nocode && D_1000BF74 && (srcsuf == 'h'))) {
+            if ((cppchoice != CPP_CHOICE_2) || (oldcppflag && (ansichoice != ANSICHOICE_KR))) {
+                cppchoice = CPP_CHOICE_1;
                 relocate_passes("p", NULL, NULL);
             }
-        } else if ((srcsuf == 0x68) && (compiler == 1)) {
-            if (cppchoice == 0) {
-                cppchoice = 1;
+        } else if ((srcsuf == 'h') && (compiler == COMPILER_1)) {
+            if (cppchoice == CPP_CHOICE_0) {
+                cppchoice = CPP_CHOICE_1;
                 relocate_passes("p", NULL, NULL);
             }
-        } else if (compiler == 1) {
-            if ((Eflag == 0) && (Pflag == 0) && (cppchoice == 3)) {
-                cppchoice = 2;
+        } else if (compiler == COMPILER_1) {
+            if (!Eflag && !Pflag && (cppchoice == CPP_CHOICE_3)) {
+                cppchoice = CPP_CHOICE_2;
                 relocate_passes("p", NULL, NULL);
             }
-        } else if (cppchoice == 3) {
-            cppchoice = 2;
+        } else if (cppchoice == CPP_CHOICE_3) {
+            cppchoice = CPP_CHOICE_2;
             relocate_passes("p", NULL, NULL);
         }
-        if (((compchoice == 3) || (compchoice == 4)) && (run_sopt == 0) && !(cmp_flag & 1) && !(cmp_flag & 8)) {
+
+        if (((compchoice == COMP_CHOICE_3) || (compchoice == COMP_CHOICE_4)) && !run_sopt && !(cmp_flag & 1) &&
+            !(cmp_flag & 8)) {
             addstr(&execlist, cfe);
         } else {
-            if (sixty4bitflag != 0) {
-                error(1, NULL, 0, NULL, 0, "-64bit option is not implemented with ccom or accom.\n");
+            if (sixty4bitflag) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-64bit option is not implemented with ccom or accom.\n");
                 exit(2);
             }
-            if (c_compiler_choice == 0) {
-                addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
+            if (c_compiler_choice == C_COMPILER_CHOICE_0) {
+                addstr(&execlist, ((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3) ? "cpp" : "acpp"));
             }
         }
-        if (mips_abi == 1) {
+
+        if (mips_abi == MIPS_ABI_1) {
             addstr(&execlist, "-D_MIPS_FPSET=16");
-            if (mips1flag != 0) {
+            if (mips1flag) {
                 addstr(&execlist, "-D_MIPS_ISA=1");
-            } else if (mips2flag != 0) {
+            } else if (mips2flag) {
                 addstr(&execlist, "-D_MIPS_ISA=2");
-            } else if (mips3flag != 0) {
+            } else if (mips3flag) {
                 addstr(&execlist, "-D_MIPS_ISA=3");
             }
             addstr(&execlist, "-D_ABIO32=1");
@@ -1653,255 +1961,283 @@ repeat_after_edit:
             addstr(&execlist, "-D_MIPS_SZINT=32");
             addstr(&execlist, "-D_MIPS_SZLONG=32");
             addstr(&execlist, "-D_MIPS_SZPTR=32");
-        } else if (mips_abi == 2) {
+        } else if (mips_abi == MIPS_ABI_2) {
             addstr(&execlist, "-D_MIPS_FPSET=32");
             addstr(&execlist, "-D_MIPS_ISA=_MIPS_ISA_MIPS3");
             addstr(&execlist, "-D_MIPS_SIM=_MIPS_SIM_ABI64");
             addstr(&execlist, "-D_MIPS_SZINT=32");
             addstr(&execlist, "-D_MIPS_SZLONG=64");
             addstr(&execlist, "-D_MIPS_SZPTR=64");
-        } else if (mips_abi != 0) {
+        } else if (mips_abi != MIPS_ABI_0) {
             if (1) {}
-            error(1, NULL, 0, NULL, 0, "Unknown value for mips_abi: %d.\n", mips_abi);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown value for mips_abi: %d.\n", mips_abi);
             exit(2);
         }
-        if (c_compiler_choice == 0) {
-            if ((emptyIflag != 0) && (compchoice != 3)) {
+
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
+            if (emptyIflag && (compchoice != COMP_CHOICE_3)) {
                 addstr(&execlist, "-nostdinc");
             }
-            if (cppchoice == 1) {
-                if ((ansichoice == 0) || (ansichoice == 3)) {
+
+            if (cppchoice == CPP_CHOICE_1) {
+                if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                     addstr(&execlist, "-D__EXTENSIONS__");
                 }
-                if (compchoice != 3) {
-                    if (fullwarn != 0) {
+
+                if (compchoice != COMP_CHOICE_3) {
+                    if (fullwarn) {
                         addstr(&execlist, "-Wall");
                     }
-                    if (acpp_traditional != 0) {
+                    if (acpp_traditional) {
                         addstr(&execlist, "-traditional");
                     }
                     addstr(&execlist, "-trigraphs");
-                    if (ansichoice != 0) {
+                    if (ansichoice != ANSICHOICE_KR) {
                         addstr(&execlist, "-undef");
                         addstr(&execlist, "-p");
                     }
                 }
             }
-            if ((cppchoice == 2) && (compchoice == 3)) {
+
+            if ((cppchoice == CPP_CHOICE_2) && (compchoice == COMP_CHOICE_3)) {
                 addstr(&execlist, "-D__EXTENSIONS__");
             }
         } else {
             addstr(&execlist, "-YE");
-            if (edison_type == (char*)2) {
+            if (edison_type == EDISON_TYPE_2) {
                 addstr(&execlist, "-a");
             }
-            if ((edison_type == (char*)1) || (edison_type == (char*)3)) {
+            if ((edison_type == EDISON_TYPE_1) || (edison_type == EDISON_TYPE_3)) {
                 addstr(&execlist, "-D__EXTENSIONS__");
             }
         }
 
         switch (srcsuf) { /* switch 13 */
-            case 0x6:
-            case 0x63:
-            case 0x68:
-                if ((srcsuf != 0x68) || (D_1000BF74 != 0)) {
-                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            case SUF_6:   /* switch 13 */
+            case 'c':     /* switch 13 */
+            case 'h':     /* switch 13 */
+                if ((srcsuf != 'h') || D_1000BF74) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                         addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
                         addstr(&execlist, "-D__cplusplus=1");
                         addstr(&execlist, "-D__ANSI_CPP__=1");
-                        if ((compiler == 1) && (c_compiler_choice == 3)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
                             addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
                         }
                     } else {
-                        if ((ansichoice == 0) || (ansichoice == 3)) {
+                        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                             addstr(&execlist, "-DLANGUAGE_C");
                         }
                         addstr(&execlist, "-D_LANGUAGE_C");
                         if (cmp_flag != 0) {
                             addstr(&execlist, "-D_LANGUAGE_PWRC");
                         }
-                        if (((cmp_flag & 1) || (run_sopt != 0)) && (cppchoice == 1)) {
+                        if (((cmp_flag & 1) || run_sopt) && (cppchoice == CPP_CHOICE_1)) {
                             addstr(&execlist, "-trigraphs");
                         }
                     }
                 }
                 break;
-            case 0x70:
+
+            case 'p': /* switch 13 */
                 addstr(&execlist, "-DLANGUAGE_PASCAL");
                 addstr(&execlist, "-D_LANGUAGE_PASCAL");
                 addstr(&execlist, "-Q");
                 break;
-            case 0x46:
-            case 0x65:
-            case 0x66:
-            case 0x72:
+
+            case 'F': /* switch 13 */
+            case 'e': /* switch 13 */
+            case 'f': /* switch 13 */
+            case 'r': /* switch 13 */
                 addstr(&execlist, "-DLANGUAGE_FORTRAN");
                 addstr(&execlist, "-D_LANGUAGE_FORTRAN");
                 break;
-            case 0x73: /* switch 13 */
+
+            case 's': /* switch 13 */
                 addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
                 addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
                 break;
-            case 0x1:
+
+            case SUF_1: /* switch 13 */
                 addstr(&execlist, "-DLANGUAGE_PL1");
                 addstr(&execlist, "-D_LANGUAGE_PL1");
                 break;
-            case 0x2:
+
+            case SUF_2: /* switch 13 */
                 addstr(&execlist, "-DLANGUAGE_COBOL");
                 addstr(&execlist, "-D_LANGUAGE_COBOL");
                 break;
         }
 
-        if ((ansichoice == 0) || (ansichoice == 3)) {
+        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&execlist, "-D__INLINE_INTRINSICS");
             addstr(&execlist, "-Dsgi");
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 addstr(&execlist, "-DSVR3");
                 addstr(&execlist, "-D__SVR3");
             }
             addstr(&execlist, "-D__sgi");
         } else {
             addstr(&execlist, "-D__sgi");
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 addstr(&execlist, "-D__SVR3");
             }
         }
-        if ((compchoice != 3) && (dollar_sign != 0)) {
-            if (cppchoice == 1) {
+
+        if ((compchoice != COMP_CHOICE_3) && dollar_sign) {
+            if (cppchoice == CPP_CHOICE_1) {
                 addstr(&execlist, "-$");
             } else {
                 addstr(&execlist, "-dollar");
             }
         }
-        if ((ansichoice == 0) || (ansichoice == 3)) {
+
+        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
             addstr(&execlist, "-Dunix");
             addstr(&execlist, "-Dmips");
             addstr(&execlist, "-Dhost_mips");
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
-            if (irix4 == 0) {
-                if ((svr4_systype != 0) && (ansichoice != 1) && (ansichoice != 2)) {
+            if (!irix4) {
+                if (svr4_systype && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
                 addstr(&execlist, "-D_SGI_SOURCE");
             }
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
         } else {
             addstr(&execlist, "-D__unix");
             addstr(&execlist, "-D__host_mips");
-            if (irix4 == 0) {
-                if ((svr4_systype != 0) && (ansichoice != 1) && (ansichoice != 2)) {
+            if (!irix4) {
+                if (svr4_systype && (ansichoice != ANSICHOICE_ANSI) && (ansichoice != ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-D_SVR4_SOURCE");
                 }
                 addstr(&execlist, "-D_MODERN_C");
             }
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
         }
-        if ((systype != NULL) && (irix4 == 0)) {
+
+        if ((systype != NULL) && !irix4) {
             var_s1 = systype;
             while (*var_s1 != '\0') {
                 *var_s1++ = toupper(*var_s1);
             }
-            if ((ansichoice == 0) || (ansichoice == 3)) {
+            if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, mkstr("-DSYSTYPE_", systype, NULL));
             }
             addstr(&execlist, mkstr("-D_SYSTYPE_", systype, NULL));
         }
-        if (svr4_systype == 0) {
-            if ((ansichoice == 0) || (ansichoice == 3)) {
+
+        if (!svr4_systype) {
+            if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, "-DSYSTYPE_SYSV");
             }
             addstr(&execlist, "-D_SYSTYPE_SYSV");
         }
-        if (sixty4bitflag != 0) {
+
+        if (sixty4bitflag) {
             addstr(&execlist, "-D__64BIT");
         }
-        if (((ansichoice == 0) || (ansichoice == 3)) && (longlong_emitted == 0)) {
+
+        if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && !longlong_emitted) {
             addstr(&execlist, "-D_LONGLONG");
-            longlong_emitted = 1;
+            longlong_emitted = TRUE;
         }
+
         if (dmips_emit == 0) {
-            if (mips2flag != 0) {
-                if (((call_shared != 0) || (default_call_shared != 0)) && (kpic_flag == 0)) {
-                    old_non_shared = 1;
-                    non_shared = 1;
-                    default_call_shared = 0;
-                    call_shared = 0;
+            if (mips2flag) {
+                if ((call_shared || default_call_shared) && !kpic_flag) {
+                    old_non_shared = TRUE;
+                    non_shared = TRUE;
+                    default_call_shared = FALSE;
+                    call_shared = FALSE;
                 }
                 addstr(&execlist, "-D__mips=2");
-            } else if (mips3flag != 0) {
+            } else if (mips3flag) {
                 addstr(&execlist, "-D__mips=3");
             } else {
                 addstr(&execlist, "-D__mips=1");
             }
         }
         dmips_emit = 1;
-        if (irix4 != 0) {
+
+        if (irix4) {
             include = mkstr("/usr/irix4/", "usr/include", NULL);
         }
-        if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
-                (fiveflag != 0)) &&
-            ((compiler != 1) || (c_compiler_choice == 0)) && ((compiler != 3) || (D_1000BF74 == 0))) {
+        if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || fiveflag) &&
+            ((compiler != COMPILER_1) || (c_compiler_choice == C_COMPILER_CHOICE_0)) &&
+            ((compiler != COMPILER_3) || !D_1000BF74)) {
             addstr(&execlist, "-I");
         }
+
         addlist(&execlist, &cppflags);
-        if (cppchoice == 1) {
+
+        if (cppchoice == CPP_CHOICE_1) {
             addlist(&execlist, &acppflags);
         }
+
         addlist(&execlist, &undefineflags);
-        if (emptyIflag == 0) {
+
+        if (!emptyIflag) {
             if ((abi_flag != 0) && (includeB != NULL)) {
                 addstr(&execlist, mkstr("-I", includeB, NULL));
             }
-            if ((einclude != NULL) && (compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((einclude != NULL) && (compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 addstr(&execlist, mkstr("-I", einclude, NULL));
             }
             if (include != NULL) {
                 addstr(&execlist, mkstr("-I", include, NULL));
             }
         }
-        if (Pflag != 0) {
-            if ((compiler == 4) && (getsuf(srcfiles.entries[i]) == 0)) {
+
+        if (Pflag) {
+            if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                 passout = mkstr(srcfiles.entries[i], ".i", NULL);
             } else {
-                passout = mksuf(srcfiles.entries[i], 0x69);
+                passout = mksuf(srcfiles.entries[i], 'i');
             }
-        } else if (Eflag != 0) {
+        } else if (Eflag) {
             passout = NULL;
-        } else if ((Hchar == 0x4B) || (Kflag != 0)) {
-            if ((compchoice == 3) && (run_sopt == 0) && (acpp == 0) && (cmp_flag == 0) && (compiler == 1)) {
-                passout = mksuf(srcfiles.entries[i], 0x42);
+        } else if ((Hchar == 'K') || Kflag) {
+            if ((compchoice == COMP_CHOICE_3) && !run_sopt && !acpp && (cmp_flag == 0) && (compiler == COMPILER_1)) {
+                passout = mksuf(srcfiles.entries[i], 'B');
             } else {
-                passout = mksuf(srcfiles.entries[i], 0x69);
+                passout = mksuf(srcfiles.entries[i], 'i');
             }
         } else {
             passout = tempstr[2];
         }
         if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
             exit(2);
         }
-        if ((compiler == 3) && (D_1000BF74 != 0)) {
+
+        if ((compiler == COMPILER_3) && D_1000BF74) {
             addstr(&execlist, "-K");
             addstr(&execlist, "-E");
             addstr(&execlist, sp144);
         }
-        if (c_compiler_choice == 0) {
+
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
             addstr(&execlist, passin);
         }
-        if (((compchoice != 3) && (compchoice != 4)) || ((compiler != 1) && (compiler != 4)) || (run_sopt != 0) ||
-            (cmp_flag & 1) || (cmp_flag & 8) || (acpp != 0) || (oldcppflag != 0)) {
-            if (run((compiler == 3) && (D_1000BF74 != 0) ? cfe : cpp, execlist.entries, NULL, passout, NULL) != 0) {
-                runerror += 1;
-                if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
-                                        ((srcsuf == 0x73) && (mflag != 0)))) {
+
+        if (((compchoice != COMP_CHOICE_3) && (compchoice != COMP_CHOICE_4)) ||
+            ((compiler != COMPILER_1) && (compiler != COMPILER_4)) || run_sopt || (cmp_flag & 1) || (cmp_flag & 8) ||
+            acpp || oldcppflag) {
+            if (run((((compiler == COMPILER_3) && D_1000BF74) ? cfe : cpp), execlist.entries, NULL, passout, NULL) !=
+                0) {
+                runerror++;
+                if (!Eflag && ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && mflag))) {
                     unlink(passin);
                 }
                 unlink(passout);
@@ -1911,79 +2247,86 @@ repeat_after_edit:
             }
             goto block_922;
         }
+
         cppchoice = sp114;
         relocate_passes("p", NULL, NULL);
 
-        if ((
-                (srcsuf == 0x63) ||
-                (srcsuf == 6) ||
-                ((compiler == 1) && (nocode != 0) && (D_1000BF74 != 0) && (srcsuf == 0x68))
-            ) && (Pflag == 0) && (Eflag == 0)) {
+        if (((srcsuf == 'c') || (srcsuf == SUF_6) ||
+             ((compiler == COMPILER_1) && nocode && D_1000BF74 && (srcsuf == 'h'))) &&
+            !Pflag && !Eflag) {
             goto block_1042;
         }
-        if (minus_M == 0) {
+
+        if (!minus_M) {
             addstr(&execlist, "-E");
         }
-        if ((compiler != 1) || (c_compiler_choice == 0)) {
+
+        if ((compiler != COMPILER_1) || (c_compiler_choice == C_COMPILER_CHOICE_0)) {
             switch (srcsuf) {
-                case 0x63:
+                case 'c':
                     addstr(&execlist, "-D_LANGUAGE_C");
-                    if (oldcflag == 0) {
+                    if (!oldcflag) {
                         addstr(&execlist, "-D_CFE");
                     }
                     break;
-                case 0x70:
+
+                case 'p':
                     addstr(&execlist, "-DLANGUAGE_PASCAL");
                     addstr(&execlist, "-D_LANGUAGE_PASCAL");
                     addstr(&execlist, "-Q");
                     break;
-                case 0x46:
-                case 0x65:
-                case 0x66:
-                case 0x72:
+
+                case 'F':
+                case 'e':
+                case 'f':
+                case 'r':
                     addstr(&execlist, "-DLANGUAGE_FORTRAN");
                     addstr(&execlist, "-D_LANGUAGE_FORTRAN");
                     break;
-                case 0x73:
+
+                case 's':
                     addstr(&execlist, "-std0");
                     addstr(&execlist, "-DLANGUAGE_ASSEMBLY");
                     addstr(&execlist, "-D_LANGUAGE_ASSEMBLY");
                     break;
-                case 0x1:
+
+                case SUF_1:
                     addstr(&execlist, "-DLANGUAGE_PL1");
                     addstr(&execlist, "-D_LANGUAGE_PL1");
                     break;
-                case 0x2:
+
+                case SUF_2:
                     addstr(&execlist, "-DLANGUAGE_COBOL");
                     addstr(&execlist, "-D_LANGUAGE_COBOL");
                     break;
             }
             addstr(&execlist, "-D__unix");
-            if (sixty4bitflag != 0) {
+            if (sixty4bitflag) {
                 addstr(&execlist, "-D__64BIT");
             }
-            if (((ansichoice == 0) || (ansichoice == 3)) && (longlong_emitted == 0)) {
+            if (((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) && !longlong_emitted) {
                 addstr(&execlist, "-D_LONGLONG");
-                longlong_emitted = 1;
+                longlong_emitted = TRUE;
             }
             if (dmips_emit == 0) {
-                if (mips2flag != 0) {
-                    if ((call_shared != 0) || (default_call_shared != 0)) {
-                        old_non_shared = 1;
-                        non_shared = 1;
-                        default_call_shared = 0;
-                        call_shared = 0;
+                if (mips2flag) {
+                    if (call_shared || default_call_shared) {
+                        old_non_shared = TRUE;
+                        non_shared = TRUE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
                     }
                     addstr(&execlist, "-D__mips=2");
-                } else if (mips3flag != 0) {
+                } else if (mips3flag) {
                     addstr(&execlist, "-D__mips=3");
                 } else {
                     addstr(&execlist, "-D__mips=1");
                 }
             }
             dmips_emit = 1;
+
             addstr(&execlist, "-D__host_mips");
-            if (kpic_flag != 0) {
+            if (kpic_flag) {
                 addstr(&execlist, "-D_PIC");
             }
             addstr(&execlist, "-D__DSO__");
@@ -1996,10 +2339,10 @@ repeat_after_edit:
                 addstr(&execlist, "-D_SYSTYPE_SVR4");
             }
         }
-        if ((Eflag == 0) && (Pflag == 0)) {
-            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) ||
-                    (fiveflag != 0)) &&
-                (c_compiler_choice == 0)) {
+
+        if (!Eflag && !Pflag) {
+            if ((((include != NULL) && ((strcmp(comp_target_root, "/") != 0) || (systype != NULL))) || fiveflag) &&
+                (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 addstr(&execlist, "-I");
             }
             addlist(&execlist, &cppflags);
@@ -2007,7 +2350,7 @@ repeat_after_edit:
             if (cpp_stdflag != NULL) {
                 addstr(&execlist, cpp_stdflag);
             }
-            if (emptyIflag == 0) {
+            if (!emptyIflag) {
                 if ((abi_flag != 0) && (includeB != NULL)) {
                     addstr(&execlist, mkstr("-I", includeB, NULL));
                 }
@@ -2016,383 +2359,418 @@ repeat_after_edit:
                 }
             }
         }
-        if (((Pflag != 0) || (Eflag != 0)) && (c_compiler_choice == 0)) {
-            if ((ansichoice == 1) || (ansichoice == 2)) {
+
+        if ((Pflag || Eflag) && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
+            if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                 addstr(&execlist, "-std1");
-            } else if (ansichoice == 3) {
+            } else if (ansichoice == ANSICHOICE_XANSI) {
                 addstr(&execlist, "-std");
-            } else if (ansichoice == 0) {
+            } else if (ansichoice == ANSICHOICE_KR) {
                 addstr(&execlist, "-std0");
             }
         }
-        if ((compiler == 1) && (c_compiler_choice != 0)) {
-            if (vflag != 0) {
+
+        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
-            if (fullwarn != 0) {
+            if (fullwarn) {
                 addstr(&execlist, "-Yw");
             }
             if (srcfiles.length == 1) {
                 if (outfile != NULL) {
                     sp118 = outfile;
-                } else if (cflag == 0) {
+                } else if (!cflag) {
                     sp118 = "a.out";
                 } else {
-                    sp118 = mksuf(srcfiles.entries[i], 0x6F);
+                    sp118 = mksuf(srcfiles.entries[i], 'o');
                 }
             } else {
-                sp118 = mksuf(srcfiles.entries[i], 0x6F);
+                sp118 = mksuf(srcfiles.entries[i], 'o');
             }
             addstr(&execlist, mkstr("-YN", sp118, NULL));
-            if (c_compiler_choice == 2) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_2) {
 
-            } else if (c_compiler_choice == 3) {
+            } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == (char*)3) {
+            } else if (edison_type == EDISON_TYPE_3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
             }
             addstr(&execlist, passin);
         }
-        if (Pflag != 0) {
-            if ((compiler == 4) && (getsuf(srcfiles.entries[i]) == 0)) {
+
+        if (Pflag) {
+            if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
                 passout = mkstr(srcfiles.entries[i], ".i", NULL);
             } else {
-                passout = mksuf(srcfiles.entries[i], 0x69);
+                passout = mksuf(srcfiles.entries[i], 'i');
             }
-        } else if (Eflag != 0) {
+        } else if (Eflag) {
             passout = NULL;
         } else {
             passout = tempstr[2];
         }
         if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
             exit(2);
         }
-        if (oldcflag == 1) {
-            if (oldcppflag != 0) {
+
+        if (oldcflag == TRUE) {
+            if (oldcppflag) {
                 retcode = run(cpp, execlist.entries, NULL, passout, NULL);
             } else {
                 retcode = run(cpp, execlist.entries, NULL, passout, NULL);
             }
-        } else if (oldcppflag != 0) {
-            retcode = run(cpp, execlist.entries, NULL, passout, NULL);
         } else {
-            retcode = run(cfe, execlist.entries, NULL, passout, NULL);
+            if (oldcppflag) {
+                retcode = run(cpp, execlist.entries, NULL, passout, NULL);
+            } else {
+                retcode = run(cfe, execlist.entries, NULL, passout, NULL);
+            }
         }
 
         if (retcode != 0) {
-            runerror += 1;
-            if ((Eflag == 0) && ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
-                                    ((srcsuf == 0x73) && (mflag != 0)))) {
+            runerror++;
+            if (!Eflag && ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && mflag))) {
                 unlink(passin);
             }
             unlink(passout);
             continue;
         }
-        if ((Pflag != 0) || (Eflag != 0)) {
+
+        if (Pflag || Eflag) {
             continue;
         }
-        if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
-            ((srcsuf == 0x73) && (mflag != 0))) {
+
+        if ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && mflag)) {
             unlink(passin);
         }
         passin = passout;
         dmips_emit = 0;
+
         switch (srcsuf) { /* switch 17 */
-            case 0x1:
-                goto block_1388;
-            case 0x2: /* switch 17 */
-                goto block_1453;
-            case 0x63:
-                goto block_940;
-            case 0x70: /* switch 17 */
-                goto block_1341;
-            case 0x73: /* switch 17 */
-                goto block_2130;
-            case 0x46: /* switch 17 */
-            case 0x65: /* switch 17 */
-            case 0x66: /* switch 17 */
-            case 0x72: /* switch 17 */
-                goto block_1505;
+            case SUF_1:
+                goto phase_upl1;
+
+            case SUF_2: /* switch 17 */
+                goto phase_ucob;
+
+            case 'c': /* switch 17 */
+                goto phase_copt;
+
+            case 'p': /* switch 17 */
+                goto phase_upas;
+
+            case 's': /* switch 17 */
+                goto phase_as0;
+
+            case 'F': /* switch 17 */
+            case 'e': /* switch 17 */
+            case 'f': /* switch 17 */
+            case 'r': /* switch 17 */
+                goto phase_fopt;
         }
 
     block_922:
         cppchoice = sp114;
         relocate_passes("p", NULL, NULL);
-        if (c_compiler_choice == 0) {
-            if ((Pflag == 0) && (Eflag == 0)) {
-                if ((((srcsuf == 0x65) || (srcsuf == 0x72)) && (Kflag == 0)) ||
-                    ((srcsuf == 0x73) && (mflag != 0))) {
+
+        if (c_compiler_choice == C_COMPILER_CHOICE_0) {
+            if (!Pflag && !Eflag) {
+                if ((((srcsuf == 'e') || (srcsuf == 'r')) && !Kflag) || ((srcsuf == 's') && mflag)) {
                     unlink(passin);
                 }
                 passin = passout;
-            } else
+            } else {
                 continue;
-        }
-        dmips_emit = 0;
-        switch (srcsuf) { /* switch 18 */
-            case 0x1: /* switch 18 */
-                goto block_1388;
-            case 0x2: /* switch 18 */
-                goto block_1453;
-            case 0x6: /* switch 18 */
-            case 0x63: /* switch 18 */
-                goto block_940;
-            case 0x70: /* switch 18 */
-                goto block_1341;
-            case 0x73: /* switch 18 */
-                goto block_2130;
-            case 0x46: /* switch 18 */
-            case 0x65: /* switch 18 */
-            case 0x66: /* switch 18 */
-            case 0x72: /* switch 18 */
-                goto block_1505;
+            }
         }
 
-    block_940:
-        if (run_sopt != 0) {
+        dmips_emit = 0;
+
+        switch (srcsuf) { /* switch 18 */
+            case SUF_1:   /* switch 18 */
+                goto phase_upl1;
+
+            case SUF_2: /* switch 18 */
+                goto phase_ucob;
+
+            case SUF_6: /* switch 18 */
+            case 'c':   /* switch 18 */
+                goto phase_copt;
+
+            case 'p': /* switch 18 */
+                goto phase_upas;
+
+            case 's': /* switch 18 */
+                goto phase_as0;
+
+            case 'F': /* switch 18 */
+            case 'e': /* switch 18 */
+            case 'f': /* switch 18 */
+            case 'r': /* switch 18 */
+                goto phase_fopt;
+        }
+
+    phase_copt:
+        if (run_sopt) {
             if (cmp_flag & 1) {
-                error(2, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
-                goto skip_sopt;
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
+                goto phase_pca;
             }
+
             execlist.length = 0;
+
             addstr(&execlist, "copt");
-            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
+            if ((Oflag >= 2) && !set_loop_unroll) {
                 addstr(&optflags, "-loopunroll");
                 addstr(&optflags, "0");
             }
             addstr(&execlist, mkstr("-I=", passin, NULL));
-            if ((Hchar == 0x4B) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x4D);
+            if ((Hchar == 'K') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'M');
             } else {
                 passout = mkstr(tempstr[31], "M", NULL);
             }
             addstr(&execlist, mkstr("-CMP=", passout, NULL));
             addstr(&execlist, "-cp=i");
-            if (ansichoice == 0) {
+            if (ansichoice == ANSICHOICE_KR) {
                 addstr(&execlist, "-sy=k");
             }
             addlist(&execlist, &soptflags);
+
             if (run(copt, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+                runerror++;
+                if (docpp && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
-                if ((Hchar != 0x4B) || (Kflag != 0)) {
+                if ((Hchar != 'K') || Kflag) {
                     unlink(passout);
                 }
                 continue;
             }
-            if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
+
+            if (docpp && (srcsuf != 'i') && !Kflag) {
                 unlink(passin);
             }
             passin = passout;
-            if ((compchoice != 3) || (cmp_flag & 0x10000)) {
-                if (Hchar == 0x4B) {
+            if ((compchoice != COMP_CHOICE_3) || (cmp_flag & 0x10000)) {
+                if (Hchar == 'K') {
                     continue;
                 }
-                if ((Hchar == 0x4B) || (Kflag != 0)) {
-                    passout = mksuf(srcfiles.entries[i], 0x49);
+                if ((Hchar == 'K') || Kflag) {
+                    passout = mksuf(srcfiles.entries[i], 'I');
                 } else {
                     passout = mkstr(tempstr[31], "I", NULL);
                 }
-                if (vflag != 0) {
+                if (vflag) {
                     addstr(&execlist, "-v");
                 }
                 execlist.length = 0;
-                addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
+                addstr(&execlist, (((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3)) ? "cpp" : "acpp"));
                 addstr(&execlist, passin);
-                if (cppchoice != 2) {
-                    cppchoice = 1;
+                if (cppchoice != CPP_CHOICE_2) {
+                    cppchoice = CPP_CHOICE_1;
                 } else {
                     addstr(&execlist, "-l");
                 }
-                if (emptyIflag != 0) {
+                if (emptyIflag) {
                     addstr(&execlist, "-nostdinc");
                 }
                 addlist(&execlist, &cpp2flags);
+
                 relocate_passes("p", NULL, NULL);
+
                 if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
-                    runerror += 1;
-                    if (Kflag == 0) {
+                    runerror++;
+                    if (!Kflag) {
                         unlink(passin);
                     }
                     unlink(passout);
                     continue;
                 }
-                if (Kflag == 0) {
+
+                if (!Kflag) {
                     unlink(passin);
                 }
                 passin = passout;
-                goto block_1042;
             }
             goto block_1042;
         }
-    skip_sopt:
 
-        if ((Hchar == 0x4B) || (Kflag != 0)) {
-            cmp_flag |= 6;
-        }
-        if (cmp_flag & 1) {
-            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                addstr(&optflags, "-loopunroll");
-                addstr(&optflags, "0");
+    phase_pca:
+        {
+            if ((Hchar == 'K') || Kflag) {
+                cmp_flag |= 6;
             }
-            execlist.length = 0;
-            addstr(&execlist, "pca");
-            addstr(&execlist, mkstr("-I=", passin, NULL));
-            if (cmp_flag & 4) {
-                passout = mksuf(srcfiles.entries[i], 0x4D);
-            } else {
-                passout = mkstr(tempstr[31], "M", NULL);
-            }
-            addstr(&execlist, mkstr("-CMP=", passout, NULL));
-            if (cmp_flag & 2) {
-                sp110 = mksuf(srcfiles.entries[i], 0x4C);
-            } else {
-                sp110 = mkstr(tempstr[31], "L", NULL);
-            }
-            addstr(&execlist, mkstr("-L=", sp110, NULL));
-            addstr(&execlist, "-lo=ls");
-            addstr(&execlist, "-cp=i");
-            if (ansichoice == 0) {
-                addstr(&execlist, "-sy=k");
-            }
-            addlist(&execlist, &pcaflags);
-            if (run(pca, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                    unlink(passin);
+            if (cmp_flag & 1) {
+                if ((Oflag >= 2) && !set_loop_unroll) {
+                    addstr(&optflags, "-loopunroll");
+                    addstr(&optflags, "0");
                 }
-                if (!(cmp_flag & 4)) {
-                    unlink(passout);
-                }
-                continue;
-            }
-            if (!(cmp_flag & 2)) {
-                unlink(sp110);
-            }
-            if ((docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                unlink(passin);
-            }
-            passin = passout;
-            if (Hchar != 0x4B) {
+
                 execlist.length = 0;
-                addstr(&execlist, (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp");
-                if ((Hchar == 0x4B) || (Kflag != 0)) {
-                    passout = mksuf(srcfiles.entries[i], 0x49);
+                addstr(&execlist, "pca");
+                addstr(&execlist, mkstr("-I=", passin, NULL));
+                if (cmp_flag & 4) {
+                    passout = mksuf(srcfiles.entries[i], 'M');
                 } else {
-                    passout = mkstr(tempstr[31], "I", NULL);
+                    passout = mkstr(tempstr[31], "M", NULL);
                 }
-                if (vflag != 0) {
-                    addstr(&execlist, "-v");
-                }
-                addstr(&execlist, passin);
-                if (cppchoice != 2) {
-                    cppchoice = 1;
+                addstr(&execlist, mkstr("-CMP=", passout, NULL));
+                if (cmp_flag & 2) {
+                    sp110 = mksuf(srcfiles.entries[i], 'L');
                 } else {
-                    addstr(&execlist, "-l");
+                    sp110 = mkstr(tempstr[31], "L", NULL);
                 }
-                if (emptyIflag != 0) {
-                    addstr(&execlist, "-nostdinc");
+                addstr(&execlist, mkstr("-L=", sp110, NULL));
+                addstr(&execlist, "-lo=ls");
+                addstr(&execlist, "-cp=i");
+                if (ansichoice == ANSICHOICE_KR) {
+                    addstr(&execlist, "-sy=k");
                 }
-                addlist(&execlist, &cpp2flags);
-                addlist(&execlist, &undefineflags);
-                relocate_passes("p", NULL, NULL);
-                if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
-                    runerror += 1;
-                    if ((Kflag == 0) && !(cmp_flag & 4)) {
+                addlist(&execlist, &pcaflags);
+                if (run(pca, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    if (docpp && (srcsuf != 'i') && !Kflag) {
                         unlink(passin);
                     }
-                    unlink(passout);
+                    if (!(cmp_flag & 4)) {
+                        unlink(passout);
+                    }
                     continue;
                 }
-                if ((Kflag == 0) && !(cmp_flag & 4)) {
+                if (!(cmp_flag & 2)) {
+                    unlink(sp110);
+                }
+                if (docpp && (srcsuf != 'i') && !Kflag) {
                     unlink(passin);
                 }
                 passin = passout;
-            } else
-                continue;
+
+                if (Hchar != 'K') {
+                    execlist.length = 0;
+                    addstr(&execlist, ((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3) ? "cpp" : "acpp"));
+                    if ((Hchar == 'K') || Kflag) {
+                        passout = mksuf(srcfiles.entries[i], 'I');
+                    } else {
+                        passout = mkstr(tempstr[31], "I", NULL);
+                    }
+                    if (vflag) {
+                        addstr(&execlist, "-v");
+                    }
+                    addstr(&execlist, passin);
+                    if (cppchoice != CPP_CHOICE_2) {
+                        cppchoice = CPP_CHOICE_1;
+                    } else {
+                        addstr(&execlist, "-l");
+                    }
+                    if (emptyIflag) {
+                        addstr(&execlist, "-nostdinc");
+                    }
+                    addlist(&execlist, &cpp2flags);
+                    addlist(&execlist, &undefineflags);
+                    relocate_passes("p", NULL, NULL);
+                    if (run(cpp, execlist.entries, NULL, passout, NULL) != 0) {
+                        runerror++;
+                        if (!Kflag && !(cmp_flag & 4)) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        continue;
+                    }
+                    if (!Kflag && !(cmp_flag & 4)) {
+                        unlink(passin);
+                    }
+                    passin = passout;
+                } else
+                    continue;
+            }
         }
 
     block_1042:
         if (gflag >= 2) {
             func_00431D00(srcfiles.entries[i]);
         }
-        if ((compiler == 1) && (c_compiler_choice != 0)) {
-            if ((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) ||
-                (acpp != 0)) {
+
+        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+            if (!docpp || oldcppflag || run_sopt || (srcsuf == 'i') || acpp) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
             }
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
-            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                if (anachronisms != 0) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                if (anachronisms) {
                     addstr(&execlist, "-O");
                 }
-                if (cfront_compatible != 0) {
+                if (cfront_compatible) {
                     addstr(&execlist, "-b");
                 }
             }
-            if (nocode != 0) {
+            if (nocode) {
                 addstr(&execlist, "-n");
             }
-            if (Fflag == 0) {
+            if (!Fflag) {
                 addstr(&execlist, "-Zz");
                 addstr(&execlist, "-ZO");
                 addstr(&execlist, mkstr("-ZS", symtab, NULL));
             }
-            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 if (Oflag >= 3) {
                     addstr(&execlist, "-Qz");
                 }
-                if (non_shared != 0) {
+                if (non_shared) {
                     addstr(&execlist, "-Qn");
                 }
             }
-            if (signedcharflag != 0) {
+            if (signedcharflag) {
                 addstr(&execlist, "-s");
             } else {
                 addstr(&execlist, "-u");
             }
-            if (fullwarn != 0) {
+            if (fullwarn) {
                 addstr(&execlist, "-Yw");
             }
-            if (disable_inlines != 0) {
+            if (disable_inlines) {
                 addstr(&execlist, "-YJ");
             }
-            if (c_compiler_choice == 2) {
-            } else if (c_compiler_choice == 3) {
+            if (c_compiler_choice == C_COMPILER_CHOICE_2) {
+            } else if (c_compiler_choice == C_COMPILER_CHOICE_3) {
                 addstr(&execlist, "-YD");
-            } else if (edison_type == (char*)3) {
+            } else if (edison_type == EDISON_TYPE_3) {
                 addstr(&execlist, "-K");
             } else {
                 addstr(&execlist, "-m");
             }
 
-            if (srcsuf == 0x69) {
+            if (srcsuf == 'i') {
                 addstr(&execlist, "-Yp");
             }
-            if (smart_build != 0) {
+            if (smart_build) {
                 addstr(&execlist, mkstr("-YR", sbrepos, NULL));
             }
+
             if (srcfiles.length == 1) {
                 if (outfile != NULL) {
                     sp118 = outfile;
-                } else if (cflag == 0) {
+                } else if (!cflag) {
                     sp118 = "a.out";
                 } else {
-                    sp118 = mksuf(srcfiles.entries[i], 0x6F);
+                    sp118 = mksuf(srcfiles.entries[i], 'o');
                 }
             } else {
-                sp118 = mksuf(srcfiles.entries[i], 0x6F);
+                sp118 = mksuf(srcfiles.entries[i], 'o');
             }
+
             addstr(&execlist, mkstr("-YN", sp118, NULL));
-            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                 switch (default_template_instantiation_mode) {
                     case 0:
                         break;
@@ -2403,19 +2781,21 @@ repeat_after_edit:
                         addstr(&execlist, "-tall");
                         break;
                 }
-                if (no_prelink != 0) {
+
+                if (no_prelink) {
                     addstr(&execlist, "-T");
                 } else {
-                    if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                    if ((outfile != NULL) && cflag && (srcfiles.length == 1)) {
                         sp10C = outfile;
                     } else {
-                        sp10C = mksuf(srcfiles.entries[i], 0x6F);
+                        sp10C = mksuf(srcfiles.entries[i], 'o');
                     }
                     sp108 = make_ii_file_name(sp10C);
                     addstr(&execlist, mkstr("-YO", sp108, NULL));
                     free(sp108);
                 }
-                if (auto_template_include == 0) {
+
+                if (!auto_template_include) {
                     addstr(&execlist, "-B");
                 }
             }
@@ -2424,93 +2804,99 @@ repeat_after_edit:
             }
             addstr(&execlist, mkstr("-YG", Gnum, NULL));
             addlist(&execlist, &edisonflags);
-            if (dollar_sign != 0) {
+            if (dollar_sign) {
                 addstr(&execlist, "-$");
             }
-            if (Fflag != 0) {
+            if (Fflag) {
                 addstr(&execlist, mkstr("-", NULL));
             } else {
                 addstr(&execlist, passin);
             }
+
             var_s1 = 0;
         }
-        if (compchoice == 3) {
+
+        if (compchoice == COMP_CHOICE_3) {
             if (cmp_flag & 0x10000) {
-                if ((Hchar == 0x4D) || (Kflag != 0) || (cmp_flag & 4)) {
-                    passout = mksuf(srcfiles.entries[i], 0x50);
+                if ((Hchar == 'M') || Kflag || (cmp_flag & 4)) {
+                    passout = mksuf(srcfiles.entries[i], 'P');
                 } else {
                     passout = mkstr(tempstr[31], "P", NULL);
                 }
+
                 execlist.length = 0;
                 addstr(&execlist, mpc);
                 addstr(&execlist, passin);
                 addstr(&execlist, mkstr("-K", passout, NULL));
-                if ((ansichoice == 1) || (ansichoice == 2)) {
+                if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-ansi");
-                } else if (ansichoice == 0) {
+                } else if (ansichoice == ANSICHOICE_KR) {
                     addstr(&execlist, "-cckr");
                 } else {
                     addstr(&execlist, "-xansi");
                 }
                 addlist(&execlist, &mpcflags);
                 retcode = run(mpc, execlist.entries, NULL, NULL, errout);
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                 }
                 if (retcode != 0) {
-                    runerror += 1;
-                    if ((Hchar != 0x4D) && (Kflag == 0) && !(cmp_flag & 4)) {
+                    runerror++;
+                    if ((Hchar != 'M') && !Kflag && !(cmp_flag & 4)) {
                         unlink(passout);
                     }
                     continue;
                 }
-                if (Hchar == 0x4D) {
+
+                if (Hchar == 'M') {
                     continue;
                 }
+
                 passin = passout;
             }
-            if (((docpp == 0) || (oldcppflag != 0) || (run_sopt != 0) || (srcsuf == 0x69) ||
-                    (acpp != 0) || (cmp_flag & 0x10000)) &&
-                (c_compiler_choice == 0)) {
+
+            if ((!docpp || oldcppflag || run_sopt || (srcsuf == 'i') || acpp || (cmp_flag & 0x10000)) &&
+                (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                 execlist.length = 0;
                 addstr(&execlist, cfe);
                 addstr(&execlist, passin);
             }
-            if (Hchar == 0x66) {
-                if (ucodeflag != 0) {
+
+            if (Hchar == 'f') {
+                if (ucodeflag) {
                     passout = tempstr[3];
                 } else {
-                    passout = mksuf(srcfiles.entries[i], 0x42);
+                    passout = mksuf(srcfiles.entries[i], 'B');
                 }
-            } else if (((Fflag != 0) && (plusIflag == 0)) || (nocode != 0)) {
+            } else if ((Fflag && !plusIflag) || nocode) {
                 passout = NULL;
-            } else if (plusIflag != 0) {
-                passout = mksuf(srcfiles.entries[i], 7);
-            } else if (Kflag != 0) {
-                passout = mksuf(srcfiles.entries[i], 0x42);
+            } else if (plusIflag) {
+                passout = mksuf(srcfiles.entries[i], SUF_7);
+            } else if (Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'B');
             } else {
                 passout = tempstr[3];
             }
             if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                 exit(2);
             }
-            if (((docpp == 0) || (srcsuf == 0x69) || (acpp != 0) || (oldcppflag != 0)) &&
-                (run_sopt == 0)) {
-                if ((default_nocpp == 0) &&
-                    ((srcsuf == 0x63) || (srcsuf == 0x73) || (srcsuf == 0x70))) {
+
+            if ((!docpp || (srcsuf == 'i') || acpp || oldcppflag) && !run_sopt) {
+                if (!default_nocpp && ((srcsuf == 'c') || (srcsuf == 's') || (srcsuf == 'p'))) {
                     addstr(&execlist, "-nocpp");
                 }
-                if (srcsuf == i) {
+                if (srcsuf == i) { //! @bug typo for 'i'? So was this variable was actually called `i`?
                     addstr(&execlist, "-nocpp");
                 }
             }
-            if (c_compiler_choice == 0) {
-                if (vflag != 0) {
+
+            if (c_compiler_choice == C_COMPILER_CHOICE_0) {
+                if (vflag) {
                     addstr(&execlist, "-Xv");
                 }
-                if (compiler == 1) {
-                    if ((run_sopt == 0) && !(cmp_flag & 1)) {
+                if (compiler == COMPILER_1) {
+                    if (!run_sopt && !(cmp_flag & 1)) {
                         addstr(&execlist, "-D_CFE");
                         addstr(&execlist, "-Amachine(mips)");
                         addstr(&execlist, "-Asystem(unix)");
@@ -2520,14 +2906,14 @@ repeat_after_edit:
                     addstr(&execlist, "-G");
                     addstr(&execlist, Gnum);
                 }
-                if ((ansichoice == 1) || (ansichoice == 2)) {
+                if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                     addstr(&execlist, "-std1");
-                } else if (ansichoice == 3) {
+                } else if (ansichoice == ANSICHOICE_XANSI) {
                     addstr(&execlist, "-std");
-                } else if (ansichoice == 0) {
+                } else if (ansichoice == ANSICHOICE_KR) {
                     addstr(&execlist, "-std0");
                 }
-                if (prototype_checking_on != 0) {
+                if (prototype_checking_on) {
                     addstr(&execlist, "-Xprototypes");
                 }
                 addstr(&execlist, mkstr("-XS", symtab, NULL));
@@ -2536,1261 +2922,1035 @@ repeat_after_edit:
                     addstr(&execlist, mkstr("-Xcmd:", tempstr[33], NULL));
                 }
             }
-            if ((run_sopt != 0) || (cmp_flag & 1)) {
+
+            if (run_sopt || (cmp_flag & 1)) {
                 unlink(tempstr[2]);
             }
-            if (run_sopt != 0) {
+
+            if (run_sopt) {
                 addlist(&execlist, &undefineflags);
             }
-            retcode = run(cfe, execlist.entries, Fflag != 0 ? passin : NULL, passout, errout);
-            if ((smart_build != 0) && (retcode == 0xFA)) {
+            retcode = run(cfe, execlist.entries, (Fflag ? passin : NULL), passout, errout);
+            if (smart_build && (retcode == 0xFA)) {
                 retcode = 0;
-                nocompileneeded = 1;
-                if ((outfile != NULL) && (cflag != 0) && (srcfiles.length == 1)) {
+                nocompileneeded = TRUE;
+
+                if ((outfile != NULL) && cflag && (srcfiles.length == 1)) {
                     sp104 = outfile;
-                } else if ((srcsuf == 0x3F) && (Hchar != 0x62) && (Kflag == 0)) {
+                } else if ((srcsuf == '?') && (Hchar != 'b') && !Kflag) {
                     tmp_uldobj = sp104 = tempstr[12];
                 } else {
-                    sp104 = mksuf(srcfiles.entries[i], 0x6F);
+                    sp104 = mksuf(srcfiles.entries[i], 'o');
                 }
+
                 if (touch(sp118) < 0) {
-                    runerror += 1;
+                    runerror++;
                 }
-                if ((srcfiles.length == 1) && (cflag == 0)) {
-                    goto block_2588;
+
+                if ((srcfiles.length == 1) && !cflag) {
+                    goto phase_cord;
                 }
             }
-            if (Fflag != 0) {
+
+            if (Fflag) {
                 continue;
             }
+
             if (retcode == 0xFF) {
-                c_inline = 1;
+                c_inline = TRUE;
                 addstr(&umergeflags, "-c_inline");
             } else if (retcode != 0) {
-                runerror += 1;
-                if ((oldcflag == 1) && (docpp != 0) && (srcsuf != 0x69) &&
-                    (c_compiler_choice == 0)) {
+                runerror++;
+                if ((oldcflag == TRUE) && docpp && (srcsuf != 'i') && (c_compiler_choice == C_COMPILER_CHOICE_0)) {
                     unlink(passin);
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passout);
                     unlink(symtab);
                 }
                 continue;
             }
-            if (((run_sopt != 0) && (Kflag == 0)) || (acpp != 0) || (oldcppflag != 0) ||
-                (cmp_flag & 0x10000)) {
+
+            if ((run_sopt && !Kflag) || acpp || oldcppflag || (cmp_flag & 0x10000)) {
                 unlink(passin);
             }
-            if ((NoMoreOptions != 0) && (*passout == 0x2D)) {
+
+            if (NoMoreOptions && (*passout == '-')) {
                 passout = func_00433534(passout);
             }
             passin = passout;
-            if ((Hchar == 0x66) && (ucodeflag != 0)) {
+
+            if ((Hchar == 'f') && ucodeflag) {
                 execlist.length = 0;
                 addstr(&execlist, "btou");
                 addstr(&execlist, passin);
-                passout = mksuf(srcfiles.entries[i], 0x55);
+                passout = mksuf(srcfiles.entries[i], 'U');
                 if ((passout != NULL) && (regular_not_writeable(passout) == 1)) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
                 addstr(&execlist, passout);
                 if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                    runerror += 1;
-                    if (Kflag == 0) {
+                    runerror++;
+                    if (!Kflag) {
+                        unlink(passin);
+                        unlink(passout);
+                    }
+
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                } else if (!Kflag) {
+                    unlink(passin);
+                }
+                continue;
+            }
+            passin = passout;
+            if (Hchar == 'f') {
+                continue;
+            }
+            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
+                (Eflag || nocode || nocompileneeded)) {
+                unlink(passout);
+                continue;
+            }
+            goto phase_ujoin;
+        }
+
+    phase_ccom:
+        {
+            execlist.length = 0;
+            addstr(&execlist, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom");
+            if (vflag) {
+                addstr(&execlist, "-Xv");
+            }
+            if (cmp_flag & 0x10000) {
+                addstr(&execlist, "-XMP");
+            }
+            addlist(&execlist, &ccomflags);
+            if (dollar_sign) {
+                addstr(&execlist, "-Xdollar");
+            }
+            if (use_real_fp) {
+                addstr(&execlist, "-Xreal_fp");
+            }
+            if (prototype_checking_on || (ansichoice != ANSICHOICE_KR)) {
+                addstr(&execlist, "-Xprototypes");
+            }
+            if (ansichoice != ANSICHOICE_KR) {
+                if (ansichoice == ANSICHOICE_XANSI) {
+                    addstr(&execlist, "-Xxansi");
+                } else {
+                    addstr(&execlist, "-Xansi");
+                }
+                addlist(&execlist, &accomflags);
+            }
+
+            if (Hchar == 'f') {
+                if (ucodeflag) {
+                    passout = tempstr[3];
+                } else {
+                    passout = mksuf(srcfiles.entries[i], 'B');
+                }
+            } else if (Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'B');
+            } else {
+                passout = tempstr[3];
+            }
+            if (regular_not_writeable(passout) == 1) {
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                exit(2);
+            }
+
+            addstr(&execlist, mkstr("-XS", symtab, NULL));
+            if (!Kflag && docpp && (srcsuf != 'i')) {
+                var_s1 = passin;
+            } else {
+                addstr(&execlist, passin);
+                var_s1 = NULL;
+            }
+
+            retcode = run(ccom, execlist.entries, var_s1, passout, errout);
+            if (retcode == 0xFF) {
+                c_inline = TRUE;
+                addstr(&umergeflags, "-c_inline");
+            } else if (retcode != 0) {
+                if (editflag != EDIT_FLAG_0) {
+                    if (times_edited < edit_cnt_max) {
+                        times_edited++;
+                        if (edit_src(editor, srcfiles.entries[i], 1) != 0) {
+                            show_err(errout);
+                            exit(1);
+                        }
+                        if (docpp && (srcsuf != 'i')) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        unlink(errout);
+                        unlink(symtab);
+                        passin = srcfiles.entries[i];
+                        goto repeat_after_edit;
+                    }
+                    show_err(errout);
+                }
+                runerror++;
+
+                if (!Kflag && docpp && (srcsuf != 'i')) {
+                    unlink(passin);
+                }
+
+                if (!Kflag) {
+                    unlink(passout);
+                    unlink(symtab);
+                }
+                continue;
+            }
+
+            if (editflag != EDIT_FLAG_0) {
+                unlink(errout);
+            }
+
+            if (!Kflag && docpp && (srcsuf != 'i')) {
+                unlink(passin);
+            }
+            passin = passout;
+
+            if ((Hchar == 'f') && ucodeflag) {
+                execlist.length = 0;
+                addstr(&execlist, "btou");
+                addstr(&execlist, passin);
+                passout = mksuf(srcfiles.entries[i], 'U');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+                addstr(&execlist, passout);
+                if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    if (!Kflag) {
                         unlink(passin);
                         unlink(passout);
                     }
                     if (tmpst != 0) {
                         unlink(symtab);
                     }
-                } else if (Kflag == 0) {
+                } else if (!Kflag) {
                     unlink(passin);
                 }
                 continue;
             }
-            passin = passout;
-            if (Hchar == 0x66) {
+            if (Hchar == 'f') {
                 continue;
             }
-            if ((compiler == 1) && (c_compiler_choice != 0) &&
-                ((Eflag != 0) || (nocode != 0) || (nocompileneeded != 0))) {
-                unlink(passout);
+            if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) &&
+                (Eflag || nocode || nocompileneeded)) {
                 continue;
             }
-            goto block_1729;
+            goto phase_ujoin;
         }
-        execlist.length = 0;
-        addstr(&execlist, ansichoice != 0 ? "accom" : "ccom");
-        if (vflag != 0) {
-            addstr(&execlist, "-Xv");
-        }
-        if (cmp_flag & 0x10000) {
-            addstr(&execlist, "-XMP");
-        }
-        addlist(&execlist, &ccomflags);
-        if (dollar_sign != 0) {
-            addstr(&execlist, "-Xdollar");
-        }
-        if (use_real_fp != 0) {
-            addstr(&execlist, "-Xreal_fp");
-        }
-        if ((prototype_checking_on != 0) || (ansichoice != 0)) {
-            addstr(&execlist, "-Xprototypes");
-        }
-        if (ansichoice != 0) {
-            if (ansichoice == 3) {
-                addstr(&execlist, "-Xxansi");
-            } else {
-                addstr(&execlist, "-Xansi");
-            }
-            addlist(&execlist, &accomflags);
-        }
-        if (Hchar == 0x66) {
-            if (ucodeflag != 0) {
-                passout = tempstr[3];
-            } else {
-                passout = mksuf(srcfiles.entries[i], 0x42);
-            }
-        } else if (Kflag != 0) {
-            passout = mksuf(srcfiles.entries[i], 0x42);
-        } else {
-            passout = tempstr[3];
-        }
-        if (regular_not_writeable(passout) == 1) {
-            error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-            exit(2);
-        }
-        addstr(&execlist, mkstr("-XS", symtab, NULL));
-        if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-            var_s1 = passin;
-        } else {
-            addstr(&execlist, passin);
-            var_s1 = NULL;
-        }
-        retcode = run(ccom, execlist.entries, var_s1, passout, errout);
-        if (retcode == 0xFF) {
-            c_inline = 1;
-            addstr(&umergeflags, "-c_inline");
-        } else if (retcode != 0) {
-            if (editflag != 0) {
-                if (times_edited < edit_cnt_max) {
-                    times_edited += 1;
-                    if (edit_src(editor, srcfiles.entries[i], 1) != 0) {
-                        show_err(errout);
-                        exit(1);
-                    }
-                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                        unlink(passin);
-                    }
-                    unlink(passout);
-                    unlink(errout);
-                    unlink(symtab);
-                    passin = srcfiles.entries[i];
-                    goto repeat_after_edit;
-                }
-                show_err(errout);
-            }
-            runerror += 1;
-            if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                unlink(symtab);
-            }
-            continue;
-        }
-        if (editflag != 0) {
-            unlink(errout);
-        }
-        if ((Kflag == 0) && (docpp != 0) && (srcsuf != 0x69)) {
-            unlink(passin);
-        }
-        passin = passout;
-        if ((Hchar == 0x66) && (ucodeflag != 0)) {
+
+    phase_upas:
+        {
             execlist.length = 0;
-            addstr(&execlist, "btou");
-            addstr(&execlist, passin);
-            passout = mksuf(srcfiles.entries[i], 0x55);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    unlink(passin);
-                    unlink(passout);
-                }
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            } else if (Kflag == 0) {
-                unlink(passin);
-            }
-            continue;
-        }
-        if (Hchar == 0x66) {
-            continue;
-        }
-        if ((compiler == 1 && c_compiler_choice != 0) &&
-                    (Eflag != 0 || nocode != 0 || nocompileneeded != 0)) {
-            continue;
-        }
-        goto block_1729;
-
-    block_1341:
-        execlist.length = 0;
-        addstr(&execlist, "upas");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addstr(&execlist, "-G");
-        addstr(&execlist, Gnum);
-        addlist(&execlist, &upasflags);
-        addstr(&execlist, passin);
-        if (((Hchar == 0x66) && (ucodeflag == 0)) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 0x42);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                exit(2);
-            }
-        } else {
-            passout = tempstr[3];
-        }
-        addstr(&execlist, passout);
-        addstr(&execlist, "-t");
-        addstr(&execlist, symtab);
-        if (run(upas, execlist.entries, NULL, NULL, errout) != 0) {
-            if (editflag != 0) {
-                if (times_edited < edit_cnt_max) {
-                    times_edited += 1;
-                    if (edit_src(editor, srcfiles.entries[i], 2) != 0) {
-                        show_err(errout);
-                        exit(1);
-                    }
-                    if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                        unlink(passin);
-                    }
-                    unlink(passout);
-                    unlink(errout);
-                    unlink(symtab);
-                    passin = srcfiles.entries[i];
-                    goto repeat_after_edit;
-                }
-                show_err(errout);
-            }
-            runerror += 1;
-            if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                unlink(symtab);
-            }
-            continue;
-        }
-        if (editflag != 0) {
-            unlink(errout);
-        }
-        if ((stdflag == 0) && (docpp != 0) && (srcsuf != 0x69) && (Kflag == 0)) {
-            unlink(passin);
-        }
-        passin = passout;
-        if ((Hchar == 0x66) && (ucodeflag != 0)) {
-            execlist.length = 0;
-            addstr(&execlist, "btou");
-            addstr(&execlist, passin);
-            passout = mksuf(srcfiles.entries[i], 0x55);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    unlink(passin);
-                    unlink(passout);
-                }
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            } else if (Kflag == 0) {
-                unlink(passin);
-            }
-            continue;
-        }
-        if (Hchar == 0x66) {
-            continue;
-        }
-        goto block_1729;
-
-    block_1388:
-        execlist.length = 0;
-        addstr(&execlist, "pl1fe");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &upl1flags);
-        addstr(&execlist, passin);
-        if ((Hchar == 0x66) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 3);
-            lpi_st = mksuf(srcfiles.entries[i], 4);
-        } else {
-            passout = tempstr[16];
-            lpi_st = tempstr[17];
-        }
-        lpi_p1 = tempstr[18];
-        addstr(&execlist, "-o");
-        addstr(&execlist, passout);
-        addstr(&execlist, "-s");
-        addstr(&execlist, lpi_st);
-        addstr(&execlist, "-p");
-        addstr(&execlist, lpi_p1);
-        addstr(&execlist, "-e");
-        addstr(&execlist, pl1err);
-        if (run(upl1, execlist.entries, NULL, errout, NULL) != 0) {
-            if (editflag != 0) {
-                if (times_edited < edit_cnt_max) {
-                    times_edited += 1;
-                    if (edit_src(editor, srcfiles.entries[i], 5) != 0) {
-                        show_err(errout);
-                        exit(1);
-                    }
-                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                        unlink(passin);
-                    }
-                    unlink(passout);
-                    unlink(errout);
-                    unlink(lpi_st);
-                    unlink(lpi_p1);
-                    passin = srcfiles.entries[i];
-                    goto repeat_after_edit;
-                }
-                show_err(errout);
-            }
-            runerror += 1;
-            if ((docpp != 0) && (srcsuf != 0x69)) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                unlink(lpi_st);
-            }
-            unlink(lpi_p1);
-            continue;
-        }
-        if (editflag != 0) {
-            unlink(errout);
-        }
-        unlink(lpi_p1);
-        if ((docpp != 0) && (srcsuf != 0x69)) {
-            unlink(passin);
-        }
-        if (Hchar == 0x66) {
-            continue;
-        }
-        passin = passout;
-
-    block_1417:
-        execlist.length = 0;
-        addstr(&execlist, "ulpi");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &ulpiflags);
-        addstr(&execlist, passin);
-        if (((Hchar == 0x6B) && (ucodeflag == 0)) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 0x42);
-        } else {
-            passout = tempstr[3];
-        }
-        if ((srcsuf == 3) || (Kflag != 0)) {
-            lpi_st = mksuf(srcfiles.entries[i], 4);
-        } else {
-            lpi_st = tempstr[17];
-        }
-        addstr(&execlist, "-s");
-        addstr(&execlist, lpi_st);
-        addstr(&execlist, "-o");
-        addstr(&execlist, passout);
-        addstr(&execlist, "-t");
-        addstr(&execlist, symtab);
-        if (run(ulpi, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (srcsuf != 3) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                if (srcsuf != 3) {
-                    unlink(lpi_st);
-                }
-            }
-            if (tmpst != 0) {
-                unlink(symtab);
-            }
-            continue;
-        }
-        if ((srcsuf != 3) && (Kflag == 0)) {
-            unlink(passin);
-        }
-        if ((Kflag == 0) && (srcsuf != 3)) {
-            unlink(lpi_st);
-        }
-        passin = passout;
-        if ((Hchar == 0x6B) && (ucodeflag != 0)) {
-            execlist.length = 0;
-            addstr(&execlist, "btou");
-            addstr(&execlist, passin);
-            passout = mksuf(srcfiles.entries[i], 0x55);
-            addstr(&execlist, passout);
-            if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    unlink(passin);
-                    unlink(passout);
-                }
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            } else if (Kflag == 0) {
-                unlink(passin);
-            }
-            continue;
-        }
-        if (Hchar == 0x6B) {
-            continue;
-        }
-        goto block_1729;
-
-    block_1453:
-        execlist.length = 0;
-        addstr(&execlist, "cobfe");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &ucobflags);
-        addstr(&execlist, passin);
-        if ((Hchar == 0x66) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 3);
-            lpi_st = mksuf(srcfiles.entries[i], 4);
-        } else {
-            passout = tempstr[16];
-            lpi_st = tempstr[17];
-        }
-        lpi_p1 = tempstr[18];
-        lpi_pd = tempstr[20];
-        lpi_dd = tempstr[19];
-        addstr(&execlist, "-o");
-        addstr(&execlist, passout);
-        addstr(&execlist, "-s");
-        addstr(&execlist, lpi_st);
-        addstr(&execlist, "-p");
-        addstr(&execlist, lpi_p1);
-        addstr(&execlist, "-pd");
-        addstr(&execlist, lpi_pd);
-        addstr(&execlist, "-dd");
-        addstr(&execlist, lpi_dd);
-        addstr(&execlist, "-e");
-        addstr(&execlist, pl1err);
-        if (run(ucob, execlist.entries, NULL, errout, NULL) != 0) {
-            if (editflag != 0) {
-                if (times_edited < edit_cnt_max) {
-                    times_edited += 1;
-                    if (edit_src(editor, srcfiles.entries[i], 6) != 0) {
-                        show_err(errout);
-                        exit(1);
-                    }
-                    if ((docpp != 0) && (srcsuf != 0x69)) {
-                        unlink(passin);
-                    }
-                    unlink(passout);
-                    unlink(errout);
-                    unlink(lpi_st);
-                    unlink(lpi_p1);
-                    unlink(lpi_pd);
-                    unlink(lpi_dd);
-                    passin = srcfiles.entries[i];
-                    goto repeat_after_edit;
-                }
-                show_err(errout);
-            }
-            runerror += 1;
-            if ((docpp != 0) && (srcsuf != 0x69)) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                unlink(lpi_st);
-            }
-            unlink(lpi_p1);
-            unlink(lpi_pd);
-            unlink(lpi_dd);
-            continue;
-        }
-        if (editflag != 0) {
-            unlink(errout);
-        }
-        if ((docpp != 0) && (srcsuf != 0x69)) {
-            unlink(passin);
-        }
-        unlink(lpi_p1);
-        unlink(lpi_pd);
-        unlink(lpi_dd);
-        if (Hchar == 0x66) {
-            continue;
-        }
-        passin = passout;
-        goto block_1417;
-
-    block_A:
-        if (mflag != 0) {
-            execlist.length = 0;
-            addstr(&execlist, "m4");
-            addstr(&execlist, passin);
-            if ((compiler == 4) || (srcsuf == 0x73)) {
-                passout = tempstr[14];
-            } else {
-                passout = mksuf(srcfiles.entries[i], 0x70);
-            }
-            if (run(m4, execlist.entries, NULL, passout, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    unlink(passout);
-                }
-                continue;
-            }
-            passin = passout;
-        }
-
-        switch (srcsuf) {
-            case 0x73:
-                if (docpp == 0) {
-                    if (default_nocpp != 0) {
-                        goto block_531;
-                    }
-                    goto block_2130;
-                }
-                goto block_531;
-            case 0x65:
-            default:
-                error(1, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
-                exit(2);
-            case 0x72:
-                execlist.length = 0;
-                addstr(&execlist, "ratfor");
-                addlist(&execlist, &ratforflags);
-                addstr(&execlist, passin);
-                passout = mksuf(srcfiles.entries[i], 0x66);
-                if (run(ratfor, execlist.entries, NULL, passout, NULL) != 0) {
-                    runerror += 1;
-                    if (Kflag == 0) {}
-                    continue;
-                }
-                if (mflag != 0) {
-                    unlink(passin);
-                }
-                passin = passout;
-                if (Fflag != 0) {
-                    continue;
-                }
-                if (docpp != 0) {
-                    goto block_531;
-                }
-        }
-
-    block_1505:
-        sp100 = 0;
-        spFC = 0;
-        spF0[0] = 0x31;
-        spF0[1] = 0;
-        if (run_sopt != 0) {
-            if (mp_flag & 1) {
-                error(2, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
-                goto skip_sopt2;
-            }
-            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                addstr(&optflags, "-loopunroll");
-                addstr(&optflags, "0");
-            }
-            if ((mp_i2flag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
-            }
-            if ((mp_66flag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
-            }
-            if ((mp_uflag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
-            }
-            if ((mp_backslashflag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
-            }
-            if (mp_caseflag != 0) {
-                error(1, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
-                exit(2);
-            }
-            execlist.length = 0;
-            addstr(&execlist, "fopt");
-            spF4 = mkstr(tempstr[31], "l", NULL);
-            addstr(&execlist, mkstr("-L=", spF4, NULL));
-            if ((Hchar == 0x4B) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x6D);
-            } else {
-                passout = mkstr(tempstr[31], "m", &spF0, NULL);
-            }
-            addstr(&execlist, mkstr("-F=", passout, NULL));
-            addstr(&execlist, mkstr("-I=", passin, NULL));
-            if (mp_col120flag != 0) {
-                addstr(&execlist, "-scan=120");
-            }
-            if (mp_extendflag != 0) {
-                addstr(&execlist, "-scan=132");
-            }
-            if (automaticflag == 0) {
-                addstr(&execlist, "-save=all");
-            }
-            if (mp_onetripflag != 0) {
-                addstr(&execlist, "-onetrip");
-            }
-            if (mp_dlinesflag != 0) {
-                addstr(&execlist, "-dlines");
-            }
-            if (w1flag == 2) {
-                addstr(&execlist, "-suppress=w");
-            }
-            if (vflag != 0) {
-                addstr(&execlist, "-lo=lno");
-            }
-            if (irix4 != 0) {
-                addstr(&execlist,
-                        mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
-            } else {
-                addstr(&execlist,
-                        mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
-            }
-            //! @bug addstr called with extra argument
-            addstr(&execlist, "-include=/usr/include", 0);
-            addstr(&execlist, "-cp=i");
-            addlist(&execlist, &soptflags);
-            if (run(fopt, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) &&
-                    (Kflag == 0)) {
-                    unlink(passin);
-                }
-                if ((Hchar != 0x4B) || (Kflag != 0)) {
-                    unlink(passout);
-                }
-                unlink(spF4);
-                continue;
-            }
-            if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) &&
-                (srcsuf != 0x69) && (Kflag == 0)) {
-                unlink(passin);
-            }
-            unlink(spF4);
-            passin = passout;
-            if (Hchar == 0x4B) {
-                continue;
-            }
-            goto block_1660;
-        }
-    skip_sopt2:
-
-        if ((Hchar == 0x4B) || (Kflag != 0)) {
-            mp_flag |= 6;
-        }
-        if (mp_flag & 1) {
-            if ((Oflag >= 2) && (set_loop_unroll == 0)) {
-                addstr(&optflags, "-loopunroll");
-                addstr(&optflags, "0");
-            }
-            if ((mp_i2flag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
-            }
-            if ((mp_66flag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
-            }
-            if ((mp_uflag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
-            }
-            if ((mp_backslashflag != 0) && (w1flag != 2)) {
-                error(2, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
-            }
-            if (mp_caseflag != 0) {
-                error(1, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
-                exit(2);
-            }
-        loop_1587:
-            execlist.length = 0;
-            addstr(&execlist, "pfa");
-            spF0[0] = spFC + 0x31;
-            if (mp_flag & 2) {
-                spF8 = mksuf(srcfiles.entries[i], 0x6C);
-                if (mp_prepass_count > spFC) {
-                    spF8 = mkstr(spF8, spF0, NULL);
-                }
-            } else {
-                spF8 = mkstr(tempstr[31], "l", spF0, NULL);
-            }
-            addstr(&execlist, mkstr("-L=", spF8, NULL));
-            if (mp_flag & 4) {
-                passout = mksuf(srcfiles.entries[i], 0x6D);
-                if (mp_prepass_count > spFC) {
-                    passout = mkstr(passout, spF0, NULL);
-                }
-            } else {
-                passout = mkstr(tempstr[31], "m", spF0, NULL);
-            }
-            addstr(&execlist, mkstr("-F=", passout, NULL));
-            addstr(&execlist, mkstr("-I=", passin, NULL));
-            if (mp_col120flag != 0) {
-                addstr(&execlist, "-scan=120");
-            }
-            if (mp_extendflag != 0) {
-                addstr(&execlist, "-scan=132");
-            }
-            if (automaticflag == 0) {
-                addstr(&execlist, "-save=all");
-            }
-            if (mp_onetripflag != 0) {
-                addstr(&execlist, "-onetrip");
-            }
-            if (mp_dlinesflag != 0) {
-                addstr(&execlist, "-dlines");
-            }
-            if (w1flag == 2) {
-                addstr(&execlist, "-suppress=w");
-            }
-            if (vflag != 0) {
-                addstr(&execlist, "-lo=lno");
-            } else {
-                addstr(&execlist, "-lo=lo");
-            }
-            if (mp_flag & 2) {
-                addstr(&execlist, mkstr("-analysis=", mksuf(srcfiles.entries[i], 5), NULL));
-            } else if (irix4 == 0) {
-                addstr(&execlist, "-noanalysis");
-            }
-            if (irix4 != 0) {
-                addstr(&execlist,
-                        mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
-            } else {
-                addstr(&execlist,
-                        mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
-            }
-            //! @bug addstr called with extra argument
-            addstr(&execlist, "-include=/usr/include", 0);
-            addstr(&execlist, "-cp=i");
-            if (mp_prepass_count <= spFC) {
-                addlist(&execlist, &pfaflags);
-            } else {
-                addstr(&execlist, "-p=1");
-                addstr(&execlist, "-ur=1");
-
-                sp100++;
-                while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
-                    sp100++;
-                    if (argv[sp100] == NULL) {
-                        error(1, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
-                        exit(2);
-                    }
-                }
-
-                spE8 = argv[sp100] + strlen("-pfaprepass");
-                for (;;) {
-                    spEC = spE8 + 1;
-                    if (*spEC == 0) {
-                        error(1, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
-                        exit(2);
-                    }
-                    spE8 = spEC + 1;
-                    while (*spE8 != ',' && *spE8 != '\0')
-                        spE8++;
-                    spE7 = spE8[0];
-                    spE8[0] = 0;
-                    addstr(&execlist, mkstr(spEC, NULL));
-                    if (spE7 == 0)
-                        break;
-                    spE8[0] = spE7;
-                }
-            }
-            if (run(pfa, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) && (srcsuf != 0x69) &&
-                    (Kflag == 0)) {
-                    unlink(passin);
-                }
-                if (!(mp_flag & 4)) {
-                    unlink(passout);
-                }
-                continue;
-            }
-            if (!(mp_flag & 2)) {
-                unlink(spF8);
-            }
-            if (spFC == 0) {
-                if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72) || (srcsuf == 0x46)) &&
-                    (srcsuf != 0x69) && (Kflag == 0)) {
-                    unlink(passin);
-                }
-            } else if (!(mp_flag & 4)) {
-                unlink(passin);
-            }
-            spFC++;
-            if (mp_prepass_count >= spFC) {
-                passin = passout;
-                goto loop_1587;
-            }
-            passin = passout;
-            if (Hchar == 0x4B) {
-                continue;
-            }
-        }
-
-    block_1660:
-        execlist.length = 0;
-        addstr(&execlist, "fcom");
-        if (alignarg != NULL) {
-            addstr(&execlist, alignarg);
-        }
-        if (align_common > 0) {
-            addstr(&execlist, "-align_common");
-        }
-        if (mp_flag & 0x10000) {
-            addstr(&execlist, "-MP");
-        }
-        if (showdirt_flag != 0) {
-            addstr(&execlist, "-showdirt");
-        }
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &fcomflags);
-        if (nocode == 0) {
-            addstr(&execlist, mkstr("-XS", symtab, NULL));
-        }
-        var_s2 = NULL;
-        if (nocode != 0) {
-            addstr(&execlist, "-nocode");
-            passout = NULL;
-        } else if (Hchar == 0x66) {
-            passout = mksuf(srcfiles.entries[i], 0x42);
-            if (ucodeflag != 0) {
-                addstr(&execlist, "-Xu");
-                var_s2 = mksuf(srcfiles.entries[i], 0x55);
-            }
-        } else if (Kflag != 0) {
-            passout = mksuf(srcfiles.entries[i], 0x42);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
-                exit(2);
-            }
-        } else {
-            passout = tempstr[3];
-        }
-        if (passout != NULL) {
-            addstr(&execlist, "-t");
-            addstr(&execlist, passout);
-        }
-        if ((docpp != 0) && (srcsuf != 0x69) && (srcsuf != 0x6D)) {
-            var_s1 = passin;
-        } else {
-            addstr(&execlist, passin);
-            var_s1 = NULL;
-        }
-        if (run(fcom, execlist.entries, var_s1, var_s2, errout) != 0) {
-            if (editflag != 0) {
-                if (times_edited < edit_cnt_max) {
-                    times_edited += 1;
-                    if (edit_src(editor, srcfiles.entries[i], 3) != 0) {
-                        show_err(errout);
-                        exit(1);
-                    }
-                    if (((docpp != 0) || (srcsuf == 0x65) || (srcsuf == 0x72)) &&
-                        (srcsuf != 0x69) && (srcsuf != 0x66)) {
-                        unlink(passin);
-                    }
-                    unlink(passout);
-                    unlink(errout);
-                    unlink(symtab);
-                    passin = srcfiles.entries[i];
-                    goto repeat_after_edit;
-                }
-                show_err(errout);
-            }
-            runerror += 1;
-            if (((docpp != 0) || (mp_flag & 1) || (srcsuf == 0x65) || (srcsuf == 0x72)) &&
-                (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
-                unlink(passin);
-            }
-            if (Kflag == 0) {
-                unlink(passout);
-                unlink(symtab);
-            }
-            continue;
-        }
-        if (editflag != 0) {
-            unlink(errout);
-        }
-        if (nocode != 0) {
-            if (docpp != 0) {
-                unlink(passin);
-            }
-            continue;
-        }
-        if (((docpp != 0) || (mp_flag & 1) || (run_sopt != 0) || (srcsuf == 0x65) ||
-                (srcsuf == 0x72) || (srcsuf == 0x46)) &&
-            (srcsuf != 0x69) && (srcsuf != 0x6D) && (Kflag == 0) && !(mp_flag & 4)) {
-            unlink(passin);
-        }
-        passin = passout;
-        if (Hchar == 0x66) {
-            continue;
-        }
-
-    block_1729:
-        if ((Oflag != 3) && (Oflag != 4) && (jflag == 0)) {
-            if (c_inline == 0) {
-                goto block_1933;
-            } else {
-                goto block_1913;
-            }
-        }
-        execlist.length = 0;
-        addstr(&execlist, "ujoin");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &ujoinflags);
-        if ((outfile != NULL) && (jflag != 0) && (srcfiles.length == 1)) {
-            passout = outfile;
-        } else {
-            passout = mksuf(srcfiles.entries[i], 0x75);
-        }
-        addstr(&execlist, "-o");
-        addstr(&execlist, passout);
-        addstr(&execlist, passin);
-        addstr(&execlist, symtab);
-        if (run(ujoin, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                if (srcsuf != 0x42) {
-                    unlink(passin);
-                }
-                unlink(passout);
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            }
-            continue;
-        }
-        if ((cflag == 0) || (Oflag == 3) || (Oflag == 4)) {
-            if (Kflag == 0) {
-                if (srcsuf != 0x42) {
-                    unlink(passin);
-                }
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            }
-            passin = passout;
-            continue;
-        }
-        goto block_1933;
-
-    c8d8:
-        if ((non_shared != 0) && (non_shared_emitted == 0)) {
-            addstr(&ldflags, "-non_shared");
-            non_shared_emitted = 1;
-        }
-
-        execlist.length = 0;
-        addstr(&execlist, "uld");
-        if ((mips2flag != 0) && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
-                                            currcomp, "nonshared", NULL));
-                } else {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
-                                            currcomp, "", NULL));
-                }
-            } else if (non_shared != 0) {
-                addstr(&execlist,
-                        mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-            } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-            }
-        }
-        if ((mips1flag != 0) && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
-                                            currcomp, "nonshared", NULL));
-                } else {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
-                                            currcomp, "", NULL));
-                }
-            } else if (non_shared != 0) {
-                addstr(&execlist,
-                        mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-            } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-            }
-        }
-        if (((fiveflag != 0) || (strcmp("/", comp_target_root) != 0)) && (Lflag == 0) &&
-            (strcmp("/", comp_target_root) != 0)) {
-            if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", comp_target_root, runlib,
-                                        "usr/lib/nonshared/", currcomp, NULL));
-            } else {
-                addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/",
-                                        currcomp, NULL));
-            }
-        }
-        if (svr4_systype != 0) {
-            if (compchoice == 1) {
-                addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
-            }
-            addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-            if (call_shared != 0) {
-                addstr(&execlist, "-require_dynamic_link");
-                addstr(&execlist, "_rld_new_interface");
-            }
-        }
-        if ((allBstring != NULL) && (*allBstring != 0)) {
-            addstr(&execlist, mkstr("-kB", allBstring, NULL));
-        }
-        addlist(&execlist, &uldflags);
-        addlist(&execlist, &ldflags);
-        if (irix4 != 0) {
-            addstr(&execlist, mkstr("-L", NULL));
-            if (non_shared != 0) {
-                addstr(&execlist,
-                        mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
-            } else {
-                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
-            }
-        }
-        if (cflag == 0) {
-            addstr(&execlist, crtx);
-        } else {
-            addstr(&execlist, "-no_AutoGnum");
-            if (force_rm_dead_code == 0) {
-                addstr(&execlist, "-preserve_dead_code");
-            }
-        }
-        adduldlist(&execlist, &ufiles, &objfiles);
-        if (cflag == 0) {
-            addlist(&execlist, &uldlibflags);
-            if ((compiler == 2) || (haspascal != 0)) {
-                addspacedstr(&execlist, newstr(libp));
-                addspacedstr(&execlist, newstr(libxmalloc));
-                addspacedstr(&execlist, newstr(libexc));
-                addspacedstr(&execlist, newstr(libmld));
-                if (((default_call_shared != 0) || (call_shared != 0)) &&
-                    (systype != NULL) && (strcmp(systype, "svr3") == 0)) {
-                    addspacedstr(&execlist, "-lbsd");
-                }
-            }
-            if ((compiler == 3) || (hasfortran != 0)) {
-                if (mp_flag != 0) {
-                    addstr(&execlist, libI77_mp);
-                }
-                if ((non_shared != 0) || (irix4 != 0)) {
-                    addspacedstr(&execlist, newstr(libF77));
-                } else {
-                    addspacedstr(&execlist, libftn);
-                }
-                if ((non_shared != 0) || (irix4 != 0)) {
-                    addspacedstr(&execlist, newstr(libI77));
-                }
-                if ((non_shared != 0) || (irix4 != 0)) {
-                    addspacedstr(&execlist, newstr(libU77));
-                }
-                if ((non_shared != 0) || (irix4 != 0)) {
-                    addspacedstr(&execlist, newstr(libisam));
-                }
-            }
-            if (compiler == 5) {
-                addstr(&execlist, libpl1);
-                addstr(&execlist, libxmalloc);
-                addstr(&execlist, "-ltermcap");
-                addstr(&execlist, libexc);
-                addstr(&execlist, libmld);
-            }
-            if (((compiler == 2) || (compiler == 3) || (haspascal != 0) ||
-                    (hasfortran != 0) || (haspl1 != 0) || (compiler == 5) ||
-                    (compiler == 6)) &&
-                (nonshared != 0)) {
-                addspacedstr(&execlist, newstr(libm));
-            }
-            if (pgflag != 0) {
-                addspacedstr(&execlist, newstr(libgprof));
-            } else if (pflag != 0) {
-                addspacedstr(&execlist, newstr(libprof));
-            }
-            if (cmp_flag & 0x10000) {
-                addstr(&execlist, libc_mp);
-                if (compiler == 1) {
-                    addstr(&execlist, "-lkapio");
-                }
-            }
-            if ((run_sopt != 0) && (compiler == 1)) {
-                addstr(&execlist, "-lkapio");
-            }
-            if (compiler == 3) {
-                if (D_1000C130 == 2) {
-                    addstr(&execlist, "-lc_s");
-                    if (xpg_flag != 0) {
-                        addstr(&execlist, "-dont_warn_unused");
-                        addstr(&execlist, "-lgen");
-                        addstr(&execlist, "-warn_unused");
-                    }
-                    addstr(&execlist, "-lc");
-                } else {
-                    if ((irix4 != 0) && (B_1000ED74 == 0)) {
-                        addstr(&execlist, "-lmpc");
-                    }
-                    if (B_1000ED2C != 0) {
-                        addstr(&execlist, "-lc_s");
-                    } else if (B_1000ED30 != 0) {
-                        addstr(&execlist, "-lc_s");
-                    }
-                }
-            } else if (B_1000ED2C != 0) {
-                addstr(&execlist, "-lc_s");
-            }
-            if (sixty4bitflag == 0) {
-                ldw_file = fopen(libdw_path, "r");
-                if (ldw_file != NULL) {
-                    addspacedstr(&execlist, newstr(libdw));
-                }
-            }
-            if (xpg_flag != 0) {
-                addstr(&execlist, "-dont_warn_unused");
-                addstr(&execlist, "-lgen");
-                addstr(&execlist, "-warn_unused");
-            }
-            addstr(&execlist, "-lc");
-            if (libm_spec != 0) {
-                addstr(&execlist, "-lm");
-            }
-            if (libfastm_spec != 0) {
-                addstr(&execlist, "-lfastm");
-            }
-        }
-        if ((cflag == 0) && (crtn_required != 0)) {
-            addstr(&execlist, crtn);
-        }
-        if (rls_id_object != NULL) {
-            addstr(&execlist, rls_id_object);
-        }
-        addstr(&execlist, "-ko");
-        if (uoutfile != NULL) {
-            passout = uoutfile;
-        } else if ((Hchar == 0x75) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 0x75);
-        } else {
-            passout = tempstr[4];
-        }
-        addstr(&execlist, passout);
-        if (run(uld, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                unlink(passout);
-            }
-            continue;
-        }
-        passin = passout;
-        if ((ufiles.length == 1) && (srcfiles.length == 2) &&
-            ((Oflag == 3) || (Oflag == 4))) {
-            unlink(*ufiles.entries);
-        }
-        if (Hchar == 0x75) {
-            continue;
-        }
-
-    block_1896:
-        execlist.length = 0;
-        addstr(&execlist, "usplit");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addlist(&execlist, &usplitflags);
-        if ((Hchar == 0x73) || (Kflag != 0)) {
-            passout = mksuf(srcfiles.entries[i], 0x53);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n", passout);
-                exit(2);
-            }
-        } else {
-            passout = tempstr[5];
-        }
-        addstr(&execlist, "-o");
-        addstr(&execlist, passout);
-        addstr(&execlist, "-t");
-        addstr(&execlist, symtab);
-        addstr(&execlist, passin);
-        if (run(usplit, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                unlink(passin);
-                unlink(passout);
-            }
-            if (tmpst != 0) {
-                unlink(symtab);
-            }
-            continue;
-        }
-        if ((Kflag == 0) && (srcsuf != 0x75) && (uoutfile == NULL)) {
-            unlink(passin);
-        }
-        passin = passout;
-        if (Hchar == 0x73) {
-            continue;
-        }
-
-    block_1913:
-        if ((Oflag == 3) || (Oflag == 4) || (c_inline != 0)) {
-            execlist.length = 0;
-            addstr(&execlist, "umerge");
-            if (vflag != 0) {
+            addstr(&execlist, "upas");
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
-            addlist(&execlist, &umergeflags);
+            addstr(&execlist, "-G");
+            addstr(&execlist, Gnum);
+            addlist(&execlist, &upasflags);
             addstr(&execlist, passin);
-            addstr(&execlist, "-o");
-            if ((Hchar == 0x6D) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x4D);
+            if (((Hchar == 'f') && !ucodeflag) || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'B');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected file %s \n",
-                            passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
-                passout = tempstr[6];
+                passout = tempstr[3];
             }
             addstr(&execlist, passout);
             addstr(&execlist, "-t");
             addstr(&execlist, symtab);
-            if (run(umerge, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    if (srcsuf != 0x53) {
+            if (run(upas, execlist.entries, NULL, NULL, errout) != 0) {
+                if (editflag != EDIT_FLAG_0) {
+                    if (times_edited < edit_cnt_max) {
+                        times_edited++;
+                        if (edit_src(editor, srcfiles.entries[i], 2) != 0) {
+                            show_err(errout);
+                            exit(1);
+                        }
+                        if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        unlink(errout);
+                        unlink(symtab);
+                        passin = srcfiles.entries[i];
+                        goto repeat_after_edit;
+                    }
+                    show_err(errout);
+                }
+                runerror++;
+
+                if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
+                    unlink(passin);
+                }
+
+                if (!Kflag) {
+                    unlink(passout);
+                    unlink(symtab);
+                }
+                continue;
+            }
+
+            if (editflag != EDIT_FLAG_0) {
+                unlink(errout);
+            }
+
+            if ((stdflag == 0) && docpp && (srcsuf != 'i') && !Kflag) {
+                unlink(passin);
+            }
+            passin = passout;
+
+            if ((Hchar == 'f') && ucodeflag) {
+                execlist.length = 0;
+                addstr(&execlist, "btou");
+                addstr(&execlist, passin);
+                passout = mksuf(srcfiles.entries[i], 'U');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+                addstr(&execlist, passout);
+                if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    if (!Kflag) {
+                        unlink(passin);
+                        unlink(passout);
+                    }
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                } else if (!Kflag) {
+                    unlink(passin);
+                }
+                continue;
+            }
+            if (Hchar == 'f') {
+                continue;
+            }
+
+            goto phase_ujoin;
+        }
+
+    phase_upl1:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "pl1fe");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &upl1flags);
+            addstr(&execlist, passin);
+
+            if ((Hchar == 'f') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], SUF_3);
+                lpi_st = mksuf(srcfiles.entries[i], SUF_4);
+            } else {
+                passout = tempstr[16];
+                lpi_st = tempstr[17];
+            }
+            lpi_p1 = tempstr[18];
+
+            addstr(&execlist, "-o");
+            addstr(&execlist, passout);
+            addstr(&execlist, "-s");
+            addstr(&execlist, lpi_st);
+            addstr(&execlist, "-p");
+            addstr(&execlist, lpi_p1);
+            addstr(&execlist, "-e");
+            addstr(&execlist, pl1err);
+            if (run(upl1, execlist.entries, NULL, errout, NULL) != 0) {
+                if (editflag != EDIT_FLAG_0) {
+                    if (times_edited < edit_cnt_max) {
+                        times_edited++;
+                        if (edit_src(editor, srcfiles.entries[i], 5) != 0) {
+                            show_err(errout);
+                            exit(1);
+                        }
+                        if (docpp && (srcsuf != 'i')) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        unlink(errout);
+                        unlink(lpi_st);
+                        unlink(lpi_p1);
+                        passin = srcfiles.entries[i];
+                        goto repeat_after_edit;
+                    }
+                    show_err(errout);
+                }
+
+                runerror++;
+
+                if (docpp && (srcsuf != 'i')) {
+                    unlink(passin);
+                }
+                if (!Kflag) {
+                    unlink(passout);
+                    unlink(lpi_st);
+                }
+                unlink(lpi_p1);
+                continue;
+            }
+
+            if (editflag != EDIT_FLAG_0) {
+                unlink(errout);
+            }
+            unlink(lpi_p1);
+            if (docpp && (srcsuf != 'i')) {
+                unlink(passin);
+            }
+            if (Hchar == 'f') {
+                continue;
+            }
+            passin = passout;
+        }
+
+    phase_ulpi:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "ulpi");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &ulpiflags);
+            addstr(&execlist, passin);
+
+            if (((Hchar == 'k') && !ucodeflag) || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'B');
+            } else {
+                passout = tempstr[3];
+            }
+
+            if ((srcsuf == SUF_3) || Kflag) {
+                lpi_st = mksuf(srcfiles.entries[i], SUF_4);
+            } else {
+                lpi_st = tempstr[17];
+            }
+
+            addstr(&execlist, "-s");
+            addstr(&execlist, lpi_st);
+            addstr(&execlist, "-o");
+            addstr(&execlist, passout);
+            addstr(&execlist, "-t");
+            addstr(&execlist, symtab);
+            if (run(ulpi, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (srcsuf != 3) {
+                    unlink(passin);
+                }
+                if (!Kflag) {
+                    unlink(passout);
+                    if (srcsuf != 3) {
+                        unlink(lpi_st);
+                    }
+                }
+                if (tmpst != 0) {
+                    unlink(symtab);
+                }
+                continue;
+            }
+
+            if ((srcsuf != 3) && !Kflag) {
+                unlink(passin);
+            }
+            if (!Kflag && (srcsuf != 3)) {
+                unlink(lpi_st);
+            }
+
+            passin = passout;
+
+            if ((Hchar == 'k') && ucodeflag) {
+                execlist.length = 0;
+                addstr(&execlist, "btou");
+                addstr(&execlist, passin);
+                passout = mksuf(srcfiles.entries[i], 'U');
+                addstr(&execlist, passout);
+                if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    if (!Kflag) {
+                        unlink(passin);
+                        unlink(passout);
+                    }
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                } else if (!Kflag) {
+                    unlink(passin);
+                }
+                continue;
+            }
+            if (Hchar == 'k') {
+                continue;
+            }
+
+            goto phase_ujoin;
+        }
+
+    phase_ucob:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "cobfe");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &ucobflags);
+            addstr(&execlist, passin);
+
+            if ((Hchar == 'f') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], SUF_3);
+                lpi_st = mksuf(srcfiles.entries[i], SUF_4);
+            } else {
+                passout = tempstr[16];
+                lpi_st = tempstr[17];
+            }
+            lpi_p1 = tempstr[18];
+            lpi_pd = tempstr[20];
+            lpi_dd = tempstr[19];
+
+            addstr(&execlist, "-o");
+            addstr(&execlist, passout);
+            addstr(&execlist, "-s");
+            addstr(&execlist, lpi_st);
+            addstr(&execlist, "-p");
+            addstr(&execlist, lpi_p1);
+            addstr(&execlist, "-pd");
+            addstr(&execlist, lpi_pd);
+            addstr(&execlist, "-dd");
+            addstr(&execlist, lpi_dd);
+            addstr(&execlist, "-e");
+            addstr(&execlist, pl1err);
+            if (run(ucob, execlist.entries, NULL, errout, NULL) != 0) {
+                if (editflag != EDIT_FLAG_0) {
+                    if (times_edited < edit_cnt_max) {
+                        times_edited++;
+                        if (edit_src(editor, srcfiles.entries[i], 6) != 0) {
+                            show_err(errout);
+                            exit(1);
+                        }
+                        if (docpp && (srcsuf != 'i')) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        unlink(errout);
+                        unlink(lpi_st);
+                        unlink(lpi_p1);
+                        unlink(lpi_pd);
+                        unlink(lpi_dd);
+                        passin = srcfiles.entries[i];
+                        goto repeat_after_edit;
+                    }
+                    show_err(errout);
+                }
+
+                runerror++;
+
+                if (docpp && (srcsuf != 'i')) {
+                    unlink(passin);
+                }
+                if (!Kflag) {
+                    unlink(passout);
+                    unlink(lpi_st);
+                }
+                unlink(lpi_p1);
+                unlink(lpi_pd);
+                unlink(lpi_dd);
+                continue;
+            }
+
+            if (editflag != EDIT_FLAG_0) {
+                unlink(errout);
+            }
+            if (docpp && (srcsuf != 'i')) {
+                unlink(passin);
+            }
+            unlink(lpi_p1);
+            unlink(lpi_pd);
+            unlink(lpi_dd);
+            if (Hchar == 'f') {
+                continue;
+            }
+
+            passin = passout;
+            goto phase_ulpi;
+        }
+
+    phase_m4:
+        if (mflag) {
+            execlist.length = 0;
+            addstr(&execlist, "m4");
+            addstr(&execlist, passin);
+
+            if ((compiler == COMPILER_4) || (srcsuf == 's')) {
+                passout = tempstr[14];
+            } else {
+                passout = mksuf(srcfiles.entries[i], 'p');
+            }
+            if (run(m4, execlist.entries, NULL, passout, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    unlink(passout);
+                }
+                continue;
+            }
+
+            passin = passout;
+        }
+
+        switch (srcsuf) {
+            case 's':
+                if (docpp || default_nocpp) {
+                    goto block_531;
+                }
+                goto phase_as0;
+
+            case 'e':
+            default:
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "efl not supported. Cannot use .e files\n");
+                exit(2);
+                // not actually fallthrough due to exit being noreturn
+            case 'r':
+                execlist.length = 0;
+                addstr(&execlist, "ratfor");
+                addlist(&execlist, &ratforflags);
+                addstr(&execlist, passin);
+                passout = mksuf(srcfiles.entries[i], 'f');
+                if (run(ratfor, execlist.entries, NULL, passout, NULL) != 0) {
+                    runerror++;
+                    if (!Kflag) {}
+                    continue;
+                }
+                if (mflag) {
+                    unlink(passin);
+                }
+                passin = passout;
+
+                if (Fflag) {
+                    continue;
+                }
+                if (docpp) {
+                    goto block_531;
+                }
+                break;
+        }
+
+    phase_fopt:
+        {
+            sp100 = 0;
+            spFC = 0;
+            spF0[0] = '1';
+            spF0[1] = '\0';
+
+            if (run_sopt) {
+                if (mp_flag & 1) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
+                    goto phase_pfa;
+                }
+
+                if ((Oflag >= 2) && !set_loop_unroll) {
+                    addstr(&optflags, "-loopunroll");
+                    addstr(&optflags, "0");
+                }
+
+                if (mp_i2flag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -i2 option\n");
+                }
+                if (mp_66flag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -66 option\n");
+                }
+                if (mp_uflag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not recognize the -u option\n");
+                }
+                if (mp_backslashflag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "fopt does not support the -backslash option\n");
+                }
+                if (mp_caseflag) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fopt does not support the -U option\n");
+                    exit(2);
+                }
+
+                execlist.length = 0;
+                addstr(&execlist, "fopt");
+                spF4 = mkstr(tempstr[31], "l", NULL);
+                addstr(&execlist, mkstr("-L=", spF4, NULL));
+
+                if ((Hchar == 'K') || Kflag) {
+                    passout = mksuf(srcfiles.entries[i], 'm');
+                } else {
+                    passout = mkstr(tempstr[31], "m", &spF0, NULL);
+                }
+
+                addstr(&execlist, mkstr("-F=", passout, NULL));
+                addstr(&execlist, mkstr("-I=", passin, NULL));
+                if (mp_col120flag) {
+                    addstr(&execlist, "-scan=120");
+                }
+                if (mp_extendflag) {
+                    addstr(&execlist, "-scan=132");
+                }
+                if (!automaticflag) {
+                    addstr(&execlist, "-save=all");
+                }
+                if (mp_onetripflag) {
+                    addstr(&execlist, "-onetrip");
+                }
+                if (mp_dlinesflag) {
+                    addstr(&execlist, "-dlines");
+                }
+                if (w1flag == 2) {
+                    addstr(&execlist, "-suppress=w");
+                }
+                if (vflag) {
+                    addstr(&execlist, "-lo=lno");
+                }
+                if (irix4) {
+                    addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
+                } else {
+                    addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
+                }
+                //! @bug addstr called with extra argument
+                addstr(&execlist, "-include=/usr/include", 0);
+                addstr(&execlist, "-cp=i");
+                addlist(&execlist, &soptflags);
+                if (run(fopt, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && !Kflag) {
+                        unlink(passin);
+                    }
+                    if ((Hchar != 'K') || Kflag) {
+                        unlink(passout);
+                    }
+                    unlink(spF4);
+                    continue;
+                }
+                if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') && !Kflag) {
+                    unlink(passin);
+                }
+                unlink(spF4);
+
+                passin = passout;
+
+                if (Hchar == 'K') {
+                    continue;
+                }
+                goto phase_fcom;
+            }
+        }
+
+    phase_pfa:
+        {
+            if ((Hchar == 'K') || Kflag) {
+                mp_flag |= 6;
+            }
+            if (mp_flag & 1) {
+                if ((Oflag >= 2) && !set_loop_unroll) {
+                    addstr(&optflags, "-loopunroll");
+                    addstr(&optflags, "0");
+                }
+
+                if (mp_i2flag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -i2 option\n");
+                }
+                if (mp_66flag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -66 option\n");
+                }
+                if (mp_uflag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not recognize the -u option\n");
+                }
+                if (mp_backslashflag && (w1flag != 2)) {
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "PFA does not support the -backslash option\n");
+                }
+                if (mp_caseflag) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "PFA does not support the -U option\n");
+                    exit(2);
+                }
+
+            loop_pfa:
+                {
+                    execlist.length = 0;
+                    addstr(&execlist, "pfa");
+                    spF0[0] = spFC + '1';
+                    if (mp_flag & 2) {
+                        spF8 = mksuf(srcfiles.entries[i], 'l');
+                        if (mp_prepass_count > spFC) {
+                            spF8 = mkstr(spF8, spF0, NULL);
+                        }
+                    } else {
+                        spF8 = mkstr(tempstr[31], "l", spF0, NULL);
+                    }
+                    addstr(&execlist, mkstr("-L=", spF8, NULL));
+
+                    if (mp_flag & 4) {
+                        passout = mksuf(srcfiles.entries[i], 'm');
+                        if (mp_prepass_count > spFC) {
+                            passout = mkstr(passout, spF0, NULL);
+                        }
+                    } else {
+                        passout = mkstr(tempstr[31], "m", spF0, NULL);
+                    }
+
+                    addstr(&execlist, mkstr("-F=", passout, NULL));
+                    addstr(&execlist, mkstr("-I=", passin, NULL));
+                    if (mp_col120flag) {
+                        addstr(&execlist, "-scan=120");
+                    }
+                    if (mp_extendflag) {
+                        addstr(&execlist, "-scan=132");
+                    }
+                    if (!automaticflag) {
+                        addstr(&execlist, "-save=all");
+                    }
+                    if (mp_onetripflag) {
+                        addstr(&execlist, "-onetrip");
+                    }
+                    if (mp_dlinesflag) {
+                        addstr(&execlist, "-dlines");
+                    }
+                    if (w1flag == 2) {
+                        addstr(&execlist, "-suppress=w");
+                    }
+                    if (vflag) {
+                        addstr(&execlist, "-lo=lno");
+                    } else {
+                        addstr(&execlist, "-lo=lo");
+                    }
+                    if (mp_flag & 2) {
+                        addstr(&execlist, mkstr("-analysis=", mksuf(srcfiles.entries[i], SUF_5), NULL));
+                    } else if (!irix4) {
+                        addstr(&execlist, "-noanalysis");
+                    }
+                    if (irix4) {
+                        addstr(&execlist, mkstr("-customer=", mksuf(srcfiles.entries[i], srcsuf), NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-original_filename=", mksuf(srcfiles.entries[i], srcsuf), NULL));
+                    }
+                    //! @bug addstr called with extra argument
+                    addstr(&execlist, "-include=/usr/include", 0);
+                    addstr(&execlist, "-cp=i");
+                    if (mp_prepass_count <= spFC) {
+                        addlist(&execlist, &pfaflags);
+                    } else {
+                        addstr(&execlist, "-p=1");
+                        addstr(&execlist, "-ur=1");
+
+                        sp100++;
+                        while (strncmp(argv[sp100], "-pfaprepass,", 12) != 0) {
+                            sp100++;
+                            if (argv[sp100] == NULL) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Can't parse -pfaprepass option\n");
+                                exit(2);
+                            }
+                        }
+
+                        spE8 = argv[sp100] + strlen("-pfaprepass");
+                        while (TRUE) {
+                            spEC = spE8 + 1;
+                            if (*spEC == 0) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Bad pfaprepass syntax: no arg after comma\n");
+                                exit(2);
+                            }
+                            spE8 = spEC + 1;
+                            while (*spE8 != ',' && *spE8 != '\0')
+                                spE8++;
+                            spE7 = spE8[0];
+                            spE8[0] = 0;
+                            addstr(&execlist, mkstr(spEC, NULL));
+                            if (spE7 == 0)
+                                break;
+                            spE8[0] = spE7;
+                        }
+                    }
+                    if (run(pfa, execlist.entries, NULL, NULL, NULL) != 0) {
+                        runerror++;
+                        if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && !Kflag) {
+                            unlink(passin);
+                        }
+                        if (!(mp_flag & 4)) {
+                            unlink(passout);
+                        }
+                        continue;
+                    }
+
+                    if (!(mp_flag & 2)) {
+                        unlink(spF8);
+                    }
+                    if (spFC == 0) {
+                        if ((docpp || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) && (srcsuf != 'i') &&
+                            !Kflag) {
+                            unlink(passin);
+                        }
+                    } else if (!(mp_flag & 4)) {
+                        unlink(passin);
+                    }
+
+                    spFC++;
+                    if (mp_prepass_count >= spFC) {
+                        passin = passout;
+                        goto loop_pfa;
+                    }
+                    passin = passout;
+
+                    if (Hchar == 'K') {
+                        continue;
+                    }
+                }
+            }
+        }
+
+    phase_fcom:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "fcom");
+            if (alignarg != NULL) {
+                addstr(&execlist, alignarg);
+            }
+            if (align_common > 0) {
+                addstr(&execlist, "-align_common");
+            }
+            if (mp_flag & 0x10000) {
+                addstr(&execlist, "-MP");
+            }
+            if (showdirt_flag) {
+                addstr(&execlist, "-showdirt");
+            }
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &fcomflags);
+            if (!nocode) {
+                addstr(&execlist, mkstr("-XS", symtab, NULL));
+            }
+
+            var_s2 = NULL;
+            if (nocode) {
+                addstr(&execlist, "-nocode");
+                passout = NULL;
+            } else if (Hchar == 'f') {
+                passout = mksuf(srcfiles.entries[i], 'B');
+                if (ucodeflag) {
+                    addstr(&execlist, "-Xu");
+                    var_s2 = mksuf(srcfiles.entries[i], 'U');
+                }
+            } else if (Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'B');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+            } else {
+                passout = tempstr[3];
+            }
+            if (passout != NULL) {
+                addstr(&execlist, "-t");
+                addstr(&execlist, passout);
+            }
+
+            if (docpp && (srcsuf != 'i') && (srcsuf != 'm')) {
+                var_s1 = passin;
+            } else {
+                addstr(&execlist, passin);
+                var_s1 = NULL;
+            }
+            if (run(fcom, execlist.entries, var_s1, var_s2, errout) != 0) {
+                if (editflag != EDIT_FLAG_0) {
+                    if (times_edited < edit_cnt_max) {
+                        times_edited++;
+                        if (edit_src(editor, srcfiles.entries[i], 3) != 0) {
+                            show_err(errout);
+                            exit(1);
+                        }
+                        if ((docpp || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') && (srcsuf != 'f')) {
+                            unlink(passin);
+                        }
+                        unlink(passout);
+                        unlink(errout);
+                        unlink(symtab);
+
+                        passin = srcfiles.entries[i];
+
+                        goto repeat_after_edit;
+                    }
+                    show_err(errout);
+                }
+
+                runerror++;
+
+                if ((docpp || (mp_flag & 1) || (srcsuf == 'e') || (srcsuf == 'r')) && (srcsuf != 'i') &&
+                    (srcsuf != 'm') && !Kflag && !(mp_flag & 4)) {
+                    unlink(passin);
+                }
+                if (!Kflag) {
+                    unlink(passout);
+                    unlink(symtab);
+                }
+                continue;
+            }
+
+            if (editflag != EDIT_FLAG_0) {
+                unlink(errout);
+            }
+            if (nocode) {
+                if (docpp) {
+                    unlink(passin);
+                }
+                continue;
+            }
+
+            if ((docpp || (mp_flag & 1) || run_sopt || (srcsuf == 'e') || (srcsuf == 'r') || (srcsuf == 'F')) &&
+                (srcsuf != 'i') && (srcsuf != 'm') && !Kflag && !(mp_flag & 4)) {
+                unlink(passin);
+            }
+
+            passin = passout;
+
+            if (Hchar == 'f') {
+                continue;
+            }
+        }
+
+    phase_ujoin:
+        {
+            if ((Oflag != 3) && (Oflag != 4) && !jflag) {
+                if (!c_inline) {
+                    goto phase_uloop;
+                } else {
+                    goto phase_umerge;
+                }
+            }
+
+            execlist.length = 0;
+            addstr(&execlist, "ujoin");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &ujoinflags);
+
+            if ((outfile != NULL) && jflag && (srcfiles.length == 1)) {
+                passout = outfile;
+            } else {
+                passout = mksuf(srcfiles.entries[i], 'u');
+            }
+
+            addstr(&execlist, "-o");
+            addstr(&execlist, passout);
+            addstr(&execlist, passin);
+            addstr(&execlist, symtab);
+            if (run(ujoin, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    if (srcsuf != 'B') {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -3800,44 +3960,366 @@ repeat_after_edit:
                 }
                 continue;
             }
-            if ((Kflag == 0) && (srcsuf != 0x53)) {
-                unlink(passin);
+            if (!cflag || (Oflag == 3) || (Oflag == 4)) {
+                if (!Kflag) {
+                    if (srcsuf != 'B') {
+                        unlink(passin);
+                    }
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                }
+                passin = passout;
+                continue;
             }
+            goto phase_uloop;
+        }
+
+    phase_uld:
+        {
+            if (non_shared && !non_shared_emitted) {
+                addstr(&ldflags, "-non_shared");
+                non_shared_emitted = TRUE;
+            }
+
+            execlist.length = 0;
+            addstr(&execlist, "uld");
+            if (mips2flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                } else {
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+            }
+            if (mips1flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                } else {
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+            }
+            if ((fiveflag || (strcmp("/", comp_target_root) != 0)) && !Lflag && (strcmp("/", comp_target_root) != 0)) {
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
+                } else {
+                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
+                }
+            }
+            if (svr4_systype) {
+                if (compchoice == COMP_CHOICE_1) {
+                    addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
+                }
+                addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
+                if (call_shared) {
+                    addstr(&execlist, "-require_dynamic_link");
+                    addstr(&execlist, "_rld_new_interface");
+                }
+            }
+            if ((allBstring != NULL) && (*allBstring != '\0')) {
+                addstr(&execlist, mkstr("-kB", allBstring, NULL));
+            }
+            addlist(&execlist, &uldflags);
+            addlist(&execlist, &ldflags);
+            if (irix4) {
+                addstr(&execlist, mkstr("-L", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
+                } else {
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
+                }
+            }
+            if (!cflag) {
+                addstr(&execlist, crtx);
+            } else {
+                addstr(&execlist, "-no_AutoGnum");
+                if (!force_rm_dead_code) {
+                    addstr(&execlist, "-preserve_dead_code");
+                }
+            }
+            adduldlist(&execlist, &ufiles, &objfiles);
+            if (!cflag) {
+                addlist(&execlist, &uldlibflags);
+                if ((compiler == COMPILER_2) || haspascal) {
+                    addspacedstr(&execlist, newstr(libp));
+                    addspacedstr(&execlist, newstr(libxmalloc));
+                    addspacedstr(&execlist, newstr(libexc));
+                    addspacedstr(&execlist, newstr(libmld));
+                    if ((default_call_shared || call_shared) && (systype != NULL) && (strcmp(systype, "svr3") == 0)) {
+                        addspacedstr(&execlist, "-lbsd");
+                    }
+                }
+                if ((compiler == COMPILER_3) || hasfortran) {
+                    if (mp_flag) {
+                        addstr(&execlist, libI77_mp);
+                    }
+                    if (non_shared || irix4) {
+                        addspacedstr(&execlist, newstr(libF77));
+                    } else {
+                        addspacedstr(&execlist, libftn);
+                    }
+                    if (non_shared || irix4) {
+                        addspacedstr(&execlist, newstr(libI77));
+                    }
+                    if (non_shared || irix4) {
+                        addspacedstr(&execlist, newstr(libU77));
+                    }
+                    if (non_shared || irix4) {
+                        addspacedstr(&execlist, newstr(libisam));
+                    }
+                }
+                if (compiler == COMPILER_5) {
+                    addstr(&execlist, libpl1);
+                    addstr(&execlist, libxmalloc);
+                    addstr(&execlist, "-ltermcap");
+                    addstr(&execlist, libexc);
+                    addstr(&execlist, libmld);
+                }
+                if (((compiler == COMPILER_2) || (compiler == COMPILER_3) || haspascal || hasfortran || haspl1 ||
+                     (compiler == COMPILER_5) || (compiler == COMPILER_6)) &&
+                    (nonshared != 0)) {
+                    addspacedstr(&execlist, newstr(libm));
+                }
+                if (pgflag != 0) {
+                    addspacedstr(&execlist, newstr(libgprof));
+                } else if (pflag != 0) {
+                    addspacedstr(&execlist, newstr(libprof));
+                }
+                if (cmp_flag & 0x10000) {
+                    addstr(&execlist, libc_mp);
+                    if (compiler == COMPILER_1) {
+                        addstr(&execlist, "-lkapio");
+                    }
+                }
+                if (run_sopt && (compiler == COMPILER_1)) {
+                    addstr(&execlist, "-lkapio");
+                }
+                if (compiler == COMPILER_3) {
+                    if (D_1000C130 == 2) {
+                        addstr(&execlist, "-lc_s");
+                        if (xpg_flag) {
+                            addstr(&execlist, "-dont_warn_unused");
+                            addstr(&execlist, "-lgen");
+                            addstr(&execlist, "-warn_unused");
+                        }
+                        addstr(&execlist, "-lc");
+                    } else {
+                        if (irix4 && (B_1000ED74 == 0)) {
+                            addstr(&execlist, "-lmpc");
+                        }
+                        if (B_1000ED2C != 0) {
+                            addstr(&execlist, "-lc_s");
+                        } else if (B_1000ED30 != 0) {
+                            addstr(&execlist, "-lc_s");
+                        }
+                    }
+                } else if (B_1000ED2C != 0) {
+                    addstr(&execlist, "-lc_s");
+                }
+
+                if (!sixty4bitflag) {
+                    ldw_file = fopen(libdw_path, "r");
+                    if (ldw_file != NULL) {
+                        addspacedstr(&execlist, newstr(libdw));
+                    }
+                }
+
+                if (xpg_flag) {
+                    addstr(&execlist, "-dont_warn_unused");
+                    addstr(&execlist, "-lgen");
+                    addstr(&execlist, "-warn_unused");
+                }
+                addstr(&execlist, "-lc");
+                if (libm_spec) {
+                    addstr(&execlist, "-lm");
+                }
+                if (libfastm_spec) {
+                    addstr(&execlist, "-lfastm");
+                }
+            }
+            if (!cflag && crtn_required) {
+                addstr(&execlist, crtn);
+            }
+            if (rls_id_object != NULL) {
+                addstr(&execlist, rls_id_object);
+            }
+            addstr(&execlist, "-ko");
+
+            if (uoutfile != NULL) {
+                passout = uoutfile;
+            } else if ((Hchar == 'u') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'u');
+            } else {
+                passout = tempstr[4];
+            }
+            addstr(&execlist, passout);
+            if (run(uld, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    unlink(passout);
+                }
+                continue;
+            }
+
             passin = passout;
-            if (Hchar == 0x6D) {
+
+            if ((ufiles.length == 1) && (srcfiles.length == 2) && ((Oflag == 3) || (Oflag == 4))) {
+                unlink(ufiles.entries[0]);
+            }
+            if (Hchar == 'u') {
                 continue;
             }
         }
 
-    block_1933:
-        if (unrollflag != 0) {
+    phase_usplit:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "usplit");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &usplitflags);
+
+            if ((Hchar == 's') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'S');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+            } else {
+                passout = tempstr[5];
+            }
+
+            addstr(&execlist, "-o");
+            addstr(&execlist, passout);
+            addstr(&execlist, "-t");
+            addstr(&execlist, symtab);
+            addstr(&execlist, passin);
+            if (run(usplit, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    unlink(passin);
+                    unlink(passout);
+                }
+                if (tmpst != 0) {
+                    unlink(symtab);
+                }
+                continue;
+            }
+
+            if (!Kflag && (srcsuf != 'u') && (uoutfile == NULL)) {
+                unlink(passin);
+            }
+
+            passin = passout;
+
+            if (Hchar == 's') {
+                continue;
+            }
+        }
+
+    phase_umerge:
+        if ((Oflag == 3) || (Oflag == 4) || c_inline) {
+            execlist.length = 0;
+            addstr(&execlist, "umerge");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addlist(&execlist, &umergeflags);
+            addstr(&execlist, passin);
+            addstr(&execlist, "-o");
+
+            if ((Hchar == 'm') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'M');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+            } else {
+                passout = tempstr[6];
+            }
+
+            addstr(&execlist, passout);
+            addstr(&execlist, "-t");
+            addstr(&execlist, symtab);
+            if (run(umerge, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+
+                if (!Kflag) {
+                    if (srcsuf != 'S') {
+                        unlink(passin);
+                    }
+                    unlink(passout);
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                }
+                continue;
+            }
+
+            if (!Kflag && (srcsuf != 'S')) {
+                unlink(passin);
+            }
+
+            passin = passout;
+
+            if (Hchar == 'm') {
+                continue;
+            }
+        }
+
+    phase_uloop:
+        if (unrollflag) {
             execlist.length = 0;
             addstr(&execlist, "uloop");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addlist(&execlist, &uloopflags);
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
-            if ((Hchar == 0x76) || (Kflag != 0)) {
-                if ((Hchar == 0x76) || (Kflag != 0)) {
-                    passout = mksuf(srcfiles.entries[i], 0x56);
+
+            if ((Hchar == 'v') || Kflag) {
+                if ((Hchar == 'v') || Kflag) {
+                    passout = mksuf(srcfiles.entries[i], 'V');
                     if (regular_not_writeable(passout) == 1) {
-                        error(1, NULL, 0, NULL, 0,
-                                "can't overwrite a write-protected file %s \n", passout);
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                              passout);
                         exit(2);
                     }
                 } else {
                     passout = tempstr[23];
                 }
             }
+
             addstr(&execlist, passout);
             addstr(&execlist, "-t");
             addstr(&execlist, symtab);
             if (run(uloop, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    if (srcsuf != 0x4D) {
+                runerror++;
+                if (!Kflag) {
+                    if (srcsuf != 'M') {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -3847,46 +4329,48 @@ repeat_after_edit:
                 }
                 continue;
             }
-            if ((Kflag == 0) && (srcsuf != 0x4D)) {
+
+            if (!Kflag && (srcsuf != 'M')) {
                 unlink(passin);
             }
             passin = passout;
-            if (Hchar == 0x76) {
+
+            if (Hchar == 'v') {
                 continue;
             }
         }
 
-    block_1953:
-        if ((uopt0flag == 1) && (compiler == 3) && (Oflag >= 2)) {
+    phase_uopt0:
+        if ((uopt0flag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "uopt0");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
             addstr(&execlist, Gnum);
             addlist(&execlist, &uopt0flags);
             addstr(&execlist, passin);
-            if ((Hchar == 0x71) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x51);
+
+            if ((Hchar == 'q') || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'Q');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected file %s \n", passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
                 passout = tempstr[28];
             }
+
             addstr(&execlist, passout);
             addstr(&execlist, "-t");
             addstr(&execlist, symtab);
             uopt0str = tempstr[29];
             addstr(&execlist, uopt0str);
             if (run(uopt0, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    if ((srcsuf != 0x4D) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
-                        (srcsuf != 0x51)) {
+                runerror++;
+                if (!Kflag) {
+                    if ((srcsuf != 'M') && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q')) {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -3897,53 +4381,54 @@ repeat_after_edit:
                 unlink(uopt0str);
                 continue;
             }
-            if ((Kflag == 0) && (srcsuf != 0x4D) && (srcsuf != 0x42) &&
-                (srcsuf != 0x53) && (srcsuf != 0x51)) {
+
+            if (!Kflag && (srcsuf != 'M') && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q')) {
                 unlink(passin);
             }
             unlink(uopt0str);
+
             passin = passout;
-            if (Hchar == 0x71) {
+
+            if (Hchar == 'q') {
                 continue;
             }
         }
 
-    block_1980:
-        if ((ddoptflag == 1) && (compiler == 3) && (Oflag >= 2)) {
+    phase_ddopt:
+        if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "ddopt");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
             addstr(&execlist, Gnum);
             addlist(&execlist, &ddoptflags);
             addstr(&execlist, passin);
-            if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x44);
+
+            if (((Hchar == 'd') && !ucodeflag) || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'D');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected file %s \n",
-                            passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
                 passout = tempstr[27];
             }
-            if (ddoptinfo != 0) {
+
+            if (ddoptinfo) {
                 addstr(&execlist, "-e");
-                if (((Hchar == 0x64) && (ucodeflag == 0)) || (Kflag != 0)) {
-                    addstr(&execlist, mksuf(srcfiles.entries[i], 0x45));
+                if (((Hchar == 'd') && !ucodeflag) || Kflag) {
+                    addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
                 } else {
                     addstr(&execlist, tempstr[26]);
                 }
             }
             addstr(&execlist, passout);
             if (run(ddopt, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    if ((srcsuf != 0x42) && (srcsuf != 0x53) &&
-                        (srcsuf != 0x4D) && (srcsuf != 0x51)) {
+                runerror++;
+                if (!Kflag) {
+                    if ((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'M') && (srcsuf != 'Q')) {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -3954,68 +4439,68 @@ repeat_after_edit:
                 unlink(ddoptstr);
                 continue;
             }
-            if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
-                (srcsuf != 0x4D) && (srcsuf != 0x51)) {
+
+            if (!Kflag && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'M') && (srcsuf != 'Q')) {
                 unlink(passin);
             }
             unlink(ddoptstr);
+
             passin = passout;
-            if (Hchar == 0x64) {
+
+            if (Hchar == 'd') {
                 continue;
             }
         }
 
-    block_2015:
+    phase_uopt:
         if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
             execlist.length = 0;
             addstr(&execlist, "uopt");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
             addstr(&execlist, Gnum);
-            if ((mp_flag & 0x10000) &&
-                ((srcsuf == 0x66) || (srcsuf == 0x46))) {
+            if ((mp_flag & 0x10000) && ((srcsuf == 'f') || (srcsuf == 'F'))) {
                 addstr(&execlist, "-noPalias");
             }
-            if (irix4 == 0) {
-                if (kpicopt_flag != 0) {
+            if (!irix4) {
+                if (kpicopt_flag) {
                     addstr(&execlist, "-kpicopt");
                 }
-                if (nokpicopt_flag != 0) {
+                if (nokpicopt_flag) {
                     addstr(&execlist, "-nokpicopt");
                 }
             }
             addlist(&execlist, &optflags);
             addstr(&execlist, passin);
-            if (((Hchar == 0x6F) && (ucodeflag == 0)) || (Kflag != 0)) {
-                passout = mksuf(srcfiles.entries[i], 0x4F);
+
+            if (((Hchar == 'o') && !ucodeflag) || Kflag) {
+                passout = mksuf(srcfiles.entries[i], 'O');
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected file %s \n",
-                            passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
-                if (NoMoreOptions != 0) {
-                    *passout = 0x2D;
-                    if (*passout != 0) {
+                if (NoMoreOptions) {
+                    *passout = '-';
+                    if (*passout != '\0') {
                         passout = func_00433534(passout);
                     }
                 }
             } else {
                 passout = tempstr[7];
             }
+
             addstr(&execlist, passout);
             addstr(&execlist, "-t");
             addstr(&execlist, symtab);
             optstr = tempstr[8];
             addstr(&execlist, optstr);
             if (run(opt, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if (Kflag == 0) {
-                    if ((srcsuf != 0x42) && (srcsuf != 0x53) &&
-                        (srcsuf != 0x51) && (srcsuf != 0x44) &&
-                        (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+                runerror++;
+                if (!Kflag) {
+                    if ((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
+                        (srcsuf != 'V')) {
                         unlink(passin);
                     }
                     unlink(passout);
@@ -4026,22 +4511,24 @@ repeat_after_edit:
                 unlink(optstr);
                 continue;
             }
-            if ((Kflag == 0) && (srcsuf != 0x42) && (srcsuf != 0x53) &&
-                (srcsuf != 0x51) && (srcsuf != 0x44) &&
-                (srcsuf != 0x4D) && (srcsuf != 0x56)) {
+
+            if (!Kflag && (srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
+                (srcsuf != 'V')) {
                 unlink(passin);
             }
             unlink(optstr);
+
             passin = passout;
-            if ((Hchar == 0x6F) && (ucodeflag != 0)) {
+
+            if ((Hchar == 'o') && ucodeflag) {
                 execlist.length = 0;
                 addstr(&execlist, "btou");
                 addstr(&execlist, passin);
-                passout = mksuf(srcfiles.entries[i], 0x55);
+                passout = mksuf(srcfiles.entries[i], 'U');
                 addstr(&execlist, passout);
                 if (run(btou, execlist.entries, NULL, NULL, NULL) != 0) {
-                    runerror += 1;
-                    if (Kflag == 0) {
+                    runerror++;
+                    if (!Kflag) {
                         unlink(passin);
                         unlink(passout);
                         if (tmpst != 0) {
@@ -4050,7 +4537,7 @@ repeat_after_edit:
                     }
                     continue;
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passin);
                     if (tmpst != 0) {
                         unlink(symtab);
@@ -4058,182 +4545,165 @@ repeat_after_edit:
                 }
                 continue;
             }
-            if (Hchar == 0x6F) {
+            if (Hchar == 'o') {
                 continue;
             }
         }
 
-    block_2068:
-        execlist.length = 0;
-        addstr(&execlist, "ugen");
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        addstr(&execlist, "-G");
-        addstr(&execlist, Gnum);
-        if ((kpic_flag != 0) && (coff_spec == 0) && (irix4 == 0)) {
-            if (Oflag >= 3) {
-                addstr(&execlist, "-pic1");
+    phase_ugen:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "ugen");
+            if (vflag) {
+                addstr(&execlist, "-v");
+            }
+            addstr(&execlist, "-G");
+            addstr(&execlist, Gnum);
+            if (kpic_flag && !coff_spec && !irix4) {
+                if (Oflag >= 3) {
+                    addstr(&execlist, "-pic1");
+                } else {
+                    addstr(&execlist, "-pic2");
+                }
+            }
+            addlist(&execlist, &genflags);
+            addstr(&execlist, passin);
+            if (Sflag) {
+                addstr(&execlist, "-o");
+                if (Kflag) {
+                    addstr(&execlist, mksuf(srcfiles.entries[i], 'G'));
+                } else {
+                    binasm = tempstr[9];
+                    addstr(&execlist, binasm);
+                }
+                addstr(&execlist, "-l");
+                passout = mksuf(srcfiles.entries[i], 's');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+                addstr(&execlist, passout);
+            } else if (Hchar == 'c') {
+                addstr(&execlist, "-o");
+                passout = mksuf(srcfiles.entries[i], 'G');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+                addstr(&execlist, passout);
+            } else if (Kflag) {
+                addstr(&execlist, "-o");
+                passout = mksuf(srcfiles.entries[i], 'G');
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
+                }
+                addstr(&execlist, passout);
+                if (regular_not_writeable(mksuf(srcfiles.entries[i], 's')) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n",
+                          mksuf(srcfiles.entries[i], 's'));
+                    exit(2);
+                }
+                addstr(&execlist, "-l");
+                addstr(&execlist, mksuf(srcfiles.entries[i], 's'));
             } else {
-                addstr(&execlist, "-pic2");
-            }
-        }
-        addlist(&execlist, &genflags);
-        addstr(&execlist, passin);
-        if (Sflag != 0) {
-            addstr(&execlist, "-o");
-            if (Kflag != 0) {
-                addstr(&execlist,
-                        mksuf(srcfiles.entries[i], 0x47));
-            } else {
-                binasm = tempstr[9];
-                addstr(&execlist, binasm);
-            }
-            addstr(&execlist, "-l");
-            passout = mksuf(srcfiles.entries[i], 0x73);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n",
-                        passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-        } else if (Hchar == 0x63) {
-            addstr(&execlist, "-o");
-            passout = mksuf(srcfiles.entries[i], 0x47);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n",
-                        passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-        } else if (Kflag != 0) {
-            addstr(&execlist, "-o");
-            passout = mksuf(srcfiles.entries[i], 0x47);
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n",
-                        passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-            if (regular_not_writeable(
-                    mksuf(srcfiles.entries[i], 0x73)) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n",
-                        mksuf(srcfiles.entries[i], 0x73));
-                exit(2);
-            }
-            addstr(&execlist, "-l");
-            addstr(&execlist, mksuf(srcfiles.entries[i], 0x73));
-        } else {
-            addstr(&execlist, "-o");
-            passout = tempstr[10];
-            if (regular_not_writeable(passout) == 1) {
-                error(1, NULL, 0, NULL, 0,
-                        "can't overwrite a write-protected file %s \n",
-                        passout);
-                exit(2);
-            }
-            addstr(&execlist, passout);
-        }
-        addstr(&execlist, "-t");
-        addstr(&execlist, symtab);
-        addstr(&execlist, "-temp");
-        gentmp = tempstr[15];
-        addstr(&execlist, gentmp);
-        if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                if ((srcsuf != 0x42) && (srcsuf != 0x4F) &&
-                    (srcsuf != 0x51) && (srcsuf != 0x44) &&
-                    (srcsuf != 0x4D) && (srcsuf != 0x53) &&
-                    (srcsuf != 0x56)) {
-                    unlink(passin);
+                addstr(&execlist, "-o");
+                passout = tempstr[10];
+                if (regular_not_writeable(passout) == 1) {
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
+                    exit(2);
                 }
-                unlink(passout);
-                if (tmpst != 0) {
-                    unlink(symtab);
-                }
-            } else if (Sflag != 0) {
-                unlink(binasm);
+                addstr(&execlist, passout);
             }
-            unlink(gentmp);
-            continue;
-        }
-        unlink(gentmp);
-        if ((((srcsuf != 0x42) && (srcsuf != 0x53) &&
-                (srcsuf != 0x51) && (srcsuf != 0x44) &&
-                (srcsuf != 0x4D) && (srcsuf != 0x56)) ||
-                (Oflag >= 2)) &&
-            (srcsuf != 0x4F) && (Kflag == 0)) {
-            unlink(passin);
-        }
-        if (Sflag != 0) {
-            if (Kflag == 0) {
-                if (tmpst != 0) {
-                    unlink(symtab);
+            addstr(&execlist, "-t");
+            addstr(&execlist, symtab);
+            addstr(&execlist, "-temp");
+            gentmp = tempstr[15];
+            addstr(&execlist, gentmp);
+            if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    if ((srcsuf != 'B') && (srcsuf != 'O') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
+                        (srcsuf != 'S') && (srcsuf != 'V')) {
+                        unlink(passin);
+                    }
+                    unlink(passout);
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                } else if (Sflag) {
+                    unlink(binasm);
                 }
-                unlink(binasm);
+                unlink(gentmp);
+                continue;
             }
-            continue;
-        }
-        if (Hchar == 0x63) {
-            continue;
-        }
-        passin = passout;
 
-    block_2130:
-        if (srcsuf == 0x73) {
+            unlink(gentmp);
+            if ((((srcsuf != 'B') && (srcsuf != 'S') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') &&
+                  (srcsuf != 'V')) ||
+                 (Oflag >= 2)) &&
+                (srcsuf != 'O') && !Kflag) {
+                unlink(passin);
+            }
+            if (Sflag) {
+                if (!Kflag) {
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                    unlink(binasm);
+                }
+                continue;
+            }
+
+            if (Hchar == 'c') {
+                continue;
+            }
+            passin = passout;
+        }
+
+    phase_as0:
+        if (srcsuf == 's') {
             execlist.length = 0;
             addstr(&execlist, "as0");
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-v");
             }
             addstr(&execlist, "-G");
             addstr(&execlist, Gnum);
             addlist(&execlist, &asflags);
-            if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
+            if (NoMoreOptions && (*passin == '-')) {
                 passin = func_00433534(passin);
             }
             addstr(&execlist, passin);
             addstr(&execlist, "-o");
-            if ((Hchar == 0x61) || (Kflag != 0)) {
-                if ((compiler == 4) &&
-                    (getsuf(srcfiles.entries[i]) == 0)) {
-                    passout = mkstr(srcfiles.entries[i],
-                                    ".G", NULL);
+
+            if ((Hchar == 'a') || Kflag) {
+                if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == 0)) {
+                    passout = mkstr(srcfiles.entries[i], ".G", NULL);
                 } else {
-                    passout =
-                        mksuf(srcfiles.entries[i], 0x47);
+                    passout = mksuf(srcfiles.entries[i], 'G');
                 }
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected "
-                            "file %s \n",
-                            passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             } else {
                 passout = tempstr[11];
                 if (regular_not_writeable(passout) == 1) {
-                    error(1, NULL, 0, NULL, 0,
-                            "can't overwrite a write-protected "
-                            "file %s \n",
-                            passout);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't overwrite a write-protected file %s \n", passout);
                     exit(2);
                 }
             }
+
             addstr(&execlist, passout);
             addstr(&execlist, "-t");
             addstr(&execlist, symtab);
             if (run(as0, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                if ((docpp != 0) || (mflag != 0)) {
+                runerror++;
+                if (docpp || mflag) {
                     unlink(passin);
                 }
-                if (Kflag == 0) {
+                if (!Kflag) {
                     unlink(passout);
                     if (tmpst != 0) {
                         unlink(symtab);
@@ -4241,195 +4711,185 @@ repeat_after_edit:
                 }
                 continue;
             }
-            if ((docpp != 0) || (mflag != 0)) {
+
+            if (docpp || mflag) {
                 unlink(passin);
             }
-            if (Hchar == 0x61) {
+
+            if (Hchar == 'a') {
                 continue;
             }
 
             passin = passout;
         }
 
-    block_2159:
-        execlist.length = 0;
-        addstr(&execlist, "as1");
-        addstr(&execlist, "-t5_ll_sc_bug");
-        if (tfp_flag != 0) {
-            addstr(&execlist, "-tfp");
-        }
-        if (noaliasokflag != 0) {
-            addstr(&execlist, "-noaliasok");
-        }
-        if (alignarg != NULL) {
-            addstr(&execlist, alignarg);
-        }
-        if (align_common > 0) {
-            addstr(&execlist, "-align_common");
-        }
-        if (((compiler == 4) || (srcsuf == 0x73)) &&
-            (kpic_spec == 0) && (irix4 == 0)) {
-            addstr(&execlist, "-pic0");
-        }
-        if (coff_spec != 0) {
-            addstr(&execlist, "-coff");
-            kpic_flag = 0;
-        } else if (kpic_flag != 0) {
-            if (irix4 == 0) {
-                if (coff_spec == 0) {
-                    addstr(&execlist, "-elf");
-                    if (Oflag >= 3) {
-                        addstr(&execlist, "-pic1");
+    phase_as1:
+        {
+            execlist.length = 0;
+            addstr(&execlist, "as1");
+            addstr(&execlist, "-t5_ll_sc_bug");
+            if (tfp_flag) {
+                addstr(&execlist, "-tfp");
+            }
+            if (noaliasokflag) {
+                addstr(&execlist, "-noaliasok");
+            }
+            if (alignarg != NULL) {
+                addstr(&execlist, alignarg);
+            }
+            if (align_common > 0) {
+                addstr(&execlist, "-align_common");
+            }
+            //! @note `as1` does not generate PIC by default, -KPIC must be passed explicitly or an assembler directive
+            //! used
+            //! (.pic0 for not PIC, .pic2 for PIC)
+            if (((compiler == COMPILER_4) || (srcsuf == 's')) && !kpic_spec && !irix4) {
+                addstr(&execlist, "-pic0");
+            }
+            if (coff_spec) {
+                addstr(&execlist, "-coff");
+                kpic_flag = FALSE;
+            } else if (kpic_flag) {
+                if (!irix4) {
+                    if (!coff_spec) {
+                        addstr(&execlist, "-elf");
+                        if (Oflag >= 3) {
+                            addstr(&execlist, "-pic1");
+                        } else {
+                            addstr(&execlist, "-pic2");
+                        }
                     } else {
-                        addstr(&execlist, "-pic2");
+                        addstr(&execlist, "-coff");
+                        kpic_flag = FALSE;
                     }
-                } else {
+                }
+            } else if (!irix4) {
+                if (coff_spec) {
                     addstr(&execlist, "-coff");
-                    kpic_flag = 0;
+                } else {
+                    addstr(&execlist, "-elf");
                 }
             }
-        } else if (irix4 == 0) {
-            if (coff_spec != 0) {
-                addstr(&execlist, "-coff");
-            } else {
-                addstr(&execlist, "-elf");
+            if (vflag) {
+                addstr(&execlist, "-v");
             }
-        }
-        if (vflag != 0) {
-            addstr(&execlist, "-v");
-        }
-        if ((fullasoptflag == 0) && (srcsuf == 0x73) &&
-            (Oflag >= 2)) {
-            addstr(&execlist, "-noglobal");
-        }
-        addstr(&execlist, "-G");
-        addstr(&execlist, Gnum);
-        switch (pflag) {
-            case 0:
-                addstr(&execlist, "-p0");
-                break;
-            case 1:
-                addstr(&execlist, "-p1");
-                break;
-        }
-        addlist(&execlist, &asflags);
-        addlist(&execlist, &as1flags);
-        if (irix4 == 0) {
-            addlist(&execlist, &olimitflags);
-        }
-        if ((NoMoreOptions != 0) && (*passin == 0x2D)) {
-            passin = func_00433534(passin);
-        }
-        addstr(&execlist, passin);
-        addstr(&execlist, "-o");
-        if (compiler == 4) {
-            if (outfile != NULL) {
+            if (!fullasoptflag && (srcsuf == 's') && (Oflag >= 2)) {
+                addstr(&execlist, "-noglobal");
+            }
+            addstr(&execlist, "-G");
+            addstr(&execlist, Gnum);
+            switch (pflag) {
+                case 0:
+                    addstr(&execlist, "-p0");
+                    break;
+                case 1:
+                    addstr(&execlist, "-p1");
+                    break;
+            }
+            addlist(&execlist, &asflags);
+            addlist(&execlist, &as1flags);
+            if (!irix4) {
+                addlist(&execlist, &olimitflags);
+            }
+
+            if (NoMoreOptions && (*passin == '-')) {
+                passin = func_00433534(passin);
+            }
+            addstr(&execlist, passin);
+            addstr(&execlist, "-o");
+
+            if (compiler == COMPILER_4) {
+                if (outfile != NULL) {
+                    passout = outfile;
+                } else {
+                    passout = "a.out";
+                }
+            } else if ((outfile != NULL) && cflag && ((Oflag == 3) || (srcfiles.length == 1))) {
                 passout = outfile;
             } else {
-                passout = "a.out";
-            }
-        } else if ((outfile != NULL) && (cflag != 0) &&
-                    ((Oflag == 3) ||
-                    (srcfiles.length == 1))) {
-            passout = outfile;
-        } else {
-            if ((srcsuf == 0x3F) && (Hchar != 0x62) &&
-                (Kflag == 0)) {
-                if (cflag == 0) {
-                    tmp_uldobj = passout = tempstr[12];
-                } else if (srcfiles.length == 2) {
-                    passout =
-                        mksuf(*srcfiles.entries, 0x6F);
-                    tmp_uldobj = NULL;
+                if ((srcsuf == '?') && (Hchar != 'b') && !Kflag) {
+                    if (!cflag) {
+                        tmp_uldobj = passout = tempstr[12];
+                    } else if (srcfiles.length == 2) {
+                        passout = mksuf(*srcfiles.entries, 'o');
+                        tmp_uldobj = NULL;
+                    } else {
+                        passout = mksuf(srcfiles.entries[i], 'o');
+                        tmp_uldobj = NULL;
+                    }
                 } else {
-                    passout = mksuf(
-                        srcfiles.entries[i], 0x6F);
-                    tmp_uldobj = NULL;
+                    passout = mksuf(srcfiles.entries[i], 'o');
                 }
-            } else {
-                passout =
-                    mksuf(srcfiles.entries[i], 0x6F);
-            }
-            if (uldobj_place != -1) {
-                set_place(&objfiles, passout, uldobj_place);
-            }
-        }
-        addstr(&execlist, passout);
-        addstr(&execlist, "-t");
-        addstr(&execlist, symtab);
-        if ((ddoptflag == 1) && (compiler == 3) &&
-            (ddoptinfo != 0) && (Oflag >= 2)) {
-            addstr(&execlist, "-e");
-            if (((Hchar == 0x62) && (ucodeflag == 0)) ||
-                (Kflag != 0)) {
-                addstr(
-                    &execlist,
-                    mksuf(srcfiles.entries[i], 0x45));
-            } else {
-                addstr(&execlist, tempstr[26]);
-            }
-        }
-        if (regular_not_writeable(passout) != 0) {
-            unlink(passout);
-        }
-        if (run(as1, execlist.entries, NULL, NULL, NULL) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                if (srcsuf != 0x47) {
-                    unlink(passin);
+                if (uldobj_place != -1) {
+                    set_place(&objfiles, passout, uldobj_place);
                 }
-                spE0 = regular_file(passout);
-                if (spE0 == 1) {
-                    unlink(passout);
-                } else if (spE0 != 0) {
-                    error(
-                        2, NULL, 0, NULL, 0,
-                        "%s does not exist or is not "
-                        "stat(2)-able. Not deleted (if it "
-                        "exists) even though as1 failed.\n",
-                        passout);
+            }
+            addstr(&execlist, passout);
+            addstr(&execlist, "-t");
+            addstr(&execlist, symtab);
+            if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
+                addstr(&execlist, "-e");
+                if (((Hchar == 'b') && !ucodeflag) || Kflag) {
+                    addstr(&execlist, mksuf(srcfiles.entries[i], 'E'));
                 } else {
-                    error(
-                        2, NULL, 0, NULL, 0,
-                        "%s is not a regular file, not "
-                        "deleted even though as1 failed.\n",
-                        passout);
-                }
-                if (tmpst != 0) {
-                    unlink(symtab);
+                    addstr(&execlist, tempstr[26]);
                 }
             }
-            if (tmp_uldobj != NULL) {
-                unlink(tmp_uldobj);
+            if (regular_not_writeable(passout) != 0) {
+                unlink(passout);
             }
-            continue;
-        }
-        if ((ddoptflag == 1) && (compiler == 3) &&
-            (ddoptinfo != 0) && (Oflag >= 2)) {
-            unlink(tempstr[26]);
-        }
-        if ((srcsuf != 0x47) && (Kflag == 0)) {
-            unlink(passin);
-        }
-        if ((tmpst != 0) && (Kflag == 0)) {
-            unlink(symtab);
-        }
-        if ((compiler == 3) && (sp11C != 0) &&
-            (srcsuf != 0x66) && (srcsuf != 0x46)) {
-            D_1000BF74 = sp11C;
-            relocate_passes("f", NULL, NULL);
-        }
-        if ((compiler == 1) &&
-            ((c_compiler_choice == 2) ||
-                (c_compiler_choice == 3)) &&
-            (no_prelink == 0)) {
-            update_instantiation_info_file(
-                srcfiles.entries[i], passout);
-        }
-    }
+            if (run(as1, execlist.entries, NULL, NULL, NULL) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    if (srcsuf != 'G') {
+                        unlink(passin);
+                    }
+                    spE0 = regular_file(passout);
+                    if (spE0 == 1) {
+                        unlink(passout);
+                    } else if (spE0 != 0) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                              "%s does not exist or is not stat(2)-able. Not deleted (if it exists) even though as1 "
+                              "failed.\n",
+                              passout);
+                    } else {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                              "%s is not a regular file, not deleted even though as1 failed.\n", passout);
+                    }
+                    if (tmpst != 0) {
+                        unlink(symtab);
+                    }
+                }
+                if (tmp_uldobj != NULL) {
+                    unlink(tmp_uldobj);
+                }
+                continue;
+            }
 
-    srcsuf = 0;
-    if (compiler == 4) {
+            if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && ddoptinfo && (Oflag >= 2)) {
+                unlink(tempstr[26]);
+            }
+            if ((srcsuf != 'G') && !Kflag) {
+                unlink(passin);
+            }
+            if ((tmpst != 0) && !Kflag) {
+                unlink(symtab);
+            }
+
+            if ((compiler == COMPILER_3) && sp11C && (srcsuf != 'f') && (srcsuf != 'F')) {
+                D_1000BF74 = sp11C;
+                relocate_passes("f", NULL, NULL);
+            }
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                !no_prelink) {
+                update_instantiation_info_file(srcfiles.entries[i], passout);
+            }
+        }
+    } /* end of main file-processing loop */
+
+    srcsuf = '\0';
+    if (compiler == COMPILER_4) {
         if (runerror != 0) {
             exit(1);
         } else {
@@ -4437,402 +4897,429 @@ repeat_after_edit:
         }
     }
 
-    if (NoMoreOptions != 0) {
+    if (NoMoreOptions) {
         for (i = 0; i < objfiles.length; i++) {
-            if ((*objfiles.entries[i] == 0x2D) && (strchr(objfiles.entries[i], 0x2E) != NULL)) {
+            if ((objfiles.entries[i][0] == '-') && (strchr(objfiles.entries[i], '.') != NULL)) {
                 objfiles.entries[i] = func_00433534(objfiles.entries[i]);
             }
         }
     }
 
-    if ((cflag == 0) && (Sflag == 0) && (Eflag == 0) && (Pflag == 0) && (jflag == 0) && (runerror == 0) &&
-        (objfiles.length != 0) && (Hchar == 0) && (nocode == 0)) {
-        if ((old_non_shared != 0) && (mips2flag != 0) && (kpic_flag == 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+    // linking passes
+    if (!cflag && !Sflag && !Eflag && !Pflag && !jflag && (runerror == 0) && (objfiles.length != 0) &&
+        (Hchar == '\0') && !nocode) {
+        if (old_non_shared && mips2flag && !kpic_flag) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                  "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
+            default_call_shared = FALSE;
+            call_shared = FALSE;
         }
-        if ((old_non_shared != 0) && (mips3flag != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+        if (old_non_shared && mips3flag) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix ucode 32-bit -mips3 with shared\n");
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if ((old_non_shared != 0) && (coff_spec != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+        if (old_non_shared && coff_spec) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -coff with shared, try using -non_shared\n");
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if ((old_non_shared != 0) && (excpt_flag != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
-            default_call_shared = 0;
-            call_shared = 0;
+        if (old_non_shared && excpt_flag) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -excpt with shared, try using -non_shared\n");
+            default_call_shared = FALSE;
+            call_shared = FALSE;
             exit(2);
         }
-        if (((old_non_shared != 0) || (non_shared != 0)) && (make_edison_shlib != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
+        if ((old_non_shared || non_shared) && make_edison_shlib) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -shared with -non_shared\n");
             exit(2);
         }
-        if ((cordflag != 0) && (make_edison_shlib != 0)) {
-            error(1, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
+        if (cordflag && make_edison_shlib) {
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -shared with -cord\n");
             exit(2);
         }
 
-        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (no_prelink == 0)) {
+    phase_prelinker:
+        {
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                !no_prelink) {
+                execlist.length = 0;
+                addstr(&execlist, "edg_prelink");
+                addstr(&execlist, "-fSGI");
+                addlist(&execlist, &prelinkerflags);
+                if (vflag || verbose_prelink) {
+                    addstr(&execlist, "-v");
+                }
+                add_prelinker_objects(&execlist, &objfiles);
+                if (xpg_flag) {
+                    add_prelinker_objects(&execlist, &dashlfiles);
+                }
+                if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    goto phase_cord;
+                }
+            }
+        }
+
+    phase_ld:
+        {
             execlist.length = 0;
-            addstr(&execlist, "edg_prelink");
-            addstr(&execlist, "-fSGI");
-            addlist(&execlist, &prelinkerflags);
-            if ((vflag != 0) || (verbose_prelink != 0)) {
-                addstr(&execlist, "-v");
+            addstr(&execlist, LD);
+            if (kpic_flag && !irix4 && !coff_spec) {
+                addstr(&ldflags, "-KPIC");
             }
-            add_prelinker_objects(&execlist, &objfiles);
-            if (xpg_flag != 0) {
-                add_prelinker_objects(&execlist, &dashlfiles);
+            if (non_shared && !non_shared_emitted) {
+                if (!mips2flag && !mips3flag) {
+                    addstr(&ldflags, "-non_shared");
+                    non_shared_emitted = TRUE;
+                }
+            } else if (call_shared || make_edison_shlib) {
+                if (transitive_link) {
+                    addstr(&ldflags, "-transitive_link");
+                } else if (full_transitive_link) {
+                    addstr(&ldflags, "-full_transitive_link");
+                } else if (no_transitive_link) {
+                    addstr(&ldflags, "-no_transitive_link");
+                }
             }
-            if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                goto block_2588;
+            if (quickstart_info) {
+                addstr(&ldflags, "-quickstart_info");
             }
-        }
-        execlist.length = 0;
-        addstr(&execlist, LD);
-        if ((kpic_flag != 0) && (irix4 == 0) && (coff_spec == 0)) {
-            addstr(&ldflags, "-KPIC");
-        }
-        if ((non_shared != 0) && (non_shared_emitted == 0)) {
-            if ((mips2flag == 0) && (mips3flag == 0)) {
-                addstr(&ldflags, "-non_shared");
-                non_shared_emitted = 1;
+            if (elfflag && !coff_spec) {
+                addstr(&execlist, "-elf");
             }
-        } else if ((call_shared != 0) || (make_edison_shlib != 0)) {
-            if (transitive_link != 0) {
-                addstr(&ldflags, "-transitive_link");
-            } else if (full_transitive_link != 0) {
-                addstr(&ldflags, "-full_transitive_link");
-            } else if (no_transitive_link != 0) {
-                addstr(&ldflags, "-no_transitive_link");
+            if (tfp_flag) {
+                addstr(&execlist, "-allow_jump_at_eop");
             }
-        }
-        if (quickstart_info != 0) {
-            addstr(&ldflags, "-quickstart_info");
-        }
-        if ((elfflag != 0) && (coff_spec == 0)) {
-            addstr(&execlist, "-elf");
-        }
-        if (tfp_flag != 0) {
-            addstr(&execlist, "-allow_jump_at_eop");
-        }
-        if ((compiler == 1) && (c_compiler_choice == 3)) {
-            addstr(&execlist, "-delta");
-        }
-        if (cordflag != 0) {
-            addstr(&execlist, "-o");
-            passout = tempstr[22];
-            addstr(&execlist, passout);
-        } else if (outfile != NULL) {
-            addstr(&execlist, "-o");
-            addstr(&execlist, outfile);
-        }
-        if (gethostsex() != targetsex) {
-            if (targetsex == 0) {
-                addstr(&execlist, "-EB");
-            } else {
-                addstr(&execlist, "-EL");
+            if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                addstr(&execlist, "-delta");
             }
-        }
-        if (make_edison_shlib != 0) {
-            addstr(&execlist, "-shared");
-        }
-        if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-            add_cxx_symbol_options();
-        }
-        if (irix4 != 0) {
-            addstr(&execlist, mkstr("-L", NULL));
-            if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
-            } else {
-                addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
-                crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
-                crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
+            if (cordflag) {
+                addstr(&execlist, "-o");
+                passout = tempstr[22];
+                addstr(&execlist, passout);
+            } else if (outfile != NULL) {
+                addstr(&execlist, "-o");
+                addstr(&execlist, outfile);
             }
-        }
-        if (svr4_systype != 0) {
-            if (compchoice == 1) {
-                addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
-            }
-            addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-            if ((call_shared != 0) || (make_edison_shlib != 0)) {
-                addstr(&execlist, "-require_dynamic_link");
-                addstr(&execlist, "_rld_new_interface");
-                if (ignore_unresolved_flag != 0) {
-                    addstr(&execlist, "-ignore_unresolved");
-                } else if (no_unresolved_flag != 0) {
-                    addstr(&execlist, "-no_unresolved");
-                } else if ((default_svr4 != 0) || (make_edison_shlib != 0)) {
-                    addstr(&execlist, "-ignore_unresolved");
+            if (gethostsex() != targetsex) {
+                if (targetsex == 0) {
+                    addstr(&execlist, "-EB");
                 } else {
-                    addstr(&execlist, "-no_unresolved");
+                    addstr(&execlist, "-EL");
                 }
             }
-        }
-        if (fiveflag != 0) {
-            addstr(&execlist, mkstr("-L", runlib, NULL));
-        }
-        if ((allBstring != NULL) && (*allBstring != 0)) {
-            addstr(&execlist, mkstr("-B", allBstring, NULL));
-        }
-        if (cordflag != 0) {
-            addstr(&execlist, "-r");
-            addstr(&execlist, "-d");
-            addstr(&execlist, "-z");
-        }
-        if (irix4 != 0) {
-            addstr(&execlist, "-G");
-        } else {
-            addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
-        }
-        addstr(&execlist, Gnum);
-        addlist(&execlist, &ldflags);
-        addlist(&execlist, &nldflags);
-        if ((mips2flag != 0) && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
-                    addstr(&execlist,
-                            mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+            if (make_edison_shlib) {
+                addstr(&execlist, "-shared");
+            }
+            if ((compiler == COMPILER_1) &&
+                ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                add_cxx_symbol_options();
+            }
+            if (irix4) {
+                addstr(&execlist, mkstr("-L", NULL));
+                if (non_shared) {
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/nonshared/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/nonshared/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/nonshared/", "crtn.o", NULL);
                 } else {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-            } else {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-            }
-        }
-        if ((mips1flag != 0) && (sp148 == 0)) {
-            if (strcmp("/", comp_target_root) != 0) {
-                if (non_shared != 0) {
-                    addstr(&execlist,
-                            mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
-                } else if (abi_flag == 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
-                }
-            } else if (non_shared != 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
-            } else if (abi_flag == 0) {
-                addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
-            }
-        }
-        if (strcmp("/", comp_target_root) != 0) {
-            if (Lflag == 0) {
-                if ((compiler == 1) && (c_compiler_choice == 3)) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
-                }
-                if (non_shared != 0) {
-                    addstr(&execlist,
-                            mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
-                } else if (abi_flag == 0) {
-                    addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
+                    addstr(&execlist, mkstr("-L", "/usr/irix4/", "usr/lib/", NULL));
+                    crtx = mkstr(comp_host_root, "usr/lib/", CRTX, NULL);
+                    crtn = mkstr(comp_host_root, "usr/lib/", "crtn.o", NULL);
                 }
             }
-        } else if ((Lflag == 0) && (compiler == 1) && (c_compiler_choice == 3)) {
-            addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
-        }
-        if (make_edison_shlib != 0) {
-            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                addstr(&execlist, cxx_init);
-            }
-            if ((compiler == 1) && (c_compiler_choice == 3)) {
-                addstr(&execlist, delta_init);
-            }
-            addlist(&execlist, &objfiles);
-            if (xpg_flag != 0) {
-                addlist(&execlist, &dashlfiles);
-            }
-            if (nodeflib == 0) {
-                if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                    spDC = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
-                    if (spDC != 0) {
-                        addstr(&execlist, "-dont_warn_unused");
-                    }
-                    if (exception_handling != 0) {
-                        addstr(&execlist, "-lCsup");
-                    }
-                    addstr(&execlist, "-lC");
-                    if (spDC != 0) {
-                        addstr(&execlist, "-warn_unused");
-                    }
+            if (svr4_systype) {
+                if (compchoice == COMP_CHOICE_1) {
+                    addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
                 }
-                if (xpg_flag != 0) {
-                    addstr(&execlist, "-dont_warn_unused");
-                    addstr(&execlist, "-lgen");
-                    addstr(&execlist, "-warn_unused");
-                }
-                addstr(&execlist, "-lc");
-            }
-        } else {
-            addstr(&execlist, "-nocount");
-            addstr(&execlist, crtx);
-            if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                addstr(&execlist, cxx_init);
-            }
-            if ((compiler == 1) && (c_compiler_choice == 3)) {
-                addstr(&execlist, delta_init);
-            }
-            addstr(&execlist, "-count");
-            addlist(&execlist, &objfiles);
-            if (xpg_flag != 0) {
-                addlist(&execlist, &dashlfiles);
-            }
-            addlist(&execlist, &ldZflags);
-            if ((ansichoice == 0) && (compiler == 1) && (irix4 == 0)) {
-                addstr(&execlist, "-cckr");
-            }
-            addstr(&execlist, "-nocount");
-            if (nodeflib == 0) {
-                if ((compiler == 2) || (haspascal != 0)) {
-                    addspacedstr(&execlist, libp);
-                    addspacedstr(&execlist, libxmalloc);
-                    addspacedstr(&execlist, libexc);
-                    addspacedstr(&execlist, libmld);
-                }
-                if ((compiler == 3) || (hasfortran != 0)) {
-                    if (mp_flag != 0) {
-                        addspacedstr(&execlist, libI77_mp);
-                    }
-                    if ((non_shared != 0) || (irix4 != 0)) {
-                        addspacedstr(&execlist, libF77);
-                        addspacedstr(&execlist, libm);
-                        addspacedstr(&execlist, libU77);
-                        if (D_1000C130 != 0) {
-                            spD8 = strlen(libI77);
-                            spD4 = malloc(spD8 + 2);
-                            memcpy(spD4, libI77, spD8);
-                            spD4[spD8] = 0x5F;
-                            spD4[spD8 + 1] = 0x73;
-                            spD4[spD8 + 2] = 0;
-                            libI77 = spD4;
-                        }
-                        addspacedstr(&execlist, libI77);
-                        addspacedstr(&execlist, libisam);
+                addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
+                if (call_shared || make_edison_shlib) {
+                    addstr(&execlist, "-require_dynamic_link");
+                    addstr(&execlist, "_rld_new_interface");
+                    if (ignore_unresolved_flag) {
+                        addstr(&execlist, "-ignore_unresolved");
+                    } else if (no_unresolved_flag) {
+                        addstr(&execlist, "-no_unresolved");
+                    } else if (default_svr4 || make_edison_shlib) {
+                        addstr(&execlist, "-ignore_unresolved");
                     } else {
-                        addspacedstr(&execlist, libftn);
-                        addspacedstr(&execlist, libm);
+                        addstr(&execlist, "-no_unresolved");
                     }
                 }
-                if (compiler == 5) {
-                    addstr(&execlist, libpl1);
-                    addspacedstr(&execlist, libxmalloc);
-                    addstr(&execlist, "-ltermcap");
-                    addspacedstr(&execlist, libexc);
-                    addspacedstr(&execlist, libmld);
-                }
-                if ((compiler == 2) || ((hasfortran != 0) && (compiler != 3)) || (haspascal != 0) ||
-                    (haspl1 != 0) || (compiler == 5) || (compiler == 6)) {
-                    addspacedstr(&execlist, libm);
-                }
-                if (pgflag != 0) {
-                    addspacedstr(&execlist, libgprof);
-                } else if (pflag != 0) {
-                    addspacedstr(&execlist, libprof);
-                }
-                if (sixty4bitflag == 0) {
-                    ldw_file = fopen(libdw_path, "r");
-                    if (ldw_file != NULL) {
-                        addspacedstr(&execlist, libdw);
-                    }
-                }
-                if (cmp_flag & 0x10000) {
-                    addstr(&execlist, libc_mp);
-                    if (compiler == 1) {
-                        addstr(&execlist, "-lkapio");
-                    }
-                }
-                if ((run_sopt != 0) && (compiler == 1)) {
-                    addstr(&execlist, "-lkapio");
-                }
-                if (compiler == 3) {
-                    if (D_1000C130 == 2) {
-                        addstr(&execlist, "-lc_s");
-                        if (xpg_flag != 0) {
-                            addstr(&execlist, "-dont_warn_unused");
-                            addstr(&execlist, "-lgen");
-                            addstr(&execlist, "-warn_unused");
-                        }
-                        addstr(&execlist, "-lc");
+            }
+            if (fiveflag) {
+                addstr(&execlist, mkstr("-L", runlib, NULL));
+            }
+            if ((allBstring != NULL) && (*allBstring != '\0')) {
+                addstr(&execlist, mkstr("-B", allBstring, NULL));
+            }
+            if (cordflag) {
+                addstr(&execlist, "-r");
+                addstr(&execlist, "-d");
+                addstr(&execlist, "-z");
+            }
+            if (irix4) {
+                addstr(&execlist, "-G");
+            } else {
+                addstr(&execlist, mkstr("-Wx", ",", "-G", NULL));
+            }
+            addstr(&execlist, Gnum);
+            addlist(&execlist, &ldflags);
+            addlist(&execlist, &nldflags);
+            if (mips2flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
                     } else {
-                        if ((irix4 != 0) && (B_1000ED74 == 0)) {
-                            addstr(&execlist, "-lmpc");
-                        }
-                        if (B_1000ED2C != 0) {
-                            addstr(&execlist, "-lc_s");
-                        } else if (B_1000ED30 != 0) {
-                            addstr(&execlist, "-lc_s");
-                        }
-                        if (xpg_flag != 0) {
-                            addstr(&execlist, "-dont_warn_unused");
-                            addstr(&execlist, "-lgen");
-                            addstr(&execlist, "-warn_unused");
-                        }
-                        addstr(&execlist, "-lc");
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
                     }
                 } else {
-                    if ((irix4 != 0) && (cmp_flag & 0x10000)) {
-                        addstr(&execlist, "-lmpc");
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
                     }
-                    if ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                        spD0 = D_1000BF90 == 0 && strcmp(LD, "old_ld") != 0;
-                        if (spD0 != 0) {
+                }
+            }
+            if (mips1flag && (sp148 == 0)) {
+                if (strcmp("/", comp_target_root) != 0) {
+                    if (non_shared) {
+                        addstr(&execlist,
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                } else {
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                    }
+                }
+            }
+            if (strcmp("/", comp_target_root) != 0) {
+                if (!Lflag) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
+                    }
+                    if (non_shared) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
+                    } else if (abi_flag == 0) {
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
+                    }
+                }
+            } else {
+                if (!Lflag) {
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/DCC", currcomp, NULL));
+                    }
+                }
+            }
+            if (make_edison_shlib) {
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                    addstr(&execlist, cxx_init);
+                }
+                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                    addstr(&execlist, delta_init);
+                }
+                addlist(&execlist, &objfiles);
+                if (xpg_flag) {
+                    addlist(&execlist, &dashlfiles);
+                }
+                if (!nodeflib) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                        spDC = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                        if (spDC) {
                             addstr(&execlist, "-dont_warn_unused");
                         }
-                        if (exception_handling != 0) {
+                        if (exception_handling) {
                             addstr(&execlist, "-lCsup");
                         }
                         addstr(&execlist, "-lC");
-                        if (spD0 != 0) {
+                        if (spDC) {
                             addstr(&execlist, "-warn_unused");
                         }
                     }
-                    if (B_1000ED2C != 0) {
-                        addstr(&execlist, "-lc_s");
-                    } else if (B_1000ED30 != 0) {
-                        addstr(&execlist, "-lc_s");
-                    }
-                    if (xpg_flag != 0) {
+                    if (xpg_flag) {
                         addstr(&execlist, "-dont_warn_unused");
                         addstr(&execlist, "-lgen");
                         addstr(&execlist, "-warn_unused");
                     }
                     addstr(&execlist, "-lc");
                 }
-            }
-            if (crtn_required != 0) {
-                addstr(&execlist, crtn);
-            }
-            if (rls_id_object != NULL) {
-                addstr(&execlist, rls_id_object);
-            }
-        }
-        passin = NULL;
-        if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
-            runerror += 1;
-            if (Kflag == 0) {
-                if ((strcmp(LD, "old_ld") == 0) ||
-                    ((compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)))) {
-                    if (outfile != NULL) {
-                        unlink(outfile);
+            } else {
+                addstr(&execlist, "-nocount");
+                addstr(&execlist, crtx);
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                    addstr(&execlist, cxx_init);
+                }
+                if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                    addstr(&execlist, delta_init);
+                }
+                addstr(&execlist, "-count");
+                addlist(&execlist, &objfiles);
+                if (xpg_flag) {
+                    addlist(&execlist, &dashlfiles);
+                }
+                addlist(&execlist, &ldZflags);
+                if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) && !irix4) {
+                    addstr(&execlist, "-cckr");
+                }
+                addstr(&execlist, "-nocount");
+                if (!nodeflib) {
+                    if ((compiler == COMPILER_2) || haspascal) {
+                        addspacedstr(&execlist, libp);
+                        addspacedstr(&execlist, libxmalloc);
+                        addspacedstr(&execlist, libexc);
+                        addspacedstr(&execlist, libmld);
+                    }
+                    if ((compiler == COMPILER_3) || hasfortran) {
+                        if (mp_flag) {
+                            addspacedstr(&execlist, libI77_mp);
+                        }
+                        if (non_shared || irix4) {
+                            addspacedstr(&execlist, libF77);
+                            addspacedstr(&execlist, libm);
+                            addspacedstr(&execlist, libU77);
+                            if (D_1000C130 != 0) {
+                                spD8 = strlen(libI77);
+                                spD4 = malloc(spD8 + 2);
+                                memcpy(spD4, libI77, spD8);
+                                spD4[spD8 + 0] = '_';
+                                spD4[spD8 + 1] = 's';
+                                spD4[spD8 + 2] = '\0';
+                                libI77 = spD4;
+                            }
+                            addspacedstr(&execlist, libI77);
+                            addspacedstr(&execlist, libisam);
+                        } else {
+                            addspacedstr(&execlist, libftn);
+                            addspacedstr(&execlist, libm);
+                        }
+                    }
+                    if (compiler == COMPILER_5) {
+                        addstr(&execlist, libpl1);
+                        addspacedstr(&execlist, libxmalloc);
+                        addstr(&execlist, "-ltermcap");
+                        addspacedstr(&execlist, libexc);
+                        addspacedstr(&execlist, libmld);
+                    }
+                    if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
+                        (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
+                        addspacedstr(&execlist, libm);
+                    }
+                    if (pgflag != 0) {
+                        addspacedstr(&execlist, libgprof);
+                    } else if (pflag != 0) {
+                        addspacedstr(&execlist, libprof);
+                    }
+                    if (!sixty4bitflag) {
+                        ldw_file = fopen(libdw_path, "r");
+                        if (ldw_file != NULL) {
+                            addspacedstr(&execlist, libdw);
+                        }
+                    }
+                    if (cmp_flag & 0x10000) {
+                        addstr(&execlist, libc_mp);
+                        if (compiler == COMPILER_1) {
+                            addstr(&execlist, "-lkapio");
+                        }
+                    }
+                    if (run_sopt && (compiler == COMPILER_1)) {
+                        addstr(&execlist, "-lkapio");
+                    }
+                    if (compiler == COMPILER_3) {
+                        if (D_1000C130 == 2) {
+                            addstr(&execlist, "-lc_s");
+                            if (xpg_flag) {
+                                addstr(&execlist, "-dont_warn_unused");
+                                addstr(&execlist, "-lgen");
+                                addstr(&execlist, "-warn_unused");
+                            }
+                            addstr(&execlist, "-lc");
+                        } else {
+                            if (irix4 && (B_1000ED74 == 0)) {
+                                addstr(&execlist, "-lmpc");
+                            }
+                            if (B_1000ED2C != 0) {
+                                addstr(&execlist, "-lc_s");
+                            } else if (B_1000ED30 != 0) {
+                                addstr(&execlist, "-lc_s");
+                            }
+                            if (xpg_flag) {
+                                addstr(&execlist, "-dont_warn_unused");
+                                addstr(&execlist, "-lgen");
+                                addstr(&execlist, "-warn_unused");
+                            }
+                            addstr(&execlist, "-lc");
+                        }
                     } else {
-                        unlink("a.out");
+                        if (irix4 && (cmp_flag & 0x10000)) {
+                            addstr(&execlist, "-lmpc");
+                        }
+                        if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                         (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                            spD0 = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                            if (spD0) {
+                                addstr(&execlist, "-dont_warn_unused");
+                            }
+                            if (exception_handling) {
+                                addstr(&execlist, "-lCsup");
+                            }
+                            addstr(&execlist, "-lC");
+                            if (spD0) {
+                                addstr(&execlist, "-warn_unused");
+                            }
+                        }
+                        if (B_1000ED2C != 0) {
+                            addstr(&execlist, "-lc_s");
+                        } else if (B_1000ED30 != 0) {
+                            addstr(&execlist, "-lc_s");
+                        }
+                        if (xpg_flag) {
+                            addstr(&execlist, "-dont_warn_unused");
+                            addstr(&execlist, "-lgen");
+                            addstr(&execlist, "-warn_unused");
+                        }
+                        addstr(&execlist, "-lc");
                     }
                 }
-                if (tmp_uldobj != NULL) {
-                    unlink(tmp_uldobj);
+                if (crtn_required) {
+                    addstr(&execlist, crtn);
+                }
+                if (rls_id_object != NULL) {
+                    addstr(&execlist, rls_id_object);
+                }
+            }
+
+            passin = NULL;
+            if (run(ld, execlist.entries, NULL, NULL, tempstr[32]) != 0) {
+                runerror++;
+                if (!Kflag) {
+                    if ((strcmp(LD, "old_ld") == 0) ||
+                        ((compiler == COMPILER_1) &&
+                         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
+                        if (outfile != NULL) {
+                            unlink(outfile);
+                        } else {
+                            unlink("a.out");
+                        }
+                    }
+                    if (tmp_uldobj != NULL) {
+                        unlink(tmp_uldobj);
+                    }
                 }
             }
         }
+
+    phase_filter:
         if (tempstr[32] != NULL) {
             if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
                 execlist.length = 0;
@@ -4841,10 +5328,13 @@ repeat_after_edit:
             }
             unlink(tempstr[32]);
         }
-        if ((runerror == 0) && (compiler == 1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+
+    phase_patch:
+        if ((runerror == 0) && (compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             execlist.length = 0;
             addstr(&execlist, patch);
-            if (vflag != 0) {
+            if (vflag) {
                 addstr(&execlist, "-d");
             }
             if (outfile != NULL) {
@@ -4853,10 +5343,12 @@ repeat_after_edit:
                 addstr(&execlist, "a.out");
             }
             if (run(patch, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
+                runerror++;
             }
         }
-        if ((runerror == 0) && (do_strip != 0)) {
+
+    phase_strip:
+        if ((runerror == 0) && do_strip) {
             execlist.length = 0;
             addstr(&execlist, strip);
             if (outfile != NULL) {
@@ -4865,54 +5357,56 @@ repeat_after_edit:
                 addstr(&execlist, "a.out");
             }
             if (run(strip, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
+                runerror++;
             }
         }
-    block_2588:
 
-        if ((cordflag != 0) && (runerror == 0)) {
-            execlist.length = 0;
-            addstr(&execlist, "cord");
-            if (vflag != 0) {
-                addstr(&execlist, "-v");
+    phase_cord:
+        {
+            if (cordflag && (runerror == 0)) {
+                execlist.length = 0;
+                addstr(&execlist, "cord");
+                if (vflag) {
+                    addstr(&execlist, "-v");
+                }
+                addlist(&execlist, &cordflags);
+                if (outfile != NULL) {
+                    passout = outfile;
+                } else {
+                    passout = "a.out";
+                }
+                addstr(&execlist, "-o");
+                addstr(&execlist, passout);
+                addstr(&execlist, tempstr[22]);
+                if (feedlist.length != 0) {
+                    addlist(&execlist, &feedlist);
+                } else {
+                    addstr(&execlist, mkstr(passout, ".fb", NULL));
+                }
+                if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
+                    runerror++;
+                    unlink(passout);
+                    unlink(tempstr[22]);
+                } else {
+                    unlink(tempstr[22]);
+                }
             }
-            addlist(&execlist, &cordflags);
-            if (outfile != NULL) {
-                passout = outfile;
-            } else {
-                passout = "a.out";
+            if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && !Kflag) {
+                unlink(mksuf(srcfiles.entries[0], 'o'));
             }
-            addstr(&execlist, "-o");
-            addstr(&execlist, passout);
-            addstr(&execlist, tempstr[22]);
-            if (feedlist.length != 0) {
-                addlist(&execlist, &feedlist);
-            } else {
-                addstr(&execlist, mkstr(passout, ".fb", NULL));
-            }
-            if (run(cord, execlist.entries, NULL, NULL, NULL) != 0) {
-                runerror += 1;
-                unlink(passout);
-                unlink(tempstr[22]);
-            } else {
-                unlink(tempstr[22]);
-            }
-        }
-        if ((runerror == 0) && (srcfiles.length == 1) && (nobjs == 1) && (Kflag == 0)) {
-            unlink(mksuf(*srcfiles.entries, 0x6F));
         }
     }
 
     if (tmp_uldobj != NULL) {
         unlink(tmp_uldobj);
     }
-    if (editflag != 0) {
+    if (editflag != EDIT_FLAG_0) {
         unlink(errout);
-        if (editflag == 2) {
+        if (editflag == EDIT_FLAG_2) {
             unlink(tempstr[25]);
         }
     }
-    if ((compiler == 1) && (gflag >= 2)) {
+    if ((compiler == COMPILER_1) && (gflag >= 2)) {
         unlink(tempstr[33]);
     }
     if (runerror != 0) {
@@ -4936,16 +5430,16 @@ void process_config(int argc, char** argv) {
         if (strcmp(argv[i], "-systype") == 0) {
             i++;
             if (i >= argc) {
-                error(1, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
                 exit(2);
             }
 
-            user_systype = 1;
+            user_systype = TRUE;
             systype = argv[i];
             if (strcmp(systype, "svr4") == 0) {
-                svr4_systype = 1;
+                svr4_systype = TRUE;
             } else {
-                error(1, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only systype svr4 allowed\n");
                 exit(2);
             }
 
@@ -4955,25 +5449,26 @@ void process_config(int argc, char** argv) {
                 && (strcmp(systype, "svr3") != 0) 
                 && (strcmp(systype, "sysv") != 0) 
                 && (fopen(strcat("/", systype), "r") == NULL) 
-                && (systype_warn == 0)) {
+                && !systype_warn) {
                 // clang-format on
-                error(2, NULL, 0, NULL, 0, "This systype doesn't exist on this machine; changed systype to svr3.\n");
-                systype_warn = 1;
+                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                      "This systype doesn't exist on this machine; changed systype to svr3.\n");
+                systype_warn = TRUE;
                 systype = "svr3";
             }
 
-            if (svr4_systype == 0) {
+            if (!svr4_systype) {
                 sp1144 = mkstr(comp_target_root, systype, "/", NULL);
             }
             break;
         }
     }
 
-    if (user_systype == 0) {
+    if (!user_systype) {
         sp1144 = mkstr(comp_target_root, systype, "/", NULL);
     }
 
-    user_systype = 0;
+    user_systype = FALSE;
     sp1140 = mkstr(sp1144, "usr/lib/", currcomp, "comp.config", NULL);
     sp113C = fopen(sp1140, "r");
     if (sp113C != NULL) {
@@ -4991,7 +5486,7 @@ void process_config(int argc, char** argv) {
 
                 if (*var_s1 != 0) {
                     sp38[sp138] = var_s1;
-                    sp138 += 1;
+                    sp138++;
                 }
 
                 while ((*var_s1 != '\0') && (*var_s1 != ' ') && (*var_s1 != '\t')) {
@@ -5037,33 +5532,33 @@ void parse_command(int argc, char** argv) {
     char* sp148 = getenv("SGI_IRIX4");
 
     if (sp148 != NULL) {
-        irix4 = 1;
+        irix4 = TRUE;
         comp_host_root = "/usr/irix4/";
         systype = "";
-        elfflag = 0;
-        svr4_systype = 0;
-        call_shared = 0;
-        non_shared = 0;
-        old_non_shared = 0;
-        default_call_shared = 0;
+        elfflag = FALSE;
+        svr4_systype = FALSE;
+        call_shared = FALSE;
+        non_shared = FALSE;
+        old_non_shared = FALSE;
+        default_call_shared = FALSE;
         Gnum = "8";
-        kpic_flag = 0;
-        mips_abi = 0;
+        kpic_flag = FALSE;
+        mips_abi = MIPS_ABI_0;
         runlib = "/usr/irix4/";
         relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
     }
 
     for (var_s0 = 0; var_s0 < argc; var_s0++) {
-        if ((argv[var_s0][0] == '-') && ((NoMoreOptions == 0) || (strchr(argv[var_s0], '.') == NULL))) {
+        if ((argv[var_s0][0] == '-') && (!NoMoreOptions || (strchr(argv[var_s0], '.') == NULL))) {
             switch (argv[var_s0][1]) { /* switch 1 */
                 case '#':              /* switch 1 */
                                        //! @bug Should end in '\n'.
-                    error(2, NULL, 0, NULL, 0, "-# is not supported. Use -v to see compiler passesn");
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-# is not supported. Use -v to see compiler passesn");
                     break;
 
                 case '1': /* switch 1 */
                     if ((compiler == COMPILER_3) && (argv[var_s0][2] == '\0')) {
-                        mp_onetripflag = 1;
+                        mp_onetripflag = TRUE;
                         addstr(&fcomflags, argv[var_s0]);
                         break;
                     }
@@ -5071,17 +5566,17 @@ void parse_command(int argc, char** argv) {
 
                 case '3': /* switch 1 */
                     if ((strcmp(argv[var_s0], "-32bit") == 0) || (strcmp(argv[var_s0], "-32") == 0)) {
-                        thirty2bitflag = 1;
-                        mips_abi = 1;
+                        thirty2bitflag = TRUE;
+                        mips_abi = MIPS_ABI_1;
                     }
                     break;
 
                 case '5': /* switch 1 */
-                    error(2, NULL, 0, NULL, 0, "-5 not supported\n");
+                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-5 not supported\n");
                     if (argv[var_s0][2] == '\0') {
-                        if (Bflag != 0) {
-                            if (fiveflag == 0) {
-                                error(1, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
+                        if (Bflag) {
+                            if (!fiveflag) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-5 must precede any -B flags\n");
                                 exit(2);
                             }
                         } else {
@@ -5102,11 +5597,12 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-64bit") == 0) {
-                        error(2, NULL, 0, NULL, 0,
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                               "-64bit option is not yet implemented for ucode compilers, ignore\n");
-                        sixty4bit_spec = 1;
-                        if (swopcodeflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-64bit can not be used with -swopcode for ucode compilers\n");
+                        sixty4bit_spec = TRUE;
+                        if (swopcodeflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-64bit can not be used with -swopcode for ucode compilers\n");
                             exit(2);
                         }
                         break;
@@ -5121,7 +5617,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&objfiles, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
                             exit(2);
                         }
                     }
@@ -5156,7 +5652,7 @@ void parse_command(int argc, char** argv) {
                     } else {
                         char* sp144;
 
-                        Bflag = 1;
+                        Bflag = TRUE;
                         sp144 = argv[var_s0] + 2;
                         relocate_passes(tstring, hstring, sp144);
                         if (tstring == NULL) {
@@ -5182,7 +5678,7 @@ void parse_command(int argc, char** argv) {
                     }
                     //! @note Only checks for "-CG_E"
                     if (strncmp(argv[var_s0], "-CG_EMIT:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-CG_EMIT options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-CG_EMIT options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -5226,25 +5722,25 @@ void parse_command(int argc, char** argv) {
                     // -E
                     if (argv[var_s0][2] == '\0') {
                         Eflag++;
-                        docpp = 1;
+                        docpp = TRUE;
                         break;
                     }
                     // -EB/-EL (Endian)
                     if ((argv[var_s0][3] == '\0') && ((argv[var_s0][2] == 'B') || (argv[var_s0][2] == 'L'))) {
                         if (argv[var_s0][2] == 'B') {
-                            if ((Bflag != 0) && (targetsex != 0)) {
-                                error(1, NULL, 0, NULL, 0,
+                            if (Bflag && (targetsex != BIGENDIAN)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                       "-EB or -EL must precede any -B flags for ucode compilers\n");
                                 exit(2);
                             }
-                            targetsex = 0;
+                            targetsex = BIGENDIAN;
                         } else {
-                            if ((Bflag != 0) && (targetsex != 1)) {
-                                error(1, NULL, 0, NULL, 0,
+                            if (Bflag && (targetsex != LITTLEENDIAN)) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                       "-EB or -EL must precede any -B flags for ucode compilers\n");
                                 exit(2);
                             }
-                            targetsex = 1;
+                            targetsex = LITTLEENDIAN;
                         }
                         newrunlib();
                         break;
@@ -5255,9 +5751,10 @@ void parse_command(int argc, char** argv) {
                     if (argv[var_s0][2] == '\0') {
                         if (compiler == COMPILER_3) {
                             Fflag++;
-                        } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                            cflag = 1;
-                            Fflag = 1;
+                        } else if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                                (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                            cflag = TRUE;
+                            Fflag = TRUE;
                             default_template_instantiation_mode = 1;
                         } else {
                             addstr(&ldflags, argv[var_s0]);
@@ -5268,22 +5765,22 @@ void parse_command(int argc, char** argv) {
 
                 case 'G': /* switch 1 */
                     if (strncmp(argv[var_s0], "-GCM:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-GCM options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-GCM options are ignored\n");
                         break;
                     }
                     if (argv[var_s0][2] == '\0') {
-                        if (default_svr4 != 0) {
-                            if (dn_flag != 0) {
-                                error(1, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
+                        if (default_svr4) {
+                            if (dn_flag) {
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G can not be used with -dn \n");
                                 exit(2);
                             }
-                            G_flag = 1;
+                            G_flag = TRUE;
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-G requires a decimal number argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-G requires a decimal number argument\n");
                             exit(2);
                         }
                         if (Oflag < 3) {
@@ -5292,7 +5789,7 @@ void parse_command(int argc, char** argv) {
                             Gnum = "0";
                         }
                     } else {
-                        if (default_svr4 != 0) {
+                        if (default_svr4) {
                             break;
                         }
                         if (Oflag < 3) {
@@ -5303,13 +5800,13 @@ void parse_command(int argc, char** argv) {
                     }
                     for (var_s2 = Gnum; *var_s2 != '\0'; var_s2++) {
                         if (!isdigit(*var_s2)) {
-                            error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", Gnum);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", Gnum);
                             exit(2);
                         }
                     }
-                    if (Gseen_flag == 0) {
+                    if (!Gseen_flag) {
                         relocate_passes(tstring, hstring, NULL);
-                        Gseen_flag = 1;
+                        Gseen_flag = TRUE;
                     }
                     break;
 
@@ -5326,7 +5823,7 @@ void parse_command(int argc, char** argv) {
                         for (var_s2 = "fKMdkjusmocab"; (*var_s2 != '\0' && *var_s2 != Hchar); var_s2++) {}
 
                         if (*var_s2 == '\0') {
-                            error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                             exit(2);
                         }
                         break;
@@ -5365,7 +5862,7 @@ void parse_command(int argc, char** argv) {
 
                         for (sp130 = sp12C; *sp130 != 0; sp130++) {
                             if (!isdigit(*sp130)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -J %s\n", sp12C);
                                 exit(2);
                             }
                         }
@@ -5376,7 +5873,7 @@ void parse_command(int argc, char** argv) {
                     }
                     //! @bug fallthrough means -K options can also be specified with -J
                 case 'K': /* switch 1 */
-                    if (default_svr4 != 0) {
+                    if (default_svr4) {
                         Kpass = argv[var_s0] + 2;
                         if (*Kpass == '\0') {
                             Kpass = argv[var_s0] + 3;
@@ -5391,7 +5888,7 @@ void parse_command(int argc, char** argv) {
                             Kpass = var_s2;
 
                             if (strncmp(Karg, "minabi", 6) == 0) {
-                                kminabiflag = 1;
+                                kminabiflag = TRUE;
                             } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
                             } else if (strncmp(Karg, "sd", 2) == 0) {
@@ -5401,13 +5898,13 @@ void parse_command(int argc, char** argv) {
                             } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
-                                if (non_shared != 0) {
-                                    error(2, NULL, 0, NULL, 0,
+                                if (non_shared) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                    kpic_flag = 0;
+                                    kpic_flag = FALSE;
                                 } else {
-                                    kpic_flag = 1;
-                                    kpic_spec = 1;
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
                                 }
                             } else {
                                 goto bad_option;
@@ -5423,7 +5920,7 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if (svr4_systype != 0) {
+                    if (svr4_systype) {
                         Kpass = argv[var_s0] + 2;
                         if (*Kpass == '\0') {
                             Kflag++;
@@ -5439,7 +5936,7 @@ void parse_command(int argc, char** argv) {
                             Kpass = var_s2;
 
                             if (strncmp(Karg, "minabi", 6) == 0) {
-                                kminabiflag = 1;
+                                kminabiflag = TRUE;
                             } else if (strncmp(Karg, "fpe", 3) == 0) {
                                 addstr(&ldflags, "-Kfpe");
                             } else if (strncmp(Karg, "sd", 2) == 0) {
@@ -5449,13 +5946,13 @@ void parse_command(int argc, char** argv) {
                             } else if (strncmp(Karg, "mau", 3) == 0) {
                                 addstr(&ldflags, "-Kmau");
                             } else if (strncmp(Karg, "PIC", 3) == 0) {
-                                if (non_shared != 0) {
-                                    error(2, NULL, 0, NULL, 0,
+                                if (non_shared) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                    kpic_flag = 0;
+                                    kpic_flag = FALSE;
                                 } else {
-                                    kpic_flag = 1;
-                                    kpic_spec = 1;
+                                    kpic_flag = TRUE;
+                                    kpic_spec = TRUE;
                                 }
                             } else {
                                 goto bad_option;
@@ -5473,12 +5970,13 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] != '\0') {
                         if (strcmp(argv[var_s0], "-KPIC") == 0) {
-                            if (non_shared != 0) {
-                                error(2, NULL, 0, NULL, 0, "Can't mix -KPIC and -non_shared, change to -non_shared\n");
-                                kpic_flag = 0;
+                            if (non_shared) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "Can't mix -KPIC and -non_shared, change to -non_shared\n");
+                                kpic_flag = FALSE;
                             } else {
-                                kpic_flag = 1;
-                                kpic_spec = 1;
+                                kpic_flag = TRUE;
+                                kpic_spec = TRUE;
                             }
                             break;
                         } else {
@@ -5500,14 +5998,13 @@ void parse_command(int argc, char** argv) {
                             sp128 = mkstr(argv[var_s0 - 1], argv[var_s0], NULL);
                             addstr(&ldflags, sp128);
                             addstr(&prelinkerflags, sp128);
-                            Lflag = 1;
+                            Lflag = TRUE;
                             break;
                         } else {
                             addstr(&prelinkerflags, mkstr("-YB", NULL));
                         }
                     }
-
-                    Lflag = 1;
+                    Lflag = TRUE;
                     addstr(&ldflags, argv[var_s0]);
                     addstr(&prelinkerflags, argv[var_s0]);
                     break;
@@ -5523,7 +6020,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             addstr(&ldflags, argv[var_s0 + 1]);
                         } else if (strcmp(argv[var_s0] + 3, "target") == 0) {
-                            if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                                 sp154 = argv[var_s0 + 1];
                             } else {
                                 addstr(&cppflags, argv[var_s0]);
@@ -5534,7 +6031,8 @@ void parse_command(int argc, char** argv) {
                         }
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "%s must be followed by a file name\n", argv[var_s0 - 1]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must be followed by a file name\n",
+                                  argv[var_s0 - 1]);
                             exit(2);
                         }
                         break;
@@ -5561,16 +6059,16 @@ void parse_command(int argc, char** argv) {
                     goto bad_option;
 
                 case 'O': /* switch 1 */
-                    plain_O = 0;
+                    plain_O = FALSE;
                     if (argv[var_s0][2] == '\0') {
                         //! @bug var_s1 possibly used uninitialised
-                        if ((xpg_flag != 0) && (var_s1 == 'f')) {
+                        if (xpg_flag && (var_s1 == 'f')) {
                             fprintf(stderr, "Error: optlevel should be specified\n");
                             exit(1);
                         }
                         Oflag = 2;
-                        plain_O = 1;
-                        if (plain_g != 0) {
+                        plain_O = TRUE;
+                        if (plain_g) {
                             Oflag = 1;
                         }
                         if (((var_s0 + 1) < argc) && (argv[var_s0 + 1][1] == '\0') && (*argv[var_s0 + 1] >= '0') &&
@@ -5609,8 +6107,8 @@ void parse_command(int argc, char** argv) {
                                 addstr(&olimitflags, sp120);
                                 addstr(&olimitflags, sp11C);
                             }
-                            if ((Oflag >= 3) && (jflag == 0)) {
-                                uload = 1;
+                            if ((Oflag >= 3) && !jflag) {
+                                uload = TRUE;
                             }
                             break;
                         }
@@ -5624,12 +6122,13 @@ void parse_command(int argc, char** argv) {
                         addstr(&olimitflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-Olimit must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-Olimit must have an argument\n");
                             exit(2);
                         }
                         for (var_s2 = argv[var_s0]; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -Olimit %s\n",
+                                      argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -5641,7 +6140,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strncmp(argv[var_s0], "-OPT:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-OPT options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-OPT options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -5649,9 +6148,9 @@ void parse_command(int argc, char** argv) {
                 case 'P': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
                         if (1) {} // FAKE
-                        docpp = 1;
+                        docpp = TRUE;
                         addstr(&cppflags, argv[var_s0]);
-                        if (Eflag == 0) {
+                        if (!Eflag) {
                             Pflag++;
                         }
                         break;
@@ -5674,7 +6173,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'S': /* switch 1 */
                     if (strncmp(argv[var_s0], "-SWP:", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-SWP options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-SWP options are ignored\n");
                         break;
                     }
                     if (argv[var_s0][2] == '\0') {
@@ -5691,15 +6190,15 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -T to have an argument\n");
                         exit(2);
                     }
                     if (strncmp(argv[var_s0], "-TARG:", 6) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-TARG options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TARG options are ignored\n");
                         break;
                     }
                     if (strncmp(argv[var_s0], "-TENV:", 6) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-TENV options are ignored\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-TENV options are ignored\n");
                         break;
                     }
                     goto bad_option;
@@ -5727,7 +6226,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'V': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        error(2, NULL, 0, NULL, 0, "-V is not supported.\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-V is not supported.\n");
                         break;
                     }
                     if (strcmp(argv[var_s0], "-VS") == 0) {
@@ -5737,19 +6236,20 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -VS to have an argument\n");
                         exit(2);
                     }
                     goto bad_option;
 
                 case 'W': /* switch 1 */
+                    // Options to pass on to subsequent programs Use as -W[letter],option1,option2,...
                     Wpass = argv[var_s0] + 2;
-                    if (*Wpass != 0) {
+                    if (*Wpass != '\0') {
                         if (1) {} // FAKE
                         Warg = argv[var_s0] + 3;
 
                         while (*Warg != ',') {
-                            if (*Warg++ == 0) {
+                            if (*Warg++ == '\0') {
                                 goto bad_option;
                             }
                         }
@@ -5768,16 +6268,16 @@ void parse_command(int argc, char** argv) {
                                         } else if (compiler == COMPILER_1) {
                                             addstr(&pcaflags, Warg);
                                         } else {
-                                            error(1, NULL, 0, NULL, 0,
+                                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                   "-WK only valid in FORTRAN or C compilations.\n");
                                             exit(2);
                                         }
                                         break;
 
-                                    case '0':               /* switch 2 */
-                                    case 'f':               /* switch 2 */
-                                        switch (compiler) { /* switch 6; irregular */
-                                            case COMPILER_2:         /* switch 6 */
+                                    case '0': /* switch 2 */
+                                    case 'f': /* switch 2 */
+                                        switch (compiler) {
+                                            case COMPILER_2:
                                                 addstr(&upasflags, Warg);
                                                 break;
                                             case COMPILER_3:
@@ -5789,7 +6289,7 @@ void parse_command(int argc, char** argv) {
                                             case COMPILER_6:
                                                 addstr(&ucobflags, Warg);
                                                 break;
-                                            default:
+                                            default: // COMPILER_1, COMPILER_4
                                                 addstr(&ccomflags, Warg);
                                                 addstr(&edisonflags, Warg);
                                                 break;
@@ -5834,8 +6334,8 @@ void parse_command(int argc, char** argv) {
 
                                     case 'o': /* switch 2 */
                                         addstr(&optflags, Warg);
-                                        if (strstr(Warg, "loopunroll") != 0) {
-                                            set_loop_unroll = 1;
+                                        if (strstr(Warg, "loopunroll") != NULL) {
+                                            set_loop_unroll = TRUE;
                                         }
                                         break;
 
@@ -5873,7 +6373,7 @@ void parse_command(int argc, char** argv) {
                                                 if (Warg[2] == '\0') {
                                                     var_s0++;
                                                     if (var_s0 >= argc) {
-                                                        error(1, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                               "-G requires a decimal number argument\n");
                                                         exit(2);
                                                     }
@@ -5889,26 +6389,27 @@ void parse_command(int argc, char** argv) {
                                                 }
                                                 for (var_s3 = Gnum; ((*var_s3 != ',') && (*var_s3 != 0));) {
                                                     if (!isdigit(*var_s3)) {
-                                                        error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n",
-                                                              Gnum);
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                              "non-digit character in -G %s\n", Gnum);
                                                         exit(2);
                                                     }
                                                     if (*var_s3 != ',') {
                                                         var_s3++;
                                                     }
                                                 }
-                                                if (Gseen_flag == 0) {
-                                                    Gseen_flag = 1;
+                                                if (!Gseen_flag) {
+                                                    Gseen_flag = TRUE;
                                                     relocate_passes(tstring, hstring, NULL);
                                                 }
                                                 Warg = var_s3;
                                                 break;
 
                                             case 'v': /* switch 3 */
+                                                // -Wxv
                                                 if ((Warg[2] == '\0') || (Warg[2] == ',')) {
-                                                    vflag = 1;
+                                                    vflag = TRUE;
                                                     if (getenv("ROOTDIR") != NULL) {
-                                                        error(2, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                                               "ROOTDIR env var ignored, use COMP_TARGET_ROOT and "
                                                               "COMP_HOST_ROOT\n");
                                                     }
@@ -5916,7 +6417,7 @@ void parse_command(int argc, char** argv) {
                                                 break;
 
                                             case 'D': /* switch 3 */
-                                                // -WxD?
+                                                // -WxD
                                                 if (argv[var_s0][2] == '\0') {
                                                     if ((var_s0 + 1) < argc) {
                                                         int sp114;
@@ -5926,7 +6427,7 @@ void parse_command(int argc, char** argv) {
                                                         if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
                                                             (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
-                                                            error(2, NULL, 0, NULL, 0,
+                                                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                                                   "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
                                                             break;
                                                         }
@@ -5938,7 +6439,7 @@ void parse_command(int argc, char** argv) {
                                                         addstr(&ldflags, argv[var_s0]);
                                                         break;
                                                     } else {
-                                                        error(1, NULL, 0, NULL, 0,
+                                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
                                                               "ld requires -D to have an argument\n");
                                                         exit(2);
                                                     }
@@ -5964,7 +6465,8 @@ void parse_command(int argc, char** argv) {
                                                     if (var_s0 < argc) {
                                                         addstr(&objfiles, "-A");
                                                     }
-                                                    error(1, NULL, 0, NULL, 0, "ld requires -A to have an argument\n");
+                                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                                          "ld requires -A to have an argument\n");
                                                     exit(2);
                                                 }
                                                 break;
@@ -5972,7 +6474,8 @@ void parse_command(int argc, char** argv) {
                                         break;
 
                                     default: /* switch 2 */
-                                        error(1, NULL, 0, NULL, 0, "Unknown pass character in %s\n", argv[var_s0]);
+                                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown pass character in %s\n",
+                                              argv[var_s0]);
                                         exit(2);
                                         break;
                                 }
@@ -6022,7 +6525,7 @@ void parse_command(int argc, char** argv) {
                         if (var_s0 < argc) {
                             addstr(&ldflags, argv[var_s0]);
                         } else {
-                            error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
                         }
                     }
                     break;
@@ -6032,35 +6535,37 @@ void parse_command(int argc, char** argv) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-auto_include") == 0)) {
-                        auto_template_include = 1;
+                        auto_template_include = TRUE;
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-anach") == 0)) {
-                        anachronisms = 1;
+                        anachronisms = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ansi") == 0) {
-                        if (compchoice == 1) {
-                            compchoice = 0;
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
                         }
-                        ansichoice = 1;
-                        if (cppchoice != 1) {
-                            cppchoice = 3;
+                        ansichoice = ANSICHOICE_ANSI;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_3;
                         }
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ansiposix") == 0) {
-                        if (compchoice == 1) {
-                            compchoice = 0;
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
                         }
-                        ansichoice = 2;
-                        if (cppchoice != 1) {
-                            cppchoice = 3;
+                        ansichoice = ANSICHOICE_ANSIPOSIX;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_3;
                         }
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
@@ -6074,12 +6579,12 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-acpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
-                            cppchoice = 1;
-                            acpp = 1;
+                            cppchoice = CPP_CHOICE_1;
+                            acpp = TRUE;
                             relocate_passes("p", NULL, NULL);
                         }
                         break;
@@ -6117,12 +6622,12 @@ void parse_command(int argc, char** argv) {
                             break;
                         }
                         if (strcmp(argv[var_s0], "-automatic") == 0) {
-                            automaticflag = 1;
+                            automaticflag = TRUE;
                             break;
                         }
                     }
                     if ((compiler == COMPILER_6) && (strcmp(argv[var_s0], "-ansi") == 0)) {
-                        ansiflag = 1;
+                        ansiflag = TRUE;
                         break;
                     }
                     if ((compiler == COMPILER_2) && (strcmp(argv[var_s0], "-apc") == 0)) {
@@ -6180,48 +6685,49 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cckr") == 0) {
-                        ansichoice = 0;
-                        if (cppchoice != 1) {
-                            cppchoice = 2;
+                        ansichoice = ANSICHOICE_KR;
+                        if (cppchoice != CPP_CHOICE_1) {
+                            cppchoice = CPP_CHOICE_2;
                         }
                         add_static_opt(argv[var_s0]);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cfe") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
-                            compchoice = 3;
+                            compchoice = COMP_CHOICE_3;
                             relocate_passes("p", NULL, NULL);
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-common") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&accomflags, "-Xcommon");
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-cfront") == 0)) {
-                        cfront_compatible = 1;
+                        cfront_compatible = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cachesz") == 0) {
                         addstr(&ddoptflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-cachesz must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-cachesz must have an argument\n");
                             exit(2);
                         }
 
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -6230,56 +6736,57 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cplus") == 0) {
-                        cplusflag = 1;
+                        cplusflag = TRUE;
                         addstr(&ccomflags, "-cplus");
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cpp") == 0) {
-                        error(2, NULL, 0, NULL, 0, "-cpp is default\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-cpp is default\n");
                         break;
                     }
                     if (strcmp(argv[var_s0], "-cord") == 0) {
-                        cordflag = 1;
+                        cordflag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-coff") == 0) {
                         addstr(&ldflags, argv[var_s0]);
-                        coff_spec = 1;
-                        if (default_call_shared == 1) {
-                            if (non_shared == 0) {
-                                old_non_shared = 1;
-                                non_shared = 1;
+                        coff_spec = TRUE;
+                        if (default_call_shared == TRUE) {
+                            if (!non_shared) {
+                                old_non_shared = TRUE;
+                                non_shared = TRUE;
                             }
-                            default_call_shared = 0;
-                            call_shared = 0;
+                            default_call_shared = FALSE;
+                            call_shared = FALSE;
                         }
                         break;
                     }
+                    //! @bug Impossible to satisfy this conditional
                     if ((strcmp(argv[var_s0], "-call_shared") == 0) &&
                         ((strcmp(argv[var_s0], "-count") == 0) || (strcmp(argv[var_s0], "-countall") == 0))) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-call_shared") == 0) {
-                        non_shared = 0;
-                        call_shared = 1;
+                        non_shared = FALSE;
+                        call_shared = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-crt0") == 0) {
                         CRTX = "crt0.o";
                         MCRTX = "mcrt0.o";
-                        crtn_required = 0;
+                        crtn_required = FALSE;
                         relocate_passes("r", NULL, NULL);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-crt1") == 0) {
-                        if ((ansichoice == 1) || (ansichoice == 2)) {
+                        if ((ansichoice == ANSICHOICE_ANSI) || (ansichoice == ANSICHOICE_ANSIPOSIX)) {
                             CRTX = "acrt1.o";
                         } else {
                             CRTX = "crt1.o";
                         }
                         MCRTX = "mcrt1.o";
-                        crtn_required = 1;
+                        crtn_required = TRUE;
                         relocate_passes("r", NULL, NULL);
                         break;
                     }
@@ -6296,7 +6803,7 @@ void parse_command(int argc, char** argv) {
                          (strcmp(argv[var_s0], "-chararg1") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
                          (strcmp(argv[var_s0], "-check_bounds") == 0))) {
                         if (strcmp(argv[var_s0], "-col120") == 0) {
-                            mp_col120flag = 1;
+                            mp_col120flag = TRUE;
                         }
                         if (strcmp(argv[var_s0], "-check_bounds") == 0) {
                             addstr(&fcomflags, "-C");
@@ -6323,7 +6830,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-check_registry") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-check_registry requires a filename argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -6347,24 +6854,24 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ddoptinfo") == 0) {
-                        ddoptinfo = 1;
+                        ddoptinfo = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-dy") == 0) || (strcmp(argv[var_s0], "-dn") == 0)) {
-                        if (G_flag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
+                        if (G_flag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-dn can not be used with -G \n");
                             exit(2);
                         }
-                        dn_flag = 1;
+                        dn_flag = TRUE;
                         addstr(&ldflags, argv[var_s0]);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ddopt") == 0) {
-                        ddoptflag = 1;
+                        ddoptflag = TRUE;
                         break;
                     }
                     if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-d_lines") == 0)) {
-                        mp_dlinesflag = 1;
+                        mp_dlinesflag = TRUE;
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
                         break;
@@ -6390,10 +6897,9 @@ void parse_command(int argc, char** argv) {
 
                 case 'e': /* switch 1 */
                     if (strcmp(argv[var_s0], "-excpt") == 0) {
-                        error(1, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-excpt is not supported in svr4 env.\n");
                         exit(2);
                     }
-
                     if (compiler == COMPILER_1) {
                         if (strcmp(argv[var_s0], "-elf") == 0) {
                             addstr(&ldflags, argv[var_s0]);
@@ -6406,7 +6912,8 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exported_symbol") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exported_symbol requires a symbol argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-exported_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6416,7 +6923,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exports_file") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exports_file requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6426,20 +6933,22 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-exclude") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-exclude requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&objfiles, argv[var_s0 - 1]);
                             addstr(&objfiles, argv[var_s0]);
                             break;
                         }
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                        if ((compiler == COMPILER_1) &&
+                            ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                             (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                             (strcmp(argv[var_s0], "-exceptions") == 0)) {
-                            if ((compiler != COMPILER_1) || (c_compiler_choice != 3)) {
-                                exception_handling = 1;
+                            if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
+                                exception_handling = TRUE;
                                 relocate_passes("f", NULL, NULL);
                                 if (access(cfe, EX_OK) == -1) {
-                                    exception_handling = 0;
+                                    exception_handling = FALSE;
                                     relocate_passes("f", NULL, NULL);
                                 } else {
                                     break;
@@ -6456,7 +6965,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -e to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -e to have an argument\n");
                             exit(2);
                         }
                     }
@@ -6466,8 +6975,8 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-elf") == 0) {
-                        elfflag = 1;
-                        elf_spec = 1;
+                        elfflag = TRUE;
+                        elf_spec = TRUE;
                         addstr(&asflags, argv[var_s0]);
                         addstr(&ldflags, argv[var_s0]);
                         break;
@@ -6490,39 +6999,41 @@ void parse_command(int argc, char** argv) {
                         } else if (isdigit(argv[var_s0][5]) && (argv[var_s0][6] == '\0')) {
                             edit_cnt_max = argv[var_s0][5] - '0';
                         } else {
-                            error(1, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
+                            //! @remark typo of "syntax"
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "the correct -edit option sybtax is -edit[0-9]\n");
                             exit(2);
                         }
-                        editflag = 1;
+                        editflag = EDIT_FLAG_1;
                         editor = getenv("EDITOR");
                         if (editor != NULL) {
                             for (var_s2 = editor; strlen(var_s2) >= 5; var_s2++) {
                                 if (strncmp(var_s2, "emacs", 5) == 0) {
-                                    editflag = 2;
+                                    editflag = EDIT_FLAG_2;
                                     break;
                                 }
                             }
                         }
-                        if ((editflag == 1) && (editor == NULL)) {
+                        if ((editflag == EDIT_FLAG_1) && (editor == NULL)) {
                             editor = "vi";
                         }
 
                         xserver = getenv("DISPLAY");
                         if ((ioctl(2, TIOCGPGRP, &sp108) == 0) && (getpgrp() == sp108) && (xserver == 0)) {
-                            editflag = 0;
-                            error(2, NULL, 0, NULL, 0, "%s ignored for background compile in non-X environment\n",
-                                  argv[var_s0]);
+                            editflag = EDIT_FLAG_0;
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "%s ignored for background compile in non-X environment\n", argv[var_s0]);
                         }
                         break;
                     }
                     goto bad_option;
 
                 case 'f': /* switch 1 */
+                          // Accounts for a misspelling?
                     if ((strcmp(argv[var_s0], "-full_transtive_link") == 0) ||
                         (strcmp(argv[var_s0], "-full_transitive_link") == 0)) {
-                        full_transitive_link = 1;
-                        transitive_link = 0;
-                        no_transitive_link = 0;
+                        full_transitive_link = TRUE;
+                        transitive_link = FALSE;
+                        no_transitive_link = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-feedback") == 0) {
@@ -6531,7 +7042,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&feedlist, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-feedback must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-feedback must have an argument\n");
                             exit(2);
                         }
                     }
@@ -6544,7 +7055,7 @@ void parse_command(int argc, char** argv) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
-                    if ((strcmp(argv[var_s0], "-fullwarn") == 0) && (fullwarn = 1, (compiler == COMPILER_1))) {
+                    if ((strcmp(argv[var_s0], "-fullwarn") == 0) && (fullwarn = TRUE, (compiler == COMPILER_1))) {
                         addstr(&accomflags, "-Xfullwarn");
                         addstr(&cfeflags, "-verbose");
                         addstr(&cfeflags, "-wimplicit");
@@ -6588,7 +7099,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&ucobflags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-f requires an argument of 1, 2, 3 or 4\n");
                                 exit(2);
                             }
                         } else {
@@ -6602,18 +7113,18 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -f to have an argument\n");
                         exit(2);
                     }
                     goto bad_option;
 
                 case 'g': /* switch 1 */
-                    plain_g = 0;
+                    plain_g = FALSE;
                     // "-g" , which is converted to "-g2 -O1"
                     if (argv[var_s0][2] == '\0') {
                         gflag = 2;
-                        plain_g = 1;
-                        if (plain_O != 0) {
+                        plain_g = TRUE;
+                        if (plain_O) {
                             Oflag = 1;
                         }
                         break;
@@ -6622,8 +7133,8 @@ void parse_command(int argc, char** argv) {
                     if ((argv[var_s0][3] == '\0') && (argv[var_s0][2] >= '0') && (argv[var_s0][2] <= '3')) {
                         gflag = argv[var_s0][2] - '0';
                         if (gflag == 2) {
-                            plain_g = 1;
-                            if (plain_O != 0) {
+                            plain_g = TRUE;
+                            if (plain_O) {
                                 Oflag = 1;
                             }
                         }
@@ -6637,7 +7148,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strncmp(argv[var_s0], "-help", 5) == 0) {
-                        error(2, NULL, 0, NULL, 0, "-help is ignored.\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-help is ignored.\n");
                         break;
                     }
                     if (compiler == COMPILER_1) {
@@ -6648,7 +7159,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-hidden_symbol") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hidden_symbol requires a symbol argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6658,7 +7169,7 @@ void parse_command(int argc, char** argv) {
                         if (strcmp(argv[var_s0], "-hides_file") == 0) {
                             var_s0++;
                             if ((var_s0 >= argc) || (argv[var_s0][0] == '-')) {
-                                error(1, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-hides_file requires a filename argument\n");
                                 exit(2);
                             }
                             addstr(&ldflags, argv[var_s0 - 1]);
@@ -6680,7 +7191,7 @@ void parse_command(int argc, char** argv) {
                             addstr(&ldflags, argv[var_s0]);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "ld requires -i to have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -i to have an argument\n");
                             exit(2);
                         }
                     }
@@ -6689,12 +7200,12 @@ void parse_command(int argc, char** argv) {
                         addstr(&umergeflags, argv[var_s0]);
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-inline_to must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-inline_to must have an argument\n");
                             exit(2);
                         }
                         for (var_s2 = Gnum; *var_s2 != 0; var_s2++) {
                             if (!isdigit(*var_s2)) {
-                                error(1, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "non-digit character in -G %s\n", argv[var_s0]);
                                 exit(2);
                             }
                         }
@@ -6702,7 +7213,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ignore_unresolved") == 0) {
-                        ignore_unresolved_flag = 1;
+                        ignore_unresolved_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-ignore_minor") == 0) {
@@ -6710,18 +7221,18 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-irix4") == 0) {
-                        irix4 = 1;
+                        irix4 = TRUE;
                         comp_host_root = "/usr/irix4/";
                         Gnum = "8";
                         systype = "";
-                        elfflag = 0;
-                        svr4_systype = 0;
-                        kpic_flag = 0;
-                        default_call_shared = 0;
-                        call_shared = 0;
-                        non_shared = 0;
-                        old_non_shared = 0;
-                        mips_abi = 0;
+                        elfflag = FALSE;
+                        svr4_systype = FALSE;
+                        kpic_flag = FALSE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        non_shared = FALSE;
+                        old_non_shared = FALSE;
+                        mips_abi = MIPS_ABI_0;
                         relocate_passes("pKfjrsulmvocabtyz", NULL, NULL);
                         add_static_opt(argv[var_s0]);
                         break;
@@ -6730,7 +7241,7 @@ void parse_command(int argc, char** argv) {
                          ((strcmp(argv[var_s0], "-i2") == 0) || (strcmp(argv[var_s0], "-i4") == 0))) ||
                         (strcmp(argv[var_s0], "-i8") == 0)) {
                         if ((argv[var_s0][2] == '2') || (argv[var_s0][2] == '8')) {
-                            mp_i2flag = 1;
+                            mp_i2flag = TRUE;
                         }
                         addstr(&fcomflags, argv[var_s0]);
                         break;
@@ -6743,7 +7254,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&upl1flags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-ipath must have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ipath must have an argument\n");
                                 exit(2);
                             }
                         }
@@ -6754,7 +7265,7 @@ void parse_command(int argc, char** argv) {
                                 addstr(&upl1flags, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-isuffix must have an argument\n");
                                 exit(2);
                             }
                         }
@@ -6765,7 +7276,7 @@ void parse_command(int argc, char** argv) {
                           // "-j"
                     if (argv[var_s0][2] == '\0') {
                         jflag++;
-                        uload = 0;
+                        uload = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-jalr") == 0) {
@@ -6784,7 +7295,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-kpicopt") == 0) {
-                        kpicopt_flag = 1;
+                        kpicopt_flag = TRUE;
                         break;
                     }
                     switch (argv[var_s0][2]) { /* switch 7; irregular */
@@ -6796,7 +7307,7 @@ void parse_command(int argc, char** argv) {
                                 if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
                                     (var_s1 == 'r') || (var_s1 == 'e') || (var_s1 == 6) || (var_s1 == 's') ||
                                     (var_s1 == 1) || (var_s1 == 2)) {
-                                    error(1, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-ko would overwrite %s\n", argv[var_s0]);
                                     exit(2);
                                 }
                             }
@@ -6836,7 +7347,7 @@ void parse_command(int argc, char** argv) {
                             sp104[0] = '-';
                             sp104[1] = 'l';
                             sp104[2] = '\0';
-                            if (xpg_flag != 0) {
+                            if (xpg_flag) {
                                 addstr(&dashlfiles, strcat(sp104, argv[var_s0 + 1]));
                             } else {
                                 addstr(&objfiles, strcat(sp104, argv[var_s0 + 1]));
@@ -6844,7 +7355,7 @@ void parse_command(int argc, char** argv) {
                             var_s0++;
                             break;
                         }
-                        if (xpg_flag != 0) {
+                        if (xpg_flag) {
                             addstr(&dashlfiles, argv[var_s0]);
                         } else {
                             addstr(&objfiles, argv[var_s0]);
@@ -6866,8 +7377,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-mp") == 0)) {
                         cmp_flag |= 0x10008;
-                        if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "'-mp' must preceed any -B flags.\n");
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "'-mp' must preceed any -B flags.\n");
                             exit(2);
                         }
                         relocate_passes("fY", NULL, NULL);
@@ -6895,50 +7406,54 @@ void parse_command(int argc, char** argv) {
                         }
                     }
                     if (strcmp(argv[var_s0], "-mips1") == 0) {
-                        chip_targ = 0;
-                        mips1flag = 1;
-                        mips2flag = 0;
-                        if (dwopcodeflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
+                        chip_targ = CHIP_TARGET_MIPS1;
+                        mips1flag = TRUE;
+                        mips2flag = FALSE;
+                        if (dwopcodeflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips1 with -dwopcode\n");
                             exit(2);
                         }
-                        if (mips2_spec_flag != 0) {
-                            error(2, NULL, 0, NULL, 0, "-mips1 conflicts with -mips2; using last value (mips1)\n");
-                            mips2_spec_flag = 0;
+                        if (mips2_spec_flag) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips1 conflicts with -mips2; using last value (mips1)\n");
+                            mips2_spec_flag = FALSE;
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips2") == 0) {
-                        if ((mips1flag != 0) || (mips3flag != 0)) {
-                            error(2, NULL, 0, NULL, 0, "-mips2 conflicts with -mips1; using last value (mips2)\n");
+                        if (mips1flag || mips3flag) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips2 conflicts with -mips1; using last value (mips2)\n");
                         }
-                        mips1flag = 0;
-                        mips2flag = 1;
-                        mips2_spec_flag = 1;
+                        mips1flag = FALSE;
+                        mips2flag = TRUE;
+                        mips2_spec_flag = TRUE;
                         relocate_passes("M", NULL, NULL);
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips3") == 0) {
-                        mips1flag = 0;
-                        mips2flag = 0;
-                        if (mips2_spec_flag != 0) {
-                            error(1, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
+                        mips1flag = FALSE;
+                        mips2flag = FALSE;
+                        if (mips2_spec_flag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips3 with -mips[1,2]\n");
                             exit(2);
                         }
                         if ((compiler == COMPILER_4) || (compiler == COMPILER_1)) {
-                            error(2, NULL, 0, NULL, 0, "-mips3 should not be used for ucode 32-bit compiles\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-mips3 should not be used for ucode 32-bit compiles\n");
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-mips3 cannot be used for ucode 32-bit compiles\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-mips3 cannot be used for ucode 32-bit compiles\n");
                             exit(2);
                         }
-                        chip_targ = 2;
-                        mips3flag = 1;
-                        dwopcodeflag = 1;
+                        chip_targ = CHIP_TARGET_MIPS3;
+                        mips3flag = TRUE;
+                        dwopcodeflag = TRUE;
                         relocate_passes("M", NULL, NULL);
-                        if (non_shared_emitted == 0) {
+                        if (!non_shared_emitted) {
                             addstr(&ldflags, "-non_shared");
                             addstr(&cfeflags, "-non_shared");
-                            non_shared_emitted = 1;
+                            non_shared_emitted = TRUE;
                         }
                         addstr(&ccomflags, argv[var_s0]);
                         addstr(&upasflags, argv[var_s0]);
@@ -6957,7 +7472,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-mips4") == 0) {
-                        error(1, NULL, 0, NULL, 0, "-mips4 cannot be used for ucode 32-bit compiles\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips4 cannot be used for ucode 32-bit compiles\n");
                         exit(2);
                     }
                     if (compiler == COMPILER_3) {
@@ -6967,11 +7482,11 @@ void parse_command(int argc, char** argv) {
                         }
                         if (strncmp(argv[var_s0], "-mp_keep", strlen("-mp_keep")) == 0) {
                             if (argv[var_s0][8] != '\0') {
-                                error(1, NULL, 0, NULL, 0, " Unknown flag: %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, " Unknown flag: %s\n", argv[var_s0]);
                                 exit(2);
                             }
                             mp_flag |= 0x10000;
-                            showdirt_flag = 1;
+                            showdirt_flag = TRUE;
                             break;
                         }
                         if (strncmp(argv[var_s0], "-mp_schedtype=", strlen("-mp_schedtype=")) == 0) {
@@ -6989,38 +7504,39 @@ void parse_command(int argc, char** argv) {
 
                 case 'n': /* switch 1 */
                     if (strcmp(argv[var_s0], "-nokpicopt") == 0) {
-                        nokpicopt_flag = 1;
+                        nokpicopt_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-no_unresolved") == 0) {
-                        no_unresolved_flag = 1;
+                        no_unresolved_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-no_transitive_link") == 0) {
-                        transitive_link = 0;
-                        full_transitive_link = 0;
-                        no_transitive_link = 1;
+                        transitive_link = FALSE;
+                        full_transitive_link = FALSE;
+                        no_transitive_link = TRUE;
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-no_exceptions") == 0)) {
-                        if ((compiler != COMPILER_1) || (c_compiler_choice != 3)) {
-                            exception_handling = 0;
+                        if ((compiler != COMPILER_1) || (c_compiler_choice != C_COMPILER_CHOICE_3)) {
+                            exception_handling = FALSE;
                             relocate_passes("f", NULL, NULL);
                             break;
                         }
                         goto bad_option;
                     }
                     if (strcmp(argv[var_s0], "-new_ld") == 0) {
-                        if (D_1000BF94 != 0) {
-                            error(1, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
+                        if (D_1000BF94) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -new_ld\n");
                             exit(2);
-                        } else if ((compiler == COMPILER_1) && (c_compiler_choice == 3)) {
-                            error(1, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
+                        } else if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-new_ld not supported for DCC\n");
                             exit(2);
                         } else {
                             LD = "ld";
-                            D_1000BF90 = 0;
+                            D_1000BF90 = FALSE;
                         }
                         relocate_passes("l", NULL, NULL);
                         break;
@@ -7030,15 +7546,15 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-nouopt0") == 0) {
-                        uopt0flag = 0;
+                        uopt0flag = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-noaliasok") == 0) {
-                        noaliasokflag = 1;
+                        noaliasokflag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-nostdinc") == 0) {
-                        emptyIflag = 1;
+                        emptyIflag = TRUE;
                         add_static_opt(argv[var_s0]);
                         break;
                     }
@@ -7048,11 +7564,11 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-nodeflib") == 0) {
-                        nodeflib = 1;
+                        nodeflib = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-noprototypes") == 0) {
-                        prototype_checking_on = 0;
+                        prototype_checking_on = FALSE;
                         break;
                     }
                     if ((argv[var_s0][2] == '\0') || (strcmp(argv[var_s0], "-nocount") == 0) ||
@@ -7061,15 +7577,15 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-non_shared") == 0) {
-                        old_non_shared = 0;
-                        non_shared = 1;
-                        default_call_shared = 0;
-                        call_shared = 0;
-                        kpic_flag = 0;
-                        if (non_shared_emitted == 0) {
+                        old_non_shared = FALSE;
+                        non_shared = TRUE;
+                        default_call_shared = FALSE;
+                        call_shared = FALSE;
+                        kpic_flag = FALSE;
+                        if (!non_shared_emitted) {
                             addstr(&ldflags, "-non_shared");
                             addstr(&cfeflags, "-non_shared");
-                            non_shared_emitted = 1;
+                            non_shared_emitted = TRUE;
                         }
                         break;
                     }
@@ -7091,7 +7607,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (compiler == COMPILER_6) {
                         if (strcmp(argv[var_s0], "-nolock") == 0) {
-                            nolockflag = 1;
+                            nolockflag = TRUE;
                             break;
                         }
                         if ((strcmp(argv[var_s0], "-nomfdata") == 0) || (strcmp(argv[var_s0], "-normdata") == 0)) {
@@ -7101,27 +7617,28 @@ void parse_command(int argc, char** argv) {
                         goto bad_option;
                     }
                     if (strcmp(argv[var_s0], "-nocpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
-                            docpp = 0;
+                            docpp = FALSE;
                             add_static_opt(argv[var_s0]);
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_3) || ((compiler == COMPILER_1) && (c_compiler_choice != 0))) {
+                    if ((compiler == COMPILER_3) ||
+                        ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0))) {
                         if (strcmp(argv[var_s0], "-nocode") == 0) {
-                            nocode = 1;
-                            cflag = 1;
+                            nocode = TRUE;
+                            cflag = TRUE;
                             break;
                         }
                         if (strcmp(argv[var_s0], "-no_prelink") == 0) {
-                            no_prelink = 1;
+                            no_prelink = TRUE;
                             break;
                         }
                         if (strcmp(argv[var_s0], "-no_auto_include") == 0) {
-                            auto_template_include = 0;
+                            auto_template_include = FALSE;
                             add_static_opt(argv[var_s0]);
                             break;
                         }
@@ -7130,13 +7647,14 @@ void parse_command(int argc, char** argv) {
                         addstr(&objfiles, argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-nofilt") == 0)) {
-                        nofilt = 1;
+                        nofilt = TRUE;
                         add_static_opt(argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && (c_compiler_choice == 3) &&
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3) &&
                         (strncmp(argv[var_s0], "-no_delta", 9) == 0)) {
                         char* spFC;
 
@@ -7151,12 +7669,12 @@ void parse_command(int argc, char** argv) {
                         }
                         if (spFC != NULL) {
                             if (var_s0 >= (argc - 1)) {
-                                error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0]);
                                 exit(2);
                             }
                             var_s0++;
                             if (argv[var_s0][0] == '-') {
-                                error(1, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s must have an argument\n", argv[var_s0 - 1]);
                                 exit(2);
                             }
                             addstr(&edisonflags, mkstr(spFC, argv[var_s0], NULL));
@@ -7173,20 +7691,20 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-oldcpp") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
-                            oldcppflag = 1;
-                            if ((compiler == COMPILER_1) && (tpflag != 0)) {
+                            oldcppflag = TRUE;
+                            if ((compiler == COMPILER_1) && tpflag) {
                                 relocate_passes(tstring, hstring, Bstring);
                             }
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-old_ld") == 0) {
-                        if (D_1000BF94 != 0) {
-                            error(1, NULL, 0, NULL, 0, "malformed or unknown option: -old_ld\n");
+                        if (D_1000BF94) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: -old_ld\n");
                             exit(2);
                         } else {
                             LD = "old_ld";
@@ -7195,9 +7713,9 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-o32") == 0) {
-                        thirty2bitflag = 1;
+                        thirty2bitflag = TRUE;
                         mips_abi = 1;
-                        if (var_s0 >= (argc - 1)) {
+                        if (var_s0 >= (argc - MIPS_ABI_1)) {
                             func_00431B38(var_s0 + 1, 1);
                         }
                         break;
@@ -7208,7 +7726,7 @@ void parse_command(int argc, char** argv) {
                             var_s0++;
                             addstr(&objfiles, argv[var_s0]);
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-objectlist must be given a file argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-objectlist must be given a file argument\n");
                         }
                         break;
                     }
@@ -7221,43 +7739,45 @@ void parse_command(int argc, char** argv) {
                             var_s1 = getsuf(outfile);
                             if (((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') ||
                                  (var_s1 == 'r') || (var_s1 == 'e') ||
-                                 ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                                 ((compiler == COMPILER_1) &&
+                                  ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                   (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                                   (var_s1 == 6)) ||
                                  (var_s1 == 's') || (var_s1 == 1) || (var_s1 == 2)) &&
                                 (stat(outfile, &sp74) == 0)) {
-                                error(1, NULL, 0, NULL, 0, "-o %s resembles the name of a source file, disallowed\n",
-                                      argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                      "-o %s resembles the name of a source file, disallowed\n", argv[var_s0]);
                                 exit(2);
                             }
                             B_1000ECCC = mkstr(outfile, NULL);
                             func_00431B38(var_s0, 2);
                             break;
                         } else {
-                            error(1, NULL, 0, NULL, 0, "-o must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-o must have an argument\n");
                             exit(2);
                         }
                     }
                     if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-onetrip") == 0)) {
                         addstr(&fcomflags, "-1");
-                        mp_onetripflag = 1;
+                        mp_onetripflag = TRUE;
                         break;
                     }
                     goto bad_option;
 
                 case 'p': /* switch 1 */
                     if (strcmp(argv[var_s0], "-prototypes") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
-                            prototype_checking_on = 1;
+                            prototype_checking_on = TRUE;
                         }
                         break;
                     }
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-pedantic") == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&acppflags, "-p");
                         }
@@ -7286,8 +7806,8 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-pca") == 0) {
                         cmp_flag |= 0x10001;
-                        if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-pca must preceed any -B flags.\n");
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-pca must preceed any -B flags.\n");
                             exit(2);
                         }
                         relocate_passes("fKY", NULL, NULL);
@@ -7306,7 +7826,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
                         if (strncmp(argv[var_s0], "-pt", 3) == 0) {
                             char* sp68 = argv[var_s0] + 3;
 
@@ -7323,15 +7844,17 @@ void parse_command(int argc, char** argv) {
                                     (strcmp(sp68 + 1, ".c++") != 0) && (strcmp(sp68 + 1, ".C") != 0) &&
                                     (strcmp(sp68 + 1, ".cxx") != 0) && (strcmp(sp68 + 1, ".CXX") != 0) &&
                                     (strcmp(sp68 + 1, ".cpp") != 0) && (strcmp(sp68 + 1, ".CPP") != 0)) {
-                                    error(2, NULL, 0, NULL, 0, "unsupported suffix in %s\n", argv[var_s0]);
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "unsupported suffix in %s\n",
+                                          argv[var_s0]);
                                 }
                             } else {
-                                error(2, NULL, 0, NULL, 0, "ignored unsupported option %s\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "ignored unsupported option %s\n",
+                                      argv[var_s0]);
                             }
                             break;
                         }
                         if (strcmp(argv[var_s0], "-prelink") == 0) {
-                            force_prelink = 1;
+                            force_prelink = TRUE;
                             break;
                         }
                     }
@@ -7351,12 +7874,12 @@ void parse_command(int argc, char** argv) {
                         goto bad_option;
                     }
                     if ((pflag == 0) || (pflag == 1)) {
-                        if (Bflag != 0) {
-                            error(1, NULL, 0, NULL, 0, "-p0 or -p1 must precede any -B flags\n");
+                        if (Bflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-p0 or -p1 must precede any -B flags\n");
                             exit(2);
                         }
                     } else {
-                        error(1, NULL, 0, NULL, 0, "%s has been superseded, see prof (1) and pixie (1)\n",
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s has been superseded, see prof (1) and pixie (1)\n",
                               argv[var_s0]);
                         exit(2);
                     }
@@ -7365,7 +7888,7 @@ void parse_command(int argc, char** argv) {
 
                 case 'q': /* switch 1 */
                     if (strcmp(argv[var_s0], "-quickstart_info") == 0) {
-                        quickstart_info = 1;
+                        quickstart_info = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-ql") == 0) || (strcmp(argv[var_s0], "-qp") == 0)) {
@@ -7387,7 +7910,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-rm_dead_code") == 0) {
-                        force_rm_dead_code = 1;
+                        force_rm_dead_code = TRUE;
                         break;
                     }
                     if ((strcmp(argv[var_s0], "-rpath") == 0) && (argv[var_s0 + 1] != 0) &&
@@ -7416,8 +7939,9 @@ void parse_command(int argc, char** argv) {
 
                 case 's': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
-                            do_strip = 1;
+                        if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                                         (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                            do_strip = TRUE;
                         } else {
                             addstr(&ldflags, argv[var_s0]);
                         }
@@ -7427,10 +7951,11 @@ void parse_command(int argc, char** argv) {
                         addstr(&optflags, argv[var_s0]);
                         break;
                     }
-                    if ((((compiler == COMPILER_1) && (c_compiler_choice != 0)) || (compiler == COMPILER_3)) &&
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
                         (strncmp(argv[var_s0], "-sa", 3) == 0) &&
                         ((argv[var_s0][3] == '\0') || (argv[var_s0][3] == ','))) {
-                        D_1000BF74 = 1;
+                        D_1000BF74 = TRUE;
                         if ((argv[var_s0][3] == ',') && (argv[var_s0][4] != '\0')) {
                             char* sp64;
 
@@ -7438,7 +7963,8 @@ void parse_command(int argc, char** argv) {
                                 if (strcmp(sp64, "nosrc") == 0) {
                                     D_1000BF78 = 1;
                                 } else if (D_1000BF80 != NULL) {
-                                    error(1, NULL, 0, NULL, 0, "Static analysis directory already specified\n");
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                          "Static analysis directory already specified\n");
                                 } else {
                                     D_1000BF80 = sp64;
                                     if (sp64[strlen(sp64) - 1] != '/') {
@@ -7449,7 +7975,8 @@ void parse_command(int argc, char** argv) {
                         }
                         break;
                     }
-                    if ((((compiler == COMPILER_1) && (c_compiler_choice != 0)) || (compiler == COMPILER_3)) &&
+                    if ((((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                         (compiler == COMPILER_3)) &&
                         (strncmp(argv[var_s0], "-sa_fs", 6) == 0) &&
                         ((argv[var_s0][6] == '\0') || (argv[var_s0][6] == ','))) {
                         D_1000BF84 =
@@ -7460,7 +7987,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-set_version") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-set_version requires an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-set_version requires an argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -7470,7 +7997,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-soname") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-soname requires an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-soname requires an argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -7480,50 +8007,50 @@ void parse_command(int argc, char** argv) {
                     if (strcmp(argv[var_s0], "-systype") == 0) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-systype must have an argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must have an argument\n");
                             exit(2);
                         }
-                        if (user_systype != 0) {
-                            if (strcmp(systype, argv[var_s0]) != 0) {
-                                error(1, NULL, 0, NULL, 0, "only one -systype option allowed\n");
+                        if (user_systype) {                           // systype already specified via an argument
+                            if (strcmp(systype, argv[var_s0]) != 0) { // Different systype from previous
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one -systype option allowed\n");
                                 exit(2);
                             } else {
-                                multiple_systype = 1;
+                                multiple_systype = TRUE;
                             }
                         }
                         systype = argv[var_s0];
-                        user_systype = 1;
-                        if ((Bflag != 0) && (systype_seen == 0)) {
-                            error(1, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
+                        user_systype = TRUE;
+                        if (Bflag && !systype_seen) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-systype must precede any -B flags\n");
                             exit(2);
                         } else {
-                            systype_seen = 1;
+                            systype_seen = TRUE;
                         }
-                        if (multiple_systype == 0) {
+                        if (!multiple_systype) {
                             if (strcmp(systype, "svr4") == 0) {
-                                svr4_systype = 1;
-                                if (elfflag == 0) {
+                                svr4_systype = TRUE;
+                                if (!elfflag) {
                                     addstr(&asflags, "-elf");
                                     addstr(&ldflags, "-elf");
                                 }
-                                elfflag = 1;
+                                elfflag = TRUE;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Only systype svr4 allowed\n");
                                 exit(2);
                             }
                             if ((strcmp(systype, "svr4") != 0) && (strcmp(systype, "bsd43") != 0) &&
                                 (strcmp(systype, "svr3") != 0) && (strcmp(systype, "sysv") != 0) &&
                                 (fopen(strcat("/", systype), "r") == NULL)) {
-                                if (systype_warn == 0) {
-                                    error(2, NULL, 0, NULL, 0,
+                                if (!systype_warn) {
+                                    error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                           "This systype doesn't exist on this machine; changed systype to svr3.\n");
                                 }
                                 systype = "svr3";
                             }
-                            if (svr4_systype == 0) {
+                            if (!svr4_systype) {
                                 comp_target_root = mkstr(comp_target_root, systype, "/", NULL);
                             }
-                            if (fiveflag != 0) {
+                            if (fiveflag) {
                                 include = mkstr(comp_target_root, "usr/5include", NULL);
                             } else {
                                 einclude = mkstr(comp_target_root, "usr/include/CC", NULL);
@@ -7538,19 +8065,21 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-swopcode") == 0) {
-                        if ((dwopcodeflag != 0) || (sixty4bitflag != 0)) {
-                            error(1, NULL, 0, NULL, 0, "-swopcode can not be used with -dwopcode/-64bit\n");
+                        if (dwopcodeflag || sixty4bitflag) {
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                                  "-swopcode can not be used with -dwopcode/-64bit\n");
                             exit(2);
                         }
-                        swopcodeflag = 1;
+                        swopcodeflag = TRUE;
                         break;
                     }
-                    if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) {
+                    if ((argv[var_s0][2] == 'o') && (argv[var_s0][3] == 'p') && (argv[var_s0][4] == 't')) { // "-sopt"
                         if ((compiler != COMPILER_1) && (compiler != COMPILER_3)) {
-                            error(2, NULL, 0, NULL, 0, "-sopt only available with Fortran and C; option ignored.\n");
-                        } else if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                  "-sopt only available with Fortran and C; option ignored.\n");
+                        } else if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             Warg = argv[var_s0] + 5;
                             while (*Warg == ',') {
@@ -7560,21 +8089,21 @@ void parse_command(int argc, char** argv) {
                                     Warg++;
                                 }
                             }
-                            run_sopt = 1;
+                            run_sopt = TRUE;
                         }
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show") == 0) {
-                        vflag = 1;
+                        vflag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-showt") == 0) {
-                        time_flag = 1;
+                        time_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show0") == 0) {
-                        vflag = 1;
-                        execute_flag = 0;
+                        vflag = TRUE;
+                        execute_flag = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-showm") == 0) {
@@ -7582,24 +8111,24 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-show_defaults") == 0) {
-                        execute_flag = 0;
+                        execute_flag = FALSE;
                         exit(0);
                         break;
                     }
                     if (compiler == COMPILER_1) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0) &&
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0) &&
                             (strncmp(argv[var_s0], "-smart", 6) == 0)) {
-                            if ((argv[var_s0][6] == 0x2C) && (argv[var_s0][7] != 0)) {
+                            if ((argv[var_s0][6] == ',') && (argv[var_s0][7] != 0)) {
                                 sbrepos = argv[var_s0] + 7;
                             } else {
                                 sbrepos = NULL;
                             }
                             add_static_opt(argv[var_s0]);
-                            smart_build = 1;
+                            smart_build = TRUE;
                             break;
                         }
                         if (strcmp(argv[var_s0], "-shared") == 0) {
-                            call_shared = 0;
+                            call_shared = FALSE;
                             make_edison_shlib++;
                             break;
                         }
@@ -7617,8 +8146,8 @@ void parse_command(int argc, char** argv) {
                             addstr(&pcaflags, "-signed");
                             addstr(&soptflags, "-signed");
                             addstr(&ccomflags, "-Xsigned");
-                            if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                                signedcharflag = 1;
+                            if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                                signedcharflag = TRUE;
                             }
                             break;
                         }
@@ -7636,7 +8165,7 @@ void parse_command(int argc, char** argv) {
                             break;
                         }
                         if (strcmp(argv[var_s0], "-static") == 0) {
-                            automaticflag = 0;
+                            automaticflag = FALSE;
                             break;
                         }
                         if (strncmp(argv[var_s0], "-share_", 7) == 0) {
@@ -7668,13 +8197,13 @@ void parse_command(int argc, char** argv) {
 
                 case 't': /* switch 1 */
                     if (strcmp(argv[var_s0], "-transitive_link") == 0) {
-                        full_transitive_link = 0;
-                        transitive_link = 1;
-                        no_transitive_link = 0;
+                        full_transitive_link = FALSE;
+                        transitive_link = TRUE;
+                        no_transitive_link = FALSE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-trapuv") == 0) {
-                        trapuv_flag = 1;
+                        trapuv_flag = TRUE;
                         addstr(&upasflags, argv[var_s0]);
                         addstr(&fcomflags, argv[var_s0]);
                         addstr(&upl1flags, argv[var_s0]);
@@ -7687,7 +8216,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-tfp") == 0) {
-                        tfp_flag = 1;
+                        tfp_flag = TRUE;
                         break;
                     }
                     if (strcmp(argv[var_s0], "-traditional") == 0) {
@@ -7701,39 +8230,39 @@ void parse_command(int argc, char** argv) {
                 case 'Z':                      /* switch 1 */
                     switch (argv[var_s0][2]) { /* switch 4 */
                         case 'A':              /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'C': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'F': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'N': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'P': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'U': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'f': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'i': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'R': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         case 'G': /* switch 4 */
@@ -7741,26 +8270,28 @@ void parse_command(int argc, char** argv) {
                             break;
 
                         case 'q': /* switch 4 */
-                            vflag = 1;
+                            // -Zq
+                            vflag = TRUE;
                             break;
 
                         case 'g': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "-Zg is obsolete and is ignored.\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zg is obsolete and is ignored.\n");
                             if (compiler == COMPILER_1) {
-                                error(2, NULL, 0, NULL, 0,
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lgl_s. See your graphics documentation.\n");
                             }
-                            if ((hasfortran != 0) || (compiler == COMPILER_3)) {
-                                error(2, NULL, 0, NULL, 0, "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
+                            if (hasfortran || (compiler == COMPILER_3)) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
+                                      "perhaps replace -Zg with -lfgl -lgl_s  See f77(1).\n");
                             }
-                            if ((haspascal != 0) || (compiler == COMPILER_2)) {
-                                error(2, NULL, 0, NULL, 0,
+                            if (haspascal || (compiler == COMPILER_2)) {
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "perhaps replace -Zg with -lpgl /usr/lib/p2cstr.o -lgl_s  See pc(1).\n");
                             }
                             break;
 
                         case 'r': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "-Zr is obsolete and is ignored.\n");
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-Zr is obsolete and is ignored.\n");
                             break;
 
                         case 'v': /* switch 4 */
@@ -7773,11 +8304,11 @@ void parse_command(int argc, char** argv) {
                             break;
 
                         case 'z': /* switch 4 */
-                            error(2, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s not supported\n", argv[var_s0]);
                             break;
 
                         default: /* switch 4 */
-                            error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                             exit(2);
                             break;
                     }
@@ -7785,19 +8316,19 @@ void parse_command(int argc, char** argv) {
 
                 case '-': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if (xpg_flag != 0) {
+                        if (xpg_flag) {
                             NoMoreOptions++;
                         }
                     } else {
                         switch (argv[var_s0][2]) { /* switch 8; irregular */
                             case 'n':              /* switch 8 */
-                                error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
                             case 'x': /* switch 8 */
-                                error(2, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "%s is default\n", argv[var_s0]);
                                 break;
                             default:
-                                error(1, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in %s\n", argv[var_s0]);
                                 exit(2);
                                 break;
                         }
@@ -7810,7 +8341,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] == '\0') {
                         if (compiler == COMPILER_3) {
-                            mp_uflag = 1;
+                            mp_uflag = TRUE;
                             addstr(&fcomflags, argv[var_s0]);
                             add_static_opt(argv[var_s0]);
                             break;
@@ -7821,14 +8352,14 @@ void parse_command(int argc, char** argv) {
                                 addstr(&objfiles, argv[var_s0]);
                                 break;
                             } else {
-                                error(1, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "ld requires -u to have an argument\n");
                                 exit(2);
                             }
                         }
                     }
 
                     if (strcmp(argv[var_s0], "-unroll") == 0) {
-                        error(1, NULL, 0, NULL, 0, "This flag is no longer supported\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "This flag is no longer supported\n");
                         exit(2);
                     } else if ((compiler == COMPILER_3) && (strcmp(argv[var_s0], "-usefpidx") == 0)) {
                         addstr(&fcomflags, argv[var_s0]);
@@ -7836,7 +8367,7 @@ void parse_command(int argc, char** argv) {
                     }
 
                     if (strcmp(argv[var_s0], "-use_readwrite_const") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             addstr(&edisonflags, "-Yr0");
                         } else {
                             addstr(&accomflags, "-use_readwrite_const");
@@ -7844,7 +8375,7 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-use_readonly_const") == 0) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
                             addstr(&edisonflags, "-Yr1");
                         } else {
                             addstr(&accomflags, "-use_readonly_const");
@@ -7854,7 +8385,7 @@ void parse_command(int argc, char** argv) {
                     if ((compiler == COMPILER_1) && (strcmp(argv[var_s0], "-update_registry") == 0)) {
                         var_s0++;
                         if (var_s0 >= argc) {
-                            error(1, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-update_registry requires a filename argument\n");
                             exit(2);
                         }
                         addstr(&ldflags, argv[var_s0 - 1]);
@@ -7865,15 +8396,15 @@ void parse_command(int argc, char** argv) {
 
                 case 'v': /* switch 1 */
                     if (argv[var_s0][2] == '\0') {
-                        if (default_svr4 == 0) {
-                            vflag = 1;
-                            time_flag = 1;
+                        if (!default_svr4) {
+                            vflag = TRUE;
+                            time_flag = TRUE;
                         }
                         break;
                     }
                     if (compiler == COMPILER_1) {
                         if (strcmp(argv[var_s0], "-volatile") == 0) {
-                            error(2, NULL, 0, NULL, 0,
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                   "-volatile is no longer supported; use the volatile qualifier instead\n");
                             break;
                         }
@@ -7892,11 +8423,12 @@ void parse_command(int argc, char** argv) {
                         add_static_opt(argv[var_s0]);
                         break;
                     }
-                    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
                         (strcmp(argv[var_s0], "-v2") == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         }
                         break;
                     }
@@ -7904,9 +8436,9 @@ void parse_command(int argc, char** argv) {
 
                 case 'w': /* switch 1 */
                     if ((compiler == COMPILER_1) && (strncmp(argv[var_s0], "-wlint", 6) == 0)) {
-                        if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                            error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0],
-                                  "");
+                        if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                                  argv[var_s0], "");
                         } else {
                             addstr(&ccomflags, argv[var_s0]);
                         }
@@ -7920,7 +8452,7 @@ void parse_command(int argc, char** argv) {
                                 break;
                             }
                             if ((argv[var_s0][0] < '0') || (argv[var_s0][0] > '9')) {
-                                error(2, NULL, 0, NULL, 0,
+                                error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
                                       "-woff requires a comma-separated list of error numbers - ignored\n");
                                 var_s0--;
                                 break;
@@ -7929,12 +8461,13 @@ void parse_command(int argc, char** argv) {
                             addstr(&edisonflags, mkstr("-YW", argv[var_s0], NULL));
                             break;
                         }
-                        error(1, NULL, 0, NULL, 0, "-woff requires a warning number (or a list of them)\n");
+                        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
+                              "-woff requires a warning number (or a list of them)\n");
                         exit(2);
                     }
                     if ((argv[var_s0][2] == '1') && (argv[var_s0][3] == '\0')) {
                         if (compiler != COMPILER_3) {
-                            error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 1;
                         }
@@ -7942,7 +8475,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((argv[var_s0][2] == '0') && (argv[var_s0][3] == '\0')) {
                         if (compiler != COMPILER_3) {
-                            error(2, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
+                            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "Unknown flag: %s\n", argv[var_s0]);
                         } else {
                             w1flag = 0;
                         }
@@ -7950,13 +8483,15 @@ void parse_command(int argc, char** argv) {
                     }
                     if (argv[var_s0][2] == '6') {
                         if ((compiler == COMPILER_3) && (argv[var_s0][2] == '6')) {
-                            mp_66flag = 1;
+                            mp_66flag = TRUE;
                         }
                         addstr(&fcomflags, argv[var_s0]);
                         break;
                     }
-                    if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                        error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
+                    if ((argv[var_s0][2] != 0) && (compiler == COMPILER_1) &&
+                        (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
                         break;
                     }
                     if ((argv[var_s0][2] == '\0') ||
@@ -7993,11 +8528,11 @@ void parse_command(int argc, char** argv) {
 
                 case 'x': /* switch 1 */
                     if (strcmp(argv[var_s0], "-xansi") == 0) {
-                        if (compchoice == 1) {
-                            compchoice = 0;
+                        if (compchoice == COMP_CHOICE_1) {
+                            compchoice = COMP_CHOICE_0;
                         }
-                        ansichoice = 3;
-                        cppchoice = 3;
+                        ansichoice = ANSICHOICE_XANSI;
+                        cppchoice = CPP_CHOICE_3;
                         relocate_passes("p", NULL, NULL);
                         add_static_opt(argv[var_s0]);
                         break;
@@ -8024,44 +8559,45 @@ void parse_command(int argc, char** argv) {
             }
             continue;
         } else if ((argv[var_s0][0] == '+') && (compiler == COMPILER_1) &&
-                   ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+                   ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             switch (argv[var_s0][1]) { /* switch 5 */
                 case 'p':              /* switch 5 */
                     if (argv[var_s0][2] == '\0') {
-                        anachronisms = 0;
+                        anachronisms = FALSE;
                     } else if (argv[var_s0][2] == 'p') {
-                        anachronisms = 0;
-                        cfront_compatible = 0;
+                        anachronisms = FALSE;
+                        cfront_compatible = FALSE;
                     } else if (argv[var_s0][2] == 'a') {
-                        anachronisms = 0;
+                        anachronisms = FALSE;
                     } else if (argv[var_s0][2] == 'c') {
-                        cfront_compatible = 0;
+                        cfront_compatible = FALSE;
                     }
                     add_static_opt(argv[var_s0]);
                     break;
 
                 case 'w': /* switch 5 */
-                    fullwarn = 1;
+                    fullwarn = TRUE;
                     break;
 
                 case 'v': /* switch 5 */
-                    vflag = 1;
+                    vflag = TRUE;
                     break;
 
                 case 'd': /* switch 5 */
-                    disable_inlines = 1;
+                    disable_inlines = TRUE;
                     break;
 
                 case 'e': /* switch 5 */
-                    if ((compiler == COMPILER_1) && (c_compiler_choice != 0)) {
-                        error(2, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n", argv[var_s0], "");
+                    if ((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "invalid option %s for Delta/C++%s - ignored\n",
+                              argv[var_s0], "");
                         break;
                     }
 
                 case 'I': /* switch 5 */
-                    cflag = 1;
-                    plusIflag = 1;
-                    Fflag = 1;
+                    cflag = TRUE;
+                    plusIflag = TRUE;
+                    Fflag = TRUE;
                     default_template_instantiation_mode = 1;
                     break;
 
@@ -8080,25 +8616,25 @@ void parse_command(int argc, char** argv) {
             var_s1 = 'f';
         }
         if (var_s1 == 'p') {
-            haspascal = 1;
+            haspascal = TRUE;
         }
         if (var_s1 == 'f') {
-            hasfortran = 1;
+            hasfortran = TRUE;
         }
-        if (var_s1 == 1) {
-            haspl1 = 1;
+        if (var_s1 == SUF_1) {
+            haspl1 = TRUE;
         }
         if ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
             (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 's') || (var_s1 == 'O') ||
             (var_s1 == 'G') || (var_s1 == 'S') || (var_s1 == 'M') || (var_s1 == 'V') || (var_s1 == 'i') ||
-            (var_s1 == 1) || (var_s1 == 'D') || (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 'u') || (var_s1 == 6) ||
-            ((compiler == COMPILER_1) && (nocode != 0) && (D_1000BF74 != 0) && (var_s1 == 'h')) || (Eflag != 0) ||
+            (var_s1 == SUF_1) || (var_s1 == 'D') || (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == 'u') ||
+            (var_s1 == SUF_6) || ((compiler == COMPILER_1) && nocode && D_1000BF74 && (var_s1 == 'h')) || Eflag ||
             (compiler == COMPILER_4)) {
             int sp60; // number of '-' on the end?
             int sp5C; // option index
 
             srcexists++;
-            if ((argv[var_s0][0] == '-') && (NoMoreOptions == 0)) {
+            if ((argv[var_s0][0] == '-') && !NoMoreOptions) {
                 sp60 = 1;
                 while (argv[var_s0][sp60] == '-') {
                     sp60++;
@@ -8110,17 +8646,17 @@ void parse_command(int argc, char** argv) {
                     jflag++;
                 }
             }
-            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0) &&
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag &&
                 ((var_s1 == 'c') || (var_s1 == 'p') || (var_s1 == 'f') || (var_s1 == 'F') || (var_s1 == 'r') ||
-                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == 1) ||
-                 (var_s1 == 3) || (var_s1 == 2) || (var_s1 == 6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
+                 (var_s1 == 'e') || (var_s1 == 'B') || (var_s1 == 'U') || (var_s1 == 'i') || (var_s1 == SUF_1) ||
+                 (var_s1 == SUF_3) || (var_s1 == SUF_2) || (var_s1 == SUF_6) || (var_s1 == 'u') || (var_s1 == 'D'))) {
                 if (var_s1 != 'u') {
                     addstr(&srcfiles, argv[var_s0]);
                     var_s2 = mksuf(argv[var_s0], 'u');
                 } else {
                     var_s2 = argv[var_s0];
                 }
-                uload = 1;
+                uload = TRUE;
                 if (uldobj_place == -1) {
                     uldobj_place = save_place(&objfiles);
                 }
@@ -8131,7 +8667,7 @@ void parse_command(int argc, char** argv) {
                 if (nodup(&objfiles, var_s2) != 0) {
                     sp158 = var_s2;
                 }
-            } else if ((Eflag == 0) && (compiler != COMPILER_4)) {
+            } else if (!Eflag && (compiler != COMPILER_4)) {
                 addstr(&srcfiles, argv[var_s0]);
                 var_s2 = mksuf(argv[var_s0], 'o');
                 if (nodup(&objfiles, var_s2) != 0) {
@@ -8143,12 +8679,12 @@ void parse_command(int argc, char** argv) {
                 addstr(&srcfiles, argv[var_s0]);
             }
         } else if (var_s1 == 'b') {
-            if (((Oflag == 3) || (Oflag == 4)) && (jflag == 0)) {
+            if (((Oflag == 3) || (Oflag == 4)) && !jflag) {
                 if (uldobj_place == -1) {
                     uldobj_place = save_place(&objfiles);
                 }
                 addstr(&ufiles, argv[var_s0]);
-                uload = 1;
+                uload = TRUE;
             }
         } else {
             addstr(&objfiles, argv[var_s0]);
@@ -8161,10 +8697,10 @@ void parse_command(int argc, char** argv) {
 
     bad_option:
         if (sp14C != 0) {
-            error(1, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
             exit(2);
         } else {
-            error(2, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
+            error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "malformed or unknown option: %s\n", argv[var_s0]);
         }
     } /* end of loop */
 
@@ -8177,12 +8713,13 @@ void parse_command(int argc, char** argv) {
                 sp58 = sp158;
             } else {
                 int sp54 = strlen(sp58); // length of single source file's name
+
                 if ((sp54 >= 3) && (sp58[sp54 - 2] == '.')) {
-                    if (Eflag != 0) {
+                    if (Eflag) {
                         sp58[sp54 - 1] = 'i';
-                    } else if (Sflag != 0) {
+                    } else if (Sflag) {
                         sp58[sp54 - 1] = 's';
-                    } else if (jflag != 0) {
+                    } else if (jflag) {
                         sp58[sp54 - 1] = 'u';
                     } else {
                         sp58[sp54 - 2] = '\0';
@@ -8191,8 +8728,9 @@ void parse_command(int argc, char** argv) {
             }
         }
 
-        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) || ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
-            if ((srcfiles.length == 1) && ((outfile != NULL) || (cflag == 0))) {
+        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+            ((compiler == COMPILER_3) && D_1000BF74)) {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
                 addstr(&ldflags, "-MDignore");
                 addstr(&ldflags, sp158);
             }
@@ -8203,7 +8741,7 @@ void parse_command(int argc, char** argv) {
             addstr(&ldflags, "-MDupdate");
             addstr(&ldflags, sp15C);
         } else {
-            if ((srcfiles.length == 1) && ((outfile != NULL) || (cflag == 0))) {
+            if ((srcfiles.length == 1) && ((outfile != NULL) || !cflag)) {
                 addstr(&cppflags, "-MDtarget");
                 if (outfile != NULL) {
                     addstr(&cppflags, outfile);
@@ -8219,7 +8757,7 @@ void parse_command(int argc, char** argv) {
                 addstr(&uldflags, "-MDtarget");
                 if (outfile != NULL) {
                     addstr(&uldflags, outfile);
-                } else if (cflag != 0) {
+                } else if (cflag) {
                     addstr(&uldflags, "u.out.o");
                 } else {
                     addstr(&uldflags, "a.out");
@@ -8233,7 +8771,7 @@ void parse_command(int argc, char** argv) {
         }
     }
 
-    if (mips2flag != 0) {
+    if (mips2flag) {
         addstr(&ccomflags, "-mips2");
         addstr(&upasflags, "-mips2");
         addstr(&fcomflags, "-mips2");
@@ -8261,8 +8799,14 @@ void get_host_chiptype(void) {
 
 // function error # 7
 
+// Error message types
 static const char* D_1000C1E0[] = {
-    "Internal", "Error", "Warning", "Info", "Fix", "",
+    "Internal", // ERRORCAT_INTERNAL
+    "Error",    // ERRORCAT_ERROR
+    "Warning",  // ERRORCAT_WARNING
+    "Info",     // ERRORCAT_INFO
+    "Fix",      // ERRORCAT_FIX
+    "",         // ERRORCAT_ERRNO
 };
 
 #ifndef PERMUTER
@@ -8287,7 +8831,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
     int len;
     int i;
 
-    if ((Vflag == 0) && (D_1000C1D8 == NULL)) {
+    if (!Vflag && (D_1000C1D8 == NULL)) {
         D_1000C1D8 = strrchr(progname, '/');
         if (D_1000C1D8 == NULL) {
             D_1000C1D8 = progname;
@@ -8312,7 +8856,8 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
         D_1000C1DC[i] = '\0';
     }
 
-    if (arg0 == 5) {
+    if (arg0 == ERRORCAT_ERRNO) {
+        //! @bug `D_1000C1DC` is null if the previous block did not run.
         fprintf(stderr, "%s: ", D_1000C1DC);
     } else {
         fprintf(stderr, "%s: %s: ", D_1000C1D8, D_1000C1E0[arg0]);
@@ -8344,21 +8889,26 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     register const char* var_s1;
 
     currcomp = "";
+
     if (arg2 == NULL) {
         arg2 = Bstring;
     }
+
     if (arg0 == NULL) {
         var_s1 = "hpfekjusmvodqcablyzrP1EXCOnMFISUtKYwx";
         allBstring = arg2;
     } else {
         var_s1 = arg0;
     }
-    if ((strcmp(Gnum, "0") == 0) && (compose_first_G0 != 0)) {
-        compose_first_G0 = 0;
+
+    // condition never passes since `compose_first_G0` is never `TRUE`
+    if ((strcmp(Gnum, "0") == 0) && compose_first_G0) {
+        compose_first_G0 = FALSE;
         compose_G0_libs("PE1COMFIUSXnW");
     }
+
     for (; *var_s1 != '\0'; var_s1++) {
-        if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == 0)) {
+        if ((arg1 != NULL) || (strchr(alltstring, *var_s1) == NULL)) {
             switch (*var_s1) {
                 case 'h':
                     if (includeB != NULL) {
@@ -8367,9 +8917,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if (eincludeB != NULL) {
                         free(eincludeB);
                     }
-                    if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != 0))) {
+                    if ((arg0 != NULL) || ((arg2 != NULL) && (*arg2 != '\0'))) {
                         if (arg1 != NULL) {
-                            if (fiveflag != 0) {
+                            if (fiveflag) {
                                 includeB = mkstr(arg1, "usr/5include", arg2, NULL);
                             } else if (abi_flag != 0) {
                                 includeB = mkstr(arg1, "usr/include/abi", arg2, NULL);
@@ -8377,13 +8927,15 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 eincludeB = mkstr(arg1, "usr/include/CC", arg2, NULL);
                                 includeB = mkstr(arg1, "usr/include", arg2, NULL);
                             }
-                        } else if (fiveflag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/5include", arg2, NULL);
-                        } else if (abi_flag != 0) {
-                            includeB = mkstr(comp_target_root, "usr/include/abi", arg2, NULL);
                         } else {
-                            eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, NULL);
-                            includeB = mkstr(comp_target_root, "usr/include", arg2, NULL);
+                            if (fiveflag) {
+                                includeB = mkstr(comp_target_root, "usr/5include", arg2, NULL);
+                            } else if (abi_flag != 0) {
+                                includeB = mkstr(comp_target_root, "usr/include/abi", arg2, NULL);
+                            } else {
+                                eincludeB = mkstr(comp_target_root, "usr/include/CC", arg2, NULL);
+                                includeB = mkstr(comp_target_root, "usr/include", arg2, NULL);
+                            }
                         }
                     } else {
                         includeB = NULL;
@@ -8395,10 +8947,13 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         free(cpp);
                     }
                     if (arg1 != NULL) {
-                        cpp = mkstr(arg1, ((cppchoice != 1) && (cppchoice != 3)) ? "cpp" : "acpp", arg2, NULL);
+                        cpp =
+                            mkstr(arg1, (((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3)) ? "cpp" : "acpp"),
+                                  arg2, NULL);
                     } else {
                         cpp = mkstr(comp_host_root, "usr/lib/", currcomp,
-                                    (cppchoice != 1) && (cppchoice != 3) ? "cpp" : "acpp", arg2, NULL);
+                                    ((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3) ? "cpp" : "acpp"), arg2,
+                                    NULL);
                     }
                     break;
 
@@ -8428,12 +8983,13 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         if (cmp_flag & 0x10000) {
                             mpc = mkstr(arg1, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(arg1, ansichoice ? "accom" : "ccom", arg2, NULL);
-                        cfe = mkstr(arg1,
-                                    ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
-                                        ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
-                                        : "cfe",
-                                    arg2, NULL);
+                        ccom = mkstr(arg1, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
+                        cfe = mkstr(
+                            arg1,
+                            (((c_compiler_choice != C_COMPILER_CHOICE_0) || ((compiler == COMPILER_3) && D_1000BF74))
+                                 ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
+                                 : "cfe"),
+                            arg2, NULL);
                         upas = mkstr(arg1, "upas", arg2, NULL);
                         fcom = mkstr(arg1, "fcom", arg2, NULL);
                         upl1 = mkstr(arg1, "pl1fe", arg2, NULL);
@@ -8442,19 +8998,22 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         if (cmp_flag & 0x10000) {
                             mpc = mkstr(comp_host_root, "usr/lib/", currcomp, "mpc", arg2, NULL);
                         }
-                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp, ansichoice ? "accom" : "ccom", arg2, NULL);
-                        if (((compiler == COMPILER_1) && (c_compiler_choice != 0)) ||
-                            ((compiler == COMPILER_3) && (D_1000BF74 != 0))) {
+                        ccom = mkstr(comp_host_root, "usr/lib/", currcomp,
+                                     (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom", arg2, NULL);
+                        if (((compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) ||
+                            ((compiler == COMPILER_3) && D_1000BF74)) {
                             cfe = mkstr(comp_host_root, "usr/lib/DCC/", currcomp,
-                                        ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
-                                            ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
-                                            : "cfe",
+                                        (((c_compiler_choice != C_COMPILER_CHOICE_0) ||
+                                          ((compiler == COMPILER_3) && D_1000BF74))
+                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
+                                             : "cfe"),
                                         arg2, NULL);
                         } else {
                             cfe = mkstr(comp_host_root, "usr/lib/", currcomp,
-                                        ((c_compiler_choice != 0) || ((compiler == COMPILER_3) && (D_1000BF74 != 0)))
-                                            ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
-                                            : "cfe",
+                                        (((c_compiler_choice != C_COMPILER_CHOICE_0) ||
+                                          ((compiler == COMPILER_3) && D_1000BF74))
+                                             ? (exception_handling ? "edgcpfe.eh" : "edgcpfe")
+                                             : "cfe"),
                                         arg2, NULL);
                         }
                         upas = mkstr(comp_host_root, "usr/lib/", currcomp, "upas", arg2, NULL);
@@ -8569,8 +9128,10 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         opt = mkstr(arg1, "uopt", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (D_1000BF8C != 0)) {
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                               D_1000BF8C) {
                         opt = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "uopt", arg2, NULL);
                     } else {
                         opt = mkstr(comp_host_root, "usr/lib/", currcomp, "uopt", arg2, NULL);
@@ -8583,8 +9144,10 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         gen = mkstr(arg1, "ugen", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (D_1000BF8C != 0)) {
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                               D_1000BF8C) {
                         gen = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "ugen", arg2, NULL);
                     } else {
                         gen = mkstr(comp_host_root, "usr/lib/", currcomp, "ugen", arg2, NULL);
@@ -8608,8 +9171,10 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     }
                     if (arg1 != NULL) {
                         as1 = mkstr(arg1, "as1", arg2, NULL);
-                    } else if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                               (D_1000BF8C != 0)) {
+                    } else if ((compiler == COMPILER_1) &&
+                               ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                                (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                               D_1000BF8C) {
                         as1 = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, "as1", arg2, NULL);
                     } else {
                         as1 = mkstr(comp_host_root, "usr/lib/", currcomp, "as1", arg2, NULL);
@@ -8642,10 +9207,12 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         patch = mkstr(arg1, "c++patch", arg2, NULL);
                         filter = mkstr(arg1, "c++filt", arg2, NULL);
                     } else {
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) &&
-                            (D_1000BF90 != 0)) {
+                        if ((compiler == COMPILER_1) &&
+                            ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
+                             (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
+                            D_1000BF90) {
                             ld = mkstr(comp_host_root, "usr/lib/DCC/", currcomp, LD, arg2, NULL);
-                        } else if (irix4 != 0) {
+                        } else if (irix4) {
                             ld = mkstr(comp_host_root, "usr/bin/", currcomp, LD, arg2, NULL);
                         } else {
                             ld = mkstr(comp_host_root, "usr/lib/", currcomp, LD, arg2, NULL);
@@ -8725,7 +9292,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 func_0042FD7C(mkstr(exception_handling ? "c++init_eh.o" : "c++init.o", arg2, NULL),
                                               dirs_for_abi_crtn.entries);
                             delta_init = func_0042FD7C(mkstr("delta_init.o", arg2, NULL), dirs_for_abi_crtn.entries);
-                        } else if (non_shared != 0) {
+                        } else if (non_shared) {
                             crtx = func_0042FD7C(mkstr(MCRTX, arg2, NULL), dirs_for_nonshared_crtn.entries);
                             crtn = func_0042FD7C(mkstr("crtn.o", arg2, NULL), dirs_for_nonshared_crtn.entries);
                             cxx_init =
@@ -8747,7 +9314,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         cxx_init =
                             func_0042FD7C(exception_handling ? "c++init_eh.o" : "c++init.o", dirs_for_abi_crtn.entries);
                         delta_init = func_0042FD7C("delta_init.o", dirs_for_abi_crtn.entries);
-                    } else if (non_shared != 0) {
+                    } else if (non_shared) {
                         crtx = func_0042FD7C(CRTX, dirs_for_nonshared_crtn.entries);
                         crtn = func_0042FD7C("crtn.o", dirs_for_nonshared_crtn.entries);
                         cxx_init = func_0042FD7C(exception_handling ? "c++init_eh.o" : "c++init.o",
@@ -8769,7 +9336,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libp_b = mkstr(arg1, "libp.b", arg2, NULL);
                     } else {
                         libp = "-lp";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libp_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libp.b", arg2, NULL);
                         } else {
                             libp_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libp.b", arg2, NULL);
@@ -8783,7 +9350,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libpl1_b = mkstr(arg1, "libpl1.b", arg2, NULL);
                     } else {
                         libpl1 = "-lpl1";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libpl1_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libpl1.b", arg2, NULL);
                         } else {
                             libpl1_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libpl1.b", arg2, NULL);
@@ -8809,7 +9376,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                             libexc = "-lexc";
                             libmld = "-lmld";
                         }
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libexc_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libexc.b", arg2, NULL);
                         } else {
                             libexc_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libexc.b", arg2, NULL);
@@ -8828,18 +9395,20 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libdw_b = mkstr(arg1, "libdw.b", arg2, NULL);
                     } else {
                         if ((arg2 != NULL) && (*arg2 != 0)) {
-                            if (non_shared != 0) {
+                            if (non_shared) {
                                 libdw = mkstr("-L", comp_target_root, "usr/lib/nonshared/", currcomp, " -B", arg2,
                                               LibDw, NULL);
                             } else {
                                 libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, " -B", arg2, LibDw, NULL);
                             }
-                        } else if (non_shared != 0) {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
                         } else {
-                            libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            if (non_shared) {
+                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            } else {
+                                libdw = mkstr("-L", comp_target_root, "usr/lib/", currcomp, LibDw, NULL);
+                            }
                         }
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libdw_path = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.a", arg2, NULL);
                             libdw_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libdw.b", arg2, NULL);
                         } else {
@@ -8859,7 +9428,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libxmalloc_b = mkstr(arg1, "libxmalloc.b", arg2, NULL);
                     } else {
                         libxmalloc = "-lxmalloc";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libxmalloc_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libxmalloc.b", arg2, NULL);
                         } else {
@@ -8874,7 +9443,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libsort_b = mkstr(arg1, "libsort.b", arg2, NULL);
                     } else {
                         libsort = "-lsort";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libsort_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libsort.b", arg2, NULL);
                         } else {
@@ -8893,7 +9462,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 libprof = mkstr("-L", arg1, LibProf1, NULL);
                                 libgprof = mkstr("-L", arg1, LibGProf1, NULL);
                             }
-                        } else if (non_shared != 0) {
+                        } else if (non_shared) {
                             libprof = func_0042FD7C("libprof.a", dirs_for_nonshared_crtn.entries);
                             libgprof = func_0042FD7C("libgprof.a", dirs_for_nonshared_crtn.entries);
                         } else {
@@ -8907,7 +9476,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     if (arg1 != NULL) {
                         switch (chip_targ) {
                             default:
-                            case 0:
+                            case CHIP_TARGET_MIPS1:
                                 if ((arg2 != NULL) && (*arg2 != 0)) {
                                     libm = mkstr(arg1, " -B", arg2, LibM, NULL);
                                 } else {
@@ -8915,11 +9484,13 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                 }
                                 libm_b = mkstr(arg1, "libm.b", arg2, NULL);
                                 break;
-                            case 1:
+
+                            case CHIP_TARGET_MIPS2:
                                 libm = mkstr(arg1, "libm_mips2.a", arg2, NULL);
                                 libm_b = mkstr(arg1, "libm_mips2.b", arg2, NULL);
                                 break;
-                            case 2:
+
+                            case CHIP_TARGET_MIPS3:
                                 libm = mkstr(arg1, "libm_mips3.a", arg2, NULL);
                                 libm_b = mkstr(arg1, "libm_mips3.b", arg2, NULL);
                                 break;
@@ -8927,17 +9498,18 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     } else {
                         switch (chip_targ) {
                             default:
-                            case 0:
+                            case CHIP_TARGET_MIPS1:
                                 libm = "-lm";
-                                if (non_shared != 0) {
+                                if (non_shared) {
                                     libm_b =
                                         mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm.b", arg2, NULL);
                                 } else {
                                     libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm.b", arg2, NULL);
                                 }
                                 break;
-                            case 1:
-                                if (non_shared != 0) {
+
+                            case CHIP_TARGET_MIPS2:
+                                if (non_shared) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.a", arg2,
                                                  NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips2.b",
@@ -8947,8 +9519,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                                     libm_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libm_mips2.b", arg2, NULL);
                                 }
                                 break;
-                            case 2:
-                                if (non_shared != 0) {
+
+                            case CHIP_TARGET_MIPS3:
+                                if (non_shared) {
                                     libm = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.a", arg2,
                                                  NULL);
                                     libm_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libm_mips3.b",
@@ -8973,7 +9546,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     } else {
                         libftn = "-lftn";
                         libF77 = "-lF77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libF77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libF77.b", arg2, NULL);
                         } else {
                             libF77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libF77.b", arg2, NULL);
@@ -8991,7 +9564,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libI77_b = mkstr(arg1, "libI77.b", arg2, NULL);
                     } else {
                         libI77 = "-lI77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libI77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libI77.b", arg2, NULL);
                         } else {
                             libI77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libI77.b", arg2, NULL);
@@ -9009,7 +9582,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libisam_b = mkstr(arg1, "libisam.b", arg2, NULL);
                     } else {
                         libisam = "-lisam";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libisam_b =
                                 mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libisam.b", arg2, NULL);
                         } else {
@@ -9028,7 +9601,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                         libU77_b = mkstr(arg1, "libU77.b", arg2, NULL);
                     } else {
                         libU77 = "-lU77";
-                        if (non_shared != 0) {
+                        if (non_shared) {
                             libU77_b = mkstr(comp_target_root, "usr/lib/nonshared/", currcomp, "libU77.b", arg2, NULL);
                         } else {
                             libU77_b = mkstr(comp_target_root, "usr/lib/", currcomp, "libU77.b", arg2, NULL);
@@ -9064,7 +9637,7 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
                     break;
 
                 default:
-                    error(1, NULL, 0, NULL, 0, "Unknown character in -t%c\n", *var_s1);
+                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Unknown character in -t%c\n", *var_s1);
                     exit(2);
                     break;
             }
@@ -9074,9 +9647,9 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
 
 // function newrunlib # 9
 void newrunlib(void) {
-    if (fiveflag != 0) {
+    if (fiveflag) {
         runlib_base = "usr/5lib";
-    } else if (irix4 != 0) {
+    } else if (irix4) {
         runlib_base = "/usr/irix4/";
     } else {
         runlib_base = "/";
@@ -9216,9 +9789,9 @@ va_dcl // K&R syntax
 
     ret = malloc(len);
     if (ret == NULL) {
-        error(1, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -9243,9 +9816,9 @@ va_dcl // K&R syntax
 // Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
 void mklist(list* arg0) {
     if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
-        error(1, NULL, 0, "mklist ()", 14561, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "mklist ()", 14561, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -9255,17 +9828,19 @@ void mklist(list* arg0) {
 }
 
 // function addstr # 14
-// Add a single string entry to a list.
-void addstr (arg0, str)
-    list* arg0;
-    char* str;
-{
+// Add a single string entry to a list. K&R since incorrectly called.
 // void addstr(list* arg0, char* str) {
+void addstr(arg0, str)
+    // clang-format off
+list* arg0;
+char* str;
+// clang-format on
+{
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
-            error(1, NULL, 0, "addstr()", 14595, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14595, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9277,7 +9852,12 @@ void addstr (arg0, str)
 }
 
 // function addspacedstr # 15
-// Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
+/**
+ * Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
+ *
+ * @param arg0 List to add the entries to
+ * @param str Space-separated string to add
+ */
 void addspacedstr(list* arg0, char* str) {
     char* str_end = str;
 
@@ -9290,16 +9870,16 @@ void addspacedstr(list* arg0, char* str) {
         if ((arg0->length + 1) >= arg0->capacity) {
             if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) ==
                 NULL) {
-                error(1, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
+                error(ERRORCAT_ERROR, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 exit(1);
             }
             arg0->capacity += LIST_CAPACITY_INCR;
         }
         arg0->entries[arg0->length] = str;
-        arg0->length += 1;
+        arg0->length++;
         arg0->entries[arg0->length] = NULL;
     } while ((str = str_end) != NULL);
 }
@@ -9317,31 +9897,37 @@ char* newstr(const char* src) {
     if (dest != NULL) {
         strcpy(dest, src);
     } else {
-        error(1, NULL, 0, NULL, 0, "newstr: unable to malloc for string %s\n", src);
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "newstr: unable to malloc for string %s\n", src);
         exit(2);
     }
     return dest;
 }
 
 // function save_place # 17
+/**
+ * Add one new uninitialised entry to a list
+ *
+ * @param arg0 list to add it to
+ * @return int index of new entry
+ */
 int save_place(list* arg0) {
-    int ret;
+    int new_entry_index;
 
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "save_place()", 14695, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "save_place()", 14695, "out of memory\n");
 
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
         arg0->capacity += LIST_CAPACITY_INCR;
     }
-    ret = arg0->length;
+    new_entry_index = arg0->length;
     arg0->length++;
     arg0->entries[arg0->length] = NULL;
-    return ret;
+    return new_entry_index;
 }
 
 // function set_place # 18
@@ -9354,7 +9940,7 @@ int save_place(list* arg0) {
  */
 void set_place(list* arg0, char* str, int place) {
     if ((place < 0) || (place >= arg0->length)) {
-        error(0, NULL, 0, "set_place ()", 14726, "place out of range");
+        error(ERRORCAT_INTERNAL, NULL, 0, "set_place ()", 14726, "place out of range");
         exit(1);
     }
     arg0->entries[place] = str;
@@ -9368,9 +9954,9 @@ void addlist(list* arg0, list* arg1) {
     if ((arg0->length + arg1->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries,
                                      (arg0->capacity + arg1->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "addlist ()", 14756, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14756, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9386,10 +9972,12 @@ void addlist(list* arg0, list* arg1) {
 }
 
 // function adduldlist # 20
-// Adds entries from arg1 and arg2 onto the end of arg0:
-// - up to the first NULL from arg2,
-// - then everything from arg1,
-// - then the rest of arg2.
+/**
+ * Adds entries from arg1 and arg2 onto the end of arg0:
+ * - up to the first NULL from arg2,
+ * - then everything from arg1,
+ * - then the rest of arg2.
+ */
 void adduldlist(list* arg0, list* arg1, list* arg2) {
     int sp3C;
     int sp38;
@@ -9399,9 +9987,9 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
         if ((arg0->entries =
                  realloc(arg0->entries, (arg0->capacity + arg1->capacity + arg2->capacity + LIST_CAPACITY_INCR) *
                                             sizeof(char*))) == NULL) {
-            error(1, NULL, 0, "addlist ()", 14795, "out of memory\n");
+            error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14795, "out of memory\n");
             if (errno < sys_nerr) {
-                error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
             }
             exit(1);
         }
@@ -9431,7 +10019,11 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
 }
 
 // function nodup # 21
-// Search for a string in a list. If found, return 0, else return 1.
+/**
+ * Search for a string in a list.
+ *
+ * return int boolean, TRUE if not found
+ */
 int nodup(list* arg0, const char* str) {
     register int i;
     register char* entry;
@@ -9439,50 +10031,68 @@ int nodup(list* arg0, const char* str) {
     for (i = 0; i < arg0->length; i++) {
         entry = arg0->entries[i];
         if ((entry != NULL) && (strcmp(entry, str) == 0)) {
-            return 0;
+            return FALSE;
         }
     }
 
-    return 1;
+    return TRUE;
 }
 
 // function getsuf # 22
+/**
+ * Find the file extension (suffix) of a path.
+ * - Most single-letter extensions will be returned as-is (with the exception of 'C').
+ * - Most multi-letter extensions are checked in the `suffixes` table and a special value is returned.
+ * - "for" -> 'f' and "FOR" -> 'F'.
+ * - If extension is not recognised, return '\0'.
+ * .
+ * @param path path to find the extension of
+ * @return char path's extension or special case (see enum)
+ */
 char getsuf(const char* path) {
-    int suflen = 0; // Length of suffix
+    int basename_len = 0; // Length of suffix
     int i;
     char ch;
     const char* str = path;
 
-    while (ch = *path++) {
+    // Look for the start of the path's basename and find its length.
+    while (ch = *path++) { // != '\0'
         if (ch == '/') {
-            suflen = 0;
+            basename_len = 0;
             str = path;
         } else {
-            suflen++;
+            basename_len++;
         }
     }
+    // `path` now points to after the trailing '\0'
 
-    if (suflen < 3) {
+    // no room for a suffix
+    if (basename_len <= 2) {
         return '\0';
     }
 
+    // Single-letter suffix
     if (path[-3] == '.') {
-        if (path[-2] == 'C') {
-            return 6; // ACK?
+        if (path[-2] == 'C') { // "*.C"
+            return 6;
+        } else { // Any other single letter
+            return path[-2];
         }
-        return path[-2];
     }
 
-    for (i = suflen - 2; i > 0; i--) {
+    // Multi-letter suffix, look backwards through basename for the last '.'
+    for (i = basename_len - 2; i > 0; i--) {
         if (str[i] == '.') {
             break;
         }
     }
 
+    // if no '.' found, no suffix.
     if (i == 0) {
         return '\0';
     }
 
+    // Search table for suffix.
     str = &str[i + 1];
     for (i = 0; suffixes[i].unk0 != NULL; i++) {
         if (strcmp(str, suffixes[i].unk0) == 0) {
@@ -9490,46 +10100,57 @@ char getsuf(const char* path) {
         }
     }
 
+    // Special case for "for"/"FOR".
     if (strcmp(str, "for") == 0) {
         return 'f';
     }
     if (strcmp(str, "FOR") == 0) {
         return 'F';
     }
+
+    // Suffix not recognised.
     return '\0';
 }
 
 // function mksuf # 23
+/**
+ * Given a file path and a value, returns a basename with an extension specified by the value.
+ *
+ * @param path Path to start with
+ * @param value Value of suffix. Values smaller than 8 will be looked up in the `suffixes` table
+ * @return char* basename of `path` with extension attached
+ */
 char* mksuf(const char* path, char value) {
-    int i; // sp54
-    int k; // sp50, also suffix length
-    size_t sp4C;
-    char* sp48;
-    char* sp44;
-    char* sp40;
-    const char* sp3C = NULL;
-    char ch; // sp38
+    int i;                      // sp54, also basename length
+    int k;                      // sp50
+    size_t new_suf_length;      // sp4C
+    char* sp48;                 // Iterator used to find start of new basename
+    char* sp44;                 // various uses: pointing to end of new copy of `path`, used for return
+    char* sp40;                 // Start of copied basename, then start of copied extension
+    const char* new_suf = NULL; // sp3C
+    char ch;                    // sp38
 
-    if (value < 8) {
+    if (value < 8) { // Special cases covered by the table
         for (i = 0; suffixes[i].unk0 != NULL; i++) {
             if (suffixes[i].unk4 == value) {
-                sp3C = suffixes[i].unk0;
+                new_suf = suffixes[i].unk0;
                 break;
             }
         }
 
-        if (sp3C == NULL) {
-            error(0, NULL, 0, "mksuf ()", 14938, "passed an unknown suffix value: %s\n", value);
+        if (new_suf == NULL) {
+            error(ERRORCAT_INTERNAL, NULL, 0, "mksuf ()", 14938, "passed an unknown suffix value: %s\n", value);
             exit(4);
         }
-        sp4C = strlen(sp3C);
+        new_suf_length = strlen(new_suf);
     } else {
-        sp4C = 0;
+        new_suf_length = 0;
     }
 
     i = 0;
-    sp40 = sp44 = sp48 = savestr(path, sp4C);
+    sp40 = sp44 = sp48 = savestr(path, new_suf_length);
 
+    // Look for the start of the (copied) path's basename
     while (ch = *sp44++) {
         if (ch == '/') {
             i = 0;
@@ -9538,40 +10159,50 @@ char* mksuf(const char* path, char value) {
             i++;
         }
     }
+    // `sp40` now points to start of basename,
+    // `sp44` to after the trailing '\0',
+    // `i` is basename length
 
-    if ((i >= 3) && (sp44[-3] == '.')) {
-        if (value < 8) {
-            strcpy(sp44 - 2, sp3C);
-        } else {
+    if ((i >= 3) && (sp44[-3] == '.')) { // Path currently has a single-letter extension
+        if (value < 8) {                 // Copy extension from table
+            strcpy(sp44 - 2, new_suf);
+        } else { // set single-letter extension from `value`
             sp44[-2] = value;
             sp44[-1] = 0;
         }
-    } else {
+    } else { // no extension or a longer one
+             // Look backwards through basename for last '.'
         for (k = i - 2; k > 0; k--) {
             if (sp40[k] == '.') {
                 break;
             }
         }
 
+        // If no extension, error out
         if (k == 0) {
-            error(1, NULL, 0, "mksuf ()", 14977, "Bad file name, no suffix: %s\n", path);
+            error(ERRORCAT_ERROR, NULL, 0, "mksuf ()", 14977, "Bad file name, no suffix: %s\n", path);
             exit(4);
         }
+
+        // move to start of current extension
         sp40 = &sp40[k + 1];
-        if (value < 8) {
-            strcpy(sp40, sp3C);
-        } else {
+        // Replace extension
+        if (value < 8) { // Copy from table
+            strcpy(sp40, new_suf);
+        } else { // set single-letter extension from `value`
             sp40[0] = value;
             sp40[1] = 0;
         }
     }
 
-    sp44 = sp48;
+    sp44 = sp48; // sp44 to start of copied path
+    // Find start of new basename
     while (*sp48 != '\0') {
         if (*sp48++ == '/') {
             sp44 = sp48;
         }
     }
+    // return new basename?
     return sp44;
 }
 
@@ -9581,9 +10212,9 @@ char* savestr(const char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
 
     if (dest == NULL) {
-        error(1, NULL, 0, "savestr ()", 15014, "out of memory\n");
+        error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 15014, "out of memory\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         exit(1);
     }
@@ -9630,7 +10261,8 @@ void mktempstr(void) {
 
     tempstr[33] = mktemp(mkstr(tmpdir, "ctmcmdXXXXXX", NULL));
 
-    if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3)) && (nofilt == 0) &&
+    if ((compiler == COMPILER_1) &&
+        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && !nofilt &&
         (access(filter, EX_OK) == 0)) {
         tempstr[32] = mktemp(mkstr(tmpdir, "ctmfiltXXXXXX", NULL));
     } else {
@@ -9656,10 +10288,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     sysset_t sp34;
     register int var_s0;
 
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "%s ", arg0);
         spA4 = arg1 + 1;
-        while (*spA4 != 0) {
+        while (*spA4 != '\0') {
             fprintf(stderr, "%s ", *spA4++);
         }
 
@@ -9671,22 +10303,22 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
         fprintf(stderr, "\n");
     }
-    if (time_flag != 0) {
+    if (time_flag) {
         settimes();
     }
-    if (execute_flag == 0) {
+    if (!execute_flag) {
         return 0;
     }
     if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
-        error(1, NULL, 0, NULL, 0, "pipe failed for -showm");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "pipe failed for -showm");
         return -1;
     }
 
     spA0 = fork();
     if (spA0 == -1) { // fork failed
-        error(1, NULL, 0, NULL, 0, "no more processes\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no more processes\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         return -1;
     }
@@ -9699,9 +10331,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg2 != NULL) {
             sp94 = open(arg2, O_RDONLY);
             if (sp94 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -9712,9 +10344,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg3 != NULL) {
             sp90 = creat(arg3, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp90 == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -9725,9 +10357,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         if (arg4 != NULL) {
             sp8C = creat(arg4, S_IRWXU | S_IRWXG | S_IRWXO); // 0777
             if (sp8C == -1) {
-                error(1, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
                 cleanup();
                 exit(1);
@@ -9738,15 +10370,15 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         execvp(arg0, arg1);
         sp78 = func_00430414(arg0, 1);
         if ((errno == ENOENT) && (sp78 != NULL)) {
-            error(1, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s is not installed (could not find %s).\n", sp78, arg0);
         } else {
             sp78 = func_00430414(arg0, 0);
             if ((errno == ENOENT) && (sp78 != NULL)) {
-                error(1, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "%s may not be installed (could not find %s).\n", sp78, arg0);
             } else {
-                error(1, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
                 if (errno < sys_nerr) {
-                    error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
                 }
             }
         }
@@ -9790,7 +10422,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         sigset(SIGINT, sp84);
         sigset(SIGTERM, sp88);
 
-        if (time_flag != 0) {
+        if (time_flag) {
             dotime(arg0);
         }
 
@@ -9849,16 +10481,16 @@ int edit_src(const char* arg0, char* arg1, int arg2) {
 
     forkPid = fork();
     if (forkPid == (pid_t)-1) { // fork failed
-        error(1, NULL, 0, NULL, 0, "fork to edit failed\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
         return -1;
     }
 
     if (forkPid == (pid_t)0) { // child process
 
-        if (editflag == 2) {
+        if (editflag == EDIT_FLAG_2) {
             get_lino(sp58, arg1, arg2);
             execlp(arg0, arg0, sp58, arg1, "-l", tempstr[25], "-f", "err-window", (char*)NULL);
         } else if (xserver == 0) {
@@ -9866,9 +10498,9 @@ int edit_src(const char* arg0, char* arg1, int arg2) {
         } else {
             execlp("xterm", "xterm", "-display", xserver, "-ls", "-e", arg0, "+1", errout, arg1, (char*)NULL);
         }
-        error(1, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
         if (errno < sys_nerr) {
-            error(5, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
         }
 
         exit(1);
@@ -10020,18 +10652,20 @@ void handler(void) {
 
 // function cleanup # 31
 void cleanup(void) {
-    if (Kflag == 0) {
+    if (!Kflag) {
         if (passout != NULL) {
             unlink(passout);
         }
         if (passin != NULL) {
-            char sp27 = getsuf(passin);
-            if (((sp27 == 0)) || ((sp27 != srcsuf) && (sp27 != 'm'))) {
-                if (Eflag == 0) {
+            char suf = getsuf(passin);
+
+            if (((suf == '\0')) || ((suf != srcsuf) && (suf != 'm'))) {
+                if (!Eflag) {
                     unlink(passin);
                 }
             }
         }
+
         if (tmpst != 0) {
             if (symtab != NULL) {
                 unlink(symtab);
@@ -10070,9 +10704,9 @@ void cleanup(void) {
         if (tmp_uldobj != NULL) {
             unlink(tmp_uldobj);
         }
-        if (editflag != 0) {
+        if (editflag != EDIT_FLAG_0) {
             unlink(errout);
-            if (editflag == 2) {
+            if (editflag == EDIT_FLAG_2) {
                 unlink(tempstr[25]);
             }
         }
@@ -10113,8 +10747,8 @@ void settimes(void) {
 void dotime(const char* programName) {
     clock_t time1; // sp6C;
     clock_t clockTimeDiff;
-    double milis;      // sp60
-    double seconds;    // sp58
+    double milis;   // sp60
+    double seconds; // sp58
     struct tms tm1; // sp48;
 
     time1 = times(&tm1);
@@ -10133,7 +10767,8 @@ static char* func_0042FD7C(const char* name, char** dirs) {
     char* path;
 
     for (; *dirs != NULL; dirs++) {
-        if ((compiler == COMPILER_1) && ((c_compiler_choice == 2) || (c_compiler_choice == 3))) {
+        if ((compiler == COMPILER_1) &&
+            ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             fildes = open(path = mkstr(*dirs, "/DCC", runlib, name, NULL), 0, 0);
             if (fildes >= 0) {
                 close(fildes);
@@ -10150,7 +10785,7 @@ static char* func_0042FD7C(const char* name, char** dirs) {
 
     if (abi_flag != 0) {
         path = mkstr("/", "usr/lib/abi", runlib, name, NULL);
-    } else if (non_shared != 0) {
+    } else if (non_shared) {
         path = mkstr("/", "usr/lib/nonshared", runlib, name, NULL);
     } else {
         path = mkstr("/", "usr/lib", runlib, name, NULL);
@@ -10159,18 +10794,24 @@ static char* func_0042FD7C(const char* name, char** dirs) {
 }
 
 // function isdir # 36
+/**
+ * Checks if `path` is a directory.
+ *
+ * @param path
+ * @return int boolean, true if
+ */
 int isdir(const char* path) {
     int spAC;
     struct stat statbuf;
 
     spAC = stat(path, &statbuf);
     if (spAC == -1) {
-        return 0;
+        return FALSE;
     }
-    if ((statbuf.st_mode & 0xF000) == 0x4000) {
-        return 1;
+    if (S_ISDIR(statbuf.st_mode)) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 
 // function regular_not_writeable # 37
@@ -10189,7 +10830,6 @@ int regular_not_writeable(const char* arg0) {
 }
 
 // function regular_file # 38
-// Needs stat.h
 int regular_file(const char* path) {
     int spAC;
     struct stat statbuf;
@@ -10198,22 +10838,20 @@ int regular_file(const char* path) {
     if (spAC == -1) {
         return -1;
     }
-    if ((statbuf.st_mode & 0xF000) != 0x8000) {
+    if (!S_ISREG(statbuf.st_mode)) {
         return 0;
     }
     return 1;
 }
 
 // function basename # 39
-static char B_1000E5E0[0x400];
-
 // Obtain the base name of a file path, i.e. the part after the final '/'
 char* basename(const char* path) {
     register char* ret;
     register char* str = B_1000E5E0;
     register size_t len;
 
-    if ((path == NULL) || (*path == 0)) {
+    if ((path == NULL) || (*path == '\0')) {
         return strcpy(str, ".");
     }
 
@@ -10273,13 +10911,12 @@ const char* dirname(const char* path) {
     return strcpy(str, ".");
 }
 
-struct _struct_prod_name_0xC {
+struct {
     /* 0x0 */ const char* unk0; // name?
     /* 0x4 */ const char* unk4; // full path?
     /* 0x8 */ const char* unk8; // description?
-};                              // size = 0xC
-
-struct _struct_prod_name_0xC prod_name[] = {
+} // size = 0xC
+prod_name[] = {
     { "accom", "/usr/lib/accom", "ANSI C" },
     { "ccom", "/usr/lib/ccom", "ANSI C" },
     { "acpp", "/usr/lib/acpp", "ANSI C" },
@@ -10337,29 +10974,29 @@ static const char* func_00430414(char* arg0, int arg1) {
 }
 
 // function force_use_cfront # 42
-static int D_1000BF7C;
-static int D_1000BF90;
-
-extern char* comp_host_root;
-extern int exception_handling;
-extern list execlist;
-
+/**
+ * Whether to force using cfront over the built-in C++ compiler. Can be set by `USE_CFRONT` environment variable, or
+ * various flags.
+ *
+ * @param argc
+ * @param argv
+ * @return int boolean TRUE if should use cfront.
+ */
 int force_use_cfront(int argc, char** argv) {
     int i;
     char* sp28 = getenv("USE_CFRONT");
-    int sp24 = 0;
+    int sp24 = 0; // Set but not used
 
     if ((sp28 != NULL) && (*sp28 != '0')) {
-        return 1;
+        return TRUE;
     }
 
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-exceptions") == 0) {
-            D_1000BF7C = 1;
+            D_1000BF7C = TRUE;
         }
-        if ((D_1000BF7C == 0) && (exception_handling == 0) &&
-            ((strcmp(argv[i], "-F") == 0) || (strcmp(argv[i], "-Fc") == 0))) {
-            return 1;
+        if (!D_1000BF7C && !exception_handling && ((strcmp(argv[i], "-F") == 0) || (strcmp(argv[i], "-Fc") == 0))) {
+            return TRUE;
         }
         // clang-format off
         if ((strcmp(argv[i], "-use_cfront") == 0) 
@@ -10367,10 +11004,10 @@ int force_use_cfront(int argc, char** argv) {
             || (strcmp(argv[i], "+I") == 0) 
             || (strncmp(argv[i], "-.", 2) == 0)) {
             // clang-format on
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 
 // function exec_OCC # 43
@@ -10381,13 +11018,13 @@ void exec_OCC(int argc, char** argv) {
     sprintf(spB8, "%susr/bin/OCC", comp_host_root);
     *argv = spB8;
     execv(spB8, argv);
-    error(2, NULL, 0, NULL, 0, "could not exec %s", spB8);
+    error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "could not exec %s", spB8);
 }
 
 // function add_cxx_symbol_options # 44
 int add_cxx_symbol_options(void) {
     addstr(&execlist, "-cxx");
-    if ((D_1000BF90 == 0) && (strcmp(LD, "old_ld") != 0)) {
+    if (!D_1000BF90 && (strcmp(LD, "old_ld") != 0)) {
         addstr(&execlist, "-woff");
         addstr(&execlist, "134");
     }
@@ -10395,16 +11032,17 @@ int add_cxx_symbol_options(void) {
 }
 
 // function init_curr_dir # 45
-
+// Sets D_1000C2F0 to current executable's basename and D_1000C1D0 to the current working directiory
 void init_curr_dir(void) {
-    if (D_1000C2F0 == 0) {
+    if (D_1000C2F0 == NULL) {
         D_1000C2F0 = strrchr(progname, '/');
-        if (D_1000C2F0 == 0) {
+        if (D_1000C2F0 == NULL) {
             D_1000C2F0 = progname;
         } else {
             D_1000C2F0++;
         }
     }
+
     if (D_1000C1D0 == NULL) {
         D_1000C1D0 = getcwd(NULL, 0x400);
         if (D_1000C1D0 == NULL) {
@@ -10433,21 +11071,13 @@ char* full_path(const char* relative_path) {
 }
 
 // function add_static_opt # 47
-list staticopts;
-
 void add_static_opt(char* opt) {
-    if (D_1000BF88 == 0) {
+    if (!D_1000BF88) {
         addstr(&staticopts, opt);
     }
 }
 
 // function record_static_fileset # 48
-static char* D_1000BF80;
-static char* D_1000BF84;
-static char* D_1000C2E8;
-static char* D_1000C2EC;
-char* tmpdir;
-
 void record_static_fileset(const char* arg0) {
     int sp28E4;
     FILE* sp28E0;
@@ -10469,17 +11099,17 @@ void record_static_fileset(const char* arg0) {
         D_1000BF84 = mkstr("cvstatic.fileset", NULL);
     }
 
-    if ((*D_1000BF84 == '/') || (*D_1000BF80 == 0)) {
+    if ((D_1000BF84[0] == '/') || (D_1000BF80[0] == '\0')) {
         D_1000C2E8 = mkstr(D_1000BF84, NULL);
     } else {
         D_1000C2E8 = mkstr(D_1000BF80, D_1000BF84, NULL);
     }
 
-    D_1000C2EC = mkstr(tmpdir, "cvstatic.fileset", &spBC, 0);
+    D_1000C2EC = mkstr(tmpdir, "cvstatic.fileset", &spBC, NULL);
     spD4 = full_path(arg0);
     spD0 = strlen(spD4);
 
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "Static fileset: %s %s", spD4, D_1000C2F0);
         for (sp28E4 = 0; sp28E4 < staticopts.length; sp28E4++) {
             fprintf(stderr, " %s", staticopts.entries[sp28E4]);
@@ -10489,7 +11119,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28E0 = fopen(D_1000C2EC, "w+");
     if (sp28E0 == NULL) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n", D_1000C2EC);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not open cvstatic fileset temp file %s\n",
+              D_1000C2EC);
         perror(D_1000C2F0);
         cleanup();
         exit(1);
@@ -10497,7 +11128,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28D8 = open(D_1000C2E8, 0x102, 0777);
     if (sp28D8 < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not open or create cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10505,7 +11137,8 @@ void record_static_fileset(const char* arg0) {
     }
 
     if (flock(sp28D8, 2) < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "error in locking cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10513,7 +11146,8 @@ void record_static_fileset(const char* arg0) {
     }
 
     if (fstat(sp28D8, &sp34) < 0) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not fstat cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10526,7 +11160,8 @@ void record_static_fileset(const char* arg0) {
 
     sp28DC = fdopen(sp28D8, "r+");
     if (sp28DC == NULL) {
-        error(1, 0, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n", D_1000C2E8);
+        error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "could not fdopen cvstatic fileset file %s\n",
+              D_1000C2E8);
         perror(D_1000C2F0);
         unlink(D_1000C2EC);
         cleanup();
@@ -10552,7 +11187,8 @@ void record_static_fileset(const char* arg0) {
 
     while ((sp28E4 = fread(spD8, 1, 0x2800, sp28E0)) > 0) {
         if (fwrite(&spD8, 1, sp28E4, sp28DC) != sp28E4) {
-            error(1, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n", D_1000C2E8);
+            error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n",
+                  D_1000C2E8);
             perror(D_1000C2F0);
             unlink(D_1000C2EC);
             cleanup();
@@ -10568,14 +11204,13 @@ void record_static_fileset(const char* arg0) {
 }
 
 // function touch # 49
-// Needs utime.h
 int touch(const char* arg0) {
     time_t curtime = time(NULL);
     struct utimbuf sp34;
     char* str;
 
     init_curr_dir();
-    if (vflag != 0) {
+    if (vflag) {
         fprintf(stderr, "%s: touch %s\n", D_1000C2F0, arg0);
     }
     sp34.modtime = curtime;
@@ -10667,10 +11302,6 @@ size_t quote_shell_arg(const char* arg0, char* arg1) {
 }
 
 // function func_00431A3C # 53
-static int B_1000E4C0;    // argc
-static char** B_1000E4C4; // argv
-static char* B_1000ECDC;
-
 static void func_00431A3C(int argc, char** argv) {
     int i;
 
@@ -10704,10 +11335,10 @@ static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
         fputs("CMDLINE=", arg0);
     }
     fprintf(arg0, "%s ", progname);
-    if (cflag == 0) {
+    if (!cflag) {
         fputs("-c ", arg0);
     }
-    if ((srcfiles.length == 1) && (cflag != 0)) {
+    if ((srcfiles.length == 1) && cflag) {
         if (B_1000ECCC != 0) {
             fprintf(arg0, "-o %s ", B_1000ECCC);
         }
@@ -10731,7 +11362,7 @@ static void func_00431D00(const char* arg0) {
         func_00431B88(file, arg0, FALSE);
         fclose(file);
     } else {
-        error(2, NULL, 0, NULL, 0, "cannot open commandfile '%s'\n", tempstr[33]);
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "cannot open commandfile '%s'\n", tempstr[33]);
     }
 }
 
@@ -10766,8 +11397,6 @@ static void func_00431DD8(void) {
 }
 
 // function skip_old_ii_controls # 58
-#define EOF (-1) // can go when headers in
-
 // Search file for the first "----" and move position to the line after it
 void skip_old_ii_controls(FILE* arg0) {
     int ch;
@@ -10816,7 +11445,7 @@ char* make_ii_file_name(const char* arg0) {
 }
 
 // function update_instantiation_info_file # 60
-// TODO: type of error(), name vars
+// TODO: name vars
 
 void update_instantiation_info_file(const char* arg0, const char* arg1) {
     char* sp54 = make_ii_file_name(arg1);
@@ -10832,7 +11461,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         }
         sp48 = fopen(sp50, "w");
         if (sp48 == NULL) {
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", sp50);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in creating file %s\n", sp50);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
@@ -10848,7 +11477,8 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
         fclose(sp48);
 
         if (rename(sp50, sp54) < 0) {
-            error(1, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", sp50, sp54);
+            error(ERRORCAT_ERROR, NULL, 0, "update_instantiation_info_file", 0, "error in renaming %s to %s\n", sp50,
+                  sp54);
             perror(D_1000C2F0);
             cleanup();
             exit(1);
