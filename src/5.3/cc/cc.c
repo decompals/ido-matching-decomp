@@ -1637,7 +1637,7 @@ int main(int argc, char** argv) {
             Kflag || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') 
             || (srcsuf == 'S') 
             || (srcsuf == 'M')
-            || (reg_s1 == 6)
+            || (reg_s1 == 6) //! @bug var is uninitialised
             || (srcsuf == 'V')
             || (srcsuf == 'D')
             || (srcsuf == 'Q')
@@ -1653,7 +1653,6 @@ int main(int argc, char** argv) {
             symtab = tempstr[0];
         }
 
-        // Something is going on with case 6 in this switch
         switch (srcsuf) { /* switch 11 */
             case 's':     /* switch 11 */
                 if (compiler == COMPILER_1) {
