@@ -201,6 +201,9 @@ typedef enum {
     /* 3 */ EDISON_TYPE_3
 } EdisonType;
 
+void get_host_chiptype(void);
+void process_config(int argc, char** argv);
+void add_info(char* s);
 void parse_command(int argc, char** argv);
 void relocate_passes(char* arg0, char* arg1, char* arg2);
 void newrunlib(void);
@@ -210,13 +213,30 @@ char* mksuf(const char* path, char value);
 void add_static_opt(/* string */ char* opt);
 void compose_G0_libs(char* arg0);
 int regular_file(const char*);
+void mklist(string_list* list);
 // Called incorrectly so cannot use prototype
 void addstr();
 // void addstr(string_list* list, string str);
+
+void show_err(const char* path);
+void whats(void);
+void init_curr_dir(void);
+void record_static_fileset(const char* arg0);
+void add_prelinker_objects(string_list* execlist, string_list* list);
+void save_off_command_line(int argc, char** argv);
+char* make_ii_file_name(char* objname);
+void update_instantiation_info_file(char* objname);
+
+void addspacedstr(string_list* list, char* str);
+char* newstr(char* s);
+void set_place(string_list* list, char* str, int place);
+void addlist(string_list* a, string_list* b);
+void adduldlist(string_list* a, string_list* b, string_list* c);
+void mktempstr(void);
 void cleanup(void);
 char* mkstr();
 /* string */ char* savestr(const /* string */ char* src, size_t extra_length);
-
+void handler(void);
 void get_lino(char* lino, const char* path, int mode);
 void settimes(void);
 void dotime(void);
