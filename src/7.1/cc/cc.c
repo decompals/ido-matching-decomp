@@ -1607,7 +1607,7 @@ int main(int argc, char** argv) {
                     symtab = tempstr[0];
                     tmpst = 1;
                 }
-                goto pass_uld;
+                goto phase_uld;
             }
             continue;
         }
@@ -1799,29 +1799,29 @@ int main(int argc, char** argv) {
                     if (docpp || default_nocpp) {
                         goto block_531;
                     }
-                    goto pass_copt;
+                    goto phase_copt;
 
                 case 'i': /* switch 19 */
                     // 'i' is a preprocessed file so does not convey a specific compiler by itself
                     switch (compiler) {
                         case COMPILER_1:
-                            goto pass_copt;
+                            goto phase_copt;
                         case COMPILER_2:
-                            goto pass_upas;
+                            goto phase_upas;
                         case COMPILER_3:
-                            goto pass_fopt;
+                            goto phase_fopt;
                         case COMPILER_4:
                             goto block_512;
                         case COMPILER_5:
-                            goto pass_upl1;
+                            goto phase_upl1;
                         case COMPILER_6:
-                            goto pass_ucob;
+                            goto phase_ucob;
                     }
                     // fallthrough
                 case 'p': /* switch 19 */
                 block_512:
                     if (stdflag != 0 || (!docpp && !default_nocpp)) {
-                        goto pass_upas;
+                        goto phase_upas;
                     }
                     goto block_531;
 
@@ -1829,22 +1829,22 @@ int main(int argc, char** argv) {
                     if (docpp) {
                         goto block_531;
                     }
-                    goto pass_fopt;
+                    goto phase_fopt;
 
                 case SUF_1: /* switch 19 */
                     if (docpp) {
                         goto block_531;
                     }
-                    goto pass_upl1;
+                    goto phase_upl1;
 
                 case SUF_2: /* switch 19 */
                     if (docpp) {
                         goto block_531;
                     }
-                    goto pass_ucob;
+                    goto phase_ucob;
 
                 case SUF_3: /* switch 19 */
-                    goto pass_ulpi;
+                    goto phase_ulpi;
 
                 case 'U': /* switch 19 */
                     execlist.length = 0;
@@ -1869,35 +1869,35 @@ int main(int argc, char** argv) {
                         continue;
                     }
                     passin = passout;
-                    goto pass_ujoin;
+                    goto phase_ujoin;
 
                 case 'e': /* switch 19 */
                 case 'r': /* switch 19 */
                 case 's': /* switch 19 */
-                    goto pass_m4;
+                    goto phase_m4;
 
                 case 'u': /* switch 19 */
-                    goto pass_usplit;
+                    goto phase_usplit;
 
                 case 'B': /* switch 19 */
-                    goto pass_ujoin;
+                    goto phase_ujoin;
 
                 case 'S': /* switch 19 */
-                    goto pass_umerge;
+                    goto phase_umerge;
 
                 case 'M': /* switch 19 */
-                    goto pass_uloop;
+                    goto phase_uloop;
 
                 case 'G': /* switch 19 */
-                    goto pass_as1;
+                    goto phase_as1;
 
                 case 'D': /* switch 19 */
                 case 'Q': /* switch 19 */
                 case 'V': /* switch 19 */
-                    goto pass_uopt;
+                    goto phase_uopt;
 
                 case 'O': /* switch 19 */
-                    goto pass_ugen;
+                    goto phase_ugen;
             }
         }
 
@@ -2452,25 +2452,25 @@ int main(int argc, char** argv) {
 
         switch (srcsuf) { /* switch 17 */
             case SUF_1:
-                goto pass_upl1;
+                goto phase_upl1;
 
             case SUF_2: /* switch 17 */
-                goto pass_ucob;
+                goto phase_ucob;
 
             case 'c': /* switch 17 */
-                goto pass_copt;
+                goto phase_copt;
 
             case 'p': /* switch 17 */
-                goto pass_upas;
+                goto phase_upas;
 
             case 's': /* switch 17 */
-                goto pass_as0;
+                goto phase_as0;
 
             case 'F': /* switch 17 */
             case 'e': /* switch 17 */
             case 'f': /* switch 17 */
             case 'r': /* switch 17 */
-                goto pass_fopt;
+                goto phase_fopt;
         }
 
     block_922:
@@ -2492,33 +2492,33 @@ int main(int argc, char** argv) {
 
         switch (srcsuf) { /* switch 18 */
             case SUF_1:   /* switch 18 */
-                goto pass_upl1;
+                goto phase_upl1;
 
             case SUF_2: /* switch 18 */
-                goto pass_ucob;
+                goto phase_ucob;
 
             case SUF_6: /* switch 18 */
             case 'c':   /* switch 18 */
-                goto pass_copt;
+                goto phase_copt;
 
             case 'p': /* switch 18 */
-                goto pass_upas;
+                goto phase_upas;
 
             case 's': /* switch 18 */
-                goto pass_as0;
+                goto phase_as0;
 
             case 'F': /* switch 18 */
             case 'e': /* switch 18 */
             case 'f': /* switch 18 */
             case 'r': /* switch 18 */
-                goto pass_fopt;
+                goto phase_fopt;
         }
 
-    pass_copt:
+    phase_copt:
         if (run_sopt) {
             if (cmp_flag & 1) {
                 error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pca both specified; -sopt ignored.\n");
-                goto pass_pca;
+                goto phase_pca;
             }
 
             execlist.length = 0;
@@ -2600,7 +2600,7 @@ int main(int argc, char** argv) {
             goto block_1042;
         }
 
-    pass_pca:
+    phase_pca:
         {
             if ((Hchar == 'K') || Kflag) {
                 cmp_flag |= 6;
@@ -2948,7 +2948,7 @@ int main(int argc, char** argv) {
                 }
 
                 if ((srcfiles.length == 1) && !cflag) {
-                    goto pass_cord;
+                    goto phase_cord;
                 }
             }
 
@@ -3014,10 +3014,10 @@ int main(int argc, char** argv) {
                 unlink(passout);
                 continue;
             }
-            goto pass_ujoin;
+            goto phase_ujoin;
         }
 
-    pass_ccom:
+    phase_ccom:
         {
             execlist.length = 0;
             addstr(&execlist, (ansichoice != ANSICHOICE_KR) ? "accom" : "ccom");
@@ -3146,10 +3146,10 @@ int main(int argc, char** argv) {
                 (Eflag || nocode || nocompileneeded)) {
                 continue;
             }
-            goto pass_ujoin;
+            goto phase_ujoin;
         }
 
-    pass_upas:
+    phase_upas:
         {
             execlist.length = 0;
             addstr(&execlist, "upas");
@@ -3241,10 +3241,10 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            goto pass_ujoin;
+            goto phase_ujoin;
         }
 
-    pass_upl1:
+    phase_upl1:
         {
             execlist.length = 0;
             addstr(&execlist, "pl1fe");
@@ -3318,7 +3318,7 @@ int main(int argc, char** argv) {
             passin = passout;
         }
 
-    pass_ulpi:
+    phase_ulpi:
         {
             execlist.length = 0;
             addstr(&execlist, "ulpi");
@@ -3396,10 +3396,10 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            goto pass_ujoin;
+            goto phase_ujoin;
         }
 
-    pass_ucob:
+    phase_ucob:
         {
             execlist.length = 0;
             addstr(&execlist, "cobfe");
@@ -3484,10 +3484,10 @@ int main(int argc, char** argv) {
             }
 
             passin = passout;
-            goto pass_ulpi;
+            goto phase_ulpi;
         }
 
-    pass_m4:
+    phase_m4:
         if (mflag) {
             execlist.length = 0;
             addstr(&execlist, "m4");
@@ -3514,7 +3514,7 @@ int main(int argc, char** argv) {
                 if (docpp || default_nocpp) {
                     goto block_531;
                 }
-                goto pass_as0;
+                goto phase_as0;
 
             case 'e':
             default:
@@ -3546,7 +3546,7 @@ int main(int argc, char** argv) {
                 break;
         }
 
-    pass_fopt:
+    phase_fopt:
         {
             sp100 = 0;
             spFC = 0;
@@ -3556,7 +3556,7 @@ int main(int argc, char** argv) {
             if (run_sopt) {
                 if (mp_flag & 1) {
                     error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-sopt and -pfa both specified; -sopt ignored.\n");
-                    goto pass_pfa;
+                    goto phase_pfa;
                 }
 
                 if ((Oflag >= 2) && !set_loop_unroll) {
@@ -3645,11 +3645,11 @@ int main(int argc, char** argv) {
                 if (Hchar == 'K') {
                     continue;
                 }
-                goto pass_fcom;
+                goto phase_fcom;
             }
         }
 
-    pass_pfa:
+    phase_pfa:
         {
             if ((Hchar == 'K') || Kflag) {
                 mp_flag |= 6;
@@ -3809,7 +3809,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_fcom:
+    phase_fcom:
         {
             execlist.length = 0;
             addstr(&execlist, "fcom");
@@ -3920,13 +3920,13 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_ujoin:
+    phase_ujoin:
         {
             if ((Oflag != 3) && (Oflag != 4) && !jflag) {
                 if (!c_inline) {
-                    goto pass_uloop;
+                    goto phase_uloop;
                 } else {
-                    goto pass_umerge;
+                    goto phase_umerge;
                 }
             }
 
@@ -3972,10 +3972,10 @@ int main(int argc, char** argv) {
                 passin = passout;
                 continue;
             }
-            goto pass_uloop;
+            goto phase_uloop;
         }
 
-    pass_uld:
+    phase_uld:
         {
             if (non_shared && !non_shared_emitted) {
                 addstr(&ldflags, "-non_shared");
@@ -4192,7 +4192,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_usplit:
+    phase_usplit:
         {
             execlist.length = 0;
             addstr(&execlist, "usplit");
@@ -4239,7 +4239,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_umerge:
+    phase_umerge:
         if ((Oflag == 3) || (Oflag == 4) || c_inline) {
             execlist.length = 0;
             addstr(&execlist, "umerge");
@@ -4289,7 +4289,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_uloop:
+    phase_uloop:
         if (unrollflag) {
             execlist.length = 0;
             addstr(&execlist, "uloop");
@@ -4340,7 +4340,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_uopt0:
+    phase_uopt0:
         if ((uopt0flag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "uopt0");
@@ -4394,7 +4394,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_ddopt:
+    phase_ddopt:
         if ((ddoptflag == TRUE) && (compiler == COMPILER_3) && (Oflag >= 2)) {
             execlist.length = 0;
             addstr(&execlist, "ddopt");
@@ -4452,7 +4452,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_uopt:
+    phase_uopt:
         if ((Oflag == 2) || (Oflag == 3) || (Oflag == 4)) {
             execlist.length = 0;
             addstr(&execlist, "uopt");
@@ -4550,7 +4550,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_ugen:
+    phase_ugen:
         {
             execlist.length = 0;
             addstr(&execlist, "ugen");
@@ -4661,7 +4661,7 @@ int main(int argc, char** argv) {
             passin = passout;
         }
 
-    pass_as0:
+    phase_as0:
         if (srcsuf == 's') {
             execlist.length = 0;
             addstr(&execlist, "as0");
@@ -4723,7 +4723,7 @@ int main(int argc, char** argv) {
             passin = passout;
         }
 
-    pass_as1:
+    phase_as1:
         {
             execlist.length = 0;
             addstr(&execlist, "as1");
@@ -4941,7 +4941,7 @@ int main(int argc, char** argv) {
             exit(2);
         }
 
-    pass_prelinker:
+    phase_prelinker:
         {
             if ((compiler == COMPILER_1) &&
                 ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) &&
@@ -4959,12 +4959,12 @@ int main(int argc, char** argv) {
                 }
                 if (run(prelinker, execlist.entries, NULL, NULL, NULL) != 0) {
                     runerror++;
-                    goto pass_cord;
+                    goto phase_cord;
                 }
             }
         }
 
-    pass_ld:
+    phase_ld:
         {
             execlist.length = 0;
             addstr(&execlist, LD);
@@ -5319,7 +5319,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_filter:
+    phase_filter:
         if (tempstr[32] != NULL) {
             if ((stat(tempstr[32], &sp48) == 0) && (sp48.st_size > 0)) {
                 execlist.length = 0;
@@ -5329,7 +5329,7 @@ int main(int argc, char** argv) {
             unlink(tempstr[32]);
         }
 
-    pass_patch:
+    phase_patch:
         if ((runerror == 0) && (compiler == COMPILER_1) &&
             ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
             execlist.length = 0;
@@ -5347,7 +5347,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_strip:
+    phase_strip:
         if ((runerror == 0) && do_strip) {
             execlist.length = 0;
             addstr(&execlist, strip);
@@ -5361,7 +5361,7 @@ int main(int argc, char** argv) {
             }
         }
 
-    pass_cord:
+    phase_cord:
         {
             if (cordflag && (runerror == 0)) {
                 execlist.length = 0;
