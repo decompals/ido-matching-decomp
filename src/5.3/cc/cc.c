@@ -43,26 +43,26 @@
  * VROM: 0x005560
  * Size: 0x400
  */
-// static int func_00405560();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
+// // static int func_00405560();
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
 
-/**
- * __start
- * Address: 0x00405960
- * VROM: 0x005960
- * Size: 0x108
- */
-// int __start();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
+// /**
+//  * __start
+//  * Address: 0x00405960
+//  * VROM: 0x005960
+//  * Size: 0x108
+//  */
+// // int __start();
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
 
-/**
- * _mcount
- * Address: 0x00405A68
- * VROM: 0x005A68
- * Size: 0xC8
- */
-// int _mcount();
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
+// /**
+//  * _mcount
+//  * Address: 0x00405A68
+//  * VROM: 0x005A68
+//  * Size: 0xC8
+//  */
+// // int _mcount();
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
 
 /* Actual file starts here */
 
