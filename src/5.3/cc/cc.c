@@ -86,6 +86,10 @@ typedef char buffer_t[0x200];
 /* return true if sub string is contained in s string */
 #define contains_substring(s, sub) (strstr(s, sub) != NULL)
 
+// ctype.h macro
+#define TO_LOWER(x) ((isupper(x)) ? _tolower(x) : (x))
+#define TO_UPPER(x) ((islower(x)) ? _toupper(x) : (x))
+
 /**
  * list of strings, implemented as vector.
  *
