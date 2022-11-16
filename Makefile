@@ -15,7 +15,7 @@ ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe libc.so.1
 else ifeq ($(VERSION),5.3)
-	IDO_TC      := cc
+	IDO_TC      := cc strip ld
 # 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
@@ -154,6 +154,9 @@ $(BUILD)/%.o: %.c
 # cc is special and is stored in a different folder
 $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
+
+$(ASM)/$(VERSION)/strip/.disasm: $(IRIX_USR_DIR)/bin/strip
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/strip.csv $< $(dir $@)
 
 $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
