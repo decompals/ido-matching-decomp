@@ -1132,14 +1132,14 @@ int main(int argc, char** argv) {
                             if (argv[i][2] == 'B') {
                                 if (Bflag && (targetsex != BIGENDIAN)) {
                                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                          "-EB or -EL must precede any -B flags for ucode compilers.\n");
+                                          "-EB or -EL must precede any -B flags\n");
                                     exit(2);
                                 }
                                 targetsex = BIGENDIAN;
                             } else { // argv[i][2] == 'L'
                                 if (Bflag && (targetsex != LITTLEENDIAN)) {
                                     error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                          "-EB or -EL must precede any -B flags for ucode compilers.\n");
+                                          "-EB or -EL must precede any -B flags\n");
                                     exit(2);
                                 }
                                 targetsex = LITTLEENDIAN;
@@ -1272,7 +1272,7 @@ int main(int argc, char** argv) {
     }
 
     if ((srcexists == 0) && (cflag || Sflag)) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source file for ucode compilers.\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no source file\n");
         // exit(4);
     }
 
@@ -1301,13 +1301,13 @@ int main(int argc, char** argv) {
 
     if (kpic_flag && (strcmp(Gnum, "0") != 0) && (Oflag < 3)) {
         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-              "-KPIC (the default) is only compatible with -G 0 for ucode compilers, changing to -G 0. \n");
+              "-KPIC (the default) is only compatible with -G 0, changing to -G 0. \n");
         Gnum = "0";
     }
 
     if ((abi_flag != 0) && non_shared) {
         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-              "-non_shared is not compatible with -abi for ucode compilers, changing to -abi.\n");
+              "-non_shared is not compatible with -abi, changing to -abi.\n");
         non_shared = FALSE;
         kpic_flag = TRUE;
         Gnum = "0";
@@ -1415,7 +1415,7 @@ int main(int argc, char** argv) {
         exit(2);
     }
     if (mips3flag && !thirty2bitflag) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips3 implies -64bit for ucode compilers, which is not supported.\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-mips3 implies -64bit, which is not supported.\n");
         exit(2);
     }
     if (irix4 && (compiler == COMPILER_1) && (c_compiler_choice != C_COMPILER_CHOICE_0)) {
@@ -1428,7 +1428,7 @@ int main(int argc, char** argv) {
     }
     if ((cflag || Sflag || nocode || Eflag || Pflag) && make_edison_shlib) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-              "-shared can be specified only when a link is to be performed for ucode compilers\n");
+              "-shared can be specified only when a link is to be performed\n");
         exit(2);
     }
 
@@ -1439,7 +1439,7 @@ int main(int argc, char** argv) {
         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && Fflag &&
         smart_build) {
         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-              "-F and -smart cannot be specified together for ucode compilers: -smart ignored\n");
+              "-F and -smart cannot be specified together: -smart ignored\n");
         smart_build = FALSE;
     }
     if ((default_template_instantiation_mode != 0) && !force_prelink) {
@@ -1468,7 +1468,7 @@ int main(int argc, char** argv) {
     if (dmips_emit == 0) {
         if (mips2flag) {
             if (dwopcodeflag) {
-                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode for ucode compilers\n");
+                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with -dwopcode\n");
                 exit(2);
             }
             addstr(&execlist, "-Dmips=2");
@@ -1564,7 +1564,7 @@ int main(int argc, char** argv) {
 
     if ((compiler == COMPILER_6) && nolockflag && lpilockflag) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-              "Conflicting flags; -nolock and -lpilock can't both be specified for ucode compilers\n");
+              "Conflicting flags; -nolock and -lpilock can't both be specified\n");
         exit(2);
     }
 
@@ -1575,7 +1575,7 @@ int main(int argc, char** argv) {
     // }
 
     if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && !Eflag && !Pflag) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s for ucode compilers\n",
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s\n",
               "as");
         exit(2);
     }
@@ -4078,15 +4078,15 @@ int main(int argc, char** argv) {
                 if (strcmp("/", comp_target_root) != 0) {
                     if (non_shared) {
                         addstr(&execlist,
-                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "mips2/nonshared", NULL));
                     } else {
-                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "mips2", NULL));
                     }
                 } else {
                     if (non_shared) {
-                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "mips2/nonshared", NULL));
                     } else {
-                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "mips2", NULL));
                     }
                 }
             }
@@ -4983,7 +4983,7 @@ int main(int argc, char** argv) {
         (Hchar == '\0') && !nocode) {
         if (old_non_shared && mips2flag && !kpic_flag) {
             error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                  "can't mix -mips2 with shared for ucode compilers, try using -non_shared\n");
+                  "can't mix -mips2 with shared, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
         }
@@ -5167,15 +5167,15 @@ int main(int argc, char** argv) {
                 if (strcmp("/", comp_target_root) != 0) {
                     if (non_shared) {
                         addstr(&execlist,
-                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                               mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "mips2/nonshared", NULL));
                     } else {
-                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "", NULL));
+                        addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, "mips2", NULL));
                     }
                 } else {
                     if (non_shared) {
-                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "nonshared", NULL));
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "mips2/nonshared", NULL));
                     } else {
-                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "", NULL));
+                        addstr(&execlist, mkstr("-L", runlib, "usr/lib/", currcomp, "mips2", NULL));
                     }
                 }
             }
@@ -5741,11 +5741,11 @@ void parse_command(int argc, char** argv) {
                     }
                     if (strcmp(argv[var_s0], "-64bit") == 0) {
                         error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-                              "-64bit option is not yet implemented for ucode compilers, ignore\n");
+                              "-64bit option is not yet implemented, ignore\n");
                         sixty4bit_spec = TRUE;
                         if (swopcodeflag) {
                             error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                  "-64bit can not be used with -swopcode for ucode compilers\n");
+                                  "-64bit can not be used with -swopcode\n");
                             exit(2);
                         }
                         break;
@@ -5892,14 +5892,14 @@ void parse_command(int argc, char** argv) {
                         if (argv[var_s0][2] == 'B') {
                             if (Bflag && (targetsex != BIGENDIAN)) {
                                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                      "-EB or -EL must precede any -B flags for ucode compilers\n");
+                                      "-EB or -EL must precede any -B flags\n");
                                 exit(2);
                             }
                             targetsex = BIGENDIAN;
                         } else {
                             if (Bflag && (targetsex != LITTLEENDIAN)) {
                                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                      "-EB or -EL must precede any -B flags for ucode compilers\n");
+                                      "-EB or -EL must precede any -B flags\n");
                                 exit(2);
                             }
                             targetsex = LITTLEENDIAN;
@@ -6962,7 +6962,7 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == COMPILER_3) &&
                         ((strcmp(argv[var_s0], "-col120") == 0) || (strcmp(argv[var_s0], "-col72") == 0) ||
-                         (strcmp(argv[var_s0], "-charargv") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
+                         (strcmp(argv[var_s0], "-chararg1") == 0) || (strcmp(argv[var_s0], "-chunk") == 0) ||
                          (strcmp(argv[var_s0], "-check_bounds") == 0))) {
                         if (strcmp(argv[var_s0], "-col120") == 0) {
                             mp_col120flag = TRUE;
@@ -7785,9 +7785,10 @@ void parse_command(int argc, char** argv) {
                     }
                     if ((compiler == COMPILER_3) &&
                         (
-                            // (strcmp(argv[var_s0], "-noextend_source") == 0) ||
+                            (strcmp(argv[var_s0], "-noextend_source") == 0) ||
                             (strcmp(argv[var_s0], "-noi4") == 0) || (strcmp(argv[var_s0], "-noisam") == 0) ||
-                            (strcmp(argv[var_s0], "-noexpopt") == 0) || (strcmp(argv[var_s0], "-noequivauto") == 0) ||
+                            (strcmp(argv[var_s0], "-noexpopt") == 0) || 
+                            // (strcmp(argv[var_s0], "-noequivauto") == 0) ||
                             (strcmp(argv[var_s0], "-nof77") == 0))) {
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
@@ -9077,7 +9078,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
 #define CCOM_MACRO ((ansichoice != ANSICHOICE_KR) ? "accom" : "ccom")
 #define CFE_MACRO                                                                             \
     (((c_compiler_choice != C_COMPILER_CHOICE_0) || ((compiler == COMPILER_3) && D_100001FC)) \
-         ? (alternate_fe ? "edgcpfe.eh" : "edgcpfe")                                          \
+         ? (alternate_fe ? "edgcpfe.alt" : "edgcpfe")                                          \
          : "cfe")
 
 /**
