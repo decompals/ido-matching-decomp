@@ -110,7 +110,7 @@ build/src/7.1/mld/%.o: OPTFLAGS := -O2
 
 # Targets
 
-.PHONY: all clean distclean setup disasm
+.PHONY: all clean distclean setup disasm diff
 .DEFAULT_GOAL:= all
 
 all: $(ELFS) $(O_FILES)
@@ -149,6 +149,15 @@ $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
 
 $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
+
+
+cc.elf: $(O_FILES)
+	rm -f cc.elf
+	$$(which qemu-irixn32) -silent -L ../ido-static-recomp/ido/7.1 ../ido-static-recomp/ido/7.1/usr/lib/ld    -elf -o cc.elf -_SYSTYPE_SVR4 -require_dynamic_link _rld_new_interface -no_unresolved -Wx,-G 0 -mips2 -call_shared -g0 -KPIC -Ltools/recomp/ido/7.1/usr/lib -nocount ../cd/ido71/usr/lib/crt1.o -count build/src/7.1/cc/cc.o build/src/7.1/mld/sex.o -nocount -lc build/src/7.1/releaseid.o ../cd/ido71/usr/lib/crtn.o
+	$$(which qemu-irixn32) -silent -L ../ido-static-recomp/ido/7.1 ../ido-static-recomp/ido/7.1/usr/lib/strip cc.elf
+
+diff: cc.elf
+	./tools/diff_sections.sh tools/recomp/ido/7.1/usr/bin/cc cc.elf
 
 
 
