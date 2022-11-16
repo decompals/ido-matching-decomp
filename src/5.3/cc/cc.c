@@ -2052,7 +2052,7 @@ int main(int argc, char** argv) {
         switch (srcsuf) { /* switch 13 */
             case SUF_6:   /* switch 13 */
             case 'c':     /* switch 13 */
-            case 'h':     /* switch 13 */
+            // case 'h':     /* switch 13 */
                 // if ((srcsuf != 'h') || D_100001FC) {
                     if ((compiler == COMPILER_1) &&
                         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
