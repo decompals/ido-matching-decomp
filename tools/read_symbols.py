@@ -15,6 +15,7 @@ import elftools.elf.enums
 @dataclasses.dataclass
 class DynSym:
     index: int
+    dynstr_index: int
     name: str
     type: str
     section: int | str
@@ -28,7 +29,42 @@ def main():
         exit(1)
 
     file = sys.argv[1]
+    with open(file, "rb") as f:
+        elf_file = elftools.elf.elffile.ELFFile(f)
+        endian_format = "<" if elf_file.little_endian else ">"
 
+        # dynamic_sec = elf_file.get_section_by_name(".dynamic")
+        # gotsym = int(dynamic_sec.get_table_offset("DT_MIPS_GOTSYM")[0])
+        # localgotno = int(dynamic_sec.get_table_offset("DT_MIPS_LOCAL_GOTNO")[0])
+
+        dynsym_sec = elf_file.get_section_by_name(".dynsym")
+        # dynsym_sec = elf_file.get_section_by_name(".symtab")
+        # got_sec = elf_file.get_section_by_name(".got")
+
+        symbols = []
+        for i, sym in enumerate(dynsym_sec.iter_symbols()):
+            dynsym = DynSym(
+                i,
+                sym["st_name"],
+                sym.name,
+                sym["st_info"]["type"],
+                sym["st_shndx"],
+                sym["st_value"],
+                sym["st_size"],
+            )
+            # if i >= gotsym:
+            #     dynsym.got = struct.unpack_from(
+            #         endian_format + "I", got_sec.data()[4 * (localgotno + i - gotsym) :]
+            #     )[0]
+            symbols.append(dynsym)
+
+        symbols.sort(key=lambda x: x.dynstr_index)
+
+        for sym in symbols:
+            print(
+                f"{sym.index:3}, {sym.dynstr_index:4}, {sym.value:08X}, {sym.type:11}, {sym.name}"
+            )
+        return
     with open(file, "rb") as f:
         elf_file = elftools.elf.elffile.ELFFile(f)
         endian_format = "<" if elf_file.little_endian else ">"
