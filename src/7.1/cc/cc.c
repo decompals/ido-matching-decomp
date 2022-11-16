@@ -684,12 +684,12 @@ typedef struct {
 struct_mpflags mpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
-    { 0 },
+    { NULL, 0 },
 };
 struct_mpflags cmpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
-    { 0 },
+    { NULL, 0 },
 };
 
 int acpp = FALSE; //! flag, boolean. Set by "-acpp"
