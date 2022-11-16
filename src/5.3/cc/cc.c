@@ -549,7 +549,7 @@ static void func_004365B8(void);
 /* 0x037208 0x10000208 None */ static char* D_10000208 = NULL;
 /* 0x03720C 0x1000020C None */ static /* boolean */ int D_1000020C = FALSE;
 /* 0x037210 0x10000210 None */ static /* boolean */ int D_10000210 = TRUE;
-/* 0x037214 0x10000214 257  */ /* boolean */ int Eflag;
+/* 0x037214 0x10000214 257  */ /* boolean */ int Eflag = FALSE;
 /* 0x037218 0x10000218 258  */ int Pflag = FALSE; // pseudoboolean
 /* 0x03721C 0x1000021C 259  */ int gflag = 0;
 /* 0x037220 0x10000220 260  */ int pflag = 0;
