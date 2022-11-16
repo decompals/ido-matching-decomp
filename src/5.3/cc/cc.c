@@ -253,188 +253,188 @@ static void func_004365B8(void);
 
 // bss
 
-/* 03F310 10008310 */ static prmap_sgi_t B_10008310[100];      // equivalent of B_1000CAC0, "mapbuf"
-/* 040C10 10009C10 */ clock_t time0;                           // line 174
-                                                               // 0x4 padding
-/* 040C18 10009C18 */ struct tms tm0;                          // line 176
-/* 040C28 10009C28 */ char perr_msg[0x100];                    // char perr_msg[0x100]; // line 124
-/* 040D28 10009D28 */ static char B_10009D28[0x400];           // "dirbuf"/"basebuf", likely declared above `basename`
-/* 041128 1000A128 */ int plain_g;                             // line 127
-/* 04112C 1000A12C */ int plain_O;                             // line 128
-/* 041130 1000A130 */ int noaliasokflag;                       // line 129
-/* 041134 1000A134 */ int haspl1;                              // line 130
-/* 041138 1000A138 */ UNK_TYPE p2cstr;                         // line 132
-/* 04113C 1000A13C */ int align;                               // line 133
-/* 041140 1000A140 */ int align_common;                        // line 134
-/* 041144 1000A144 */ char* alignarg;                          // line 136
-/* 041148 1000A148 */ int use_real_fp;                         // line 137
-/* 04114C 1000A14C */ int dollar_sign;                         // line 138
-/* 041150 1000A150 */ int mp_flag;                             // line 140
-/* 041154 1000A154 */ int mp_onetripflag;                      // line 141
-/* 041158 1000A158 */ UNK_TYPE mp_staticflag;                  // line 142
-/* 04115C 1000A15C */ int mp_dlinesflag;                       // line 143
-/* 041160 1000A160 */ int mp_caseflag;                         // line 144
-/* 041164 1000A164 */ int mp_66flag;                           // line 146
-/* 041168 1000A168 */ int mp_i2flag;                           // line 148
-/* 04116C 1000A16C */ int mp_col120flag;                       // line 150
-/* 041170 1000A170 */ int mp_extendflag;                       // line 151
-/* 041174 1000A174 */ int mp_uflag;                            // line 152
-/* 041178 1000A178 */ int mp_backslashflag;                    // line 153
-/* 04117C 1000A17C */ UNK_TYPE mp_uniq_specified;              // line 154
-/* 041180 1000A180 */ UNK_TYPE mp_passes_relocated;            // line 155
-/* 041184 1000A184 */ int default_template_instantiation_mode; // line 139
-/* 041188 1000A188 */ int cmp_flag;                            // line 156
-/* 04118C 1000A18C */ UNK_TYPE efl;                            // line 145
-/* 041190 1000A190 */ char* ratfor;                            // line 147
-/* 041194 1000A194 */ char* m4;                                // line 149
-/* 041198 1000A198 */ int fullwarn;                            // line 157
-/* 04119C 1000A19C */ char* aligndir;                          // line 158
-/* 0411A0 1000A1A0 */ int docpp;                               // line 159
-/* 0411A4 1000A1A4 */ int default_nocpp;                       // line 160
-/* 0411A8 1000A1A8 */ unsigned int j;                          // line 161
-/* 0411AC 1000A1AC */ char* tstring;                           // line 162
-/* 0411B0 1000A1B0 */ char* hstring;                           // line 163
-/* 0411B4 1000A1B4 */ char* Bstring;                           // line 164
-/* 0411B8 1000A1B8 */ char* allBstring;                        // line 165
-                                                               // 0x4 padding
-/* 0411C0 1000A1C0 */ char alltstring[20];                     // line 167
-/* 0411D4 1000A1D4 */ char* Warg;                              // line 168
-/* 0411D8 1000A1D8 */ char* Wpass;                             // line 169
-/* 0411DC 1000A1DC */ char* Kpass;                             // line 170
-/* 0411E0 1000A1E0 */ char Karg[6];                            // line 171
-/* 0411E6 1000A1E6 */ char Hchar;                              // line 172
-/* 0411E8 1000A1E8 */ int retcode;                             // line 177
-/* 0411EC 1000A1EC */ char* outfile;                           // line 178
-/* 0411F0 1000A1F0 */ char* passin;                            // line 179
-/* 0411F4 1000A1F4 */ char* passout;                           // line 180
-/* 0411F8 1000A1F8 */ char* errout;                            // line 181
-/* 0411FC 1000A1FC */ char* symtab;                            // line 182
-/* 041200 1000A200 */ char* uopt0str;                          // line 183
-/* 041204 1000A204 */ char* ddoptstr;                          // line 184
-/* 041208 1000A208 */ char* optstr;                            // line 185
-/* 04120C 1000A20C */ char* gentmp;                            // line 186
-/* 041210 1000A210 */ char* binasm;                            // line 187
-/* 041214 1000A214 */ char* uoutfile;                          // line 188
-/* 041218 1000A218 */ char* lpi_st;                            // line 189
-/* 04121C 1000A21C */ char* lpi_p1;                            // line 190
-/* 041220 1000A220 */ char* lpi_dd;                            // line 191
-/* 041224 1000A224 */ char* lpi_pd;                            // line 194
-/* 041228 1000A228 */ char* linkorder;                         // line 195
-/* 04122C 1000A22C */ UNK_TYPE valuesstr;                      // line 196
-/* 041230 1000A230 */ UNK_TYPE tmp_elfobj;                     // line 197
-/* 041234 1000A234 */ FILE* ldw_file;                          // line 199
-/* 041238 1000A238 */ FILE* tmpsfile;                          // line 201
-/* 04123C 1000A23C */ char* editor;                            // line 203
-/* 041240 1000A240 */ char* xserver;                           // line 205
-/* 041244 1000A244 */ int times_edited;                        // line 207
-/* 041248 1000A248 */ int edit_cnt_max;                        // line 209
-/* 04124C 1000A24C */ char srcsuf;                             // line 213
-/* 041250 1000A250 */ /* boolean */ int tmpst;                 // line 216
-/* 041254 1000A254 */ char* CRTX;                              // line 198
-/* 041258 1000A258 */ char* MCRTX;                             // line 200
-/* 04125C 1000A25C */ char* comp_target_root;                  // line 222
-/* 041260 1000A260 */ string_list undefineflags;               // line 202
-/* 04126C 1000A26C */ char* comp_host_root;                    // line 261
-/* 041270 1000A270 */ string_list cppflags;                    // line 204
-/* 04127C 1000A27C */ char* systype;                           // line 226
-/* 041280 1000A280 */ string_list olimitflags;                 // line 206
-/* 04128C 1000A28C */ int nonshared;                           // line 228
-/* 041290 1000A290 */ string_list acppflags;                   // line 208
-                                                               // 0x4 padding
-/* 0412A0 1000A2A0 */ string_list mpcflags;                    // line 210
-                                                               // 0x4 padding
-/* 0412B0 1000A2B0 */ string_list accomflags;                  // line 212
-                                                               // 0x4 padding
-/* 0412C0 1000A2C0 */ string_list cfeflags;                    // line 215
-                                                               // 0x4 padding
-/* 0412D0 1000A2D0 */ string_list cpp2flags;                   // line 217
-                                                               // 0x4 padding
-/* 0412E0 1000A2E0 */ string_list uldlibflags;                 // line 219
-                                                               // 0x4 padding
-/* 0412F0 1000A2F0 */ string_list edisonflags;                 // line 221
-/* 0412FC 1000A2FC */ char* tmpdir;                            // line 242
-/* 041300 1000A300 */ string_list prelinkerflags;              // line 223
-/* 04130C 1000A30C */ char* rls_id_object;                     // line 244
-/* 041310 1000A310 */ string_list ccomflags;                   // line 225
-/* 04131C 1000A31C */ char* progname;                          // line 246
-/* 041320 1000A320 */ string_list upasflags;                   // line 227
-/* 04132C 1000A32C */ char* currcomp;                          // line 248
-/* 041330 1000A330 */ string_list fcomflags;                   // line 229
-                                                               // 0x4 padding
-/* 041340 1000A340 */ char* compdirs[7];                       // line 251
-                                                               // 0x4 padding
-/* 041360 1000A360 */ string_list eflflags;                    // line 231
-/* 04136C 1000A36C */ Compiler compiler;                       // line 264
-/* 041370 1000A370 */ string_list ratforflags;                 // line 233
-                                                               // 0x4 padding
-/* 041380 1000A380 */ char* tempstr[34];                       // line 268
-/* 041408 1000A408 */ string_list upl1flags;                   // line 235
-                                                               // 0x4 padding
-/* 041418 1000A418 */ string_list ucobflags;                   // line 237
-                                                               // 0x4 padding
-/* 041428 1000A428 */ string_list ulpiflags;                   // line 239
-                                                               // 0x4 padding
-/* 041438 1000A438 */ string_list ujoinflags;                  // line 241
-                                                               // 0x4 padding
-/* 041448 1000A448 */ string_list uldflags;                    // line 243
-                                                               // 0x4 padding
-/* 041458 1000A458 */ static int B_1000A458[2];                // Pipe
-/* 041460 1000A460 */ string_list usplitflags;                 // line 245
-                                                               // 0x4 padding
-/* 041470 1000A470 */ string_list umergeflags;                 // line 247
-                                                               // 0x4 padding
-/* 041480 1000A480 */ string_list uloopflags;                  // line 249
-/* 04148C 1000A48C */ static char* B_1000A48C;                 // string containing most arguments "command_line"
-/* 041490 1000A490 */ string_list uopt0flags;                  // line 253
-/* 04149C 1000A49C */ static char* B_1000A49C;                 // string containing last "-o" argument ("outfile")
-/* 0414A0 1000A4A0 */ string_list ddoptflags;                  // line 266
-                                                               // 0x4 padding
-/* 0414B0 1000A4B0 */ string_list optflags;                    // line 269
-                                                               // 0x4 padding
-/* 0414C0 1000A4C0 */ string_list genflags;                    // line 271
-                                                               // 0x4 padding
-/* 0414D0 1000A4D0 */ string_list asflags;                     // line 273
-                                                               // 0x4 padding
-/* 0414E0 1000A4E0 */ string_list ldflags;                     // line 277
-                                                               // 0x4 padding
-/* 0414F0 1000A4F0 */ string_list as1flags;                    // line 275
-                                                               // 0x4 padding
-/* 041500 1000A500 */ string_list ftocflags;                   // line 282
-                                                               // 0x4 padding
-/* 041510 1000A510 */ string_list cordflags;                   // line 284
-                                                               // 0x4 padding
-/* 041520 1000A520 */ string_list srcfiles;                    // line 286
-                                                               // 0x4 padding
-/* 041530 1000A530 */ string_list ufiles;                      // line 288
-                                                               // 0x4 padding
-/* 041540 1000A540 */ string_list objfiles;                    // line 290
-                                                               // 0x4 padding
-/* 041550 1000A550 */ string_list feedlist;                    // line 292
-                                                               // 0x4 padding
-/* 041560 1000A560 */ string_list execlist;                    // line 294
+/* 03F310 10008310 */ static prmap_sgi_t B_10008310[100]; // equivalent of B_1000CAC0, "mapbuf"
+/* 040C10 10009C10 */ clock_t time0;
+// 0x4 padding
+/* 040C18 10009C18 */ struct tms tm0;
+/* 040C28 10009C28 */ char perr_msg[0x100];          // char perr_msg[0x100];
+/* 040D28 10009D28 */ static char B_10009D28[0x400]; // "dirbuf"/"basebuf", likely declared above `basename`
+/* 041128 1000A128 */ int plain_g;
+/* 04112C 1000A12C */ int plain_O;
+/* 041130 1000A130 */ int noaliasokflag;
+/* 041134 1000A134 */ int haspl1;
+/* 041138 1000A138 */ UNK_TYPE p2cstr;
+/* 04113C 1000A13C */ int align;
+/* 041140 1000A140 */ int align_common;
+/* 041144 1000A144 */ char* alignarg;
+/* 041148 1000A148 */ int use_real_fp;
+/* 04114C 1000A14C */ int dollar_sign;
+/* 041150 1000A150 */ int mp_flag;
+/* 041154 1000A154 */ int mp_onetripflag;
+/* 041158 1000A158 */ UNK_TYPE mp_staticflag;
+/* 04115C 1000A15C */ int mp_dlinesflag;
+/* 041160 1000A160 */ int mp_caseflag;
+/* 041164 1000A164 */ int mp_66flag;
+/* 041168 1000A168 */ int mp_i2flag;
+/* 04116C 1000A16C */ int mp_col120flag;
+/* 041170 1000A170 */ int mp_extendflag;
+/* 041174 1000A174 */ int mp_uflag;
+/* 041178 1000A178 */ int mp_backslashflag;
+/* 04117C 1000A17C */ UNK_TYPE mp_uniq_specified;
+/* 041180 1000A180 */ UNK_TYPE mp_passes_relocated;
+/* 041184 1000A184 */ int default_template_instantiation_mode;
+/* 041188 1000A188 */ int cmp_flag;
+/* 04118C 1000A18C */ UNK_TYPE efl;
+/* 041190 1000A190 */ char* ratfor;
+/* 041194 1000A194 */ char* m4;
+/* 041198 1000A198 */ int fullwarn;
+/* 04119C 1000A19C */ char* aligndir;
+/* 0411A0 1000A1A0 */ int docpp;
+/* 0411A4 1000A1A4 */ int default_nocpp;
+/* 0411A8 1000A1A8 */ unsigned int j;
+/* 0411AC 1000A1AC */ char* tstring;
+/* 0411B0 1000A1B0 */ char* hstring;
+/* 0411B4 1000A1B4 */ char* Bstring;
+/* 0411B8 1000A1B8 */ char* allBstring;
+// 0x4 padding
+/* 0411C0 1000A1C0 */ char alltstring[20];
+/* 0411D4 1000A1D4 */ char* Warg;
+/* 0411D8 1000A1D8 */ char* Wpass;
+/* 0411DC 1000A1DC */ char* Kpass;
+/* 0411E0 1000A1E0 */ char Karg[6];
+/* 0411E6 1000A1E6 */ char Hchar;
+/* 0411E8 1000A1E8 */ int retcode;
+/* 0411EC 1000A1EC */ char* outfile;
+/* 0411F0 1000A1F0 */ char* passin;
+/* 0411F4 1000A1F4 */ char* passout;
+/* 0411F8 1000A1F8 */ char* errout;
+/* 0411FC 1000A1FC */ char* symtab;
+/* 041200 1000A200 */ char* uopt0str;
+/* 041204 1000A204 */ char* ddoptstr;
+/* 041208 1000A208 */ char* optstr;
+/* 04120C 1000A20C */ char* gentmp;
+/* 041210 1000A210 */ char* binasm;
+/* 041214 1000A214 */ char* uoutfile;
+/* 041218 1000A218 */ char* lpi_st;
+/* 04121C 1000A21C */ char* lpi_p1;
+/* 041220 1000A220 */ char* lpi_dd;
+/* 041224 1000A224 */ char* lpi_pd;
+/* 041228 1000A228 */ char* linkorder;
+/* 04122C 1000A22C */ UNK_TYPE valuesstr;
+/* 041230 1000A230 */ UNK_TYPE tmp_elfobj;
+/* 041234 1000A234 */ FILE* ldw_file;
+/* 041238 1000A238 */ FILE* tmpsfile;
+/* 04123C 1000A23C */ char* editor;
+/* 041240 1000A240 */ char* xserver;
+/* 041244 1000A244 */ int times_edited;
+/* 041248 1000A248 */ int edit_cnt_max;
+/* 04124C 1000A24C */ char srcsuf;
+/* 041250 1000A250 */ /* boolean */ int tmpst;
+/* 041254 1000A254 */ char* CRTX;
+/* 041258 1000A258 */ char* MCRTX;
+/* 04125C 1000A25C */ char* comp_target_root;
+/* 041260 1000A260 */ string_list undefineflags;
+/* 04126C 1000A26C */ char* comp_host_root;
+/* 041270 1000A270 */ string_list cppflags;
+/* 04127C 1000A27C */ char* systype;
+/* 041280 1000A280 */ string_list olimitflags;
+/* 04128C 1000A28C */ int nonshared;
+/* 041290 1000A290 */ string_list acppflags;
+// 0x4 padding
+/* 0412A0 1000A2A0 */ string_list mpcflags;
+// 0x4 padding
+/* 0412B0 1000A2B0 */ string_list accomflags;
+// 0x4 padding
+/* 0412C0 1000A2C0 */ string_list cfeflags;
+// 0x4 padding
+/* 0412D0 1000A2D0 */ string_list cpp2flags;
+// 0x4 padding
+/* 0412E0 1000A2E0 */ string_list uldlibflags;
+// 0x4 padding
+/* 0412F0 1000A2F0 */ string_list edisonflags;
+/* 0412FC 1000A2FC */ char* tmpdir;
+/* 041300 1000A300 */ string_list prelinkerflags;
+/* 04130C 1000A30C */ char* rls_id_object;
+/* 041310 1000A310 */ string_list ccomflags;
+/* 04131C 1000A31C */ char* progname;
+/* 041320 1000A320 */ string_list upasflags;
+/* 04132C 1000A32C */ char* currcomp;
+/* 041330 1000A330 */ string_list fcomflags;
+// 0x4 padding
+/* 041340 1000A340 */ char* compdirs[7];
+// 0x4 padding
+/* 041360 1000A360 */ string_list eflflags;
+/* 04136C 1000A36C */ Compiler compiler;
+/* 041370 1000A370 */ string_list ratforflags;
+// 0x4 padding
+/* 041380 1000A380 */ char* tempstr[34];
+/* 041408 1000A408 */ string_list upl1flags;
+// 0x4 padding
+/* 041418 1000A418 */ string_list ucobflags;
+// 0x4 padding
+/* 041428 1000A428 */ string_list ulpiflags;
+// 0x4 padding
+/* 041438 1000A438 */ string_list ujoinflags;
+// 0x4 padding
+/* 041448 1000A448 */ string_list uldflags;
+// 0x4 padding
+/* 041458 1000A458 */ static int B_1000A458[2]; // Pipe
+/* 041460 1000A460 */ string_list usplitflags;
+// 0x4 padding
+/* 041470 1000A470 */ string_list umergeflags;
+// 0x4 padding
+/* 041480 1000A480 */ string_list uloopflags;
+/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments "command_line"
+/* 041490 1000A490 */ string_list uopt0flags;
+/* 04149C 1000A49C */ static char* B_1000A49C; // string containing last "-o" argument ("outfile")
+/* 0414A0 1000A4A0 */ string_list ddoptflags;
+// 0x4 padding
+/* 0414B0 1000A4B0 */ string_list optflags;
+// 0x4 padding
+/* 0414C0 1000A4C0 */ string_list genflags;
+// 0x4 padding
+/* 0414D0 1000A4D0 */ string_list asflags;
+// 0x4 padding
+/* 0414E0 1000A4E0 */ string_list ldflags;
+// 0x4 padding
+/* 0414F0 1000A4F0 */ string_list as1flags;
+// 0x4 padding
+/* 041500 1000A500 */ string_list ftocflags;
+// 0x4 padding
+/* 041510 1000A510 */ string_list cordflags;
+// 0x4 padding
+/* 041520 1000A520 */ string_list srcfiles;
+// 0x4 padding
+/* 041530 1000A530 */ string_list ufiles;
+// 0x4 padding
+/* 041540 1000A540 */ string_list objfiles;
+// 0x4 padding
+/* 041550 1000A550 */ string_list feedlist;
+// 0x4 padding
+/* 041560 1000A560 */ string_list execlist;
 /* 04156C 1000A56C */ static int B_1000A56C;
 /* 041570 1000A570 */ static int B_1000A570;
-/* 041578 1000A578 */ string_list dirs_for_crtn;           // line 299
-                                                           // 0x4 padding
-/* 041588 1000A588 */ string_list dirs_for_nonshared_crtn; // line 301
-                                                           // 0x4 padding
-/* 041598 1000A598 */ string_list dirs_for_abi_crtn;       // line 303
-                                                           // 0x4 padding
-/* 0415A8 1000A5A8 */ string_list ldZflags;                // line 305
+/* 041578 1000A578 */ string_list dirs_for_crtn;
+// 0x4 padding
+/* 041588 1000A588 */ string_list dirs_for_nonshared_crtn;
+// 0x4 padding
+/* 041598 1000A598 */ string_list dirs_for_abi_crtn;
+// 0x4 padding
+/* 0415A8 1000A5A8 */ string_list ldZflags;
 /* 0415B4 1000A5B4 */ static int B_1000A5B4;
-/* 0415B8 1000A5B8 */ string_list pfaflags;         // line 307
-/* 0415C4 1000A5C4 */ char* pfa;                    // line 307
-/* 0415C8 1000A5C8 */ char* libI77_mp;              // line 309
-                                                    // 0x4 padding
-/* 0415D0 1000A5D0 */ string_list pcaflags;         // line 311
-                                                    // 0x4 padding
-/* 0415E0 1000A5E0 */ string_list soptflags;        // line 313
-                                                    // 0x4 padding
-/* 0415F0 1000A5F0 */ string_list staticopts;       // line 315
-                                                    // 0x4 padding
-/* 041600 1000A600 */ int __Argc;                   // line 319
-/* 041604 1000A604 */ char** __Argv;                // line 317
-/* 041608 1000A608 */ UNK_TYPE __rld_obj_head;      // line 318
+/* 0415B8 1000A5B8 */ string_list pfaflags;
+/* 0415C4 1000A5C4 */ char* pfa;
+/* 0415C8 1000A5C8 */ char* libI77_mp;
+// 0x4 padding
+/* 0415D0 1000A5D0 */ string_list pcaflags;
+// 0x4 padding
+/* 0415E0 1000A5E0 */ string_list soptflags;
+// 0x4 padding
+/* 0415F0 1000A5F0 */ string_list staticopts;
+// 0x4 padding
+/* 041600 1000A600 */ int __Argc;
+/* 041604 1000A604 */ char** __Argv;
+/* 041608 1000A608 */ UNK_TYPE __rld_obj_head;
 /* 04160C 1000A60C */ static char B_1000A60C[0x04]; // padding?
 
 // data
@@ -927,11 +927,11 @@ int main(int argc, char** argv) {
             edison_cpp = 1;
             Bstring = progname + strlen("DCC");
         }
-        
+
     } else {
         var_s1++;
         compdirs[0] = mkstr(var_s1, "/", NULL);
-    
+
         // Determine compiler based on basename of executable
         if (strncmp(var_s1, "cc", strlen("cc")) == 0) { // C
             compiler = COMPILER_1;
@@ -942,9 +942,9 @@ int main(int argc, char** argv) {
         } else if (strncmp(var_s1, "f77", strlen("f77")) == 0) { // FORTRAN 77
             compiler = COMPILER_3;
             Bstring = var_s1 + strlen("f77");
-        // } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) { // Fortran 90
-        //     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
-        //     exit(2);
+            // } else if (strncmp(var_s1, "f90", strlen("f90")) == 0) { // Fortran 90
+            //     error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-32 compilation not supported for ucode\n");
+            //     exit(2);
         } else if (strncmp(var_s1, "as", strlen("as")) == 0) { // (MIPS) Assembly
             compiler = COMPILER_4;
             Bstring = var_s1 + strlen("as");
@@ -978,21 +978,21 @@ int main(int argc, char** argv) {
             c_compiler_choice = C_COMPILER_CHOICE_1;
             edison_cpp = 1;
             Bstring = var_s1 + strlen("ncc");
-        // } else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
-        //     compiler = COMPILER_1;
-        //     c_compiler_choice = C_COMPILER_CHOICE_2;
-        //     edison_cpp = 1;
-        //     anachronisms = FALSE;
-        //     cfront_compatible = FALSE;
-        //     D_1000BF7C = FALSE;
-        //     exception_handling = TRUE;
-        //     Bstring = var_s1 + strlen("CC"); //! @bug too short?
-        // } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
-        //     compiler = COMPILER_1;
-        //     c_compiler_choice = C_COMPILER_CHOICE_2;
-        //     edison_cpp = 1;
-        //     D_1000BF7C = FALSE;
-        //     Bstring = var_s1 + strlen("CC");
+            // } else if (strncmp(var_s1, "CC.eh", strlen("CC.eh")) == 0) {
+            //     compiler = COMPILER_1;
+            //     c_compiler_choice = C_COMPILER_CHOICE_2;
+            //     edison_cpp = 1;
+            //     anachronisms = FALSE;
+            //     cfront_compatible = FALSE;
+            //     D_1000BF7C = FALSE;
+            //     exception_handling = TRUE;
+            //     Bstring = var_s1 + strlen("CC"); //! @bug too short?
+            // } else if (strncmp(var_s1, "CC", strlen("CC")) == 0) {
+            //     compiler = COMPILER_1;
+            //     c_compiler_choice = C_COMPILER_CHOICE_2;
+            //     edison_cpp = 1;
+            //     D_1000BF7C = FALSE;
+            //     Bstring = var_s1 + strlen("CC");
         } else if (strncmp(var_s1, "NCC", strlen("NCC")) == 0) {
             compiler = COMPILER_1;
             c_compiler_choice = C_COMPILER_CHOICE_2;
@@ -1004,14 +1004,9 @@ int main(int argc, char** argv) {
             edison_cpp = 1;
             Bstring = var_s1 + strlen("DCC");
             // D_1000BF90 = TRUE;
-        }        
+        }
     }
-    
 
-
-
-
-    
     Bstring = NULL; // This appears to make the `Bstring` operations done in the above code useless?
 
     sp12C = getenv("DCC_STD_PATHS");
@@ -1019,7 +1014,7 @@ int main(int argc, char** argv) {
     // if (!D_10000210) {
     //     D_1000BF90 = D_10000210;
     // }
-    
+
     if (compiler == COMPILER_1) {
         save_off_command_line(argc, argv);
     }
@@ -1099,9 +1094,9 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[i], "-O3") == 0) {
             Oflag = 3;
             // break;
-        // } else if (strcmp(argv[i], "-old_ld") == 0) {
-        //     LD = "old_ld";
-        //     D_1000BF90 = FALSE;
+            // } else if (strcmp(argv[i], "-old_ld") == 0) {
+            //     LD = "old_ld";
+            //     D_1000BF90 = FALSE;
         } else {
             continue;
         }
@@ -1131,15 +1126,13 @@ int main(int argc, char** argv) {
                         if ((argv[i][3] == '\0') && ((argv[i][2] == 'B') || (argv[i][2] == 'L'))) {
                             if (argv[i][2] == 'B') {
                                 if (Bflag && (targetsex != BIGENDIAN)) {
-                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                          "-EB or -EL must precede any -B flags\n");
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags\n");
                                     exit(2);
                                 }
                                 targetsex = BIGENDIAN;
                             } else { // argv[i][2] == 'L'
                                 if (Bflag && (targetsex != LITTLEENDIAN)) {
-                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                          "-EB or -EL must precede any -B flags\n");
+                                    error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags\n");
                                     exit(2);
                                 }
                                 targetsex = LITTLEENDIAN;
@@ -1306,8 +1299,7 @@ int main(int argc, char** argv) {
     }
 
     if ((abi_flag != 0) && non_shared) {
-        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-              "-non_shared is not compatible with -abi, changing to -abi.\n");
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-non_shared is not compatible with -abi, changing to -abi.\n");
         non_shared = FALSE;
         kpic_flag = TRUE;
         Gnum = "0";
@@ -1427,8 +1419,7 @@ int main(int argc, char** argv) {
         exit(2);
     }
     if ((cflag || Sflag || nocode || Eflag || Pflag) && make_edison_shlib) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-              "-shared can be specified only when a link is to be performed\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-shared can be specified only when a link is to be performed\n");
         exit(2);
     }
 
@@ -1438,8 +1429,7 @@ int main(int argc, char** argv) {
     if ((compiler == COMPILER_1) &&
         ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)) && Fflag &&
         smart_build) {
-        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-              "-F and -smart cannot be specified together: -smart ignored\n");
+        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-F and -smart cannot be specified together: -smart ignored\n");
         smart_build = FALSE;
     }
     if ((default_template_instantiation_mode != 0) && !force_prelink) {
@@ -1563,8 +1553,7 @@ int main(int argc, char** argv) {
     }
 
     if ((compiler == COMPILER_6) && nolockflag && lpilockflag) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-              "Conflicting flags; -nolock and -lpilock can't both be specified\n");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "Conflicting flags; -nolock and -lpilock can't both be specified\n");
         exit(2);
     }
 
@@ -1575,14 +1564,12 @@ int main(int argc, char** argv) {
     // }
 
     if ((srcfiles.length >= 2) && (compiler == COMPILER_4) && !Eflag && !Pflag) {
-        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s\n",
-              "as");
+        error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "only one source file can be specified with %s\n", "as");
         exit(2);
     }
 
     mktempstr();
 
-    
     if ((compiler == COMPILER_1) && (gflag >= 2)) {
         sp120_2 = fopen(tempstr[33], "w");
         if (sp120_2 != NULL) {
@@ -1596,10 +1583,8 @@ int main(int argc, char** argv) {
             // } else {
             //     var_s4_3 = B_1000A49C;
             // }
-            fprintf(sp120_2, "%s %s%s%s\n", progname, 
-                (((srcfiles.length == 1) && (cflag == 0)) ? "-c " : ""), 
-                ((((srcfiles.length == 1) && (cflag == 0)) || (B_1000A49C == NULL)) ? "" : B_1000A49C), 
-                B_1000A48C);
+            fprintf(sp120_2, "%s %s%s%s\n", progname, (((srcfiles.length == 1) && (cflag == 0)) ? "-c " : ""),
+                    ((((srcfiles.length == 1) && (cflag == 0)) || (B_1000A49C == NULL)) ? "" : B_1000A49C), B_1000A48C);
             init_curr_dir();
             fprintf(sp120_2, "%s\n", D_10000438);
             fclose(sp120_2);
@@ -1618,9 +1603,9 @@ int main(int argc, char** argv) {
         // Finished srcfiles, `uload` on.
         if (i == srcfiles.length) {
             uload = FALSE;
-            if ((runerror == 0) 
+            if ((runerror == 0)
                 // && !Eflag && !Pflag
-                ) {
+            ) {
                 if (uoutfile == NULL) {
                     addstr(&srcfiles, "u.out.?");
                 } else if (getsuf(uoutfile) != '\0') {
@@ -1647,7 +1632,7 @@ int main(int argc, char** argv) {
         // if (NoMoreOptions && (*srcfiles.entries[i] == '-')) {
         //     passin = func_00433534(srcfiles.entries[i]);
         // } else {
-            passin = srcfiles.entries[i];
+        passin = srcfiles.entries[i];
         // }
         if (compiler != COMPILER_4) {
             srcsuf = getsuf(srcfiles.entries[i]);
@@ -1658,14 +1643,9 @@ int main(int argc, char** argv) {
             srcsuf = 's';
         }
         if ((Hchar == 'f') || (Hchar == 's') || (Hchar == 'm') || (Hchar == 'o') || (Hchar == 'k') || (Hchar == 'c') ||
-            Kflag || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') 
-            || (srcsuf == 'S') 
-            || (srcsuf == 'M')
-            || (reg_s1 == 6) //! @bug var is uninitialised
-            || (srcsuf == 'V')
-            || (srcsuf == 'D')
-            || (srcsuf == 'Q')
-            ) {
+            Kflag || (srcsuf == 'B') || (srcsuf == 'U') || (srcsuf == 'O') || (srcsuf == 'G') || (srcsuf == 'S') ||
+            (srcsuf == 'M') || (reg_s1 == 6) //! @bug var is uninitialised
+            || (srcsuf == 'V') || (srcsuf == 'D') || (srcsuf == 'Q')) {
             tmpst = 0;
             if ((compiler == COMPILER_4) && (getsuf(srcfiles.entries[i]) == '\0')) {
                 symtab = mkstr(srcfiles.entries[i], ".T", NULL);
@@ -1988,9 +1968,9 @@ int main(int argc, char** argv) {
                 addstr(&execlist, "-D_MIPS_ISA=1");
             } else if (mips2flag) {
                 addstr(&execlist, "-D_MIPS_ISA=2");
-            } else 
-                // if (mips3flag) 
-                {
+            } else
+            // if (mips3flag)
+            {
                 addstr(&execlist, "-D_MIPS_ISA=3");
             }
             addstr(&execlist, "-D_ABIO32=1");
@@ -2052,28 +2032,28 @@ int main(int argc, char** argv) {
         switch (srcsuf) { /* switch 13 */
             case SUF_6:   /* switch 13 */
             case 'c':     /* switch 13 */
-            // case 'h':     /* switch 13 */
-                // if ((srcsuf != 'h') || D_100001FC) {
-                    if ((compiler == COMPILER_1) &&
-                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                        addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
-                        addstr(&execlist, "-D__cplusplus=1");
-                        addstr(&execlist, "-D__ANSI_CPP__=1");
-                        if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
-                            addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
-                        }
-                    } else {
-                        if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
-                            addstr(&execlist, "-DLANGUAGE_C");
-                        }
-                        addstr(&execlist, "-D_LANGUAGE_C");
-                        if (cmp_flag != 0) {
-                            addstr(&execlist, "-D_LANGUAGE_PWRC");
-                        }
-                        if (((cmp_flag & 1) || run_sopt) && (cppchoice == CPP_CHOICE_1)) {
-                            addstr(&execlist, "-trigraphs");
-                        }
+                          // case 'h':     /* switch 13 */
+                          // if ((srcsuf != 'h') || D_100001FC) {
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                    addstr(&execlist, "-D_LANGUAGE_C_PLUS_PLUS=1");
+                    addstr(&execlist, "-D__cplusplus=1");
+                    addstr(&execlist, "-D__ANSI_CPP__=1");
+                    if ((compiler == COMPILER_1) && (c_compiler_choice == C_COMPILER_CHOICE_3)) {
+                        addstr(&execlist, "-D_DELTA_EXTENSIONS=1");
                     }
+                } else {
+                    if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
+                        addstr(&execlist, "-DLANGUAGE_C");
+                    }
+                    addstr(&execlist, "-D_LANGUAGE_C");
+                    if (cmp_flag != 0) {
+                        addstr(&execlist, "-D_LANGUAGE_PWRC");
+                    }
+                    if (((cmp_flag & 1) || run_sopt) && (cppchoice == CPP_CHOICE_1)) {
+                        addstr(&execlist, "-trigraphs");
+                    }
+                }
                 // }
                 break;
 
@@ -3019,9 +2999,9 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            if ((run_sopt && !Kflag) || acpp || oldcppflag 
+            if ((run_sopt && !Kflag) || acpp || oldcppflag
                 // || (cmp_flag & 0x10000)
-                ) {
+            ) {
                 unlink(passin);
             }
 
@@ -4073,7 +4053,7 @@ int main(int argc, char** argv) {
                     addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
                 }
             }
-            
+
             if (mips2flag && (sp148 == 0)) {
                 if (strcmp("/", comp_target_root) != 0) {
                     if (non_shared) {
@@ -4090,7 +4070,7 @@ int main(int argc, char** argv) {
                     }
                 }
             }
-            
+
             if (svr4_systype) {
                 if (compchoice == COMP_CHOICE_1) {
                     addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
@@ -4174,7 +4154,7 @@ int main(int argc, char** argv) {
                 }
                 // if (pgflag != 0) {
                 //     addspacedstr(&execlist, newstr(libgprof));
-                // } else 
+                // } else
                 if (pflag != 0) {
                     addspacedstr(&execlist, newstr(libprof));
                 }
@@ -4695,8 +4675,9 @@ int main(int argc, char** argv) {
             if (run(gen, execlist.entries, NULL, NULL, NULL) != 0) {
                 runerror++;
                 if (!Kflag) {
-                    if ((srcsuf != 'B') && (srcsuf != 'O') && (srcsuf != 'Q') && (srcsuf != 'D') && (srcsuf != 'M') 
-                        // && (srcsuf != 'S') 
+                    if ((srcsuf != 'B') && (srcsuf != 'O') && (srcsuf != 'Q') && (srcsuf != 'D') &&
+                        (srcsuf != 'M')
+                        // && (srcsuf != 'S')
                         && (srcsuf != 'V')) {
                         unlink(passin);
                     }
@@ -4982,8 +4963,7 @@ int main(int argc, char** argv) {
     if (!cflag && !Sflag && !Eflag && !Pflag && !jflag && (runerror == 0) && (objfiles.length != 0) &&
         (Hchar == '\0') && !nocode) {
         if (old_non_shared && mips2flag && !kpic_flag) {
-            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                  "can't mix -mips2 with shared, try using -non_shared\n");
+            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't mix -mips2 with shared, try using -non_shared\n");
             default_call_shared = FALSE;
             call_shared = FALSE;
         }
@@ -5050,9 +5030,9 @@ int main(int argc, char** argv) {
                     addstr(&ldflags, "-non_shared");
                     non_shared_emitted = TRUE;
                 }
-            } else if (call_shared 
-                // || make_edison_shlib
-                ) {
+            } else if (call_shared
+                       // || make_edison_shlib
+            ) {
                 if (transitive_link) {
                     addstr(&ldflags, "-transitive_link");
                 } else if (full_transitive_link) {
@@ -5126,18 +5106,18 @@ int main(int argc, char** argv) {
                     addstr(&execlist, mkstr("-SYSTYPE_SVR4", NULL, NULL));
                 }
                 addstr(&execlist, mkstr("-_SYSTYPE_SVR4", NULL, NULL));
-                if (call_shared 
+                if (call_shared
                     // || make_edison_shlib
-                    ) {
+                ) {
                     addstr(&execlist, "-require_dynamic_link");
                     addstr(&execlist, "_rld_new_interface");
                     if (ignore_unresolved_flag) {
                         addstr(&execlist, "-ignore_unresolved");
                     } else if (no_unresolved_flag) {
                         addstr(&execlist, "-no_unresolved");
-                    } else if (default_svr4 
-                        // || make_edison_shlib
-                        ) {
+                    } else if (default_svr4
+                               // || make_edison_shlib
+                    ) {
                         addstr(&execlist, "-ignore_unresolved");
                     } else {
                         addstr(&execlist, "-no_unresolved");
@@ -5202,7 +5182,8 @@ int main(int argc, char** argv) {
             //             addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/DCC", currcomp, NULL));
             //         }
             //         if (non_shared) {
-            //             addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp, NULL));
+            //             addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/nonshared/", currcomp,
+            //             NULL));
             //         } else if (abi_flag == 0) {
             //             addstr(&execlist, mkstr("-L", comp_target_root, runlib, "usr/lib/", currcomp, NULL));
             //         }
@@ -5229,26 +5210,26 @@ int main(int argc, char** argv) {
                 //     addlist(&execlist, &dashlfiles);
                 // }
                 // if (!nodeflib) {
-                    if ((compiler == COMPILER_1) &&
-                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                        // spDC = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
-                        // if (spDC) {
-                        //     addstr(&execlist, "-dont_warn_unused");
-                        // }
-                        // if (exception_handling) {
-                        //     addstr(&execlist, "-lCsup");
-                        // }
-                        addstr(&execlist, "-lC");
-                        // if (spDC) {
-                        //     addstr(&execlist, "-warn_unused");
-                        // }
-                    }
-                    // if (xpg_flag) {
+                if ((compiler == COMPILER_1) &&
+                    ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                    // spDC = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                    // if (spDC) {
                     //     addstr(&execlist, "-dont_warn_unused");
-                    //     addstr(&execlist, "-lgen");
+                    // }
+                    // if (exception_handling) {
+                    //     addstr(&execlist, "-lCsup");
+                    // }
+                    addstr(&execlist, "-lC");
+                    // if (spDC) {
                     //     addstr(&execlist, "-warn_unused");
                     // }
-                    addstr(&execlist, "-lc");
+                }
+                // if (xpg_flag) {
+                //     addstr(&execlist, "-dont_warn_unused");
+                //     addstr(&execlist, "-lgen");
+                //     addstr(&execlist, "-warn_unused");
+                // }
+                addstr(&execlist, "-lc");
                 // }
             } else {
                 addstr(&execlist, "-nocount");
@@ -5270,117 +5251,87 @@ int main(int argc, char** argv) {
                 //     addlist(&execlist, &dashlfiles);
                 // }
                 addlist(&execlist, &ldZflags);
-                if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1) 
+                if ((ansichoice == ANSICHOICE_KR) && (compiler == COMPILER_1)
                     // && !irix4
-                    ) {
+                ) {
                     addstr(&execlist, "-cckr");
                 }
                 addstr(&execlist, "-nocount");
                 // if (!nodeflib) {
-                    if ((compiler == COMPILER_2) || haspascal) {
-                        addspacedstr(&execlist, libp);
-                        addspacedstr(&execlist, libxmalloc);
-                        addspacedstr(&execlist, libexc);
-                        addspacedstr(&execlist, libmld);
+                if ((compiler == COMPILER_2) || haspascal) {
+                    addspacedstr(&execlist, libp);
+                    addspacedstr(&execlist, libxmalloc);
+                    addspacedstr(&execlist, libexc);
+                    addspacedstr(&execlist, libmld);
+                }
+                if ((compiler == COMPILER_3) || hasfortran) {
+                    if (mp_flag) {
+                        addspacedstr(&execlist, libI77_mp);
                     }
-                    if ((compiler == COMPILER_3) || hasfortran) {
-                        if (mp_flag) {
-                            addspacedstr(&execlist, libI77_mp);
+                    if (non_shared || irix4) {
+                        addspacedstr(&execlist, libF77);
+                        addspacedstr(&execlist, libm);
+                        addspacedstr(&execlist, libU77);
+                        if (D_1000039C != 0) {
+                            spD8 = strlen(libI77);
+                            spD4 = malloc(spD8 + 2);
+                            memcpy(spD4, libI77, spD8);
+                            spD4[spD8 + 0] = '_';
+                            spD4[spD8 + 1] = 's';
+                            spD4[spD8 + 2] = '\0';
+                            libI77 = spD4;
                         }
-                        if (non_shared || irix4) {
-                            addspacedstr(&execlist, libF77);
-                            addspacedstr(&execlist, libm);
-                            addspacedstr(&execlist, libU77);
-                            if (D_1000039C != 0) {
-                                spD8 = strlen(libI77);
-                                spD4 = malloc(spD8 + 2);
-                                memcpy(spD4, libI77, spD8);
-                                spD4[spD8 + 0] = '_';
-                                spD4[spD8 + 1] = 's';
-                                spD4[spD8 + 2] = '\0';
-                                libI77 = spD4;
-                            }
-                            addspacedstr(&execlist, libI77);
-                            addspacedstr(&execlist, libisam);
-                        } else {
-                            addspacedstr(&execlist, libftn);
-                            addspacedstr(&execlist, libm);
-                        }
-                    }
-                    if (compiler == COMPILER_5) {
-                        addstr(&execlist, libpl1);
-                        addspacedstr(&execlist, libxmalloc);
-                        addstr(&execlist, "-ltermcap");
-                        addspacedstr(&execlist, libexc);
-                        addspacedstr(&execlist, libmld);
-                    }
-                    if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
-                        (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
+                        addspacedstr(&execlist, libI77);
+                        addspacedstr(&execlist, libisam);
+                    } else {
+                        addspacedstr(&execlist, libftn);
                         addspacedstr(&execlist, libm);
                     }
-                    // if (pgflag != 0) {
-                    //     addspacedstr(&execlist, libgprof);
-                    // } else 
-                    if (pflag != 0) {
-                        addspacedstr(&execlist, libprof);
+                }
+                if (compiler == COMPILER_5) {
+                    addstr(&execlist, libpl1);
+                    addspacedstr(&execlist, libxmalloc);
+                    addstr(&execlist, "-ltermcap");
+                    addspacedstr(&execlist, libexc);
+                    addspacedstr(&execlist, libmld);
+                }
+                if ((compiler == COMPILER_2) || (hasfortran && (compiler != COMPILER_3)) || haspascal || haspl1 ||
+                    (compiler == COMPILER_5) || (compiler == COMPILER_6)) {
+                    addspacedstr(&execlist, libm);
+                }
+                // if (pgflag != 0) {
+                //     addspacedstr(&execlist, libgprof);
+                // } else
+                if (pflag != 0) {
+                    addspacedstr(&execlist, libprof);
+                }
+                if (!sixty4bitflag) {
+                    ldw_file = fopen(libdw_path, "r");
+                    if (ldw_file != NULL) {
+                        addspacedstr(&execlist, libdw);
                     }
-                    if (!sixty4bitflag) {
-                        ldw_file = fopen(libdw_path, "r");
-                        if (ldw_file != NULL) {
-                            addspacedstr(&execlist, libdw);
-                        }
-                    }
-                    if (cmp_flag & 0x10000) {
-                        addstr(&execlist, libc_mp);
-                        if (compiler == COMPILER_1) {
-                            addstr(&execlist, "-lkapio");
-                        }
-                    }
-                    if (run_sopt && (compiler == COMPILER_1)) {
+                }
+                if (cmp_flag & 0x10000) {
+                    addstr(&execlist, libc_mp);
+                    if (compiler == COMPILER_1) {
                         addstr(&execlist, "-lkapio");
                     }
-                    if (compiler == COMPILER_3) {
-                        if (D_1000039C == 2) {
-                            addstr(&execlist, "-lc_s");
-                            // if (xpg_flag) {
-                            //     addstr(&execlist, "-dont_warn_unused");
-                            //     addstr(&execlist, "-lgen");
-                            //     addstr(&execlist, "-warn_unused");
-                            // }
-                            addstr(&execlist, "-lc");
-                        } else {
-                            if (irix4 && (B_1000A5B4 == 0)) {
-                                addstr(&execlist, "-lmpc");
-                            }
-                            if (B_1000A56C != 0) {
-                                addstr(&execlist, "-lc_s");
-                            } else if (B_1000A570 != 0) {
-                                addstr(&execlist, "-lc_s");
-                            }
-                            // if (xpg_flag) {
-                            //     addstr(&execlist, "-dont_warn_unused");
-                            //     addstr(&execlist, "-lgen");
-                            //     addstr(&execlist, "-warn_unused");
-                            // }
-                            addstr(&execlist, "-lc");
-                        }
+                }
+                if (run_sopt && (compiler == COMPILER_1)) {
+                    addstr(&execlist, "-lkapio");
+                }
+                if (compiler == COMPILER_3) {
+                    if (D_1000039C == 2) {
+                        addstr(&execlist, "-lc_s");
+                        // if (xpg_flag) {
+                        //     addstr(&execlist, "-dont_warn_unused");
+                        //     addstr(&execlist, "-lgen");
+                        //     addstr(&execlist, "-warn_unused");
+                        // }
+                        addstr(&execlist, "-lc");
                     } else {
-                        if (irix4 && (cmp_flag & 0x10000)) {
+                        if (irix4 && (B_1000A5B4 == 0)) {
                             addstr(&execlist, "-lmpc");
-                        }
-                        if ((compiler == COMPILER_1) && ((c_compiler_choice == C_COMPILER_CHOICE_2) ||
-                                                         (c_compiler_choice == C_COMPILER_CHOICE_3))) {
-                            // spD0 = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
-                            // if (spD0) {
-                            //     addstr(&execlist, "-dont_warn_unused");
-                            // }
-                            // if (exception_handling) {
-                            //     addstr(&execlist, "-lCsup");
-                            // }
-                            addstr(&execlist, "-lC");
-                            // if (spD0) {
-                            //     addstr(&execlist, "-warn_unused");
-                            // }
                         }
                         if (B_1000A56C != 0) {
                             addstr(&execlist, "-lc_s");
@@ -5394,6 +5345,36 @@ int main(int argc, char** argv) {
                         // }
                         addstr(&execlist, "-lc");
                     }
+                } else {
+                    if (irix4 && (cmp_flag & 0x10000)) {
+                        addstr(&execlist, "-lmpc");
+                    }
+                    if ((compiler == COMPILER_1) &&
+                        ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))) {
+                        // spD0 = !D_1000BF90 && (strcmp(LD, "old_ld") != 0);
+                        // if (spD0) {
+                        //     addstr(&execlist, "-dont_warn_unused");
+                        // }
+                        // if (exception_handling) {
+                        //     addstr(&execlist, "-lCsup");
+                        // }
+                        addstr(&execlist, "-lC");
+                        // if (spD0) {
+                        //     addstr(&execlist, "-warn_unused");
+                        // }
+                    }
+                    if (B_1000A56C != 0) {
+                        addstr(&execlist, "-lc_s");
+                    } else if (B_1000A570 != 0) {
+                        addstr(&execlist, "-lc_s");
+                    }
+                    // if (xpg_flag) {
+                    //     addstr(&execlist, "-dont_warn_unused");
+                    //     addstr(&execlist, "-lgen");
+                    //     addstr(&execlist, "-warn_unused");
+                    // }
+                    addstr(&execlist, "-lc");
+                }
                 // }
                 if (crtn_required) {
                     addstr(&execlist, crtn);
@@ -5409,12 +5390,13 @@ int main(int argc, char** argv) {
                 if (!Kflag) {
                     // if ((strcmp(LD, "old_ld") == 0) ||
                     //     ((compiler == COMPILER_1) &&
-                    //      ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3)))) {
-                        if (outfile != NULL) {
-                            unlink(outfile);
-                        } else {
-                            unlink("a.out");
-                        }
+                    //      ((c_compiler_choice == C_COMPILER_CHOICE_2) || (c_compiler_choice == C_COMPILER_CHOICE_3))))
+                    //      {
+                    if (outfile != NULL) {
+                        unlink(outfile);
+                    } else {
+                        unlink("a.out");
+                    }
                     // }
                     if (tmp_uldobj != NULL) {
                         unlink(tmp_uldobj);
@@ -5451,19 +5433,19 @@ int main(int argc, char** argv) {
             }
         }
 
-    // pass_strip:
-    //     if ((runerror == 0) && do_strip) {
-    //         execlist.length = 0;
-    //         addstr(&execlist, strip);
-    //         if (outfile != NULL) {
-    //             addstr(&execlist, outfile);
-    //         } else {
-    //             addstr(&execlist, "a.out");
-    //         }
-    //         if (run(strip, execlist.entries, NULL, NULL, NULL) != 0) {
-    //             runerror++;
-    //         }
-    //     }
+        // pass_strip:
+        //     if ((runerror == 0) && do_strip) {
+        //         execlist.length = 0;
+        //         addstr(&execlist, strip);
+        //         if (outfile != NULL) {
+        //             addstr(&execlist, outfile);
+        //         } else {
+        //             addstr(&execlist, "a.out");
+        //         }
+        //         if (run(strip, execlist.entries, NULL, NULL, NULL) != 0) {
+        //             runerror++;
+        //         }
+        //     }
 
     pass_cord:
         {
@@ -5740,12 +5722,10 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if (strcmp(argv[var_s0], "-64bit") == 0) {
-                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
-                              "-64bit option is not yet implemented, ignore\n");
+                        error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "-64bit option is not yet implemented, ignore\n");
                         sixty4bit_spec = TRUE;
                         if (swopcodeflag) {
-                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                  "-64bit can not be used with -swopcode\n");
+                            error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-64bit can not be used with -swopcode\n");
                             exit(2);
                         }
                         break;
@@ -5891,15 +5871,13 @@ void parse_command(int argc, char** argv) {
                     if ((argv[var_s0][3] == '\0') && ((argv[var_s0][2] == 'B') || (argv[var_s0][2] == 'L'))) {
                         if (argv[var_s0][2] == 'B') {
                             if (Bflag && (targetsex != BIGENDIAN)) {
-                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                      "-EB or -EL must precede any -B flags\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags\n");
                                 exit(2);
                             }
                             targetsex = BIGENDIAN;
                         } else {
                             if (Bflag && (targetsex != LITTLEENDIAN)) {
-                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0,
-                                      "-EB or -EL must precede any -B flags\n");
+                                error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "-EB or -EL must precede any -B flags\n");
                                 exit(2);
                             }
                             targetsex = LITTLEENDIAN;
@@ -7784,12 +7762,10 @@ void parse_command(int argc, char** argv) {
                         break;
                     }
                     if ((compiler == COMPILER_3) &&
-                        (
-                            (strcmp(argv[var_s0], "-noextend_source") == 0) ||
-                            (strcmp(argv[var_s0], "-noi4") == 0) || (strcmp(argv[var_s0], "-noisam") == 0) ||
-                            (strcmp(argv[var_s0], "-noexpopt") == 0) || 
-                            // (strcmp(argv[var_s0], "-noequivauto") == 0) ||
-                            (strcmp(argv[var_s0], "-nof77") == 0))) {
+                        ((strcmp(argv[var_s0], "-noextend_source") == 0) || (strcmp(argv[var_s0], "-noi4") == 0) ||
+                         (strcmp(argv[var_s0], "-noisam") == 0) || (strcmp(argv[var_s0], "-noexpopt") == 0) ||
+                         // (strcmp(argv[var_s0], "-noequivauto") == 0) ||
+                         (strcmp(argv[var_s0], "-nof77") == 0))) {
                         addstr(&fcomflags, argv[var_s0]);
                         add_static_opt(argv[var_s0]);
                         break;
@@ -9078,7 +9054,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
 #define CCOM_MACRO ((ansichoice != ANSICHOICE_KR) ? "accom" : "ccom")
 #define CFE_MACRO                                                                             \
     (((c_compiler_choice != C_COMPILER_CHOICE_0) || ((compiler == COMPILER_3) && D_100001FC)) \
-         ? (alternate_fe ? "edgcpfe.alt" : "edgcpfe")                                          \
+         ? (alternate_fe ? "edgcpfe.alt" : "edgcpfe")                                         \
          : "cfe")
 
 /**
@@ -10068,8 +10044,10 @@ void mklist(string_list* list) {
  */
 // Add a single string entry to a string_list.
 void addstr(list, str)
-    string_list* list; 
+    // clang-format off
+    string_list* list;
     string str;
+// clang-format on
 {
     if ((list->length + 1) >= list->capacity) {
         if ((list->entries = realloc(list->entries, (list->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
