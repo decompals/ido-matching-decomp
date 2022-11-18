@@ -10470,8 +10470,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
 // function edit_src # 27
 int edit_src(const char* arg0, char* arg1, int arg2) {
-    int pad[3];
-    char* sp58;
+    char sp58[16];
     pid_t forkPid;
     pid_t sp50;
     int temp_t7; // sp4C
