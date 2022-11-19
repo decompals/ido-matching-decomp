@@ -229,9 +229,9 @@ int nocode = FALSE; //!< flag, boolean. Whether to *not* create object files (us
 int nocompileneeded = FALSE; //!< boolean. Whether to continue compilation after preprocessing. Set by return of `cfe`
                              //!< being 0xFA if smart_build is enabled.
 
-UNK_TYPE efl;                 // Unused
-char* ratfor;                 //!< Always set to "/usr/bin/ratfor" in main()
-char* m4;                     //!< Always set to "/usr/bin/m4" in main()
+UNK_TYPE efl; // Unused
+char* ratfor; //!< Always set to "/usr/bin/ratfor" in main()
+char* m4;     //!< Always set to "/usr/bin/m4" in main()
 char* LibM = " -lm";
 char* LibP = " -lp";
 char* LibF77 = " -lF77";
@@ -531,39 +531,39 @@ int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
 static int B_1000E4C0;    //!< argc
 static char** B_1000E4C4; //!< argv
 
-int plain_g;              //!< flag, boolean. Indicates that "-g" was passed (= "-O1 -g2")
-int plain_O;              //!< flag, boolean. Indicates that "-O" was passed (= "-O1")
-int noaliasokflag;        //!< flag, boolean. "-noaliasok"
-int haspascal = FALSE;          //!< flag, boolean. If file is Pascal, set by file extension ".p"
-int hasfortran = FALSE;         //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
-int haspl1;               //?< flag, boolean. Argument has a suffix corresponding to a PL/I program
-                          //!< TODO: confirm
-int lmflag = FALSE;             //!< flag, pseudoboolean, set and not used
-int srcexists = 0;              // Number of source code files present? Set in the main loop of parse_command()
-int w1flag = 1;                 //!< flag, values 0,1,2 used
-static int D_1000C130 = 0;      // 0, 1 (-share_io) or 2 (-share_all)
-UNK_TYPE p2cstr;          // Unused
-int align;                //!< alignment, set using "-align8", "-align16", "-align32" or "-align64". Set but not used.
+int plain_g;               //!< flag, boolean. Indicates that "-g" was passed (= "-O1 -g2")
+int plain_O;               //!< flag, boolean. Indicates that "-O" was passed (= "-O1")
+int noaliasokflag;         //!< flag, boolean. "-noaliasok"
+int haspascal = FALSE;     //!< flag, boolean. If file is Pascal, set by file extension ".p"
+int hasfortran = FALSE;    //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
+int haspl1;                //?< flag, boolean. Argument has a suffix corresponding to a PL/I program
+                           //!< TODO: confirm
+int lmflag = FALSE;        //!< flag, pseudoboolean, set and not used
+int srcexists = 0;         // Number of source code files present? Set in the main loop of parse_command()
+int w1flag = 1;            //!< flag, values 0,1,2 used
+static int D_1000C130 = 0; // 0, 1 (-share_io) or 2 (-share_all)
+UNK_TYPE p2cstr;           // Unused
+int align;                 //!< alignment, set using "-align8", "-align16", "-align32" or "-align64". Set but not used.
 int align_common; //!< flag, pseudoboolean. Set by "-align-common" and other alignment flags under certain conditions
                   //!< TODO: which conditions?
 char* alignarg;   //!< alignment argument passed on to `execlist`.
 int use_real_fp;  //!< Never set, but checked.
 int dollar_sign;  //!< flag, pseudoboolean, set by "-dollar"
 int prototype_checking_on = FALSE; //!< flag, boolean. Set on by "-prototypes" and off by "-noprototypes"
-int mp_flag;                  //!< Set of flags, 1, 2, 4, and 0x10000 are used
-int mp_onetripflag;           //!< Set by "-onetrip"
-UNK_TYPE mp_staticflag;       // Unused
-int mp_dlinesflag;            //!< flag, boolean. Set by "-d_lines"
-int mp_caseflag;              //!< flag, boolean. Set by "-U"
-int mp_66flag;                //!< flag, boolean. Set by "-6"
-int mp_i2flag;                //!< flag, boolean. Set by "-i2" or "-i8"
-int mp_col120flag;            //!< flag, boolean. Set by "-col120"
-int mp_extendflag;            //!< flag, boolean. Set by "-extend_source"
-int mp_uflag;                 //!< flag, boolean. Set by "-u"
-int mp_backslashflag;         //!< flag, boolean. Set by "-backslash"
+int mp_flag;                       //!< Set of flags, 1, 2, 4, and 0x10000 are used
+int mp_onetripflag;                //!< Set by "-onetrip"
+UNK_TYPE mp_staticflag;            // Unused
+int mp_dlinesflag;                 //!< flag, boolean. Set by "-d_lines"
+int mp_caseflag;                   //!< flag, boolean. Set by "-U"
+int mp_66flag;                     //!< flag, boolean. Set by "-6"
+int mp_i2flag;                     //!< flag, boolean. Set by "-i2" or "-i8"
+int mp_col120flag;                 //!< flag, boolean. Set by "-col120"
+int mp_extendflag;                 //!< flag, boolean. Set by "-extend_source"
+int mp_uflag;                      //!< flag, boolean. Set by "-u"
+int mp_backslashflag;              //!< flag, boolean. Set by "-backslash"
 int showdirt_flag = FALSE;         //!< flag, boolean. Set by "-mp_keep"
-UNK_TYPE mp_uniq_specified;   // Unused
-UNK_TYPE mp_passes_relocated; // Unused
+UNK_TYPE mp_uniq_specified;        // Unused
+UNK_TYPE mp_passes_relocated;      // Unused
 int mp_prepass_count = 0;
 
 // not sure about this struct
@@ -577,13 +577,13 @@ struct_mpflags mpflags[] = {
     { "keep", 0x10007 },
     { NULL, 0 },
 };
-int cmp_flag;                 //!< Set of flags, 1, 2, 4, 0x10000 used
+int cmp_flag; //!< Set of flags, 1, 2, 4, 0x10000 used
 struct_mpflags cmpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
     { NULL, 0 },
 };
-int fullwarn;                 //!< flag, boolean. Set by "-fullwarn"
+int fullwarn; //!< flag, boolean. Set by "-fullwarn"
 
 int acpp = FALSE; //! flag, boolean. Set by "-acpp"
 
@@ -635,20 +635,20 @@ int edison_type = EDISON_TYPE_1; //!< Uses `EdisonType` enum. Set based on `ansi
 
 int exception_handling = FALSE; //!< flag, boolean. Whether to use exception handling in C++.
 char* Gnum = "0";               //!< argument to pass with "-G"
-char* tstring;                //!< Used as the first argument of relocate_passes()
-char* hstring;                //!< Used as the second argument of relocate_passes()
-char* Bstring;                //!< Used as the third argument of relocate_passes()
-const char* allBstring;       //!< Sometimes set in relocate_passes()
-char alltstring[20];          //!< Used in relocate_passes()
+char* tstring;                  //!< Used as the first argument of relocate_passes()
+char* hstring;                  //!< Used as the second argument of relocate_passes()
+char* Bstring;                  //!< Used as the third argument of relocate_passes()
+const char* allBstring;         //!< Sometimes set in relocate_passes()
+char alltstring[20];            //!< Used in relocate_passes()
 char* Warg;
 char* Wpass;
 char* Kpass;  // Start of current "-K" argument
 char Karg[6]; // Current "-K" argument
 char Hchar;
-int runerror = 0;               //!< number of errors triggered
+int runerror = 0; //!< number of errors triggered
 int retcode;
-int uload = FALSE;              //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
-int uldobj_place = -1;          //!< Index into the `objfiles` list where the output of `uld` is?
+int uload = FALSE;     //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
+int uldobj_place = -1; //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
 char* outfile;
 char* passin;
@@ -693,7 +693,7 @@ char* comp_target_root;
 char* comp_host_root;
 char* systype;
 int nonshared;
-int default_svr4 = FALSE;  //!< flag, boolean. Set by environment variable "SGI_SVR4"
+int default_svr4 = FALSE; //!< flag, boolean. Set by environment variable "SGI_SVR4"
 int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or environment variable
                    //!< "SGI_IRIX4"
 char* runlib = "/";
@@ -702,7 +702,7 @@ char* tmpdir;
 char* rls_id_object;
 char* progname; //!< Path of this executable, used to determine `compiler`
 char* currcomp;
-char* compdirs[7];          // might also be a struct?
+char* compdirs[7]; // might also be a struct?
 
 typedef enum Compiler {
     /* 1 */ COMPILER_1 = 1, // C
@@ -715,7 +715,7 @@ typedef enum Compiler {
 
 int compiler;
 
-char* tempstr[34];          // Possibly a struct?
+char* tempstr[34]; // Possibly a struct?
 
 static prmap_sgi_t B_1000CAC0[100];
 static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, sizeof(B_1000CAC0) };
@@ -731,7 +731,6 @@ static char* D_1000C1DC = NULL; // progname space padding
 
 static char* B_1000ECCC; // outfile
 static char* B_1000ECDC; // cmdline
-
 
 typedef enum ErrorCategory {
     /* 0 */ ERRORCAT_INTERNAL, // Unused
