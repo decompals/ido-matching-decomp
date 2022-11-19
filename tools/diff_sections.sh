@@ -27,3 +27,9 @@ mips-linux-gnu-readelf -A $2 > b/got-text
 
 # python3 -m spimdisasm.elfObjDisasm --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --save-context a/disasm_context.csv $1 a/disasm/
 python3 -m spimdisasm.elfObjDisasm --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --save-context b/disasm_context.csv $2 b/disasm/
+
+python3 tools/print_context_symbols.py a/disasm_context.csv >a/context_symbols.txt
+python3 tools/print_context_symbols.py b/disasm_context.csv >b/context_symbols.txt
+
+python3 tools/sort_libc_symbols.py a/got-text >a/libc_syms.txt
+python3 tools/sort_libc_symbols.py b/got-text >b/libc_syms.txt
