@@ -68,15 +68,11 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2);
 static char* func_0042FD7C(const char* name, char** dirs);
 static void func_00432C94(void);
 
-#ifndef PERMUTER
-void error();
-#else
 void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
-#endif /* PERMUTER */
 
 char* mkstr();
 void mklist(list* arg0);
-void addstr(); // (list* arg0, char* str), but sometimes called incorrectly, have to use K&R
+void addstr(); // (list* arg0, char* str), but sometimes called incorrectly
 void addspacedstr(list* arg0, char* str);
 char* newstr(const char* src);
 int save_place(list* arg0);
@@ -104,8 +100,9 @@ void show_err(const char* path);
 void handler(void);
 void cleanup(void);
 void whats(void);
-void settimes(void);
+void settimes();
 void dotime(const char* programName);
+int regular_file(const char* path);
 
 void exec_OCC(int argc, char** argv);
 int add_cxx_symbol_options(void);
@@ -121,206 +118,6 @@ typedef int UNK_TYPE;
 //! @note a pseudoboolean is something that usually looks like a boolean type but is occasionally not treated as one,
 //! e.g. if something increments it.
 
-// bss
-static prmap_sgi_t B_1000CAC0[100];
-char perr_msg[0x100];
-static int B_1000E4C0;    //!< argc
-static char** B_1000E4C4; //!< argv
-int plain_g;              //!< flag, boolean. Indicates that "-g" was passed (= "-O1 -g2")
-int plain_O;              //!< flag, boolean. Indicates that "-O" was passed (= "-O1")
-int noaliasokflag;        //!< flag, boolean. "-noaliasok"
-int haspl1;               //?< flag, boolean. Argument has a suffix corresponding to a PL/I program
-                          //!< TODO: confirm
-UNK_TYPE p2cstr;          // Unused
-int align;                //!< alignment, set using "-align8", "-align16", "-align32" or "-align64". Set but not used.
-int align_common; //!< flag, pseudoboolean. Set by "-align-common" and other alignment flags under certain conditions
-                  //!< TODO: which conditions?
-char* alignarg;   //!< alignment argument passed on to `execlist`.
-int use_real_fp;  //!< Never set, but checked.
-int dollar_sign;  //!< flag, pseudoboolean, set by "-dollar"
-int default_template_instantiation_mode;
-int mp_flag;                  //!< Set of flags, 1, 2, 4, and 0x10000 are used
-int mp_onetripflag;           //!< Set by "-onetrip"
-UNK_TYPE mp_staticflag;       // Unused
-int mp_dlinesflag;            //!< flag, boolean. Set by "-d_lines"
-int mp_caseflag;              //!< flag, boolean. Set by "-U"
-UNK_TYPE efl;                 // Unused
-int mp_66flag;                //!< flag, boolean. Set by "-6"
-char* ratfor;                 //!< Always set to "/usr/bin/ratfor" in main()
-int mp_i2flag;                //!< flag, boolean. Set by "-i2" or "-i8"
-char* m4;                     //!< Always set to "/usr/bin/m4" in main()
-int mp_col120flag;            //!< flag, boolean. Set by "-col120"
-int mp_extendflag;            //!< flag, boolean. Set by "-extend_source"
-int mp_uflag;                 //!< flag, boolean. Set by "-u"
-int mp_backslashflag;         //!< flag, boolean. Set by "-backslash"
-UNK_TYPE mp_uniq_specified;   // Unused
-UNK_TYPE mp_passes_relocated; // Unused
-int cmp_flag;                 //!< Set of flags, 1, 2, 4, 0x10000 used
-int fullwarn;                 //!< flag, boolean. Set by "-fullwarn"
-char* aligndir;               //!< Set to comp_host_root + "lib/align" and not used
-int docpp;                    //!< flag, boolean. Whether to use the preprocessor?
-int default_nocpp;            //!< flag, boolean
-unsigned int j;               // Looks like a normal index variable, but is global bss for some reason
-char* tstring;                //!< Used as the first argument of relocate_passes()
-char* hstring;                //!< Used as the second argument of relocate_passes()
-char* Bstring;                //!< Used as the third argument of relocate_passes()
-const char* allBstring;       //!< Sometimes set in relocate_passes()
-static UNK_TYPE B_1000E55C;   // Unused
-char alltstring[20];          //!< Used in relocate_passes()
-char* Warg;
-char* Wpass;
-char* Kpass;  // Start of current "-K" argument
-char Karg[6]; // Current "-K" argument
-char Hchar;
-static char B_1000E587; // Unused
-int time0;
-static UNK_TYPE B_1000E58C; // Unused
-struct tms tm0;
-int retcode;
-char* outfile;
-char* passin;
-char* passout;
-char* errout;
-char* symtab;
-char* uopt0str;
-char* ddoptstr;
-char* optstr;
-char* gentmp;
-char* binasm;
-char* uoutfile;
-char* lpi_st;
-char* lpi_p1;
-char* lpi_dd;
-static UNK_TYPE B_1000E5DC;
-static char B_1000E5E0[0x400];
-char* lpi_pd;
-char* linkorder;
-static UNK_TYPE valuesstr;
-static UNK_TYPE tmp_elfobj;
-char* CRTX;
-FILE* ldw_file;
-char* MCRTX;
-FILE* tmpsfile;
-list undefineflags;
-char* editor;
-list cppflags;
-char* xserver;
-list olimitflags;
-int times_edited;
-list acppflags;
-int edit_cnt_max;
-list mpcflags;
-static UNK_TYPE B_1000EA4C; // Unused
-list accomflags;
-char srcsuf;
-static UNK_TYPE B_1000EA5D; // Unused
-list cfeflags;
-int tmpst;
-list cpp2flags;
-static UNK_TYPE B_1000EA7C; // Unused
-list uldlibflags;
-static UNK_TYPE B_1000EA8C; // Unused
-list edisonflags;
-char* comp_target_root;
-list prelinkerflags;
-char* comp_host_root;
-list ccomflags;
-char* systype;
-list upasflags;
-int nonshared;
-list fcomflags;
-static UNK_TYPE B_1000EADC; // Unused
-list eflflags;
-static UNK_TYPE B_1000EAEC; // Unused
-list ratforflags;
-static UNK_TYPE B_1000EAFC; // Unused
-list upl1flags;
-static UNK_TYPE B_1000EB0C; // Unused
-list ucobflags;
-static UNK_TYPE B_1000EB1C; // Unused
-list ulpiflags;
-static UNK_TYPE B_1000EB2C; // Unused
-list ujoinflags;
-char* tmpdir;
-list uldflags;
-char* rls_id_object;
-list usplitflags;
-char* progname; //!< Path of this executable, used to determine `compiler`
-list umergeflags;
-char* currcomp;
-list uloopflags;
-static UNK_TYPE B_1000EB7C; // Unused
-char* compdirs[7];          // might also be a struct?
-static UNK_TYPE B_1000EB9C; // Unused
-list uopt0flags;
-
-typedef enum Compiler {
-    /* 1 */ COMPILER_1 = 1, // C
-    /* 2 */ COMPILER_2,     // Pascal
-    /* 3 */ COMPILER_3,     // FORTRAN
-    /* 4 */ COMPILER_4,     // Assembler
-    /* 5 */ COMPILER_5,     // PL1
-    /* 6 */ COMPILER_6      // COBOL
-} Compiler;
-
-int compiler;
-
-list ddoptflags;
-static UNK_TYPE B_1000EBBC; // Unused
-char* tempstr[34];          // Possibly a struct?
-list optflags;
-static UNK_TYPE B_1000EC54; // Unused
-list genflags;
-static UNK_TYPE B_1000EC64; // Unused
-list asflags;
-static UNK_TYPE B_1000EC74; // Unused
-list as1flags;
-static UNK_TYPE B_1000EC84; // Unused
-list ldflags;
-static UNK_TYPE B_1000EC94; // Unused
-static int B_1000EC98[2];
-list nldflags;
-static UNK_TYPE B_1000ECAC; // Unused
-list ftocflags;
-static UNK_TYPE B_1000ECBC; // Unused
-list cordflags;
-static char* B_1000ECCC;
-list srcfiles;
-static char* B_1000ECDC;
-list ufiles;
-static UNK_TYPE B_1000ECEC; // Unused
-list objfiles;
-static UNK_TYPE B_1000ECFC; // Unused
-list feedlist;
-static UNK_TYPE B_1000ED0C; // Unused
-list execlist;
-static UNK_TYPE B_1000ED1C; // Unused
-list dashlfiles;
-static int B_1000ED2C;
-static int B_1000ED30;
-list dirs_for_crtn;
-static UNK_TYPE B_1000ED44; // Unused
-list dirs_for_nonshared_crtn;
-static UNK_TYPE B_1000ED54; // Unused
-list dirs_for_abi_crtn;
-static UNK_TYPE B_1000ED64; // Unused
-list ldZflags;
-static int B_1000ED74;
-list pfaflags;
-char* pfa;
-char* libI77_mp;
-static UNK_TYPE B_1000ED8C; // Unused
-list pcaflags;
-static UNK_TYPE B_1000ED9C; // Unused
-list soptflags;
-static UNK_TYPE B_1000EDAC; // Unused
-list staticopts;
-static UNK_TYPE B_1000EDBC; // Unused
-char** __Argv;              // Unused
-UNK_TYPE __rld_obj_head;    // Unused
-int __Argc;                 // Unused
-
-// data
 char* LD = "ld";
 
 typedef enum AnsiChoice {
@@ -371,6 +168,8 @@ struct _struct_suffixes_0x8 suffixes[] = {
     { NULL, 0 },
 };
 
+char perr_msg[0x100];
+
 char* include = NULL;
 char* includeB = NULL;
 char* einclude = NULL;
@@ -420,6 +219,7 @@ int nofilt = FALSE; //!< flag, boolean. For C++ compilers, whether to not run th
 int force_prelink =
     FALSE; //!< flag, boolean. Whether to force prelinking, also requires nonzero default_template_instantiation_mode.
            //!< Set by "-prelink". @see no_prelink, default_template_instantiation_mode
+int default_template_instantiation_mode;
 int verbose_prelink = FALSE;      //!< flag, pseudoboolean. For C++ compilers, whether to pass "-v" to prelinker. Set by
                                   //!< "-ptv". Passed on to prelinker as "-v". @see vflag
 int auto_template_include = TRUE; //!< flag, boolean. For C++ compilers. Set by "-auto_include" and unset by
@@ -429,6 +229,9 @@ int nocode = FALSE; //!< flag, boolean. Whether to *not* create object files (us
 int nocompileneeded = FALSE; //!< boolean. Whether to continue compilation after preprocessing. Set by return of `cfe`
                              //!< being 0xFA if smart_build is enabled.
 
+UNK_TYPE efl;                 // Unused
+char* ratfor;                 //!< Always set to "/usr/bin/ratfor" in main()
+char* m4;                     //!< Always set to "/usr/bin/m4" in main()
 char* LibM = " -lm";
 char* LibP = " -lp";
 char* LibF77 = " -lF77";
@@ -487,10 +290,69 @@ char* xpg_env = NULL; //!< value of `_XPG` environment variable
 int xpg_flag = FALSE; //!< boolean. Whether `_XPG` environment variable has been specified.
 int crtn_required =
     TRUE; //!< flag, boolean. On by default, unset by "-crt0", set by "-crt1", ANSICHOICE_ANSI and ANSICHOICE_ANSIPOSIX
+char* CRTX;
+char* MCRTX;
+list undefineflags;
+list cppflags;
+list olimitflags;
+list acppflags;
+list mpcflags;
+list accomflags;
+list cfeflags;
+list cpp2flags;
+list uldlibflags;
+list edisonflags;
+list prelinkerflags;
+list ccomflags;
+list upasflags;
+list fcomflags;
+list eflflags;
+list ratforflags;
+list upl1flags;
+list ucobflags;
+list ulpiflags;
+list ujoinflags;
+list uldflags;
+list usplitflags;
+list umergeflags;
+list uloopflags;
+list uopt0flags;
+list ddoptflags;
+list optflags;
+list genflags;
+list asflags;
+list as1flags;
+list ldflags;
+list nldflags;
+list ftocflags;
+list cordflags;
+list srcfiles;
+list ufiles;
+list objfiles;
+list feedlist;
+list execlist;
+list dashlfiles;
+
+static int B_1000ED2C; // number of times -lgl_s is passed
+static int B_1000ED30; // number of times -lc_s is passed
+
+list dirs_for_crtn;
+list dirs_for_nonshared_crtn;
+list dirs_for_abi_crtn;
+list ldZflags;
+
+static int B_1000ED74; // -no_mpc
+
+list pfaflags;
+char* pfa;
+char* libI77_mp;
+list pcaflags;
 char* pca = NULL;
 char* libc_mp = NULL;
+list soptflags;
 char* fopt = NULL;
 char* copt = NULL;
+list staticopts;
 
 static int D_1000BF74 = FALSE;  //!< flag, boolean. Whether to perform static analysis. Set by "-sa".
 static int D_1000BF78 = FALSE;  //!< flag, boolean. Static analysis, no source. Set by "-sa,nosrc".
@@ -665,14 +527,43 @@ int abi_flag = 0;
 int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
 int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
 int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
+
+static int B_1000E4C0;    //!< argc
+static char** B_1000E4C4; //!< argv
+
+int plain_g;              //!< flag, boolean. Indicates that "-g" was passed (= "-O1 -g2")
+int plain_O;              //!< flag, boolean. Indicates that "-O" was passed (= "-O1")
+int noaliasokflag;        //!< flag, boolean. "-noaliasok"
 int haspascal = FALSE;          //!< flag, boolean. If file is Pascal, set by file extension ".p"
 int hasfortran = FALSE;         //!< flag, boolean. If file is FORTRAN, set by file extension ".f" or ".m" (at least)
+int haspl1;               //?< flag, boolean. Argument has a suffix corresponding to a PL/I program
+                          //!< TODO: confirm
 int lmflag = FALSE;             //!< flag, pseudoboolean, set and not used
 int srcexists = 0;              // Number of source code files present? Set in the main loop of parse_command()
 int w1flag = 1;                 //!< flag, values 0,1,2 used
-static int D_1000C130 = 0;      // values 0,1,2 used
+static int D_1000C130 = 0;      // 0, 1 (-share_io) or 2 (-share_all)
+UNK_TYPE p2cstr;          // Unused
+int align;                //!< alignment, set using "-align8", "-align16", "-align32" or "-align64". Set but not used.
+int align_common; //!< flag, pseudoboolean. Set by "-align-common" and other alignment flags under certain conditions
+                  //!< TODO: which conditions?
+char* alignarg;   //!< alignment argument passed on to `execlist`.
+int use_real_fp;  //!< Never set, but checked.
+int dollar_sign;  //!< flag, pseudoboolean, set by "-dollar"
 int prototype_checking_on = FALSE; //!< flag, boolean. Set on by "-prototypes" and off by "-noprototypes"
+int mp_flag;                  //!< Set of flags, 1, 2, 4, and 0x10000 are used
+int mp_onetripflag;           //!< Set by "-onetrip"
+UNK_TYPE mp_staticflag;       // Unused
+int mp_dlinesflag;            //!< flag, boolean. Set by "-d_lines"
+int mp_caseflag;              //!< flag, boolean. Set by "-U"
+int mp_66flag;                //!< flag, boolean. Set by "-6"
+int mp_i2flag;                //!< flag, boolean. Set by "-i2" or "-i8"
+int mp_col120flag;            //!< flag, boolean. Set by "-col120"
+int mp_extendflag;            //!< flag, boolean. Set by "-extend_source"
+int mp_uflag;                 //!< flag, boolean. Set by "-u"
+int mp_backslashflag;         //!< flag, boolean. Set by "-backslash"
 int showdirt_flag = FALSE;         //!< flag, boolean. Set by "-mp_keep"
+UNK_TYPE mp_uniq_specified;   // Unused
+UNK_TYPE mp_passes_relocated; // Unused
 int mp_prepass_count = 0;
 
 // not sure about this struct
@@ -686,11 +577,13 @@ struct_mpflags mpflags[] = {
     { "keep", 0x10007 },
     { NULL, 0 },
 };
+int cmp_flag;                 //!< Set of flags, 1, 2, 4, 0x10000 used
 struct_mpflags cmpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
     { NULL, 0 },
 };
+int fullwarn;                 //!< flag, boolean. Set by "-fullwarn"
 
 int acpp = FALSE; //! flag, boolean. Set by "-acpp"
 
@@ -724,8 +617,12 @@ int cppchoice = CPP_CHOICE_0; //!< Preprocessor selection? Uses `CppChoice` enum
                               //!< `acpp`, rest use `cpp`?
 
 int acpp_traditional = FALSE; //!< flag, pseudoboolean. (Could be increased by being passed several times)
+char* aligndir;               //!< Set to comp_host_root + "lib/align" and not used
 int G_flag = FALSE;           //!< flag, boolean. Whether "-G" has been passed
 int dn_flag = FALSE;          //!< flag, boolean. Enable static linking over the default dynamic linking. Set by "-dn"
+int docpp;                    //!< flag, boolean. Whether to use the preprocessor?
+int default_nocpp;            //!< flag, boolean
+unsigned int j;               // Looks like a normal index variable, but is global bss for some reason
 int edison_cpp = 1;           //!< set and not used
 
 typedef enum EdisonType {
@@ -738,10 +635,46 @@ int edison_type = EDISON_TYPE_1; //!< Uses `EdisonType` enum. Set based on `ansi
 
 int exception_handling = FALSE; //!< flag, boolean. Whether to use exception handling in C++.
 char* Gnum = "0";               //!< argument to pass with "-G"
+char* tstring;                //!< Used as the first argument of relocate_passes()
+char* hstring;                //!< Used as the second argument of relocate_passes()
+char* Bstring;                //!< Used as the third argument of relocate_passes()
+const char* allBstring;       //!< Sometimes set in relocate_passes()
+char alltstring[20];          //!< Used in relocate_passes()
+char* Warg;
+char* Wpass;
+char* Kpass;  // Start of current "-K" argument
+char Karg[6]; // Current "-K" argument
+char Hchar;
 int runerror = 0;               //!< number of errors triggered
+int retcode;
 int uload = FALSE;              //!< flag, boolean. Whether to run `uld` after compiling all files. Set by -O>=3
 int uldobj_place = -1;          //!< Index into the `objfiles` list where the output of `uld` is?
 char* tmp_uldobj = NULL;
+char* outfile;
+char* passin;
+char* passout;
+char* errout;
+char* symtab;
+char* uopt0str;
+char* ddoptstr;
+char* optstr;
+char* gentmp;
+char* binasm;
+char* uoutfile;
+char* lpi_st;
+char* lpi_p1;
+char* lpi_dd;
+char* lpi_pd;
+char* linkorder;
+UNK_TYPE valuesstr;
+UNK_TYPE tmp_elfobj;
+FILE* ldw_file;
+FILE* tmpsfile;
+
+char* editor;
+char* xserver;
+int times_edited;
+int edit_cnt_max;
 
 typedef enum ChipTarget {
     /* -1 */ CHIP_TARGET_UNSET = -1,
@@ -751,19 +684,54 @@ typedef enum ChipTarget {
 } ChipTarget;
 
 int chip_targ = CHIP_TARGET_UNSET; //!< "Chip target", uses `ChipTarget` enum.
+char srcsuf;
+int tmpst;
 
 int nobjs = 0;             //!< Number of output objects?
 int targetsex = BIGENDIAN; //!< Endianness, constants from sex.h (yes really).
+char* comp_target_root;
+char* comp_host_root;
+char* systype;
+int nonshared;
 int default_svr4 = FALSE;  //!< flag, boolean. Set by environment variable "SGI_SVR4"
 int irix4 = FALSE; //!< flag, boolean. Whether to use irix4 libraries etc. Set by `-irix4` or environment variable
                    //!< "SGI_IRIX4"
 char* runlib = "/";
 char* runlib_base = "/";
-static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, 0x1900 };
+char* tmpdir;
+char* rls_id_object;
+char* progname; //!< Path of this executable, used to determine `compiler`
+char* currcomp;
+char* compdirs[7];          // might also be a struct?
+
+typedef enum Compiler {
+    /* 1 */ COMPILER_1 = 1, // C
+    /* 2 */ COMPILER_2,     // Pascal
+    /* 3 */ COMPILER_3,     // FORTRAN
+    /* 4 */ COMPILER_4,     // Assembler
+    /* 5 */ COMPILER_5,     // PL1
+    /* 6 */ COMPILER_6      // COBOL
+} Compiler;
+
+int compiler;
+
+char* tempstr[34];          // Possibly a struct?
+
+static prmap_sgi_t B_1000CAC0[100];
+static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, sizeof(B_1000CAC0) };
+
 static char* D_1000C1D0 = NULL; // full path of current working directory
 int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
-static char* D_1000C1D8 = NULL;
-static char* D_1000C1DC = NULL;
+
+static int B_1000EC98[2]; // pipe
+
+// (these feel like in-function statics but I can't get that to match wrt bss reordering)
+static char* D_1000C1D8 = NULL; // progname
+static char* D_1000C1DC = NULL; // progname space padding
+
+static char* B_1000ECCC; // outfile
+static char* B_1000ECDC; // cmdline
+
 
 typedef enum ErrorCategory {
     /* 0 */ ERRORCAT_INTERNAL, // Unused
@@ -8799,16 +8767,6 @@ void get_host_chiptype(void) {
 
 // function error # 7
 
-// Error message types
-static const char* D_1000C1E0[] = {
-    "Internal", // ERRORCAT_INTERNAL
-    "Error",    // ERRORCAT_ERROR
-    "Warning",  // ERRORCAT_WARNING
-    "Info",     // ERRORCAT_INFO
-    "Fix",      // ERRORCAT_FIX
-    "",         // ERRORCAT_ERRNO
-};
-
 #ifndef PERMUTER
 
 // Print an error. Has to be K&R for the variadic stuff to work in other functions
@@ -8828,6 +8786,16 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
     int argB;
 // clang-format on
 {
+    // Error message types
+    static const char* D_1000C1E0[] = {
+        "Internal", // ERRORCAT_INTERNAL
+        "Error",    // ERRORCAT_ERROR
+        "Warning",  // ERRORCAT_WARNING
+        "Info",     // ERRORCAT_INFO
+        "Fix",      // ERRORCAT_FIX
+        "",         // ERRORCAT_ERRNO
+    };
+
     int len;
     int i;
 
@@ -9828,14 +9796,8 @@ void mklist(list* arg0) {
 }
 
 // function addstr # 14
-// Add a single string entry to a list. K&R since incorrectly called.
-// void addstr(list* arg0, char* str) {
-void addstr(arg0, str)
-    // clang-format off
-list* arg0;
-char* str;
-// clang-format on
-{
+// Add a single string entry to a list.
+void addstr(list* arg0, char* str) {
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14595, "out of memory\n");
@@ -10221,6 +10183,8 @@ char* savestr(const char* src, size_t extra_length) {
     strcpy(dest, src);
     return dest;
 }
+
+static char pad0, pad1, pad2;
 
 // function mktempstr # 25
 void mktempstr(void) {
@@ -10735,8 +10699,11 @@ void whats(void) {
     printf("\tMips Computer Systems %d.%d\n", 7, 10);
 }
 
+int time0;
+struct tms tm0;
+
 // function settimes # 33
-void settimes(void) {
+void settimes() {
     time0 = times(&tm0);
 }
 
@@ -10843,6 +10810,8 @@ int regular_file(const char* path) {
     return 1;
 }
 
+static char B_1000E5E0[0x400];
+
 // function basename # 39
 // Obtain the base name of a file path, i.e. the part after the final '/'
 char* basename(const char* path) {
@@ -10938,10 +10907,6 @@ prod_name[] = {
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
 };
 
-static char* D_1000C2E8 = NULL;
-static char* D_1000C2EC = NULL;
-static char* D_1000C2F0 = NULL; // basename of progname (?)
-
 // function func_00430414 # 41
 static const char* func_00430414(char* arg0, int arg1) {
     int i;
@@ -11029,6 +10994,10 @@ int add_cxx_symbol_options(void) {
     }
     return 0;
 }
+
+static char* D_1000C2E8 = NULL;
+static char* D_1000C2EC = NULL;
+static char* D_1000C2F0 = NULL; // basename of progname (?)
 
 // function init_curr_dir # 45
 // Sets D_1000C2F0 to current executable's basename and D_1000C1D0 to the current working directiory
