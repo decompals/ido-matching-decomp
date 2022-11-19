@@ -151,9 +151,9 @@ $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
 
 
-cc.elf: $(O_FILES)
+cc.elf: $(O_FILES) lib/indy/dev/lib/libc.so.1
 	rm -f cc.elf
-	$$(which qemu-irixn32) -silent -L ../ido-static-recomp/ido/7.1 ../ido-static-recomp/ido/7.1/usr/lib/ld    -elf -o cc.elf -_SYSTYPE_SVR4 -require_dynamic_link _rld_new_interface -no_unresolved -Wx,-G 0 -mips2 -call_shared -g0 -KPIC -Ltools/recomp/ido/7.1/usr/lib -nocount ../cd/ido71/usr/lib/crt1.o -count build/src/7.1/cc/cc.o build/src/7.1/mld/sex.o -nocount -lc build/src/7.1/releaseid.o ../cd/ido71/usr/lib/crtn.o
+	$$(which qemu-irixn32) -silent -L ../ido-static-recomp/ido/7.1 ../ido-static-recomp/ido/7.1/usr/lib/ld    -elf -o cc.elf -_SYSTYPE_SVR4 -require_dynamic_link _rld_new_interface -no_unresolved -Wx,-G 0 -mips2 -call_shared -g0 -KPIC -Llib/indy/dev/lib -nocount lib/indy/dev/usr/lib/crt1.o -count build/src/7.1/cc/cc.o build/src/7.1/mld/sex.o -nocount -lc build/src/7.1/releaseid.o lib/indy/dev/usr/lib/crtn.o
 	$$(which qemu-irixn32) -silent -L ../ido-static-recomp/ido/7.1 ../ido-static-recomp/ido/7.1/usr/lib/strip cc.elf
 
 diff: cc.elf

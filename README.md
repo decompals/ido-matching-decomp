@@ -46,3 +46,4 @@ Diff: `./diff.py -mwob --objfile build/src/7.1/cc/cc.o main`
 ## Sources
 
 - `lib/indy/dev/usr/lib/crt{1,n}.o` are from `IRISDevelopmentOption7.1.1forIRIX6.4_02-97_812-0625-002.iso`
+- `lib/indy/dev/lib/libc.so.1` is from IRIX 6.4.
