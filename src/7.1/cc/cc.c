@@ -80,7 +80,7 @@ void show_err(const char* path);
 void handler(void);
 void cleanup(void);
 void whats(void);
-void settimes(void);
+// settimes
 void dotime(const char* programName);
 static char* func_0042FD7C(const char* name, char** dirs);
 int isdir(const char* path);
@@ -10255,6 +10255,9 @@ void mktempstr(void) {
     }
 }
 
+// Here for the sake of bss reordering
+void settimes(void);
+
 // function run # 26
 int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     char* const* spA4;
@@ -11685,9 +11688,3 @@ static char* func_00433534(const char* arg0) {
 
     return ret;
 }
-
-/* File boundary, -O2 */
-
-// gethostsex
-
-//#pragma GLOBAL_ASM("asm/7.1/functions/cc/__Release_ID.s")
