@@ -22,6 +22,7 @@
 #include "string.h"
 #include "malloc.h"
 
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -80,7 +81,7 @@ void show_err(const char* path);
 void handler(void);
 void cleanup(void);
 void whats(void);
-// settimes
+void settimes(void);
 void dotime(const char* programName);
 static char* func_0042FD7C(const char* name, char** dirs);
 int isdir(const char* path);
@@ -10205,7 +10206,7 @@ char* savestr(const char* src, size_t extra_length) {
 }
 
 //! FAKE: bss-shifting padding
-static char bss_pad0, bss_pad1, bss_pad2;
+static char bss_pad0, bss_pad1;
 
 // function mktempstr # 25
 void mktempstr(void) {
@@ -10254,9 +10255,6 @@ void mktempstr(void) {
         tempstr[32] = NULL;
     }
 }
-
-// Here for the sake of bss reordering
-void settimes(void);
 
 // function run # 26
 int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
