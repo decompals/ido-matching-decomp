@@ -11658,7 +11658,7 @@ void record_static_fileset(const char* arg0) {
     free(fullpath);
     rewind(file);
     rewind(temp_file);
-    ftruncate(file->_file, 0);
+    ftruncate(fileno(file), 0);
 
     while ((sp28E4 = fread(contents_buf, 1, CONTENTS_BUF_SIZE, temp_file)) > 0) {
         if ((int)fwrite(&contents_buf, 1, sp28E4, file) != sp28E4) {
