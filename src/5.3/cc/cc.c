@@ -123,9 +123,6 @@ typedef enum {
     /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
 } ErrorCategory;
 
-void error(); // Called incorrectly
-// void error(ErrorCategory category, const char* arg1, int arg2, const char* arg3, int arg4, const char* fmt, ...);
-
 typedef enum {
     /* 1 */ SUF_1 = 1, // PL/1
     /* 2 */ SUF_2,     // COBOL
@@ -139,7 +136,7 @@ typedef enum {
 // This has been totally refactored in Open64
 struct _struct_suffixes_0x8 {
     /* 0x0 */ const char* name; // suffix as a string
-    /* 0x4 */ Suffix suffix;    // single-char code
+    /* 0x4 */ int suffix;       // single-char code
 };                              // size = 0x8
 
 typedef enum {
@@ -209,51 +206,79 @@ typedef enum {
     /* 3 */ EDISON_TYPE_3
 } EdisonType;
 
-void get_host_chiptype(void);
+#if __STDC_VERSION__ >= 201112L
+#include <stdnoreturn.h>
+extern noreturn void exit(int);
+#endif
+
+int main(int argc, char** argv);
 void process_config(int argc, char** argv);
 void add_info(char* s);
 void parse_command(int argc, char** argv);
+void get_host_chiptype(void);
+// error
 void relocate_passes(const char* arg0, const char* arg1, char* arg2);
 void newrunlib(void);
-char getsuf(const /* string */ char* path);
-char* mksuf(const char* path, char value);
-/* string */ char* full_path(const /* string */ char* base);
-void add_static_opt(/* string */ char* opt);
 void compose_G0_libs(const char* arg0);
-int regular_file(const char*);
+void compose_reg_libs(const char* arg0);
+// mkstr
 void mklist(string_list* list);
-// Called incorrectly so cannot use prototype
-void addstr();
-// void addstr(string_list* list, string str);
-
-void show_err(const char* path);
-void whats(void);
-void init_curr_dir(void);
-void record_static_fileset(const char* arg0);
-void add_prelinker_objects(string_list* execlist, string_list* list);
-void save_off_command_line(int argc, char** argv);
-char* make_ii_file_name(char* objname);
-void update_instantiation_info_file(char* objname);
-
+// addstr
 void addspacedstr(string_list* list, char* str);
 char* newstr(char* s);
+int save_place(string_list* list);
 void set_place(string_list* list, char* str, int place);
 void addlist(string_list* a, string_list* b);
 void adduldlist(string_list* a, string_list* b, string_list* c);
-void mktempstr(void);
-void cleanup(void);
-char* mkstr();
+int nodup(string_list* list, const /* string */ char* s);
+char getsuf(const /* string */ char* path);
+char* mksuf(const char* path, char value);
 /* string */ char* savestr(const /* string */ char* src, size_t extra_length);
-void handler(void);
+void mktempstr(void);
+int run(char* name, char* const argv[], char* input, char* output, char* err_output);
+int edit_src(const char* program, const char* srcpath, int lino_mode);
 void get_lino(char* lino, const char* path, int mode);
+void show_err(const char* path);
+void handler(void);
+void cleanup(void);
+void whats(void);
 void settimes(void);
 void dotime(void);
 static char* func_004339C8(char* name, char** dirs);
-static void func_00436680(void);
-static void func_0043673C(char* phase, int num_maps);
+boolean isdir(const char* path);
+int regular_not_writeable(const char* path);
+int regular_file(const char* path);
+char* basename(char* const s);
+char* dirname(char* const s);
 static const char* func_00434094(const char* path, int check_full_path);
+int add_cxx_symbol_options(void);
+void init_curr_dir(void);
+/* string */ char* full_path(const /* string */ char* base);
+void add_static_opt(/* string */ char* opt);
+void record_static_fileset(const char* arg0);
+int touch(const char* path);
+void add_prelinker_objects(string_list* execlist, string_list* list);
+/* size_t */ int quoted_length(char* p, /* boolean */ int* quoted);
+/* size_t */ int quote_shell_arg(/* string */ char* p, /* string */ char* buf);
+void save_off_command_line(int argc, char** argv);
+void skip_old_ii_controls(FILE* f);
+char* make_ii_file_name(char* objname);
+void update_instantiation_info_file(char* objname);
 static int func_004362CC(pid_t pid);
 static void func_004365B8(void);
+static void func_00436680(void);
+static void func_0043673C(char* phase, int num_maps);
+
+// Functions which cannot use proper prototypes
+#if 0
+void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
+char* mkstr(const char*, ...);
+void addstr(string_list* arg0, char* str);
+#else
+void error();  // variadic but not defined as such
+char* mkstr(); // old-style varargs
+void addstr(); // sometimes called incorrectly
+#endif
 
 // bss
 
@@ -263,7 +288,7 @@ static void func_004365B8(void);
 // 0x4 padding
 /* 0x040C18 0x10009C18  381 3623 */ struct tms tm0;
 /* 0x040C28 0x10009C28  382 3627 */ char perr_msg[0x100];          // char perr_msg[0x100];
-/* 0x040D28 0x10009D28 None None */ static char B_10009D28[0x400]; // "dirbuf"/"basebuf", likely declared above `basename`
+/* 0x040D28 0x10009D28 None None */ static char B_10009D28[0x400]; // "dirbuf"/"basebuf", declared above `basename`?
 /* 0x041128 0x1000A128  383 3636 */ int plain_g;
 /* 0x04112C 0x1000A12C  384 3644 */ int plain_O;
 /* 0x041130 0x1000A130  385 3652 */ int noaliasokflag;
@@ -2163,7 +2188,8 @@ int main(int argc, char** argv) {
         if ((systype != NULL) && !irix4) {
             var_s1 = systype;
             while (*var_s1 != '\0') {
-                *var_s1++ = toupper(*var_s1);
+                *var_s1 = toupper(*var_s1);
+                var_s1++;
             }
             if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, mkstr("-DSYSTYPE_", systype, NULL));
@@ -2368,7 +2394,8 @@ int main(int argc, char** argv) {
             if (systype != NULL) {
                 var_s1 = systype;
                 while (*var_s1 != '\0') {
-                    *var_s1++ = toupper(*var_s1);
+                    *var_s1 = toupper(*var_s1);
+                    var_s1++;
                 }
             } else {
                 addstr(&execlist, "-D_SYSTYPE_SVR4");
@@ -5835,7 +5862,7 @@ void parse_command(int argc, char** argv) {
                             unsigned long sp124;
                             char* sp120;
                             sp124 = strtoul(argv[var_s0 + 1], &sp120, 16);
-                            if (((sp120 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
+                            if (((size_t)(sp120 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
                                 ((sp124 == 0) && (argv[var_s0 + 1] == sp120)) || (argv[var_s0 + 1][0] == '-') ||
                                 (argv[var_s0 + 1][0] == '+')) {
                                 error(2, 0, 0, 0, 0, "-D taken as empty cpp -D, not ld(1) -D hexnum\n");
@@ -6577,7 +6604,8 @@ void parse_command(int argc, char** argv) {
                                                         char* sp110;
 
                                                         sp114 = strtoul(argv[var_s0 + 1], &sp110, 16);
-                                                        if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
+                                                        if (((size_t)(sp110 - argv[var_s0 + 1]) !=
+                                                             strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
                                                             (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
                                                             error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
@@ -8983,6 +9011,8 @@ void parse_command(int argc, char** argv) {
 void get_host_chiptype(void) {
 }
 
+#ifndef PERMUTER
+
 /* 0x037448 0x10000448 None None */ static const char* D_10000448[] = {
     "Internal", "Error", "Warning", "Info", "Fix", "",
 }; // Error category strings
@@ -9004,12 +9034,12 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
     const char* arg3;
     int arg4;
     const char* fmt;
-    void* arg6;
-    void* arg7;
-    void* arg8;
-    void* arg9;
-    void* argA;
-    void* argB;
+    int arg6;
+    int arg7;
+    int arg8;
+    int arg9;
+    int argA;
+    int argB;
 // clang-format on
 {
     int sp34;
@@ -9065,6 +9095,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
     }
     fprintf(stderr, fmt, arg6, arg7, arg8, arg9, argA, argB);
 }
+#endif
 
 // Macros for common selections of these three programs
 #define CPP_MACRO (((cppchoice != CPP_CHOICE_1) && (cppchoice != CPP_CHOICE_3)) ? "cpp" : "acpp")
@@ -9124,7 +9155,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
  */
 void relocate_passes(const char* arg0, const char* arg1, char* arg2) {
     register int pad;
-    register char* p;
+    register const char* p;
 
     currcomp = "";
     if (arg2 == NULL) {
@@ -10611,14 +10642,14 @@ void mktempstr(void) {
  */
 int run(char* name, char* const argv[], char* input, char* output, char* err_output) {
     char* const* p;       // spA4
-    int forkpid;          // spA0
+    pid_t forkpid;        // spA0
     int waitpid;          // sp9C
     int termsig;          // sp98
     int fdin;             // sp94
     int fdout;            // sp90
     int fderr;            // sp8C
-    int sigterm;          // sp88
-    int sigint;           // sp84
+    SIG_PF sigterm;       // sp88
+    SIG_PF sigint;        // sp84
     int waitstatus;       // sp80
     int num_maps;         // sp7C
     const char* prodname; // sp78
@@ -10827,8 +10858,8 @@ int edit_src(const char* program, const char* srcpath, int lino_mode) {
     pid_t forkpid;   // sp54
     int waitpid;     // sp50
     int termsig;     // sp4C
-    int sigterm;     // sp48
-    int sigint;      // sp44
+    SIG_PF sigterm;  // sp48
+    SIG_PF sigint;   // sp44
     int waitstatus;  // sp40
 
     forkpid = fork();
@@ -11630,7 +11661,7 @@ void record_static_fileset(const char* arg0) {
     ftruncate(file->_file, 0);
 
     while ((sp28E4 = fread(contents_buf, 1, CONTENTS_BUF_SIZE, temp_file)) > 0) {
-        if (fwrite(&contents_buf, 1, sp28E4, file) != sp28E4) {
+        if ((int)fwrite(&contents_buf, 1, sp28E4, file) != sp28E4) {
             error(ERRORCAT_ERROR, NULL, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n",
                   D_10000550);
             perror(D_10000558);

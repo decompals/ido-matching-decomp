@@ -52,6 +52,7 @@ typedef struct {
 extern noreturn void exit(int);
 #endif
 
+// main
 void process_config(int argc, char** argv);
 void add_info(char* str);
 void parse_command(int argc, char** argv);
@@ -10122,6 +10123,7 @@ char* mksuf(const char* path, char value) {
         }
 
         if (new_suf == NULL) {
+            //! @bug: %s used for printing a char.
             error(ERRORCAT_INTERNAL, NULL, 0, "mksuf ()", 14938, "passed an unknown suffix value: %s\n", value);
             exit(4);
         }
