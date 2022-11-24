@@ -257,443 +257,444 @@ static void func_004365B8(void);
 
 // bss
 
-/* 03F310 10008310 */ static prmap_sgi_t B_10008310[100]; // equivalent of B_1000CAC0, "mapbuf"
-/* 040C10 10009C10 */ clock_t time0;
+/* VROM     Address   dynsym dynstr */
+/* 0x03F310 0x10008310 None None */ static prmap_sgi_t B_10008310[100]; // equivalent of B_1000CAC0, "mapbuf"
+/* 0x040C10 0x10009C10  380 3617 */ clock_t time0;
 // 0x4 padding
-/* 040C18 10009C18 */ struct tms tm0;
-/* 040C28 10009C28 */ char perr_msg[0x100];          // char perr_msg[0x100];
-/* 040D28 10009D28 */ static char B_10009D28[0x400]; // "dirbuf"/"basebuf", likely declared above `basename`
-/* 041128 1000A128 */ int plain_g;
-/* 04112C 1000A12C */ int plain_O;
-/* 041130 1000A130 */ int noaliasokflag;
-/* 041134 1000A134 */ int haspl1;
-/* 041138 1000A138 */ UNK_TYPE p2cstr;
-/* 04113C 1000A13C */ int align;
-/* 041140 1000A140 */ int align_common;
-/* 041144 1000A144 */ char* alignarg;
-/* 041148 1000A148 */ int use_real_fp;
-/* 04114C 1000A14C */ int dollar_sign;
-/* 041150 1000A150 */ int mp_flag;
-/* 041154 1000A154 */ int mp_onetripflag;
-/* 041158 1000A158 */ UNK_TYPE mp_staticflag;
-/* 04115C 1000A15C */ int mp_dlinesflag;
-/* 041160 1000A160 */ int mp_caseflag;
-/* 041164 1000A164 */ int mp_66flag;
-/* 041168 1000A168 */ int mp_i2flag;
-/* 04116C 1000A16C */ int mp_col120flag;
-/* 041170 1000A170 */ int mp_extendflag;
-/* 041174 1000A174 */ int mp_uflag;
-/* 041178 1000A178 */ int mp_backslashflag;
-/* 04117C 1000A17C */ UNK_TYPE mp_uniq_specified;
-/* 041180 1000A180 */ UNK_TYPE mp_passes_relocated;
-/* 041184 1000A184 */ int default_template_instantiation_mode;
-/* 041188 1000A188 */ int cmp_flag;
-/* 04118C 1000A18C */ UNK_TYPE efl;
-/* 041190 1000A190 */ char* ratfor;
-/* 041194 1000A194 */ char* m4;
-/* 041198 1000A198 */ int fullwarn;
-/* 04119C 1000A19C */ char* aligndir;
-/* 0411A0 1000A1A0 */ int docpp;
-/* 0411A4 1000A1A4 */ int default_nocpp;
-/* 0411A8 1000A1A8 */ unsigned int j;
-/* 0411AC 1000A1AC */ char* tstring;
-/* 0411B0 1000A1B0 */ char* hstring;
-/* 0411B4 1000A1B4 */ char* Bstring;
-/* 0411B8 1000A1B8 */ char* allBstring;
+/* 0x040C18 0x10009C18  381 3623 */ struct tms tm0;
+/* 0x040C28 0x10009C28  382 3627 */ char perr_msg[0x100];          // char perr_msg[0x100];
+/* 0x040D28 0x10009D28 None None */ static char B_10009D28[0x400]; // "dirbuf"/"basebuf", likely declared above `basename`
+/* 0x041128 0x1000A128  383 3636 */ int plain_g;
+/* 0x04112C 0x1000A12C  384 3644 */ int plain_O;
+/* 0x041130 0x1000A130  385 3652 */ int noaliasokflag;
+/* 0x041134 0x1000A134  386 3666 */ int haspl1;
+/* 0x041138 0x1000A138   29  265 */ UNK_TYPE p2cstr;
+/* 0x04113C 0x1000A13C  387 3673 */ int align;
+/* 0x041140 0x1000A140  388 3679 */ int align_common;
+/* 0x041144 0x1000A144  389 3692 */ char* alignarg;
+/* 0x041148 0x1000A148  390 3701 */ int use_real_fp;
+/* 0x04114C 0x1000A14C  391 3713 */ int dollar_sign;
+/* 0x041150 0x1000A150  392 3725 */ int mp_flag;
+/* 0x041154 0x1000A154  393 3733 */ int mp_onetripflag;
+/* 0x041158 0x1000A158   30  272 */ UNK_TYPE mp_staticflag;
+/* 0x04115C 0x1000A15C  394 3748 */ int mp_dlinesflag;
+/* 0x041160 0x1000A160  395 3762 */ int mp_caseflag;
+/* 0x041164 0x1000A164  396 3774 */ int mp_66flag;
+/* 0x041168 0x1000A168  397 3784 */ int mp_i2flag;
+/* 0x04116C 0x1000A16C  398 3794 */ int mp_col120flag;
+/* 0x041170 0x1000A170  399 3808 */ int mp_extendflag;
+/* 0x041174 0x1000A174  400 3822 */ int mp_uflag;
+/* 0x041178 0x1000A178  401 3831 */ int mp_backslashflag;
+/* 0x04117C 0x1000A17C   31  286 */ UNK_TYPE mp_uniq_specified;
+/* 0x041180 0x1000A180   32  304 */ UNK_TYPE mp_passes_relocated;
+/* 0x041184 0x1000A184  402 3848 */ int default_template_instantiation_mode;
+/* 0x041188 0x1000A188  403 3884 */ int cmp_flag;
+/* 0x04118C 0x1000A18C   33  324 */ UNK_TYPE efl;
+/* 0x041190 0x1000A190  404 3893 */ char* ratfor;
+/* 0x041194 0x1000A194  405 3900 */ char* m4;
+/* 0x041198 0x1000A198  406 3903 */ int fullwarn;
+/* 0x04119C 0x1000A19C  407 3912 */ char* aligndir;
+/* 0x0411A0 0x1000A1A0  408 3921 */ int docpp;
+/* 0x0411A4 0x1000A1A4  409 3927 */ int default_nocpp;
+/* 0x0411A8 0x1000A1A8  410 3941 */ unsigned int j;
+/* 0x0411AC 0x1000A1AC  411 3943 */ char* tstring;
+/* 0x0411B0 0x1000A1B0  412 3951 */ char* hstring;
+/* 0x0411B4 0x1000A1B4  413 3959 */ char* Bstring;
+/* 0x0411B8 0x1000A1B8  414 3967 */ char* allBstring;
 // 0x4 padding
-/* 0411C0 1000A1C0 */ char alltstring[20];
-/* 0411D4 1000A1D4 */ char* Warg;
-/* 0411D8 1000A1D8 */ char* Wpass;
-/* 0411DC 1000A1DC */ char* Kpass;
-/* 0411E0 1000A1E0 */ char Karg[6];
-/* 0411E6 1000A1E6 */ char Hchar;
-/* 0411E8 1000A1E8 */ int retcode;
-/* 0411EC 1000A1EC */ char* outfile;
-/* 0411F0 1000A1F0 */ char* passin;
-/* 0411F4 1000A1F4 */ char* passout;
-/* 0411F8 1000A1F8 */ char* errout;
-/* 0411FC 1000A1FC */ char* symtab;
-/* 041200 1000A200 */ char* uopt0str;
-/* 041204 1000A204 */ char* ddoptstr;
-/* 041208 1000A208 */ char* optstr;
-/* 04120C 1000A20C */ char* gentmp;
-/* 041210 1000A210 */ char* binasm;
-/* 041214 1000A214 */ char* uoutfile;
-/* 041218 1000A218 */ char* lpi_st;
-/* 04121C 1000A21C */ char* lpi_p1;
-/* 041220 1000A220 */ char* lpi_dd;
-/* 041224 1000A224 */ char* lpi_pd;
-/* 041228 1000A228 */ char* linkorder;
-/* 04122C 1000A22C */ UNK_TYPE valuesstr;
-/* 041230 1000A230 */ UNK_TYPE tmp_elfobj;
-/* 041234 1000A234 */ FILE* ldw_file;
-/* 041238 1000A238 */ FILE* tmpsfile;
-/* 04123C 1000A23C */ char* editor;
-/* 041240 1000A240 */ char* xserver;
-/* 041244 1000A244 */ int times_edited;
-/* 041248 1000A248 */ int edit_cnt_max;
-/* 04124C 1000A24C */ char srcsuf;
-/* 041250 1000A250 */ /* boolean */ int tmpst;
-/* 041254 1000A254 */ char* CRTX;
-/* 041258 1000A258 */ char* MCRTX;
-/* 04125C 1000A25C */ char* comp_target_root;
-/* 041260 1000A260 */ string_list undefineflags;
-/* 04126C 1000A26C */ char* comp_host_root;
-/* 041270 1000A270 */ string_list cppflags;
-/* 04127C 1000A27C */ char* systype;
-/* 041280 1000A280 */ string_list olimitflags;
-/* 04128C 1000A28C */ int nonshared;
-/* 041290 1000A290 */ string_list acppflags;
+/* 0x0411C0 0x1000A1C0  415 3978 */ char alltstring[20];
+/* 0x0411D4 0x1000A1D4  416 3989 */ char* Warg;
+/* 0x0411D8 0x1000A1D8  417 3994 */ char* Wpass;
+/* 0x0411DC 0x1000A1DC  418 4000 */ char* Kpass;
+/* 0x0411E0 0x1000A1E0  419 4006 */ char Karg[6];
+/* 0x0411E6 0x1000A1E6  420 4011 */ char Hchar;
+/* 0x0411E8 0x1000A1E8  421 4017 */ int retcode;
+/* 0x0411EC 0x1000A1EC  422 4025 */ char* outfile;
+/* 0x0411F0 0x1000A1F0  423 4033 */ char* passin;
+/* 0x0411F4 0x1000A1F4  424 4040 */ char* passout;
+/* 0x0411F8 0x1000A1F8  425 4048 */ char* errout;
+/* 0x0411FC 0x1000A1FC  426 4055 */ char* symtab;
+/* 0x041200 0x1000A200  427 4062 */ char* uopt0str;
+/* 0x041204 0x1000A204  428 4071 */ char* ddoptstr;
+/* 0x041208 0x1000A208  429 4080 */ char* optstr;
+/* 0x04120C 0x1000A20C  430 4087 */ char* gentmp;
+/* 0x041210 0x1000A210  431 4094 */ char* binasm;
+/* 0x041214 0x1000A214  432 4101 */ char* uoutfile;
+/* 0x041218 0x1000A218  433 4110 */ char* lpi_st;
+/* 0x04121C 0x1000A21C  434 4117 */ char* lpi_p1;
+/* 0x041220 0x1000A220  435 4124 */ char* lpi_dd;
+/* 0x041224 0x1000A224  436 4131 */ char* lpi_pd;
+/* 0x041228 0x1000A228  437 4138 */ char* linkorder;
+/* 0x04122C 0x1000A22C   34  328 */ UNK_TYPE valuesstr;
+/* 0x041230 0x1000A230   35  338 */ UNK_TYPE tmp_elfobj;
+/* 0x041234 0x1000A234  438 4148 */ FILE* ldw_file;
+/* 0x041238 0x1000A238  439 4157 */ FILE* tmpsfile;
+/* 0x04123C 0x1000A23C  440 4166 */ char* editor;
+/* 0x041240 0x1000A240  441 4173 */ char* xserver;
+/* 0x041244 0x1000A244  442 4181 */ int times_edited;
+/* 0x041248 0x1000A248  443 4194 */ int edit_cnt_max;
+/* 0x04124C 0x1000A24C  444 4207 */ char srcsuf;
+/* 0x041250 0x1000A250  445 4214 */ /* boolean */ int tmpst;
+/* 0x041254 0x1000A254  446 4220 */ char* CRTX;
+/* 0x041258 0x1000A258  447 4225 */ char* MCRTX;
+/* 0x04125C 0x1000A25C  448 4231 */ char* comp_target_root;
+/* 0x041260 0x1000A260  449 4248 */ string_list undefineflags;
+/* 0x04126C 0x1000A26C  450 4262 */ char* comp_host_root;
+/* 0x041270 0x1000A270  451 4277 */ string_list cppflags;
+/* 0x04127C 0x1000A27C  452 4286 */ char* systype;
+/* 0x041280 0x1000A280  453 4294 */ string_list olimitflags;
+/* 0x04128C 0x1000A28C  454 4306 */ int nonshared;
+/* 0x041290 0x1000A290  455 4316 */ string_list acppflags;
 // 0x4 padding
-/* 0412A0 1000A2A0 */ string_list mpcflags;
+/* 0x0412A0 0x1000A2A0  456 4326 */ string_list mpcflags;
 // 0x4 padding
-/* 0412B0 1000A2B0 */ string_list accomflags;
+/* 0x0412B0 0x1000A2B0  457 4335 */ string_list accomflags;
 // 0x4 padding
-/* 0412C0 1000A2C0 */ string_list cfeflags;
+/* 0x0412C0 0x1000A2C0  458 4346 */ string_list cfeflags;
 // 0x4 padding
-/* 0412D0 1000A2D0 */ string_list cpp2flags;
+/* 0x0412D0 0x1000A2D0  459 4355 */ string_list cpp2flags;
 // 0x4 padding
-/* 0412E0 1000A2E0 */ string_list uldlibflags;
+/* 0x0412E0 0x1000A2E0  460 4365 */ string_list uldlibflags;
 // 0x4 padding
-/* 0412F0 1000A2F0 */ string_list edisonflags;
-/* 0412FC 1000A2FC */ char* tmpdir;
-/* 041300 1000A300 */ string_list prelinkerflags;
-/* 04130C 1000A30C */ char* rls_id_object;
-/* 041310 1000A310 */ string_list ccomflags;
-/* 04131C 1000A31C */ char* progname;
-/* 041320 1000A320 */ string_list upasflags;
-/* 04132C 1000A32C */ char* currcomp;
-/* 041330 1000A330 */ string_list fcomflags;
+/* 0x0412F0 0x1000A2F0  461 4377 */ string_list edisonflags;
+/* 0x0412FC 0x1000A2FC  462 4389 */ char* tmpdir;
+/* 0x041300 0x1000A300  463 4396 */ string_list prelinkerflags;
+/* 0x04130C 0x1000A30C  464 4411 */ char* rls_id_object;
+/* 0x041310 0x1000A310  465 4425 */ string_list ccomflags;
+/* 0x04131C 0x1000A31C  466 4435 */ char* progname;
+/* 0x041320 0x1000A320  467 4444 */ string_list upasflags;
+/* 0x04132C 0x1000A32C  468 4454 */ char* currcomp;
+/* 0x041330 0x1000A330  469 4463 */ string_list fcomflags;
 // 0x4 padding
-/* 041340 1000A340 */ char* compdirs[7];
+/* 0x041340 0x1000A340  470 4473 */ char* compdirs[7];
 // 0x4 padding
-/* 041360 1000A360 */ string_list eflflags;
-/* 04136C 1000A36C */ Compiler compiler;
-/* 041370 1000A370 */ string_list ratforflags;
+/* 0x041360 0x1000A360  471 4482 */ string_list eflflags;
+/* 0x04136C 0x1000A36C  472 4491 */ Compiler compiler;
+/* 0x041370 0x1000A370  473 4500 */ string_list ratforflags;
 // 0x4 padding
-/* 041380 1000A380 */ char* tempstr[34];
-/* 041408 1000A408 */ string_list upl1flags;
+/* 0x041380 0x1000A380  474 4512 */ char* tempstr[34];
+/* 0x041408 0x1000A408  475 4520 */ string_list upl1flags;
 // 0x4 padding
-/* 041418 1000A418 */ string_list ucobflags;
+/* 0x041418 0x1000A418  476 4530 */ string_list ucobflags;
 // 0x4 padding
-/* 041428 1000A428 */ string_list ulpiflags;
+/* 0x041428 0x1000A428  477 4540 */ string_list ulpiflags;
 // 0x4 padding
-/* 041438 1000A438 */ string_list ujoinflags;
+/* 0x041438 0x1000A438  478 4550 */ string_list ujoinflags;
 // 0x4 padding
-/* 041448 1000A448 */ string_list uldflags;
+/* 0x041448 0x1000A448  479 4561 */ string_list uldflags;
 // 0x4 padding
-/* 041458 1000A458 */ static int B_1000A458[2]; // Pipe
-/* 041460 1000A460 */ string_list usplitflags;
+/* 0x041458 0x1000A458 None None */ static int B_1000A458[2]; // Pipe
+/* 0x041460 0x1000A460  480 4570 */ string_list usplitflags;
 // 0x4 padding
-/* 041470 1000A470 */ string_list umergeflags;
+/* 0x041470 0x1000A470  481 4582 */ string_list umergeflags;
 // 0x4 padding
-/* 041480 1000A480 */ string_list uloopflags;
-/* 04148C 1000A48C */ static char* B_1000A48C; // string containing most arguments "command_line"
-/* 041490 1000A490 */ string_list uopt0flags;
-/* 04149C 1000A49C */ static char* B_1000A49C; // string containing last "-o" argument ("outfile")
-/* 0414A0 1000A4A0 */ string_list ddoptflags;
+/* 0x041480 0x1000A480  482 4594 */ string_list uloopflags;
+/* 0x04148C 0x1000A48C None None */ static char* B_1000A48C; // string containing most arguments "command_line"
+/* 0x041490 0x1000A490  483 4605 */ string_list uopt0flags;
+/* 0x04149C 0x1000A49C None None */ static char* B_1000A49C; // string containing last "-o" argument ("outfile")
+/* 0x0414A0 0x1000A4A0  484 4616 */ string_list ddoptflags;
 // 0x4 padding
-/* 0414B0 1000A4B0 */ string_list optflags;
+/* 0x0414B0 0x1000A4B0  485 4627 */ string_list optflags;
 // 0x4 padding
-/* 0414C0 1000A4C0 */ string_list genflags;
+/* 0x0414C0 0x1000A4C0  486 4636 */ string_list genflags;
 // 0x4 padding
-/* 0414D0 1000A4D0 */ string_list asflags;
+/* 0x0414D0 0x1000A4D0  487 4645 */ string_list asflags;
 // 0x4 padding
-/* 0414E0 1000A4E0 */ string_list ldflags;
+/* 0x0414E0 0x1000A4E0  488 4653 */ string_list ldflags;
 // 0x4 padding
-/* 0414F0 1000A4F0 */ string_list as1flags;
+/* 0x0414F0 0x1000A4F0  489 4661 */ string_list as1flags;
 // 0x4 padding
-/* 041500 1000A500 */ string_list ftocflags;
+/* 0x041500 0x1000A500  490 4670 */ string_list ftocflags;
 // 0x4 padding
-/* 041510 1000A510 */ string_list cordflags;
+/* 0x041510 0x1000A510  491 4680 */ string_list cordflags;
 // 0x4 padding
-/* 041520 1000A520 */ string_list srcfiles;
+/* 0x041520 0x1000A520  492 4690 */ string_list srcfiles;
 // 0x4 padding
-/* 041530 1000A530 */ string_list ufiles;
+/* 0x041530 0x1000A530  493 4699 */ string_list ufiles;
 // 0x4 padding
-/* 041540 1000A540 */ string_list objfiles;
+/* 0x041540 0x1000A540  494 4706 */ string_list objfiles;
 // 0x4 padding
-/* 041550 1000A550 */ string_list feedlist;
+/* 0x041550 0x1000A550  495 4715 */ string_list feedlist;
 // 0x4 padding
-/* 041560 1000A560 */ string_list execlist;
-/* 04156C 1000A56C */ static int B_1000A56C;
-/* 041570 1000A570 */ static int B_1000A570;
-/* 041578 1000A578 */ string_list dirs_for_crtn;
+/* 0x041560 0x1000A560  496 4724 */ string_list execlist;
+/* 0x04156C 0x1000A56C None None */ static int B_1000A56C;
+/* 0x041570 0x1000A570 None None */ static int B_1000A570;
+/* 0x041578 0x1000A578  497 4733 */ string_list dirs_for_crtn;
 // 0x4 padding
-/* 041588 1000A588 */ string_list dirs_for_nonshared_crtn;
+/* 0x041588 0x1000A588  498 4747 */ string_list dirs_for_nonshared_crtn;
 // 0x4 padding
-/* 041598 1000A598 */ string_list dirs_for_abi_crtn;
+/* 0x041598 0x1000A598  499 4771 */ string_list dirs_for_abi_crtn;
 // 0x4 padding
-/* 0415A8 1000A5A8 */ string_list ldZflags;
-/* 0415B4 1000A5B4 */ static int B_1000A5B4;
-/* 0415B8 1000A5B8 */ string_list pfaflags;
-/* 0415C4 1000A5C4 */ char* pfa;
-/* 0415C8 1000A5C8 */ char* libI77_mp;
+/* 0x0415A8 0x1000A5A8  500 4789 */ string_list ldZflags;
+/* 0x0415B4 0x1000A5B4 None None */ static int B_1000A5B4;
+/* 0x0415B8 0x1000A5B8  501 4798 */ string_list pfaflags;
+/* 0x0415C4 0x1000A5C4  502 4807 */ char* pfa;
+/* 0x0415C8 0x1000A5C8  503 4811 */ char* libI77_mp;
 // 0x4 padding
-/* 0415D0 1000A5D0 */ string_list pcaflags;
+/* 0x0415D0 0x1000A5D0  504 4821 */ string_list pcaflags;
 // 0x4 padding
-/* 0415E0 1000A5E0 */ string_list soptflags;
+/* 0x0415E0 0x1000A5E0  505 4830 */ string_list soptflags;
 // 0x4 padding
-/* 0415F0 1000A5F0 */ string_list staticopts;
+/* 0x0415F0 0x1000A5F0  506 4840 */ string_list staticopts;
 // 0x4 padding
-/* 041600 1000A600 */ int __Argc;
-/* 041604 1000A604 */ char** __Argv;
-/* 041608 1000A608 */ UNK_TYPE __rld_obj_head;
-/* 04160C 1000A60C */ static char B_1000A60C[0x04]; // padding?
+/* 0x041600 0x1000A600  507 4851 */ int __Argc;
+/* 0x041604 0x1000A604  508 4858 */ char** __Argv;
+/* 0x041608 0x1000A608   36  349 */ UNK_TYPE __rld_obj_head;
+/* 0x04160C 0x1000A60C None None */ static char B_1000A60C[0x04]; // padding?
 
 // data
 
-/* 0x037000 0x10000000 161  */ /* boolean */ int alternate_fe = FALSE;
-/* 0x037004 0x10000004 162  */ AnsiChoice ansichoice = ANSICHOICE_XANSI;
-/* 0x037008 0x10000008 163  */ CCompilerChoice c_compiler_choice = C_COMPILER_CHOICE_0;
+/* 0x037000 0x10000000  161 1495 */ /* boolean */ int alternate_fe = FALSE;
+/* 0x037004 0x10000004  162 1508 */ AnsiChoice ansichoice = ANSICHOICE_XANSI;
+/* 0x037008 0x10000008  163 1519 */ CCompilerChoice c_compiler_choice = C_COMPILER_CHOICE_0;
 
-/* 0x03700C 0x1000000C 164  */ struct _struct_suffixes_0x8 suffixes[] = {
+/* 0x03700C 0x1000000C  164 1537 */ struct _struct_suffixes_0x8 suffixes[] = {
     { "pl1", SUF_1 }, { "pli", SUF_1 }, { "cob", SUF_2 }, { "il", SUF_3 },  { "st", SUF_4 },
     { "anl", SUF_5 }, { "c++", SUF_6 }, { "cc", SUF_6 },  { "cxx", SUF_6 }, { "C", SUF_6 },
     { "cpp", SUF_6 }, { "CXX", SUF_6 }, { "CPP", SUF_6 }, { ".c", SUF_7 },  { NULL, 0 },
 };
 
-/* 0x037084 0x10000084 165  */ char* include = NULL;
-/* 0x037088 0x10000088 166  */ char* includeB = NULL;
-/* 0x03708C 0x1000008C 167  */ char* einclude = NULL;
-/* 0x037090 0x10000090 168  */ char* eincludeB = NULL;
-/* 0x037094 0x10000094 169  */ char* cpp = NULL;
-/* 0x037098 0x10000098 170  */ char* ccom = NULL;
-/* 0x03709C 0x1000009C 171  */ char* mpc = NULL;
-/* 0x0370A0 0x100000A0 172  */ char* cfe = NULL;
-/* 0x0370A4 0x100000A4 173  */ char* upas = NULL;
-/* 0x0370A8 0x100000A8 174  */ char* fcom = NULL;
-/* 0x0370AC 0x100000AC 175  */ char* upl1 = NULL;
-/* 0x0370B0 0x100000B0 176  */ char* pl1err = NULL;
-/* 0x0370B4 0x100000B4 177  */ char* ulpi = NULL;
-/* 0x0370B8 0x100000B8 178  */ char* ucob = NULL;
-/* 0x0370BC 0x100000BC 179  */ char* ujoin = NULL;
-/* 0x0370C0 0x100000C0 180  */ char* usplit = NULL;
-/* 0x0370C4 0x100000C4 181  */ char* uld = NULL;
-/* 0x0370C8 0x100000C8 182  */ char* umerge = NULL;
-/* 0x0370CC 0x100000CC 183  */ char* uloop = NULL;
-/* 0x0370D0 0x100000D0 184  */ char* uopt0 = NULL;
-/* 0x0370D4 0x100000D4 185  */ char* ddopt = NULL;
-/* 0x0370D8 0x100000D8 186  */ char* opt = NULL;
-/* 0x0370DC 0x100000DC 187  */ char* gen = NULL;
-/* 0x0370E0 0x100000E0 188  */ char* as0 = NULL;
-/* 0x0370E4 0x100000E4 189  */ char* as1 = NULL;
-/* 0x0370E8 0x100000E8 190  */ char* ld = NULL;
-/* 0x0370EC 0x100000EC 191  */ char* ftoc = NULL;
-/* 0x0370F0 0x100000F0 192  */ char* cord = NULL;
-/* 0x0370F4 0x100000F4 193  */ char* btou = NULL;
-/* 0x0370F8 0x100000F8 194  */ char* utob = NULL;
-/* 0x0370FC 0x100000FC 195  */ char* patch = NULL;
-/* 0x037100 0x10000100 196  */ /* string */ char* filter = NULL;
-/* 0x037104 0x10000104 197  */ char* prelinker = NULL;
-/* 0x037108 0x10000108 198  */ /* boolean */ int smart_build = FALSE;
-/* 0x03710C 0x1000010C 199  */ char* sbrepos = NULL;
-/* 0x037110 0x10000110 200  */ /* boolean */ int no_prelink = FALSE;
-/* 0x037114 0x10000114 201  */ /* boolean */ int nofilt = FALSE;
-/* 0x037118 0x10000118 202  */ /* boolean */ int force_prelink = FALSE;
-/* 0x03711C 0x1000011C 203  */ int verbose_prelink = FALSE; // pseudoboolean
-/* 0x037120 0x10000120 204  */ /* boolean */ int auto_template_include = TRUE;
-/* 0x037124 0x10000124 205  */ /* boolean */ int nocode = FALSE;
-/* 0x037128 0x10000128 206  */ /* boolean */ int nocompileneeded = FALSE;
-/* 0x03712C 0x1000012C 207  */ char* LibM = " -lm";
-/* 0x037130 0x10000130 208  */ char* LibP = " -lp";
-/* 0x037134 0x10000134 209  */ char* LibF77 = " -lF77";
-/* 0x037138 0x10000138 210  */ char* LibI77 = " -lI77";
-/* 0x03713C 0x1000013C 211  */ char* LibU77 = " -lU77";
-/* 0x037140 0x10000140 212  */ char* LibIsam = " -lisam";
-/* 0x037144 0x10000144 213  */ char* LibExc = " -lexc";
-/* 0x037148 0x10000148 214  */ char* LibDw = " -ldw";
-/* 0x03714C 0x1000014C 215  */ char* LibPl1 = NULL;
-/* 0x037150 0x10000150 216  */ char* LibCob = NULL;
-/* 0x037154 0x10000154 217  */ char* LibSort = NULL;
-/* 0x037158 0x10000158 218  */ char* LibProf1 = " -lprof";
-/* 0x03715C 0x1000015C 219  */ char* LibXmalloc = " -lxmalloc";
-/* 0x037160 0x10000160 220  */ char* LibMld = " -lmld";
-/* 0x037164 0x10000164 221  */ char* crtx = NULL;
-/* 0x037168 0x10000168 222  */ char* crtn = NULL;
-/* 0x03716C 0x1000016C 223  */ char* cxx_init = NULL;
-/* 0x037170 0x10000170 224  */ char* delta_init = NULL;
-/* 0x037174 0x10000174 225  */ char* libp = NULL;
-/* 0x037178 0x10000178 226  */ char* libp_b = NULL;
-/* 0x03717C 0x1000017C 227  */ char* libm = NULL;
-/* 0x037180 0x10000180 228  */ char* libm_b = NULL;
-/* 0x037184 0x10000184 229  */ char* libF77 = NULL;
-/* 0x037188 0x10000188 230  */ char* libF77_b = NULL;
-/* 0x03718C 0x1000018C 231  */ char* libI77 = NULL;
-/* 0x037190 0x10000190 232  */ char* libI77_b = NULL;
-/* 0x037194 0x10000194 233  */ char* libU77 = NULL;
-/* 0x037198 0x10000198 234  */ char* libftn = NULL;
-/* 0x03719C 0x1000019C 235  */ char* libU77_b = NULL;
-/* 0x0371A0 0x100001A0 236  */ char* libisam = NULL;
-/* 0x0371A4 0x100001A4 237  */ char* libisam_b = NULL;
-/* 0x0371A8 0x100001A8 238  */ char* libdw_path = NULL;
-/* 0x0371AC 0x100001AC 239  */ char* libdw = NULL;
-/* 0x0371B0 0x100001B0 240  */ char* libdw_b = NULL;
-/* 0x0371B4 0x100001B4 241  */ char* libpl1 = NULL;
-/* 0x0371B8 0x100001B8 242  */ char* libpl1_b = NULL;
-/* 0x0371BC 0x100001BC 243  */ char* libexc = NULL;
-/* 0x0371C0 0x100001C0 244  */ char* libexc_b = NULL;
-/* 0x0371C4 0x100001C4 21   */ int libcob = NULL;    // unused // dynsym reorder?
-/* 0x0371C8 0x100001C8 22   */ int libcob_b = NULL;  // unused
-/* 0x0371CC 0x100001CC 245  */ char* libsort = NULL; // dynsym reorder?
-/* 0x0371D0 0x100001D0 246  */ char* libsort_b = NULL;
-/* 0x0371D4 0x100001D4 247  */ char* libprof = NULL;
-/* 0x0371D8 0x100001D8 248  */ char* libxmalloc = NULL;
-/* 0x0371DC 0x100001DC 249  */ char* libxmalloc_b = NULL;
-/* 0x0371E0 0x100001E0 250  */ char* cpp_stdflag = NULL;
-/* 0x0371E4 0x100001E4 251  */ char* libmld = NULL;
-/* 0x0371E8 0x100001E8 252  */ /* boolean */ int crtn_required = TRUE;
-/* 0x0371EC 0x100001EC 253  */ char* pca = NULL;
-/* 0x0371F0 0x100001F0 254  */ char* libc_mp = NULL;
-/* 0x0371F4 0x100001F4 255  */ char* fopt = NULL;
-/* 0x0371F8 0x100001F8 256  */ char* copt = NULL;
-/* 0x0371FC 0x100001FC None */ static /* boolean */ int D_100001FC = FALSE;
-/* 0x037200 0x10000200 None */ static /* boolean */ int D_10000200 = FALSE;
-/* 0x037204 0x10000204 None */ static char* D_10000204 = NULL;
-/* 0x037208 0x10000208 None */ static char* D_10000208 = NULL;
-/* 0x03720C 0x1000020C None */ static /* boolean */ int D_1000020C = FALSE;
-/* 0x037210 0x10000210 None */ static /* boolean */ int D_10000210 = TRUE;
-/* 0x037214 0x10000214 257  */ /* boolean */ int Eflag = FALSE;
-/* 0x037218 0x10000218 258  */ int Pflag = FALSE; // pseudoboolean
-/* 0x03721C 0x1000021C 259  */ int gflag = 0;
-/* 0x037220 0x10000220 260  */ int pflag = 0;
-/* 0x037224 0x10000224 261  */ int jflag = FALSE; // pseudoboolean
-/* 0x037228 0x10000228 262  */ int cflag = FALSE; // pseudoboolean
-/* 0x03722C 0x1000022C 263  */ int Sflag = FALSE; // pseudoboolean
-/* 0x037230 0x10000230 264  */ int Oflag = 1;
-/* 0x037234 0x10000234 265  */ /* boolean */ int vflag = FALSE;
-/* 0x037238 0x10000238 266  */ /* boolean */ int execute_flag = TRUE;
-/* 0x03723C 0x1000023C 267  */ /* boolean */ int Vflag = FALSE;
-/* 0x037240 0x10000240 268  */ /* boolean */ int Kflag = FALSE;
-/* 0x037244 0x10000244 269  */ int minus_M = FALSE; // pseudoboolean
-/* 0x037248 0x10000248 270  */ /* boolean */ int anachronisms = TRUE;
-/* 0x03724C 0x1000024C 271  */ /* boolean */ int disable_inlines = FALSE;
-/* 0x037250 0x10000250 272  */ /* boolean */ int cfront_compatible = TRUE;
-/* 0x037254 0x10000254 273  */ int make_edison_shlib = FALSE; // pseudoboolean
-/* 0x037258 0x10000258 274  */ /* boolean */ int plusIflag = FALSE;
-/* 0x03725C 0x1000025C 275  */ /* boolean */ int signedcharflag = FALSE;
-/* 0x037260 0x10000260 276  */ /* boolean */ int Lflag = FALSE;
-/* 0x037264 0x10000264 277  */ /* boolean */ int set_loop_unroll = FALSE;
-/* 0x037268 0x10000268 278  */ int mflag = FALSE; // pseudoboolean
-/* 0x03726C 0x1000026C 279  */ int Fflag = FALSE; // pseudoboolean
-/* 0x037270 0x10000270 280  */ int stdflag = 0;
-/* 0x037274 0x10000274 281  */ /* boolean */ int cplusflag = FALSE;
-/* 0x037278 0x10000278 282  */ /* boolean */ int ucodeflag = FALSE;
-/* 0x03727C 0x1000027C 283  */ /* boolean */ int Bflag = FALSE;
-/* 0x037280 0x10000280 284  */ /* boolean */ int fiveflag = FALSE;
-/* 0x037284 0x10000284 285  */ /* boolean */ int automaticflag = TRUE;
-/* 0x037288 0x10000288 286  */ int emptyIflag = FALSE; // pseudoboolean
-/* 0x03728C 0x1000028C 287  */ /* boolean */ int cordflag = FALSE;
-/* 0x037290 0x10000290 288  */ /* boolean */ int ansiflag = FALSE;
-/* 0x037294 0x10000294 289  */ /* boolean */ int lpilockflag = FALSE;
-/* 0x037298 0x10000298 290  */ /* boolean */ int nolockflag = FALSE;
-/* 0x03729C 0x1000029C 291  */ /* boolean */ int unrollflag = FALSE;
-/* 0x0372A0 0x100002A0 292  */ /* boolean */ int libm_spec = FALSE;
-/* 0x0372A4 0x100002A4 293  */ /* boolean */ int libfastm_spec = FALSE;
-/* 0x0372A8 0x100002A8 294  */ EditFlag editflag = EDIT_FLAG_0;
-/* 0x0372AC 0x100002AC 295  */ /* boolean */ int oldccomflag = FALSE;
-/* 0x0372B0 0x100002B0 296  */ /* boolean */ int oldcflag = FALSE;
-/* 0x0372B4 0x100002B4 297  */ /* boolean */ int oldcppflag = FALSE;
-/* 0x0372B8 0x100002B8 23   */ /* boolean */ int fflag = FALSE;  // unused // dynsym reorder?
-/* 0x0372BC 0x100002BC 298  */ /* boolean */ int tpflag = FALSE; // dynsym reorder?
-/* 0x0372C0 0x100002C0 299  */ /* boolean */ int ddoptflag = FALSE;
-/* 0x0372C4 0x100002C4 300  */ /* boolean */ int uopt0flag = FALSE;
-/* 0x0372C8 0x100002C8 24   */ /* boolean */ int protoflag = FALSE;   // dynsym reorder?
-/* 0x0372CC 0x100002CC 301  */ /* boolean */ int kminabiflag = FALSE; // dynsym reorder?
-/* 0x0372D0 0x100002D0 302  */ /* boolean */ int kpicopt_flag = FALSE;
-/* 0x0372D4 0x100002D4 303  */ /* boolean */ int nokpicopt_flag = FALSE;
-/* 0x0372D8 0x100002D8 304  */ /* boolean */ int elfflag = TRUE;
-/* 0x0372DC 0x100002DC 305  */ /* boolean */ int coff_spec = FALSE;
-/* 0x0372E0 0x100002E0 306  */ /* boolean */ int elf_spec = FALSE;
-/* 0x0372E4 0x100002E4 307  */ /* boolean */ int compose_first_G0 = FALSE;
-/* 0x0372E8 0x100002E8 308  */ /* boolean */ int mips1_spec_flag = FALSE;
-/* 0x0372EC 0x100002EC 309  */ /* boolean */ int mips1flag = TRUE;
-/* 0x0372F0 0x100002F0 310  */ /* boolean */ int mips2flag = FALSE;
-/* 0x0372F4 0x100002F4 311  */ /* boolean */ int mips3flag = FALSE;
-/* 0x0372F8 0x100002F8 312  */ /* boolean */ int ignore_unresolved_flag = FALSE;
-/* 0x0372FC 0x100002FC 313  */ /* boolean */ int no_unresolved_flag = FALSE;
-/* 0x037300 0x10000300 314  */ /* boolean */ int swopcodeflag = FALSE;
-/* 0x037304 0x10000304 315  */ /* boolean */ int dwopcodeflag = FALSE;
-/* 0x037308 0x10000308 316  */ /* boolean */ int sixty4bit_spec = FALSE;
-/* 0x03730C 0x1000030C 317  */ /* boolean */ int sixty4bitflag = FALSE;
-/* 0x037310 0x10000310 318  */ /* boolean */ int thirty2bitflag = FALSE;
-/* 0x037314 0x10000314 319  */ /* boolean */ int fullasoptflag = FALSE;
-/* 0x037318 0x10000318 320  */ /* boolean */ int old_non_shared = FALSE;
-/* 0x03731C 0x1000031C 321  */ /* boolean */ int non_shared_emitted = FALSE;
-/* 0x037320 0x10000320 322  */ /* boolean */ int longlong_emitted = FALSE;
-/* 0x037324 0x10000324 323  */ /* boolean */ int non_shared = FALSE;
-/* 0x037328 0x10000328 324  */ /* boolean */ int Gseen_flag = FALSE;
-/* 0x03732C 0x1000032C 325  */ /* boolean */ int transitive_link = FALSE;
-/* 0x037330 0x10000330 326  */ /* boolean */ int full_transitive_link = FALSE;
-/* 0x037334 0x10000334 327  */ /* boolean */ int no_transitive_link = FALSE;
-/* 0x037338 0x10000338 328  */ /* boolean */ int quickstart_info = FALSE;
-/* 0x03733C 0x1000033C 329  */ /* boolean */ int force_rm_dead_code = FALSE;
-/* 0x037340 0x10000340 330  */ /* boolean */ int kpic_flag = TRUE;
-/* 0x037344 0x10000344 331  */ /* boolean */ int kpic_spec = FALSE;
-/* 0x037348 0x10000348 332  */ /* boolean */ int call_shared = FALSE;
-/* 0x03734C 0x1000034C 333  */ /* boolean */ int excpt_flag = FALSE;
-/* 0x037350 0x10000350 334  */ /* boolean */ int trapuv_flag = FALSE;
-/* 0x037354 0x10000354 335  */ int dmips_emit = 0;                     // boolean?
-/* 0x037358 0x10000358 25   */ int Xvalues_Flag = 0;                   // dynsym reorder?
-/* 0x03735C 0x1000035C 336  */ /* boolean */ int user_systype = FALSE; // dynsym reorder?
-/* 0x037360 0x10000360 337  */ /* boolean */ int ddoptinfo = FALSE;
-/* 0x037364 0x10000364 338  */ /* boolean */ int systype_seen = FALSE;
-/* 0x037368 0x10000368 339  */ /* boolean */ int multiple_systype = FALSE;
-/* 0x03736C 0x1000036C 340  */ /* boolean */ int systype_warn = FALSE;
-/* 0x037370 0x10000370 341  */ /* boolean */ int svr4_systype = FALSE;
-/* 0x037374 0x10000374 342  */ /* boolean */ int c_inline = FALSE;
-/* 0x037378 0x10000378 343  */ /* boolean */ int tfp_flag = FALSE;
-/* 0x03737C 0x1000037C 344  */ int abi_flag = 0;
-/* 0x037380 0x10000380 345  */ int memory_flag = 0;
-/* 0x037384 0x10000384 346  */ /* boolean */ int default_call_shared = TRUE;
-/* 0x037388 0x10000388 347  */ /* boolean */ int haspascal = FALSE;
-/* 0x03738C 0x1000038C 348  */ /* boolean */ int hasfortran = FALSE;
-/* 0x037390 0x10000390 349  */ int lmflag = FALSE; // pseudoboolean
-/* 0x037394 0x10000394 350  */ int srcexists = FALSE;
-/* 0x037398 0x10000398 351  */ int w1flag = 1;
-/* 0x03739C 0x1000039C None */ static int D_1000039C = 0;
-/* 0x0373A0 0x100003A0 352  */ /* boolean */ int prototype_checking_on = FALSE;
-/* 0x0373A4 0x100003A4 353  */ /* boolean */ int showdirt_flag = FALSE;
-/* 0x0373A8 0x100003A8 354  */ int mp_prepass_count = 0;
+/* 0x037084 0x10000084  165 1546 */ char* include = NULL;
+/* 0x037088 0x10000088  166 1554 */ char* includeB = NULL;
+/* 0x03708C 0x1000008C  167 1563 */ char* einclude = NULL;
+/* 0x037090 0x10000090  168 1572 */ char* eincludeB = NULL;
+/* 0x037094 0x10000094  169 1582 */ char* cpp = NULL;
+/* 0x037098 0x10000098  170 1586 */ char* ccom = NULL;
+/* 0x03709C 0x1000009C  171 1591 */ char* mpc = NULL;
+/* 0x0370A0 0x100000A0  172 1595 */ char* cfe = NULL;
+/* 0x0370A4 0x100000A4  173 1599 */ char* upas = NULL;
+/* 0x0370A8 0x100000A8  174 1604 */ char* fcom = NULL;
+/* 0x0370AC 0x100000AC  175 1609 */ char* upl1 = NULL;
+/* 0x0370B0 0x100000B0  176 1614 */ char* pl1err = NULL;
+/* 0x0370B4 0x100000B4  177 1621 */ char* ulpi = NULL;
+/* 0x0370B8 0x100000B8  178 1626 */ char* ucob = NULL;
+/* 0x0370BC 0x100000BC  179 1631 */ char* ujoin = NULL;
+/* 0x0370C0 0x100000C0  180 1637 */ char* usplit = NULL;
+/* 0x0370C4 0x100000C4  181 1644 */ char* uld = NULL;
+/* 0x0370C8 0x100000C8  182 1648 */ char* umerge = NULL;
+/* 0x0370CC 0x100000CC  183 1655 */ char* uloop = NULL;
+/* 0x0370D0 0x100000D0  184 1661 */ char* uopt0 = NULL;
+/* 0x0370D4 0x100000D4  185 1667 */ char* ddopt = NULL;
+/* 0x0370D8 0x100000D8  186 1673 */ char* opt = NULL;
+/* 0x0370DC 0x100000DC  187 1677 */ char* gen = NULL;
+/* 0x0370E0 0x100000E0  188 1681 */ char* as0 = NULL;
+/* 0x0370E4 0x100000E4  189 1685 */ char* as1 = NULL;
+/* 0x0370E8 0x100000E8  190 1689 */ char* ld = NULL;
+/* 0x0370EC 0x100000EC  191 1692 */ char* ftoc = NULL;
+/* 0x0370F0 0x100000F0  192 1697 */ char* cord = NULL;
+/* 0x0370F4 0x100000F4  193 1702 */ char* btou = NULL;
+/* 0x0370F8 0x100000F8  194 1707 */ char* utob = NULL;
+/* 0x0370FC 0x100000FC  195 1712 */ char* patch = NULL;
+/* 0x037100 0x10000100  196 1718 */ /* string */ char* filter = NULL;
+/* 0x037104 0x10000104  197 1725 */ char* prelinker = NULL;
+/* 0x037108 0x10000108  198 1735 */ /* boolean */ int smart_build = FALSE;
+/* 0x03710C 0x1000010C  199 1747 */ char* sbrepos = NULL;
+/* 0x037110 0x10000110  200 1755 */ /* boolean */ int no_prelink = FALSE;
+/* 0x037114 0x10000114  201 1766 */ /* boolean */ int nofilt = FALSE;
+/* 0x037118 0x10000118  202 1773 */ /* boolean */ int force_prelink = FALSE;
+/* 0x03711C 0x1000011C  203 1787 */ int verbose_prelink = FALSE; // pseudoboolean
+/* 0x037120 0x10000120  204 1803 */ /* boolean */ int auto_template_include = TRUE;
+/* 0x037124 0x10000124  205 1825 */ /* boolean */ int nocode = FALSE;
+/* 0x037128 0x10000128  206 1832 */ /* boolean */ int nocompileneeded = FALSE;
+/* 0x03712C 0x1000012C  207 1848 */ char* LibM = " -lm";
+/* 0x037130 0x10000130  208 1853 */ char* LibP = " -lp";
+/* 0x037134 0x10000134  209 1858 */ char* LibF77 = " -lF77";
+/* 0x037138 0x10000138  210 1865 */ char* LibI77 = " -lI77";
+/* 0x03713C 0x1000013C  211 1872 */ char* LibU77 = " -lU77";
+/* 0x037140 0x10000140  212 1879 */ char* LibIsam = " -lisam";
+/* 0x037144 0x10000144  213 1887 */ char* LibExc = " -lexc";
+/* 0x037148 0x10000148  214 1894 */ char* LibDw = " -ldw";
+/* 0x03714C 0x1000014C  215 1900 */ char* LibPl1 = NULL;
+/* 0x037150 0x10000150  216 1907 */ char* LibCob = NULL;
+/* 0x037154 0x10000154  217 1914 */ char* LibSort = NULL;
+/* 0x037158 0x10000158  218 1922 */ char* LibProf1 = " -lprof";
+/* 0x03715C 0x1000015C  219 1931 */ char* LibXmalloc = " -lxmalloc";
+/* 0x037160 0x10000160  220 1942 */ char* LibMld = " -lmld";
+/* 0x037164 0x10000164  221 1949 */ char* crtx = NULL;
+/* 0x037168 0x10000168  222 1954 */ char* crtn = NULL;
+/* 0x03716C 0x1000016C  223 1959 */ char* cxx_init = NULL;
+/* 0x037170 0x10000170  224 1968 */ char* delta_init = NULL;
+/* 0x037174 0x10000174  225 1979 */ char* libp = NULL;
+/* 0x037178 0x10000178  226 1984 */ char* libp_b = NULL;
+/* 0x03717C 0x1000017C  227 1991 */ char* libm = NULL;
+/* 0x037180 0x10000180  228 1996 */ char* libm_b = NULL;
+/* 0x037184 0x10000184  229 2003 */ char* libF77 = NULL;
+/* 0x037188 0x10000188  230 2010 */ char* libF77_b = NULL;
+/* 0x03718C 0x1000018C  231 2019 */ char* libI77 = NULL;
+/* 0x037190 0x10000190  232 2026 */ char* libI77_b = NULL;
+/* 0x037194 0x10000194  233 2035 */ char* libU77 = NULL;
+/* 0x037198 0x10000198  234 2042 */ char* libftn = NULL;
+/* 0x03719C 0x1000019C  235 2049 */ char* libU77_b = NULL;
+/* 0x0371A0 0x100001A0  236 2058 */ char* libisam = NULL;
+/* 0x0371A4 0x100001A4  237 2066 */ char* libisam_b = NULL;
+/* 0x0371A8 0x100001A8  238 2076 */ char* libdw_path = NULL;
+/* 0x0371AC 0x100001AC  239 2087 */ char* libdw = NULL;
+/* 0x0371B0 0x100001B0  240 2093 */ char* libdw_b = NULL;
+/* 0x0371B4 0x100001B4  241 2101 */ char* libpl1 = NULL;
+/* 0x0371B8 0x100001B8  242 2108 */ char* libpl1_b = NULL;
+/* 0x0371BC 0x100001BC  243 2117 */ char* libexc = NULL;
+/* 0x0371C0 0x100001C0  244 2124 */ char* libexc_b = NULL;
+/* 0x0371C4 0x100001C4   21  201 */ int libcob = NULL;    // unused // dynsym reorder?
+/* 0x0371C8 0x100001C8   22  208 */ int libcob_b = NULL;  // unused
+/* 0x0371CC 0x100001CC  245 2133 */ char* libsort = NULL; // dynsym reorder?
+/* 0x0371D0 0x100001D0  246 2141 */ char* libsort_b = NULL;
+/* 0x0371D4 0x100001D4  247 2151 */ char* libprof = NULL;
+/* 0x0371D8 0x100001D8  248 2159 */ char* libxmalloc = NULL;
+/* 0x0371DC 0x100001DC  249 2170 */ char* libxmalloc_b = NULL;
+/* 0x0371E0 0x100001E0  250 2183 */ char* cpp_stdflag = NULL;
+/* 0x0371E4 0x100001E4  251 2195 */ char* libmld = NULL;
+/* 0x0371E8 0x100001E8  252 2202 */ /* boolean */ int crtn_required = TRUE;
+/* 0x0371EC 0x100001EC  253 2216 */ char* pca = NULL;
+/* 0x0371F0 0x100001F0  254 2220 */ char* libc_mp = NULL;
+/* 0x0371F4 0x100001F4  255 2228 */ char* fopt = NULL;
+/* 0x0371F8 0x100001F8  256 2233 */ char* copt = NULL;
+/* 0x0371FC 0x100001FC None None */ static /* boolean */ int D_100001FC = FALSE;
+/* 0x037200 0x10000200 None None */ static /* boolean */ int D_10000200 = FALSE;
+/* 0x037204 0x10000204 None None */ static char* D_10000204 = NULL;
+/* 0x037208 0x10000208 None None */ static char* D_10000208 = NULL;
+/* 0x03720C 0x1000020C None None */ static /* boolean */ int D_1000020C = FALSE;
+/* 0x037210 0x10000210 None None */ static /* boolean */ int D_10000210 = TRUE;
+/* 0x037214 0x10000214  257 2238 */ /* boolean */ int Eflag = FALSE;
+/* 0x037218 0x10000218  258 2244 */ int Pflag = FALSE; // pseudoboolean
+/* 0x03721C 0x1000021C  259 2250 */ int gflag = 0;
+/* 0x037220 0x10000220  260 2256 */ int pflag = 0;
+/* 0x037224 0x10000224  261 2262 */ int jflag = FALSE; // pseudoboolean
+/* 0x037228 0x10000228  262 2268 */ int cflag = FALSE; // pseudoboolean
+/* 0x03722C 0x1000022C  263 2274 */ int Sflag = FALSE; // pseudoboolean
+/* 0x037230 0x10000230  264 2280 */ int Oflag = 1;
+/* 0x037234 0x10000234  265 2286 */ /* boolean */ int vflag = FALSE;
+/* 0x037238 0x10000238  266 2292 */ /* boolean */ int execute_flag = TRUE;
+/* 0x03723C 0x1000023C  267 2305 */ /* boolean */ int Vflag = FALSE;
+/* 0x037240 0x10000240  268 2311 */ /* boolean */ int Kflag = FALSE;
+/* 0x037244 0x10000244  269 2317 */ int minus_M = FALSE; // pseudoboolean
+/* 0x037248 0x10000248  270 2325 */ /* boolean */ int anachronisms = TRUE;
+/* 0x03724C 0x1000024C  271 2338 */ /* boolean */ int disable_inlines = FALSE;
+/* 0x037250 0x10000250  272 2354 */ /* boolean */ int cfront_compatible = TRUE;
+/* 0x037254 0x10000254  273 2372 */ int make_edison_shlib = FALSE; // pseudoboolean
+/* 0x037258 0x10000258  274 2390 */ /* boolean */ int plusIflag = FALSE;
+/* 0x03725C 0x1000025C  275 2400 */ /* boolean */ int signedcharflag = FALSE;
+/* 0x037260 0x10000260  276 2415 */ /* boolean */ int Lflag = FALSE;
+/* 0x037264 0x10000264  277 2421 */ /* boolean */ int set_loop_unroll = FALSE;
+/* 0x037268 0x10000268  278 2437 */ int mflag = FALSE; // pseudoboolean
+/* 0x03726C 0x1000026C  279 2443 */ int Fflag = FALSE; // pseudoboolean
+/* 0x037270 0x10000270  280 2449 */ int stdflag = 0;
+/* 0x037274 0x10000274  281 2457 */ /* boolean */ int cplusflag = FALSE;
+/* 0x037278 0x10000278  282 2467 */ /* boolean */ int ucodeflag = FALSE;
+/* 0x03727C 0x1000027C  283 2477 */ /* boolean */ int Bflag = FALSE;
+/* 0x037280 0x10000280  284 2483 */ /* boolean */ int fiveflag = FALSE;
+/* 0x037284 0x10000284  285 2492 */ /* boolean */ int automaticflag = TRUE;
+/* 0x037288 0x10000288  286 2506 */ int emptyIflag = FALSE; // pseudoboolean
+/* 0x03728C 0x1000028C  287 2517 */ /* boolean */ int cordflag = FALSE;
+/* 0x037290 0x10000290  288 2526 */ /* boolean */ int ansiflag = FALSE;
+/* 0x037294 0x10000294  289 2535 */ /* boolean */ int lpilockflag = FALSE;
+/* 0x037298 0x10000298  290 2547 */ /* boolean */ int nolockflag = FALSE;
+/* 0x03729C 0x1000029C  291 2558 */ /* boolean */ int unrollflag = FALSE;
+/* 0x0372A0 0x100002A0  292 2569 */ /* boolean */ int libm_spec = FALSE;
+/* 0x0372A4 0x100002A4  293 2579 */ /* boolean */ int libfastm_spec = FALSE;
+/* 0x0372A8 0x100002A8  294 2593 */ EditFlag editflag = EDIT_FLAG_0;
+/* 0x0372AC 0x100002AC  295 2602 */ /* boolean */ int oldccomflag = FALSE;
+/* 0x0372B0 0x100002B0  296 2614 */ /* boolean */ int oldcflag = FALSE;
+/* 0x0372B4 0x100002B4  297 2623 */ /* boolean */ int oldcppflag = FALSE;
+/* 0x0372B8 0x100002B8   23  217 */ /* boolean */ int fflag = FALSE;  // unused // dynsym reorder?
+/* 0x0372BC 0x100002BC  298 2634 */ /* boolean */ int tpflag = FALSE; // dynsym reorder?
+/* 0x0372C0 0x100002C0  299 2641 */ /* boolean */ int ddoptflag = FALSE;
+/* 0x0372C4 0x100002C4  300 2651 */ /* boolean */ int uopt0flag = FALSE;
+/* 0x0372C8 0x100002C8   24  223 */ /* boolean */ int protoflag = FALSE;   // dynsym reorder?
+/* 0x0372CC 0x100002CC  301 2661 */ /* boolean */ int kminabiflag = FALSE; // dynsym reorder?
+/* 0x0372D0 0x100002D0  302 2673 */ /* boolean */ int kpicopt_flag = FALSE;
+/* 0x0372D4 0x100002D4  303 2686 */ /* boolean */ int nokpicopt_flag = FALSE;
+/* 0x0372D8 0x100002D8  304 2701 */ /* boolean */ int elfflag = TRUE;
+/* 0x0372DC 0x100002DC  305 2709 */ /* boolean */ int coff_spec = FALSE;
+/* 0x0372E0 0x100002E0  306 2719 */ /* boolean */ int elf_spec = FALSE;
+/* 0x0372E4 0x100002E4  307 2728 */ /* boolean */ int compose_first_G0 = FALSE;
+/* 0x0372E8 0x100002E8  308 2745 */ /* boolean */ int mips1_spec_flag = FALSE;
+/* 0x0372EC 0x100002EC  309 2761 */ /* boolean */ int mips1flag = TRUE;
+/* 0x0372F0 0x100002F0  310 2771 */ /* boolean */ int mips2flag = FALSE;
+/* 0x0372F4 0x100002F4  311 2781 */ /* boolean */ int mips3flag = FALSE;
+/* 0x0372F8 0x100002F8  312 2791 */ /* boolean */ int ignore_unresolved_flag = FALSE;
+/* 0x0372FC 0x100002FC  313 2814 */ /* boolean */ int no_unresolved_flag = FALSE;
+/* 0x037300 0x10000300  314 2833 */ /* boolean */ int swopcodeflag = FALSE;
+/* 0x037304 0x10000304  315 2846 */ /* boolean */ int dwopcodeflag = FALSE;
+/* 0x037308 0x10000308  316 2859 */ /* boolean */ int sixty4bit_spec = FALSE;
+/* 0x03730C 0x1000030C  317 2874 */ /* boolean */ int sixty4bitflag = FALSE;
+/* 0x037310 0x10000310  318 2888 */ /* boolean */ int thirty2bitflag = FALSE;
+/* 0x037314 0x10000314  319 2903 */ /* boolean */ int fullasoptflag = FALSE;
+/* 0x037318 0x10000318  320 2917 */ /* boolean */ int old_non_shared = FALSE;
+/* 0x03731C 0x1000031C  321 2932 */ /* boolean */ int non_shared_emitted = FALSE;
+/* 0x037320 0x10000320  322 2951 */ /* boolean */ int longlong_emitted = FALSE;
+/* 0x037324 0x10000324  323 2968 */ /* boolean */ int non_shared = FALSE;
+/* 0x037328 0x10000328  324 2979 */ /* boolean */ int Gseen_flag = FALSE;
+/* 0x03732C 0x1000032C  325 2990 */ /* boolean */ int transitive_link = FALSE;
+/* 0x037330 0x10000330  326 3006 */ /* boolean */ int full_transitive_link = FALSE;
+/* 0x037334 0x10000334  327 3027 */ /* boolean */ int no_transitive_link = FALSE;
+/* 0x037338 0x10000338  328 3046 */ /* boolean */ int quickstart_info = FALSE;
+/* 0x03733C 0x1000033C  329 3062 */ /* boolean */ int force_rm_dead_code = FALSE;
+/* 0x037340 0x10000340  330 3081 */ /* boolean */ int kpic_flag = TRUE;
+/* 0x037344 0x10000344  331 3091 */ /* boolean */ int kpic_spec = FALSE;
+/* 0x037348 0x10000348  332 3101 */ /* boolean */ int call_shared = FALSE;
+/* 0x03734C 0x1000034C  333 3113 */ /* boolean */ int excpt_flag = FALSE;
+/* 0x037350 0x10000350  334 3124 */ /* boolean */ int trapuv_flag = FALSE;
+/* 0x037354 0x10000354  335 3136 */ int dmips_emit = 0;                     // boolean?
+/* 0x037358 0x10000358   25  233 */ int Xvalues_Flag = 0;                   // dynsym reorder?
+/* 0x03735C 0x1000035C  336 3147 */ /* boolean */ int user_systype = FALSE; // dynsym reorder?
+/* 0x037360 0x10000360  337 3160 */ /* boolean */ int ddoptinfo = FALSE;
+/* 0x037364 0x10000364  338 3170 */ /* boolean */ int systype_seen = FALSE;
+/* 0x037368 0x10000368  339 3183 */ /* boolean */ int multiple_systype = FALSE;
+/* 0x03736C 0x1000036C  340 3200 */ /* boolean */ int systype_warn = FALSE;
+/* 0x037370 0x10000370  341 3213 */ /* boolean */ int svr4_systype = FALSE;
+/* 0x037374 0x10000374  342 3226 */ /* boolean */ int c_inline = FALSE;
+/* 0x037378 0x10000378  343 3235 */ /* boolean */ int tfp_flag = FALSE;
+/* 0x03737C 0x1000037C  344 3244 */ int abi_flag = 0;
+/* 0x037380 0x10000380  345 3253 */ int memory_flag = 0;
+/* 0x037384 0x10000384  346 3265 */ /* boolean */ int default_call_shared = TRUE;
+/* 0x037388 0x10000388  347 3285 */ /* boolean */ int haspascal = FALSE;
+/* 0x03738C 0x1000038C  348 3295 */ /* boolean */ int hasfortran = FALSE;
+/* 0x037390 0x10000390  349 3306 */ int lmflag = FALSE; // pseudoboolean
+/* 0x037394 0x10000394  350 3313 */ int srcexists = FALSE;
+/* 0x037398 0x10000398  351 3323 */ int w1flag = 1;
+/* 0x03739C 0x1000039C None None */ static int D_1000039C = 0;
+/* 0x0373A0 0x100003A0  352 3330 */ /* boolean */ int prototype_checking_on = FALSE;
+/* 0x0373A4 0x100003A4  353 3352 */ /* boolean */ int showdirt_flag = FALSE;
+/* 0x0373A8 0x100003A8  354 3366 */ int mp_prepass_count = 0;
 
-/* 0x0373AC 0x100003AC 355  */ struct_mpflags mpflags[] = {
+/* 0x0373AC 0x100003AC  355 3383 */ struct_mpflags mpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
     { NULL, 0 },
 };
 
-/* 0x0373C4 0x100003C4 356  */ struct_mpflags cmpflags[] = {
+/* 0x0373C4 0x100003C4  356 3391 */ struct_mpflags cmpflags[] = {
     { "list", 0x10003 },
     { "keep", 0x10007 },
     { NULL, 0 },
 };
 
-/* 0x0373DC 0x100003DC 357  */ /* boolean */ int acpp = FALSE;
-/* 0x0373E0 0x100003E0 358  */ MipsAbi mips_abi = MIPS_ABI_1;
-/* 0x0373E4 0x100003E4 359  */ CompChoice compchoice = COMP_CHOICE_0;
-/* 0x0373E8 0x100003E8 360  */ CppChoice cppchoice = CPP_CHOICE_0;
-/* 0x0373EC 0x100003EC 361  */ int acpp_traditional = FALSE; // pseudoboolean
-/* 0x0373F0 0x100003F0 362  */ /* boolean */ int G_flag = FALSE;
-/* 0x0373F4 0x100003F4 363  */ /* boolean */ int dn_flag = FALSE;
-/* 0x0373F8 0x100003F8 364  */ int edison_cpp = 1;
-/* 0x0373FC 0x100003FC 365  */ EdisonType edison_type = EDISON_TYPE_1;
-/* 0x037400 0x10000400 366  */ char* Gnum = "0";
-/* 0x037404 0x10000404 367  */ int runerror = 0;
-/* 0x037408 0x10000408 368  */ /* boolean */ int uload = FALSE;
-/* 0x03740C 0x1000040C 369  */ int uldobj_place = -1;
-/* 0x037410 0x10000410 370  */ char* tmp_uldobj = NULL;
-/* 0x037414 0x10000414 371  */ ChipTarget chip_targ = CHIP_TARGET_UNSET;
-/* 0x037418 0x10000418 372  */ int nobjs = FALSE; // pseudoboolean
-/* 0x03741C 0x1000041C 373  */ int targetsex = BIGENDIAN;
-/* 0x037420 0x10000420 374  */ /* boolean */ int default_svr4 = FALSE;
-/* 0x037424 0x10000424 375  */ /* boolean */ int irix4 = FALSE;
-/* 0x037428 0x10000428 376  */ char* runlib = "/";
-/* 0x03742C 0x1000042C 377  */ char* runlib_base = "/";
-/* 0x037430 0x10000430 None */ static prmap_sgi_arg_t D_10000430 = { (caddr_t)B_10008310, 0x1900 }; // mapbuf_desc
-/* 0x037438 0x10000438 None */ static char* D_10000438 = NULL; // current working directory (D_1000C1D0 in 7.1)
-/* 0x03743C 0x1000043C 378  */ /* boolean */ int run_sopt = FALSE;
-/* 0x037440 0x10000440 None */ static char* D_10000440 = NULL;
-/* 0x037444 0x10000444 None */ static char* D_10000444 = NULL;
+/* 0x0373DC 0x100003DC  357 3400 */ /* boolean */ int acpp = FALSE;
+/* 0x0373E0 0x100003E0  358 3405 */ MipsAbi mips_abi = MIPS_ABI_1;
+/* 0x0373E4 0x100003E4  359 3414 */ CompChoice compchoice = COMP_CHOICE_0;
+/* 0x0373E8 0x100003E8  360 3425 */ CppChoice cppchoice = CPP_CHOICE_0;
+/* 0x0373EC 0x100003EC  361 3435 */ int acpp_traditional = FALSE; // pseudoboolean
+/* 0x0373F0 0x100003F0  362 3452 */ /* boolean */ int G_flag = FALSE;
+/* 0x0373F4 0x100003F4  363 3459 */ /* boolean */ int dn_flag = FALSE;
+/* 0x0373F8 0x100003F8  364 3467 */ int edison_cpp = 1;
+/* 0x0373FC 0x100003FC  365 3478 */ EdisonType edison_type = EDISON_TYPE_1;
+/* 0x037400 0x10000400  366 3490 */ char* Gnum = "0";
+/* 0x037404 0x10000404  367 3495 */ int runerror = 0;
+/* 0x037408 0x10000408  368 3504 */ /* boolean */ int uload = FALSE;
+/* 0x03740C 0x1000040C  369 3510 */ int uldobj_place = -1;
+/* 0x037410 0x10000410  370 3523 */ char* tmp_uldobj = NULL;
+/* 0x037414 0x10000414  371 3534 */ ChipTarget chip_targ = CHIP_TARGET_UNSET;
+/* 0x037418 0x10000418  372 3544 */ int nobjs = FALSE; // pseudoboolean
+/* 0x03741C 0x1000041C  373 3550 */ int targetsex = BIGENDIAN;
+/* 0x037420 0x10000420  374 3560 */ /* boolean */ int default_svr4 = FALSE;
+/* 0x037424 0x10000424  375 3573 */ /* boolean */ int irix4 = FALSE;
+/* 0x037428 0x10000428  376 3579 */ char* runlib = "/";
+/* 0x03742C 0x1000042C  377 3586 */ char* runlib_base = "/";
+/* 0x037430 0x10000430 None None */ static prmap_sgi_arg_t D_10000430 = { (caddr_t)B_10008310, 0x1900 }; // mapbuf_desc
+/* 0x037438 0x10000438 None None */ static char* D_10000438 = NULL; // current working directory (D_1000C1D0 in 7.1)
+/* 0x03743C 0x1000043C  378 3598 */ /* boolean */ int run_sopt = FALSE;
+/* 0x037440 0x10000440 None None */ static char* D_10000440 = NULL;
+/* 0x037444 0x10000444 None None */ static char* D_10000444 = NULL;
 
 // static int Pipe[2]; /* for implementing semaphore */
 #ifndef linux
@@ -8982,7 +8983,7 @@ void parse_command(int argc, char** argv) {
 void get_host_chiptype(void) {
 }
 
-/* 0x037448 0x10000448 None */ static const char* D_10000448[] = {
+/* 0x037448 0x10000448 None None */ static const char* D_10000448[] = {
     "Internal", "Error", "Warning", "Info", "Fix", "",
 }; // Error category strings
 
@@ -11369,7 +11370,7 @@ char* dirname(char* const s) {
     }
 }
 
-/* 0x037460 0x10000460 379  */ struct {
+/* 0x037460 0x10000460  379 3607 */ struct {
     /* 0x0 */ const char* basename;  // name of executable
     /* 0x4 */ const char* full_path; // full path of executable
     /* 0x8 */ const char* product;   // package/product executable is part of
@@ -11395,9 +11396,9 @@ char* dirname(char* const s) {
     { "edgcpfe", "/usr/lib/DCC/edgcpfe", "Delta C++" },
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "Delta C++" },
 };
-/* 0x037550 0x10000550 None */ static char* D_10000550 = NULL;
-/* 0x037554 0x10000554 None */ static char* D_10000554 = NULL;
-/* 0x037558 0x10000558 None */ static char* D_10000558 = NULL; // program_name (D_1000C2F0 in 7.1)
+/* 0x037550 0x10000550 None None */ static char* D_10000550 = NULL;
+/* 0x037554 0x10000554 None None */ static char* D_10000554 = NULL;
+/* 0x037558 0x10000558 None None */ static char* D_10000558 = NULL; // program_name (D_1000C2F0 in 7.1)
 
 /**
  * Name: func_00434094
