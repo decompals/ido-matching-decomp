@@ -25,42 +25,44 @@
 #include "unistd.h"
 
 /**
- * _ftext
- *
- * Not clear what this is, but it's a separate section if not a separate file
- *
- * Address: 0x00405550
+ * Name: _ftext
  * VROM: 0x005550
+ * Address: 0x00405550
+ * dynsym index: 14
+ * dynstr index: 141
  * Size: 0x10
  */
 // int _ftext();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/_ftext.s")
 
 /**
- * func_00405560
- *
- * This should be mips.STUBS
- *
- * Address: 0x00405560
+ * Name: func_00405560
  * VROM: 0x005560
+ * Address: 0x00405560
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0x400
  */
 // // static int func_00405560();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
 
 /**
- * __start
- * Address: 0x00405960
+ * Name: __start
  * VROM: 0x005960
+ * Address: 0x00405960
+ * dynsym index: 15
+ * dynstr index: 148
  * Size: 0x108
  */
 // // int __start();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
 
 /**
- * _mcount
- * Address: 0x00405A68
+ * Name: _mcount
  * VROM: 0x005A68
+ * Address: 0x00405A68
+ * dynsym index: 16
+ * dynstr index: 156
  * Size: 0xC8
  */
 // // int _mcount();
@@ -702,9 +704,11 @@ static void func_004365B8(void);
 #endif
 
 /**
- * main
- * Address: 0x00405B30
+ * Name: main
  * VROM: 0x005B30
+ * Address: 0x00405B30
+ * dynsym index: 109
+ * dynstr index: 888
  * Size: 0x16250
  */
 int main(int argc, char** argv) {
@@ -5504,9 +5508,11 @@ int main(int argc, char** argv) {
 }
 
 /**
- * process_config
- * Address: 0x0041BD80
+ * Name: process_config
  * VROM: 0x01BD80
+ * Address: 0x0041BD80
+ * dynsym index: 110
+ * dynstr index: 893
  * Size: 0x570
  */
 void process_config(int argc, char** argv) {
@@ -5587,9 +5593,11 @@ void process_config(int argc, char** argv) {
 }
 
 /**
- * add_info
- * Address: 0x0041C2F0
+ * Name: add_info
  * VROM: 0x01C2F0
+ * Address: 0x0041C2F0
+ * dynsym index: 111
+ * dynstr index: 908
  * Size: 0x12C
  */
 void add_info(char* s) {
@@ -5607,9 +5615,11 @@ void add_info(char* s) {
 }
 
 /**
- * parse_command
- * Address: 0x0041C41C
+ * Name: parse_command
  * VROM: 0x01C41C
+ * Address: 0x0041C41C
+ * dynsym index: 112
+ * dynstr index: 917
  * Size: 0xEA64
  */
 /**
@@ -8962,9 +8972,11 @@ void parse_command(int argc, char** argv) {
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/parse_command.s")
 
 /**
- * get_host_chiptype
- * Address: 0x0042AE80
+ * Name: get_host_chiptype
  * VROM: 0x02AE80
+ * Address: 0x0042AE80
+ * dynsym index: 113
+ * dynstr index: 931
  * Size: 0x14
  */
 void get_host_chiptype(void) {
@@ -8975,9 +8987,11 @@ void get_host_chiptype(void) {
 }; // Error category strings
 
 /**
- * error
- * Address: 0x0042AE94
+ * Name: error
  * VROM: 0x02AE94
+ * Address: 0x0042AE94
+ * dynsym index: 114
+ * dynstr index: 949
  * Size: 0x3C0
  */
 // Print an error. Has to be K&R for the variadic stuff to work in other functions
@@ -9060,9 +9074,11 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
          : "cfe")
 
 /**
- * relocate_passes
- * Address: 0x0042B254
+ * Name: relocate_passes
  * VROM: 0x02B254
+ * Address: 0x0042B254
+ * dynsym index: 115
+ * dynstr index: 955
  * Size: 0x3F5C
  */
 /**
@@ -9818,9 +9834,11 @@ void relocate_passes(const char* arg0, const char* arg1, char* arg2) {
 }
 
 /**
- * newrunlib
- * Address: 0x0042F1B0
+ * Name: newrunlib
  * VROM: 0x02F1B0
+ * Address: 0x0042F1B0
+ * dynsym index: 116
+ * dynstr index: 971
  * Size: 0x11C
  */
 void newrunlib(void) {
@@ -9842,9 +9860,11 @@ void newrunlib(void) {
 }
 
 /**
- * compose_G0_libs
- * Address: 0x0042F2CC
+ * Name: compose_G0_libs
  * VROM: 0x02F2CC
+ * Address: 0x0042F2CC
+ * dynsym index: 117
+ * dynstr index: 981
  * Size: 0x30C
  */
 void compose_G0_libs(const char* arg0) {
@@ -9906,9 +9926,11 @@ void compose_G0_libs(const char* arg0) {
 }
 
 /**
- * compose_reg_libs
- * Address: 0x0042F5D8
+ * Name: compose_reg_libs
  * VROM: 0x02F5D8
+ * Address: 0x0042F5D8
+ * dynsym index: 17
+ * dynstr index: 164
  * Size: 0x2DC
  */
 void compose_reg_libs(const char* arg0) {
@@ -9973,9 +9995,11 @@ void compose_reg_libs(const char* arg0) {
 
 #define _VA_INIT_STATE 1
 /**
- * mkstr
- * Address: 0x0042F8B4
+ * Name: mkstr
  * VROM: 0x02F8B4
+ * Address: 0x0042F8B4
+ * dynsym index: 118
+ * dynstr index: 997
  * Size: 0x214
  */
 // Actual prototype is char* mkstr(const char*, ...);
@@ -10018,9 +10042,11 @@ va_dcl // K&R syntax
 #endif
 
 /**
- * mklist
- * Address: 0x0042FAC8
+ * Name: mklist
  * VROM: 0x02FAC8
+ * Address: 0x0042FAC8
+ * dynsym index: 119
+ * dynstr index: 1003
  * Size: 0x130
  */
 // Initialise a specified string_list with capacity LIST_INITIAL_CAPACITY and length 0.
@@ -10039,9 +10065,11 @@ void mklist(string_list* list) {
 }
 
 /**
- * addstr
- * Address: 0x0042FBF8
+ * Name: addstr
  * VROM: 0x02FBF8
+ * Address: 0x0042FBF8
+ * dynsym index: 120
+ * dynstr index: 1010
  * Size: 0x194
  */
 // Add a single string entry to a string_list.
@@ -10067,9 +10095,11 @@ void addstr(list, str)
 }
 
 /**
- * addspacedstr
- * Address: 0x0042FD8C
+ * Name: addspacedstr
  * VROM: 0x02FD8C
+ * Address: 0x0042FD8C
+ * dynsym index: 121
+ * dynstr index: 1017
  * Size: 0x1E8
  */
 /**
@@ -10105,9 +10135,11 @@ void addspacedstr(string_list* list, char* str) {
 }
 
 /**
- * newstr
- * Address: 0x0042FF74
+ * Name: newstr
  * VROM: 0x02FF74
+ * Address: 0x0042FF74
+ * dynsym index: 122
+ * dynstr index: 1030
  * Size: 0xA4
  */
 /**
@@ -10130,9 +10162,11 @@ char* newstr(char* s) {
 }
 
 /**
- * save_place
- * Address: 0x00430018
+ * Name: save_place
  * VROM: 0x030018
+ * Address: 0x00430018
+ * dynsym index: 123
+ * dynstr index: 1037
  * Size: 0x184
  */
 /**
@@ -10162,9 +10196,11 @@ int save_place(string_list* list) {
 }
 
 /**
- * set_place
- * Address: 0x0043019C
+ * Name: set_place
  * VROM: 0x03019C
+ * Address: 0x0043019C
+ * dynsym index: 124
+ * dynstr index: 1048
  * Size: 0xC4
  */
 /**
@@ -10183,9 +10219,11 @@ void set_place(string_list* list, char* str, int place) {
 }
 
 /**
- * addlist
- * Address: 0x00430260
+ * Name: addlist
  * VROM: 0x030260
+ * Address: 0x00430260
+ * dynsym index: 125
+ * dynstr index: 1058
  * Size: 0x214
  */
 // Append the entries from `b` to `a`.
@@ -10214,9 +10252,11 @@ void addlist(string_list* a, string_list* b) {
 }
 
 /**
- * adduldlist
- * Address: 0x00430474
+ * Name: adduldlist
  * VROM: 0x030474
+ * Address: 0x00430474
+ * dynsym index: 126
+ * dynstr index: 1066
  * Size: 0x384
  */
 /**
@@ -10265,9 +10305,11 @@ void adduldlist(string_list* a, string_list* b, string_list* c) {
 }
 
 /**
- * nodup
- * Address: 0x004307F8
+ * Name: nodup
  * VROM: 0x0307F8
+ * Address: 0x004307F8
+ * dynsym index: 127
+ * dynstr index: 1077
  * Size: 0xBC
  */
 /**
@@ -10289,9 +10331,11 @@ void adduldlist(string_list* a, string_list* b, string_list* c) {
 }
 
 /**
- * getsuf
- * Address: 0x004308B4
+ * Name: getsuf
  * VROM: 0x0308B4
+ * Address: 0x004308B4
+ * dynsym index: 128
+ * dynstr index: 1083
  * Size: 0x258
  */
 /**
@@ -10368,9 +10412,11 @@ char getsuf(const /* string */ char* path) {
 }
 
 /**
- * mksuf
- * Address: 0x00430B0C
+ * Name: mksuf
  * VROM: 0x030B0C
+ * Address: 0x00430B0C
+ * dynsym index: 129
+ * dynstr index: 1090
  * Size: 0x3B0
  */
 /**
@@ -10468,9 +10514,11 @@ char* mksuf(const char* path, char value) {
 }
 
 /**
- * savestr
- * Address: 0x00430EBC
+ * Name: savestr
  * VROM: 0x030EBC
+ * Address: 0x00430EBC
+ * dynsym index: 130
+ * dynstr index: 1096
  * Size: 0x140
  */
 // Copy a string, adding extra_length bytes to the allocation.
@@ -10489,9 +10537,11 @@ char* mksuf(const char* path, char value) {
 }
 
 /**
- * mktempstr
- * Address: 0x00430FFC
+ * Name: mktempstr
  * VROM: 0x030FFC
+ * Address: 0x00430FFC
+ * dynsym index: 131
+ * dynstr index: 1104
  * Size: 0x930
  */
 void mktempstr(void) {
@@ -10539,9 +10589,11 @@ void mktempstr(void) {
 }
 
 /**
- * run
- * Address: 0x0043192C
+ * Name: run
  * VROM: 0x03192C
+ * Address: 0x0043192C
+ * dynsym index: 132
+ * dynstr index: 1114
  * Size: 0xD34
  */
 /**
@@ -10754,9 +10806,11 @@ int run(char* name, char* const argv[], char* input, char* output, char* err_out
 }
 
 /**
- * edit_src
- * Address: 0x00432660
+ * Name: edit_src
  * VROM: 0x032660
+ * Address: 0x00432660
+ * dynsym index: 133
+ * dynstr index: 1118
  * Size: 0x4FC
  */
 /**
@@ -10837,9 +10891,11 @@ int edit_src(const char* program, const char* srcpath, int lino_mode) {
 }
 
 /**
- * get_lino
- * Address: 0x00432B5C
+ * Name: get_lino
  * VROM: 0x032B5C
+ * Address: 0x00432B5C
+ * dynsym index: 134
+ * dynstr index: 1127
  * Size: 0x5B0
  */
 #define GET_LINO_BUF_SIZE 0x800
@@ -10946,9 +11002,11 @@ void get_lino(char* lino, const char* path, int mode) {
 #undef GET_LINO_BUF_SIZE
 
 /**
- * show_err
- * Address: 0x0043310C
+ * Name: show_err
  * VROM: 0x03310C
+ * Address: 0x0043310C
+ * dynsym index: 135
+ * dynstr index: 1136
  * Size: 0x10C
  */
 #define SHOW_ERR_BUF_SIZE 0x10000
@@ -10971,9 +11029,11 @@ void show_err(const char* path) {
 #undef SHOW_ERR_BUF_SIZE
 
 /**
- * handler
- * Address: 0x00433218
+ * Name: handler
  * VROM: 0x033218
+ * Address: 0x00433218
+ * dynsym index: 136
+ * dynstr index: 1145
  * Size: 0x48
  */
 /*
@@ -10986,9 +11046,11 @@ void handler(void) {
 }
 
 /**
- * cleanup
- * Address: 0x00433260
+ * Name: cleanup
  * VROM: 0x033260
+ * Address: 0x00433260
+ * dynsym index: 137
+ * dynstr index: 1153
  * Size: 0x3EC
  */
 void cleanup(void) {
@@ -11056,9 +11118,11 @@ void cleanup(void) {
 }
 
 /**
- * whats
- * Address: 0x0043364C
+ * Name: whats
  * VROM: 0x03364C
+ * Address: 0x0043364C
+ * dynsym index: 138
+ * dynstr index: 1161
  * Size: 0x1C0
  */
 void whats(void) {
@@ -11084,9 +11148,11 @@ void whats(void) {
 // No evidence of this code in anything resembling this form in csh
 
 /**
- * settimes
- * Address: 0x0043380C
+ * Name: settimes
  * VROM: 0x03380C
+ * Address: 0x0043380C
+ * dynsym index: 139
+ * dynstr index: 1167
  * Size: 0x3C
  */
 // clock_t time0;
@@ -11097,9 +11163,11 @@ void settimes(void) {
 }
 
 /**
- * dotime
- * Address: 0x00433848
+ * Name: dotime
  * VROM: 0x033848
+ * Address: 0x00433848
+ * dynsym index: 140
+ * dynstr index: 1176
  * Size: 0x180
  */
 #define HZ 100
@@ -11123,9 +11191,11 @@ void dotime(void) {
 }
 
 /**
- * func_004339C8
- * Address: 0x004339C8
+ * Name: func_004339C8
  * VROM: 0x0339C8
+ * Address: 0x004339C8
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0x260
  */
 // Search through a NULL-terminated array of directory names for a library. If not found there, use an appropriate
@@ -11162,9 +11232,11 @@ static char* func_004339C8(char* name, char** dirs) {
 }
 
 /**
- * isdir
- * Address: 0x00433C28
+ * Name: isdir
  * VROM: 0x033C28
+ * Address: 0x00433C28
+ * dynsym index: 141
+ * dynstr index: 1183
  * Size: 0x7C
  */
 boolean isdir(const char* path) {
@@ -11182,9 +11254,11 @@ boolean isdir(const char* path) {
 }
 
 /**
- * regular_not_writeable
- * Address: 0x00433CA4
+ * Name: regular_not_writeable
  * VROM: 0x033CA4
+ * Address: 0x00433CA4
+ * dynsym index: 142
+ * dynstr index: 1189
  * Size: 0x98
  */
 // Looks boolean, but not treated as one.
@@ -11203,9 +11277,11 @@ int regular_not_writeable(const char* path) {
 }
 
 /**
- * regular_file
- * Address: 0x00433D3C
+ * Name: regular_file
  * VROM: 0x033D3C
+ * Address: 0x00433D3C
+ * dynsym index: 143
+ * dynstr index: 1211
  * Size: 0x7C
  */
 int regular_file(const char* path) {
@@ -11223,9 +11299,11 @@ int regular_file(const char* path) {
 }
 
 /**
- * basename
- * Address: 0x00433DB8
+ * Name: basename
  * VROM: 0x033DB8
+ * Address: 0x00433DB8
+ * dynsym index: 144
+ * dynstr index: 1224
  * Size: 0x118
  */
 // Almost identical in Open64
@@ -11252,9 +11330,11 @@ char* basename(char* const s) {
 }
 
 /**
- * dirname
- * Address: 0x00433ED0
+ * Name: dirname
  * VROM: 0x033ED0
+ * Address: 0x00433ED0
+ * dynsym index: 145
+ * dynstr index: 1233
  * Size: 0x1C4
  */
 // Almost identical in Open64
@@ -11320,9 +11400,11 @@ char* dirname(char* const s) {
 /* 0x037558 0x10000558 None */ static char* D_10000558 = NULL; // program_name (D_1000C2F0 in 7.1)
 
 /**
- * func_00434094
- * Address: 0x00434094
+ * Name: func_00434094
  * VROM: 0x034094
+ * Address: 0x00434094
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0x134
  */
 // obvious name suggestion would be `get_product` or similar?
@@ -11363,9 +11445,11 @@ static const char* func_00434094(const char* path, int check_full_path) {
 }
 
 /**
- * add_cxx_symbol_options
- * Address: 0x004341C8
+ * Name: add_cxx_symbol_options
  * VROM: 0x0341C8
+ * Address: 0x004341C8
+ * dynsym index: 146
+ * dynstr index: 1241
  * Size: 0x40
  */
 int add_cxx_symbol_options(void) {
@@ -11374,9 +11458,11 @@ int add_cxx_symbol_options(void) {
 }
 
 /**
- * init_curr_dir
- * Address: 0x00434208
+ * Name: init_curr_dir
  * VROM: 0x034208
+ * Address: 0x00434208
+ * dynsym index: 147
+ * dynstr index: 1264
  * Size: 0x158
  */
 void init_curr_dir(void) {
@@ -11400,9 +11486,11 @@ void init_curr_dir(void) {
 }
 
 /**
- * full_path
- * Address: 0x00434360
+ * Name: full_path
  * VROM: 0x034360
+ * Address: 0x00434360
+ * dynsym index: 148
+ * dynstr index: 1278
  * Size: 0x90
  */
 // Make a full path name from a base file name.
@@ -11419,9 +11507,11 @@ void init_curr_dir(void) {
 }
 
 /**
- * add_static_opt
- * Address: 0x004343F0
+ * Name: add_static_opt
  * VROM: 0x0343F0
+ * Address: 0x004343F0
+ * dynsym index: 149
+ * dynstr index: 1288
  * Size: 0x54
  */
 void add_static_opt(/* string */ char* opt) {
@@ -11432,9 +11522,11 @@ void add_static_opt(/* string */ char* opt) {
 
 #define CONTENTS_BUF_SIZE 0x2800
 /**
- * record_static_fileset
- * Address: 0x00434444
+ * Name: record_static_fileset
  * VROM: 0x034444
+ * Address: 0x00434444
+ * dynsym index: 150
+ * dynstr index: 1303
  * Size: 0x9F4
  */
 void record_static_fileset(const char* arg0) {
@@ -11555,9 +11647,11 @@ void record_static_fileset(const char* arg0) {
 #undef CONTENTS_BUF_SIZE
 
 /**
- * touch
- * Address: 0x00434E38
+ * Name: touch
  * VROM: 0x034E38
+ * Address: 0x00434E38
+ * dynsym index: 151
+ * dynstr index: 1325
  * Size: 0x17C
  */
 int touch(const char* path) {
@@ -11582,9 +11676,11 @@ int touch(const char* path) {
 }
 
 /**
- * add_prelinker_objects
- * Address: 0x00434FB4
+ * Name: add_prelinker_objects
  * VROM: 0x034FB4
+ * Address: 0x00434FB4
+ * dynsym index: 152
+ * dynstr index: 1331
  * Size: 0xFC
  */
 // Append the `list` to `execlist`, skipping any entries that are "-B"
@@ -11640,9 +11736,11 @@ void add_prelinker_objects(string_list* execlist, string_list* list) {
 #define is_shell_quote_special(c) ((c) == '"' || (c) == '\\' || (c) == '`' || (c) == '$')
 
 /**
- * quoted_length
- * Address: 0x004350B0
+ * Name: quoted_length
  * VROM: 0x0350B0
+ * Address: 0x004350B0
+ * dynsym index: 153
+ * dynstr index: 1353
  * Size: 0x174
  */
 /*
@@ -11668,9 +11766,11 @@ void add_prelinker_objects(string_list* execlist, string_list* list) {
 }
 
 /**
- * quote_shell_arg
- * Address: 0x00435224
+ * Name: quote_shell_arg
  * VROM: 0x035224
+ * Address: 0x00435224
+ * dynsym index: 154
+ * dynstr index: 1367
  * Size: 0x140
  */
 /*
@@ -11698,9 +11798,11 @@ void add_prelinker_objects(string_list* execlist, string_list* list) {
 }
 
 /**
- * save_off_command_line
- * Address: 0x00435364
+ * Name: save_off_command_line
  * VROM: 0x035364
+ * Address: 0x00435364
+ * dynsym index: 155
+ * dynstr index: 1383
  * Size: 0x340
  */
 void save_off_command_line(int argc, char** argv) {
@@ -11748,9 +11850,11 @@ void save_off_command_line(int argc, char** argv) {
 }
 
 /**
- * skip_old_ii_controls
- * Address: 0x004356A4
+ * Name: skip_old_ii_controls
  * VROM: 0x0356A4
+ * Address: 0x004356A4
+ * dynsym index: 156
+ * dynstr index: 1405
  * Size: 0x4FC
  */
 /*
@@ -11779,9 +11883,11 @@ void skip_old_ii_controls(FILE* f) {
 }
 
 /**
- * make_ii_file_name
- * Address: 0x00435BA0
+ * Name: make_ii_file_name
  * VROM: 0x035BA0
+ * Address: 0x00435BA0
+ * dynsym index: 157
+ * dynstr index: 1426
  * Size: 0x134
  */
 char* make_ii_file_name(char* objname) {
@@ -11798,9 +11904,11 @@ char* make_ii_file_name(char* objname) {
 }
 
 /**
- * update_instantiation_info_file
- * Address: 0x00435CD4
+ * Name: update_instantiation_info_file
  * VROM: 0x035CD4
+ * Address: 0x00435CD4
+ * dynsym index: 158
+ * dynstr index: 1444
  * Size: 0x5F8
  */
 /*
@@ -11876,9 +11984,11 @@ void update_instantiation_info_file(char* objname) {
 /* code used to handle the -showm */
 
 /**
- * func_004362CC
- * Address: 0x004362CC
+ * Name: func_004362CC
  * VROM: 0x0362CC
+ * Address: 0x004362CC
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0x2EC
  */
 // stop_on_exit
@@ -11948,9 +12058,11 @@ static int func_004362CC(pid_t pid) { /* sets a child process to stop on exit */
 }
 
 /**
- * func_004365B8
- * Address: 0x004365B8
+ * Name: func_004365B8
  * VROM: 0x0365B8
+ * Address: 0x004365B8
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0xC8
  */
 // my_psema
@@ -11970,9 +12082,11 @@ static void func_004365B8(void) {
 }
 
 /**
- * func_00436680
- * Address: 0x00436680
+ * Name: func_00436680
  * VROM: 0x036680
+ * Address: 0x00436680
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0xBC
  */
 // my_vsema
@@ -11989,9 +12103,11 @@ static void func_00436680(void) {
 }
 
 /**
- * func_0043673C
- * Address: 0x0043673C
+ * Name: func_0043673C
  * VROM: 0x03673C
+ * Address: 0x0043673C
+ * dynsym index: None
+ * dynstr index: None
  * Size: 0x844
  */
 // print_mem
