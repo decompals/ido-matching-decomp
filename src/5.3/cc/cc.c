@@ -4,9 +4,11 @@
  *
  * This file incorporates code from Open64's Osprey driver, version 0.13.0, licensed under GPL Version 2
  */
+
 #include "sys/types.h"
 #include "ctype.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "errno.h"
 #include "string.h"
 #include "malloc.h"
@@ -46,21 +48,21 @@
 // // static int func_00405560();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
 
-// /**
-//  * __start
-//  * Address: 0x00405960
-//  * VROM: 0x005960
-//  * Size: 0x108
-//  */
+/**
+ * __start
+ * Address: 0x00405960
+ * VROM: 0x005960
+ * Size: 0x108
+ */
 // // int __start();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/__start.s")
 
-// /**
-//  * _mcount
-//  * Address: 0x00405A68
-//  * VROM: 0x005A68
-//  * Size: 0xC8
-//  */
+/**
+ * _mcount
+ * Address: 0x00405A68
+ * VROM: 0x005A68
+ * Size: 0xC8
+ */
 // // int _mcount();
 // #pragma GLOBAL_ASM("asm/5.3/functions/cc/_mcount.s")
 
@@ -209,13 +211,13 @@ void get_host_chiptype(void);
 void process_config(int argc, char** argv);
 void add_info(char* s);
 void parse_command(int argc, char** argv);
-void relocate_passes(char* arg0, char* arg1, char* arg2);
+void relocate_passes(const char* arg0, const char* arg1, char* arg2);
 void newrunlib(void);
 char getsuf(const /* string */ char* path);
 char* mksuf(const char* path, char value);
 /* string */ char* full_path(const /* string */ char* base);
 void add_static_opt(/* string */ char* opt);
-void compose_G0_libs(char* arg0);
+void compose_G0_libs(const char* arg0);
 int regular_file(const char*);
 void mklist(string_list* list);
 // Called incorrectly so cannot use prototype
@@ -9103,7 +9105,7 @@ void error(category, arg1, arg2, arg3, arg4, fmt, arg6, arg7, arg8, arg9, argA, 
  * Y: libI77_mp, libc_mp
  * w: prelinker (edg_prelink)
  */
-void relocate_passes(char* arg0, char* arg1, char* arg2) {
+void relocate_passes(const char* arg0, const char* arg1, char* arg2) {
     register int pad;
     register char* p;
 
@@ -9845,7 +9847,7 @@ void newrunlib(void) {
  * VROM: 0x02F2CC
  * Size: 0x30C
  */
-void compose_G0_libs(char* arg0) {
+void compose_G0_libs(const char* arg0) {
     for (; *arg0 != 0; arg0++) {
         switch (*arg0) {
             case 'P':
@@ -9909,7 +9911,7 @@ void compose_G0_libs(char* arg0) {
  * VROM: 0x02F5D8
  * Size: 0x2DC
  */
-void compose_reg_libs(char* arg0) {
+void compose_reg_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
             case 'P':
