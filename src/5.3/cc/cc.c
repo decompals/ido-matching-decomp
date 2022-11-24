@@ -462,10 +462,12 @@ void addstr(); // sometimes called incorrectly
 // 0x4 padding
 /* 0x0415F0 0x1000A5F0  506 4840 */ string_list staticopts;
 // 0x4 padding
-/* 0x041600 0x1000A600  507 4851 */ int __Argc;
-/* 0x041604 0x1000A604  508 4858 */ char** __Argv;
-/* 0x041608 0x1000A608   36  349 */ UNK_TYPE __rld_obj_head;
-/* 0x04160C 0x1000A60C None None */ static char B_1000A60C[0x04]; // padding?
+
+// from crt1.o
+// /* 0x041600 0x1000A600  507 4851 */ int __Argc;
+// /* 0x041604 0x1000A604  508 4858 */ char** __Argv;
+// /* 0x041608 0x1000A608   36  349 */ UNK_TYPE __rld_obj_head;
+// /* 0x04160C 0x1000A60C None None */ static char B_1000A60C[0x04]; // padding?
 
 // data
 
