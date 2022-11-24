@@ -24,6 +24,7 @@ class Sym:
     vrom: int
     got: int | None
     dynsym: int | None
+    dynstr: int | None
     size: int
 
 
@@ -59,6 +60,9 @@ def process_csv(csv_file, asm, migrated):
                         int(row["dynsymIndex"], 0)
                         if row["dynsymIndex"] != "None"
                         else None,
+                        int(row["dynstrIndex"], 0)
+                        if row["dynstrIndex"] != "None"
+                        else None,
                         int(row["getSize"], 0),
                     )
                 elif name.startswith("STR_") or name == "__Release_ID":
@@ -71,6 +75,9 @@ def process_csv(csv_file, asm, migrated):
                         int(row["gotIndex"], 0) if row["gotIndex"] != "None" else None,
                         int(row["dynsymIndex"], 0)
                         if row["dynsymIndex"] != "None"
+                        else None,
+                        int(row["dynstrIndex"], 0)
+                        if row["dynstrIndex"] != "None"
                         else None,
                         int(row["getSize"], 0),
                         get_str_contents(os.path.join(asm, name + ".s")),
@@ -85,6 +92,9 @@ def process_csv(csv_file, asm, migrated):
                     int(row["dynsymIndex"], 0)
                     if row["dynsymIndex"] != "None"
                     else None,
+                    int(row["dynstrIndex"], 0)
+                    if row["dynstrIndex"] != "None"
+                    else None,
                     int(row["getSize"], 0),
                 )
             elif row["sectionType"] == ".bss":
@@ -97,6 +107,9 @@ def process_csv(csv_file, asm, migrated):
                     int(row["dynsymIndex"], 0)
                     if row["dynsymIndex"] != "None"
                     else None,
+                    int(row["dynstrIndex"], 0)
+                    if row["dynstrIndex"] != "None"
+                    else None,
                     int(row["getSize"], 0),
                 )
 
@@ -106,7 +119,7 @@ def process_csv(csv_file, asm, migrated):
 
 # SHORT_COMMENT = " // Address: 0x{vram:08X}, GOT: {gotIndex}"
 # SHORT_COMMENT = "/* Address: 0x{vram:08X}, GOT: {gotIndex:4} */ "
-SHORT_COMMENT = "/* 0x{vrom:06X} 0x{vram:08X} {dynsym:4} */ "
+SHORT_COMMENT = "/* 0x{vrom:06X} 0x{vram:08X} {dynsym:>4} {dynstr:>4} */ "
 
 DOCUMENTATION_COMMENT = """\
 /**
@@ -114,6 +127,7 @@ DOCUMENTATION_COMMENT = """\
  * VROM: 0x{vrom:06X}
  * Address: 0x{vram:08X}
  * dynsym index: {dynsym}
+ * dynstr index: {dynstr}
  * Size: 0x{size:X}
  */\
 """
@@ -133,7 +147,10 @@ def write_file(out, asm, symbols, migrated):
 
         # bss
         last_notgot = None
+        last_notgotstr = None
         last_got = None
+        last_gotstr = None
+        f.write("/* VROM     Address   dynsym dynstr */\n")
         for sym in symbols.values():
             if sym.category == SymCat.Bss:
                 f.write(
@@ -141,6 +158,7 @@ def write_file(out, asm, symbols, migrated):
                         vrom=sym.vrom,
                         vram=sym.vram,
                         dynsym=str(sym.dynsym),
+                        dynstr=str(sym.dynstr),
                     )
                 )
                 if sym.name.startswith("B_"):
@@ -148,13 +166,19 @@ def write_file(out, asm, symbols, migrated):
                 f.write("char {}[0x{:X}];".format(sym.name, sym.size))
                 if sym.dynsym:
                     if sym.got:
-                        if last_got and sym.dynsym != last_got + 1:
+                        if last_got and sym.dynsym < last_got:
                             f.write(" // dynsym/got reorder?")
+                        if last_gotstr and sym.dynstr < last_gotstr:
+                            f.write(" // dynstr/got reorder?")
                         last_got = sym.dynsym
+                        last_gotstr = sym.dynstr
                     else:
-                        if last_notgot and sym.dynsym != last_notgot + 1:
+                        if last_notgot and sym.dynsym < last_notgot:
                             f.write(" // dynsym reorder?")
+                        if last_notgotstr and sym.dynstr < last_notgotstr:
+                            f.write(" // dynstr reorder?")
                         last_notgot = sym.dynsym
+                        last_notgotstr = sym.dynstr
                 f.write("\n")
 
         f.write("\n")
@@ -162,6 +186,7 @@ def write_file(out, asm, symbols, migrated):
         # data
         last_notgot = None
         last_got = None
+        last_gotstr = None
         for sym in symbols.values():
             # print(type(sym))
             if sym.category == SymCat.Data:
@@ -170,6 +195,7 @@ def write_file(out, asm, symbols, migrated):
                         vrom=sym.vrom,
                         vram=sym.vram,
                         dynsym=str(sym.dynsym),
+                        dynstr=str(sym.dynstr),
                     )
                 )
                 if sym.name.startswith("D_"):
@@ -177,9 +203,12 @@ def write_file(out, asm, symbols, migrated):
 
                 f.write("extern UNK_TYPE {};".format(sym.name, sym.size))
                 if sym.dynsym:
-                    if last_got and sym.dynsym != last_got + 1:
+                    if last_got and sym.dynsym < last_got:
                         f.write(" // dynsym reorder?")
+                    if last_gotstr and sym.dynstr < last_gotstr:
+                        f.write(" // dynstr reorder?")
                     last_got = sym.dynsym
+                    last_gotstr = sym.dynstr
                 f.write("\n")
 
         f.write("\n")
@@ -199,6 +228,7 @@ def write_file(out, asm, symbols, migrated):
                         vrom=sym.vrom,
                         vram=sym.vram,
                         dynsym=sym.dynsym,
+                        dynstr=sym.dynstr,
                         size=sym.size,
                     )
                 )
