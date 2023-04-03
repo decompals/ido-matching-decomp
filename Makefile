@@ -72,7 +72,8 @@ LDFLAGS := -nostdlib -L$(RECOMP)/ido/$(VERSION)/usr/lib/ -lc
 
 ASMPROCFLAGS := 
 OPTFLAGS := -O1
-MIPS_VERSION := -mips2
+MIPS_VERSION := -mips1
+
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 CFLAGS += -G 0 -KPIC -fullwarn -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul -woff 624,649,838,712,835
@@ -107,6 +108,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
+build/src/5.3/as0/%.o: OPTFLAGS := -O2
 
 # Targets
 
