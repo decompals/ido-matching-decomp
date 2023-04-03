@@ -58,8 +58,10 @@ s32 printedline;
 s32 StructOrg;
 s32 isStruct;
 s32 LastLabel;
+s32 atflag;
 
 // static void func_00405574(s32 arg0) {}
+// static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
 void func_00405574(s32 arg0);
 void EnterSym(s32 arg0, struct sym** arg1, s32 arg2);
 s32 LookUp(s32*, void**);
@@ -70,8 +72,8 @@ void posterror(char*, char*, s32);
 void put_binasmfyle();
 s32 sym_define(s32, u32, s32);
 void GetItem(s32 *arg0, s32 *arg1);
-
 extern void Parsestmt(void);
+s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec);
 
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00403F10.s")
@@ -402,7 +404,33 @@ void func_0040BC84(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CC44.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CCCC.s")
+
+void func_0040CCCC(void) {
+    s32 temp_v0;
+
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5 = (binasm_rec.unk5 & 0xFFC0) | 0x20;
+    if (Tokench != 0x69) {
+        posterror(".set option expected", NULL, 2);
+    } else {
+        temp_v0 = func_0040CC44(&Tstring, &binasm_rec);
+        binasm_rec.unk8 = temp_v0;
+        switch (temp_v0) {                          /* irregular */
+        case 5:
+            atflag = 1;
+            break;
+        case 6:
+            atflag = 0;
+            break;
+        case 0:
+            posterror("unknown option in .set", (s8* ) &Tstring, 2);
+            break;
+        }
+        nexttoken();
+    }
+    put_binasmfyle();
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CDE4.s")
 
