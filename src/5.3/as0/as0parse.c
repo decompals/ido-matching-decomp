@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "types.h"
-#include "asm_info.h" //better
+#include "arrays.h" //better
 
 
 typedef struct {
@@ -15,13 +15,6 @@ typedef struct {
     u8 unkC;
 }foo;
 
-struct binasm {
-/* 0x0 */ s32 unk0;
-/* 0x4 */ char unk4;
-/* 0x5 */ u8 unk5;
-/* 0x8 */ s32 unk8;
-/* 0xC */ s32 unkC;
-};
 
 //to implement
 struct new_binasm {
@@ -29,7 +22,9 @@ struct new_binasm {
 // /* 0x4 */ char unk4;
 /* 0x5 */ u32 unk4_1: 10;
 /* 0x5 */ u32 unk4_2: 6;
-/* 0x5 */ u32 unk4_3: 16;
+/* 0x5 */ u32 unk4_3: 2;
+/* 0x5 */ u32 unk4_4: 2;
+/* 0x5 */ u32 unk4_5: 12;
     union {
     u32 unk8;
     struct {
@@ -48,6 +43,7 @@ static s32 B_1000A7F0; //.bss
 static s32 B_1000A7F4; //.bss
 static s32 D_10000024; //.data
 static const char* D_10000004[4] = {"", "operand 1", "operand 2", "operand 3"}; //lol?
+static s32* D_10000014;
 
 foo *in_file;
 s32 severity;
@@ -70,10 +66,11 @@ s32 LastLabel;
 s32 atflag;
 s32 atflag;
 u8 isa;
+s32 CurrentSegment;
 
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
-void func_00405574(s32 arg0);
+void func_00405574(s32 arg0); //static
 void EnterSym(s32 arg0, struct sym** arg1, s32 arg2);
 s32 LookUp(s32*, void**);
 extern void func_004054E8(s32 arg0, u8* arg1);
@@ -84,7 +81,7 @@ void put_binasmfyle();
 s32 sym_define(s32, u32, s32);
 void GetItem(s32 *arg0, s32 *arg1);
 extern void Parsestmt(void);
-s32 func_0040CC44(u8** arg0, struct binasm_new* binasm_rec);
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00403F10.s")
 
@@ -355,9 +352,34 @@ void func_0040A044(s32 arg0) {
         put_binasmfyle();
     }
 }
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A0D4.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A160.s")
+void func_0040A0D4(void) {
+    u32 ret;
+
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0xF;
+    ret = GetExpr();
+    binasm_rec.unk8 = ret;
+    if (ret & 3) {
+        posterror("Offset for cprestore must be positive and divisible by 4", NULL, 1);
+    }
+    put_binasmfyle();
+}
+
+
+static void func_0040A160(void) {
+    struct sym* var_v1;
+
+
+    binasm_rec.unk4_2 = 0x21;
+    var_v1 = GetRegister();
+    if (var_v1 == NULL) {
+        posterror(".cpalias requires a register argument", NULL, 1);
+    }
+    binasm_rec.unk8_1 = var_v1->unk14;
+    put_binasmfyle();
+}
+
 
 void func_0040A208(void) {
     s32 sp24;
@@ -453,13 +475,91 @@ void func_0040B0F4(s32 arg0) {
     } while (Tokench != 0x23);
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040B340.s")
+void func_0040B340(void) {
+    invent_locs = 0;
+    GetExpr();
+    if (Tokench != '"') {
+        posterror("string literal expected", NULL, 1);
+    }
+    make_file(&Tstring);
+    nexttoken();
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040B554.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040B5F0.s")
+void func_0040B554(s32 arg0) {
+    s32* sp24;
+    s32* temp_v0;
 
-void func_0040B984(void) {
+    sp24 = D_10000014;
+    temp_v0 = D_10000014 =  malloc(sizeof(long long));
+    if (temp_v0 == NULL) {
+        new_error();
+        return;
+    }
+    *temp_v0 = arg0;
+    D_10000014[1] = sp24;
+}
+
+static void func_0040B5F0(s32 arg0) {
+    struct sym* sp24;
+    // u8 temp_v1;
+
+
+    if (LastLabel != 0) {
+        func_00405574(0);
+    }
+
+    isStruct = false;
+
+    if ((Tokench != 'i') && (arg0 != 0x18)) {
+            posterror("identifer expected", NULL, 1);
+            return;
+    }
+    if ((arg0 == 0x1B) || (arg0 == 0x2E)) {
+        if (verbose != 0) {
+            call_name_and_line(3);
+            fprintf(stderr, "%s ", &Tstring);
+            fflush(stderr);
+        }
+        binasm_rec.unk8 = 0;
+        if (arg0 == 0x1B) {
+            if (D_10000014 != 0) {
+                posterror("missing .end preceding this .ent", &Tstring, 2);
+                do_dot_end(0);
+            }
+        } else if (D_10000014 == 0) {
+            posterror(".aent must be inside .ent/.end block", &Tstring, 2);
+            arg0 = 0x1B;
+        }
+        if (LookUp(&Tstring, &sp24) == 0) {
+            EnterSym(&Tstring, &sp24, 1);
+        }
+        if (sp24->unk10 != 3) {
+            posterror("invalid symbol for .[a]ent ", &Tstring, 1);
+        }
+        nexttoken();
+
+        if (Tokench == ',') {
+            nexttoken();
+        }
+        if (Tokench == 'd') {
+            nexttoken();
+        }
+        sym_define(sp24->unk18, 0x23U, 0);
+        func_0040B554(sp24->unk18);
+        binasm_rec.unk0 = sp24->unk18;
+        binasm_rec.unk4_2 = arg0;
+        put_binasmfyle();
+    } else if (arg0 == 0x18) {
+        do_dot_end(0);
+    }
+    if (Tokench == 'i') {
+        nexttoken();
+    }
+}
+
+
+static void func_0040B984(void) {
     struct sym* cur_symbol;
     s32 sp38;
 
@@ -574,15 +674,14 @@ void func_0040C3E0(void) {
     put_binasmfyle();
 }
 
-void func_0040C460(void) {
+static void func_0040C460(void) {
     binasm_rec.unk0 = 0;
     binasm_rec.unk4_2 = 0x3C;
     binasm_rec.unk8 = GetExpr();
     put_binasmfyle();
 }
 
-
-void func_0040C4CC(void) {
+static void func_0040C4CC(void) {
     struct sym* sp24;
 
     binasm_rec.unk0 = 0;
@@ -606,36 +705,145 @@ void func_0040C4CC(void) {
     put_binasmfyle();
 }
 
+static void func_0040C5E8(s32 arg0) {
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = arg0;
+    binasm_rec.unk8 = GetExpr();
+    binasm_rec.unkC = GetExpr();
+    put_binasmfyle();
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C5E8.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C66C.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C830.s")
+static void func_0040C830(s32 arg0) {
+    if (LastLabel != 0) {
+        func_00405574(0);
+    }
+    isStruct = false;
+    binasm_rec.unk4_2 = arg0;
+    if (arg0 == '$') {
+        if (Tokench == 'i') {
+            nexttoken();
+            return;
+        }
+        posterror("identifier expected", NULL, 1);
+        return;
+    }
+    binasm_rec.unk0 = GetExpr();
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C928.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C9D0.s")
+void func_0040C928(void) {
+    struct sym* cur_symbol;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CC44.s")
+    binasm_rec.unk4_2 = 0x25;
+
+    cur_symbol = GetRegister();
+    if (cur_symbol != NULL) {
+        binasm_rec.unkC = GetExpr();
+        binasm_rec.unk0 = GetExpr();
+        binasm_rec.unk8_1 = cur_symbol->unk14;
+    }
+}
+
+//func_0040C9D0
+static void Parse_option_directive(void) {
+    s32 as1_option;
+    char* dest;
+    char* temp_v0;
+
+    if (Tokench != 'i') {
+        posterror(".option name expected", NULL, 2);
+        return;
+    }
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0x2F;
+    dest = malloc(Tstringlength + 2);
+    dest[0] = '-';
+    strcpy(&dest[1], &Tstring);
+    as1_option = which_opt(dest);
+    free(dest);
+    nexttoken();
+    switch (as1_option) {                                 /* irregular */
+        case 0x7: //-O0
+            binasm_rec.unk4_3 = 1;
+            binasm_rec.unkC = 0;
+            break;
+        case 0x8: //-O1
+            binasm_rec.unk4_3 = 1;
+            binasm_rec.unkC = 1;
+            break;
+        case 0x6: //-O
+        case 0x9: //-O2
+            binasm_rec.unk4_3 = 1;
+            binasm_rec.unkC = 2;
+            break;
+        case 0xA: //-O3
+            binasm_rec.unk4_3 = 1;
+            binasm_rec.unkC = 3;
+            break;
+        case 0xB: //-O4
+            binasm_rec.unk4_3 = 1;
+            binasm_rec.unkC = 4;
+            break;
+
+        case 0x57: //-pic0
+            binasm_rec.unk4_3 = 2;
+            binasm_rec.unkC = 0;
+            break;
+        case 0x58: //-pic1
+            binasm_rec.unk4_3 = 2;
+            binasm_rec.unkC = 1;
+            break;
+        case 0x59: //-pic2
+            binasm_rec.unk4_3 = 2;
+            binasm_rec.unkC = 2;
+            break;
+        case 0x5A: //big_got
+        case 0x5B: //coff
+        case 0x5C: //elf
+            break;
+        default:
+            posterror("Unknown name in .option", NULL, 2);
+            break;
+    }
+    put_binasmfyle();
+}
 
 
-void func_0040CCCC(void) {
-    s32 temp_v0;
+static s32 func_0040CC44(u8** arg0) {
+    s32 var_s0;
+    s8** var_s1;
 
+    var_s1 = &sset_value;
+
+
+    for(var_s0 = 0; var_s0 <= 0x10 ; var_s0++){
+        if (strcmp(arg0, *var_s1) == 0) {
+        return var_s0;
+    }
+    var_s1 += 1;
+    }
+    return 0;
+
+
+}
+
+static void func_0040CCCC(void) {
     binasm_rec.unk0 = 0;
     binasm_rec.unk4_2 = 0x20;
-    if (Tokench != 0x69) {
+
+    if (Tokench != 'i') {
         posterror(".set option expected", NULL, 2);
     } else {
-        temp_v0 = func_0040CC44(&Tstring, &binasm_rec);
-        binasm_rec.unk8 = temp_v0;
-        switch (temp_v0) {                          /* irregular */
+        binasm_rec.unk8 = func_0040CC44(&Tstring);
+        switch (binasm_rec.unk8) {                          /* irregular */
         case 5:
-            atflag = 1;
+            atflag = true;
             break;
         case 6:
-            atflag = 0;
+            atflag = false;
             break;
         case 0:
             posterror("unknown option in .set", (s8* ) &Tstring, 2);
@@ -649,13 +857,136 @@ void func_0040CCCC(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CDE4.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CEB4.s")
+static void func_0040CEB4(void) {
+    int temp_v0;
+    int temp_v1;
+    int var_v1;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CF9C.s")
+    if (LastLabel) {
+        func_00405574(0);
+    }
+    temp_v0 = GetExpr();
+    // temp_v1 = temp_v0;
+    if (isStruct != 0) {
+        var_v1 = (temp_v0 < 0) ? 0 : temp_v0;
+        StructOrg = var_v1 + StructOrg;
+        return;
+    }
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0x14;
+    binasm_rec.unk8 = temp_v0;
+    binasm_rec.unkC = 0;
+    put_binasmfyle();
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040D110.s")
+static void func_0040CF9C(void) {
+    s32 sp54;
+    s32 sp50;
+    s32 sp4C;
+    s32 temp_t9;
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040D284.s")
+    if (LastLabel != 0) {
+        func_00405574(2);
+    }
+    while(true) {
+        sp4C = 0;
+        sp50 = 1;
+        sp54 = 0;
+        if (func_0040BEBC(&sp54, &sp4C, &sp50) == 0) {
+            break;
+        }
+
+        if (isStruct != 0) {
+            if (sp50 * 4 < 4) {
+                var_v1 = 4;
+            } else {
+                var_v1 = sp50 * 4;
+            }
+            StructOrg = var_v1 + StructOrg;
+
+        } else {
+            binasm_rec.unk0 = sp54;
+            binasm_rec.unk4_2 = 0x16;
+            binasm_rec.unk8 = sp4C;
+            binasm_rec.unkC = sp50;
+            put_binasmfyle();
+        }
+        if (Tokench == 0x23) {
+            break;
+        }
+    }
+}
+
+
+
+static void func_0040D110(void) {
+    s32 sp54;
+    s32 sp50;
+    s32 sp4C;
+    s32 temp_t9;
+    s32 var_v1;
+
+    if (LastLabel != 0) {
+        func_00405574(2);
+    }
+
+    while(true) {
+
+    sp4C = 0;
+    sp50 = 1;
+    sp54 = 0;
+
+    if (func_0040BEBC(&sp54, &sp4C, &sp50) == 0) {
+        break;
+    }
+        if (isStruct != 0) {
+            temp_t9 = sp50 * 4;
+            if (temp_t9 < 4) {
+                var_v1 = 4;
+            } else {
+                var_v1 = temp_t9;
+            }
+            StructOrg += var_v1;
+        } else {
+            binasm_rec.unk0 = sp54;
+            binasm_rec.unk4_2 = 0x10; //Fake?
+            binasm_rec.unk8 = sp4C;
+            binasm_rec.unkC = sp50;
+            put_binasmfyle();
+        }
+        if (Tokench == 0x23) {
+            break;
+
+            }
+        }
+}
+
+static void func_0040D284(u8* arg0) {
+    struct sym* cur_symbol;
+
+    if (LookUp(arg0, &cur_symbol) == 0) {
+        EnterSym(arg0, &cur_symbol, 0);
+    }
+
+    if ((cur_symbol->unk10 != 3) && (cur_symbol->unk10 != 4)) {
+        posterror("", arg0, 1);
+        return;
+    }
+    sym_define(cur_symbol->unk18, CurrentSegment, 0);
+
+    binasm_rec.unk0 =   cur_symbol->unk18;
+    binasm_rec.unk4_2 = ~0x3F; //just keep it
+
+    if (list_extsyms != 0) {
+        if (isdigit(*arg0)) {
+            func_004054E8(cur_symbol->unk18, NULL);
+        } else {
+            func_004054E8(cur_symbol->unk18, arg0);
+        }
+    }
+    put_binasmfyle();
+}
 
 void Parsestmt(void) {
     char sp38[0x400];
@@ -766,7 +1097,7 @@ void Parsestmt(void) {
             func_0040AAD4(0x2D);
             break;
         case 0x2F:                  /* switch 1 */
-            func_0040C9D0();
+            Parse_option_directive();
             break;
         case 0x20:                  /* switch 1 */
             func_0040CCCC();
@@ -783,12 +1114,12 @@ void Parsestmt(void) {
         case 0x18:                  /* switch 1 */
         case 0x1B:                  /* switch 1 */
         case 0x2E:                  /* switch 1 */
-            func_0040B5F0();
+            func_0040B5F0(temp_a0);
             break;
         case 0x1D:                  /* switch 1 */
         case 0x1E:                  /* switch 1 */
         case 0x24:                  /* switch 1 */
-            func_0040C830();
+            func_0040C830(temp_a0);
             break;
         case 0x1C:                  /* switch 1 */
             func_0040C218();
