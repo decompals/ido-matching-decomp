@@ -67,6 +67,8 @@ s32 atflag;
 s32 atflag;
 u8 isa;
 s32 CurrentSegment;
+s32 binasm_count;
+FILE* extsyms_file;
 
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
@@ -216,7 +218,20 @@ void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405178.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004054E8.s")
+void func_004054E8(s32 arg0, u8* arg1) {
+    u8* var_a2;
+
+    fprintf(extsyms_file, "%1d %1d", binasm_count, arg0);
+
+    if (arg1 != NULL) {
+        var_a2 = arg1;
+    } else {
+        var_a2 = "";
+    }
+
+    fprintf(extsyms_file, " %s\n", var_a2);
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405574.s")
 

@@ -252,8 +252,9 @@ static s32 func_00411ECC() {
     return var_s2;
 }
 
+void func_0041213C(void) {
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0041213C.s")
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00412144.s")
 
