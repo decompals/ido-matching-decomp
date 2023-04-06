@@ -3,7 +3,7 @@
 struct _struct_asm_info_0x8 {
     /* 0x0 */ u8 *unk0;                             /* inferred */
     /* 0x4 */ u32 unk4;                             /* inferred */
-};   
+};
 
  struct _struct_asm_info_0x8 asm_info[0x1AF] = {
     { (u8 *)0x10006F60, 0x08000420 },

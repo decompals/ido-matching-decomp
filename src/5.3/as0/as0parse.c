@@ -16,26 +16,6 @@ typedef struct {
 }foo;
 
 
-//to implement
-struct new_binasm {
-/* 0x0 */ s32 unk0;
-// /* 0x4 */ char unk4;
-/* 0x5 */ u32 unk4_1: 10;
-/* 0x5 */ u32 unk4_2: 6;
-/* 0x5 */ u32 unk4_3: 2;
-/* 0x5 */ u32 unk4_4: 2;
-/* 0x5 */ u32 unk4_5: 12;
-    union {
-    u32 unk8;
-    struct {
-/* 0x8 */ u32 unk8_1 : 7;
-/* 0x8 */ u32 unk8_2 : 1;
-/* 0x8 */ u32 unk8_3 : 16;
-};
-};
-/* 0xC */ u32 unkC;
-};
-
 //static void func_00404234(void);
 
 
@@ -44,6 +24,7 @@ static s32 B_1000A7F4; //.bss
 static s32 D_10000024; //.data
 static const char* D_10000004[4] = {"", "operand 1", "operand 2", "operand 3"}; //lol?
 static s32* D_10000014;
+static s32 D_10000020;
 
 foo *in_file;
 s32 severity;
@@ -51,7 +32,6 @@ s32 verbose;
 s32 warnexitflag;
 u8 Tokench;
 u8 Tstring[0x100];
-struct new_binasm binasm_rec;
 s32 list_extsyms;
 s32 CurrentFile;
 s32 CurrentLine;
@@ -69,13 +49,17 @@ u8 isa;
 s32 CurrentSegment;
 s32 binasm_count;
 FILE* extsyms_file;
+struct sym *hashtable[];
+s32 gform_extn;
+
+
+extern s32 ophashtable[0x100];
 
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
 void func_00405574(s32 arg0); //static
 void EnterSym(s32 arg0, struct sym** arg1, s32 arg2);
 s32 LookUp(s32*, void**);
-extern void func_004054E8(s32 arg0, u8* arg1);
 void nexttoken();
 s32 opLookUp(s8*, struct sym**);
 extern void posterror(char* arg0, char *arg1, s32 arg2);
@@ -87,11 +71,66 @@ extern void Parsestmt(void);
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00403F10.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00404008.s")
+void func_00404008(void) {
+    s32 directives_hash;
+    s32 index;
+    u8* asm_directives;
+    struct sym* cur_symbol;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00404108.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004041A8.s")
+    for(index = 0 ; index < 0x3F ; index++) {
+        if (*sitype[index] == 0x2E) {
+            asm_directives = sitype[index];
+            directives_hash = hash(asm_directives); //create a hash for each asm directive
+            cur_symbol = alloc_new_sym();
+
+            cur_symbol->next =  ophashtable[directives_hash];
+            cur_symbol->name = asm_directives;
+            cur_symbol->unkC = 0;
+            cur_symbol->unk8 = -1;
+            cur_symbol->unk10 = 2;
+            cur_symbol->unk14 = index;
+
+            ophashtable[directives_hash] = cur_symbol;
+        }
+    }
+}
+
+
+void func_00404108(int arg0, char* name, int arg2) {
+    struct sym* temp_v0;
+    s32 sp20;
+
+    sp20 = hash(name);
+    temp_v0 = alloc_new_sym();
+
+    temp_v0->next = hashtable[sp20];
+    temp_v0->name = name;
+    temp_v0->unkC = 0;
+    temp_v0->unk10 = 0;
+    temp_v0->unk8 = arg2;
+    temp_v0->unk14 = arg0;
+
+    hashtable[sp20] = temp_v0;
+}
+
+void func_004041A8(char* arg0, s32 arg1) {
+    s32 stackPad;
+    s32 sp20;
+    struct sym* cur_symbol;
+
+
+    sp20 = hash(arg0);
+    cur_symbol = alloc_new_sym();
+
+    cur_symbol->next = hashtable[sp20];
+    cur_symbol->name = arg0;
+    cur_symbol->unkC = 0;
+    cur_symbol->unk10 = 4;
+    cur_symbol->unk8 = arg1;
+    hashtable[sp20] = cur_symbol;
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00404234.s")
 
@@ -218,7 +257,7 @@ void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405178.s")
 
-void func_004054E8(s32 arg0, u8* arg1) {
+static void func_004054E8(s32 arg0, u8* arg1) {
     u8* var_a2;
 
     fprintf(extsyms_file, "%1d %1d", binasm_count, arg0);
@@ -237,11 +276,38 @@ void func_004054E8(s32 arg0, u8* arg1) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004055D4.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004056DC.s")
+static void func_004056DC(char* arg0) {
+    struct sym* sp2C;
+    s32 sp28;
+    s32 sp24 = LookUp(arg0, &sp2C);
+
+    if (sp24 == 0) {
+        sp28 = hash(arg0);
+        sp2C =  alloc_new_sym();
+
+        sp2C->next = hashtable[sp28];
+        sp2C->name = alloc_new_string(arg0);
+        sp2C->unk10 = 4;
+        sp2C->unk14 = 1;
+        sp2C->unk18 = sym_enter(arg0, 0);
+        hashtable[sp28] = sp2C;
+    }
+    sp2C->unkC = 0;
+    sp2C->unk10 = 4;
+    nexttoken();
+    sp2C->unk8 = GetExpr();
+    sym_define(sp2C->unk18, 5U, sp2C->unk8);
+    if (sp24 != 0) {
+        binasm_rec.unk0 = sp2C->unk18;
+        binasm_rec.unk4_2 = 0x29;
+        binasm_rec.unk8 = sp2C->unk8;
+        put_binasmfyle();
+    }
+}
 
 
 //Parse the break operand
-s32 func_00405884(void) {
+static s32 func_00405884(void) {
     s32 val;
     s32 retval;
 
@@ -254,10 +320,9 @@ s32 func_00405884(void) {
     }
 }
 
-
-/*void func_004058F0(s32 arg0) {
+static void func_004058F0(s32 arg0) {
     s32 sp34;
-    s32 ret; //temp_t0
+    // s32 temp_t0;
     s32 var_v1;
 
     if (arg0 != 0x1B) {
@@ -272,17 +337,17 @@ s32 func_00405884(void) {
         func_00405178(0, arg0, 0x48, 0x48, 2, 0x48, 0);
         return;
     }
+    sp34 = func_00405884();
+    if (Tokench == '#') {
+        var_v1 = 0;
+    } else {
+        // sp34 = temp_t0;
+        var_v1 = func_00405884();
+    }
+    func_00405178(0, arg0, 0x48, 0x48, 0xD, 0x48, (var_v1 << 0xA) + sp34);
+}
 
-    ret = func_00405884();
-
-    var_v1 = (Tokench == 0x23) ? 0 : func_00405884();
-
-    func_00405178(0, arg0, 0x48, 0x48, 0xD, 0x48, (var_v1 << 0xA) + ret);
-}*/
-
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004058F0.s")
-
-void func_00405A80(s32* arg0, s32 *arg1) {
+static void func_00405A80(s32* arg0, s32 *arg1) {
     if (Tokench == ':') {
         nexttoken();
         *arg1 = GetExpr();
@@ -298,19 +363,120 @@ void func_00405A80(s32* arg0, s32 *arg1) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405B54.s")
+static void func_00405B54(u32 arg0, u32 arg1, s32 *arg2) {
+    if (Tokench == ':') {
+        nexttoken();
+        *arg2 = GetExpr();
+        return;
+    }
+    if ((Tokench == '+') || (Tokench == '-')) {
+        dw_GetItem(arg0, arg1, arg2);
+        return;
+    }
+    if ((Tokench != '#') && (Tokench != ',')) {
+        posterror("ill-formed symbolic expression", NULL, 1);
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405C28.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405DE4.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406034.s")
+void func_00406034(void) {
+    s32 sp54;
+    s32 sp50;
+    s32 sp4C;
+    s32 sp48;
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004061F8.s")
+    if (LastLabel != 0) {
+        func_00405574(2);
+    }
+    while(1) {
+    sp4C = 0;
+    sp48 = 0;
+    sp50 = 1;
+    sp54 = 0;
+    if (func_00405DE4(&sp54, &sp4C, &sp48, &sp50) == 0) {
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406340.s")
+         break;
+    }
+        if (isStruct) {
+            if (sp50 * 4 < 4) {
+                var_v1 = 4;
+            } else {
+                var_v1 = sp50 * 4;
+            }
+            StructOrg = var_v1 + StructOrg;
+        } else {
+            binasm_rec.unk0 = sp54;
+            binasm_rec.unk4_2 = 0x3B;
+            binasm_rec.unk8 = sp4C;
+            binasm_rec.unkC = sp50;
+            put_binasmfyle();
+            binasm_rec.unk0 = sp54;
+            binasm_rec.unk4_2 = 0x3B;
+            binasm_rec.unk8 = sp48;
+            binasm_rec.unkC = sp50;
+            put_binasmfyle();
+        }
+        if (Tokench == 0x23) {
+                break;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406684.s")
+
+void func_004061F8(s32 arg0) {
+    struct sym* sp3C;
+    s32 sp38;
+    s32 sp34;
+
+    sp38 = 0;
+    sp34 = 0;
+
+    sp3C = GetRegister();
+    if (sp3C != NULL) {
+        if (Tokench == 0x22) {
+            func_00405C28(&Tstring, strlen((s8* ) &Tstring), &sp38, &sp34);
+        } else {
+            dw_GetExpr(&sp38, &sp34);
+        }
+        func_00405178(0, arg0, sp3C->unk14, 0x48, 2, 0x48, sp38);
+        func_00405178(0, arg0, sp3C->unk14, 0x48, 2, 0x48, sp34);
+        nexttoken();
+    }
+}
+
+
+void func_00406340(struct sym** arg0, s32* arg1) {
+    *arg0 = 0;
+    *arg1 = 0;
+    nexttoken();
+    if (strcmp(Tstring, "hi") == 0) {
+        gform_extn = 1;
+    } else if (strcmp(Tstring, "lo") == 0) {
+        gform_extn = 2;
+    } else if (strcmp(Tstring, "gprel") == 0) {
+        gform_extn = 5;
+    } else if (strcmp(Tstring, "half") == 0) {
+        gform_extn = 6;
+    } else {
+        posterror("% not followed by hi/lo/gprel", NULL, 1);
+        return;
+    }
+}
+
+void func_00406684(void) {
+    nexttoken();
+    if (Tokench != 'd') {
+        posterror("invalid memory tag", NULL, 1);
+        return;
+    }
+    binasm_rec.unk8_5 = GetExpr();
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406728.s")
 
@@ -338,7 +504,104 @@ void func_00405A80(s32* arg0, s32 *arg1) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409118.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004092FC.s")
+void func_004092FC(s32 arg0) {
+    struct sym* sp5C;
+    struct sym* sp58;
+    struct sym* sp54;
+    struct sym* sp50;
+    s32 sp4C;
+    s32 sp48;
+    s32 sp44;
+    s32 sp40;
+    s32 sp3C;
+    s32 sp38;
+    void* temp_v0;
+
+    sp4C = 0;
+    sp58 = NULL;
+
+    if ((sp5C = GetRegister()) == NULL) {
+        return;
+    }
+    if ((Tokench == 'i') && (LookUp(&Tstring, &sp50) != 0) && (sp50->unk10 == 0)) {
+        sp58 = sp50;
+        nexttoken();
+        if (Tokench == ',') {
+            nexttoken();
+        }
+    }
+    if (sp58 == NULL) {
+        if  ((Tokench == 'i')
+            || (Tokench == 'd')
+            || (Tokench == 'h')
+            || (Tokench == '+')
+            || (Tokench == '-')) {
+            if (isa < 3) {
+                sp40 = 0;
+                sp48 = GetExpr();
+            } else {
+                sp40 = dw_GetExpr(&sp3C, &sp48);
+            }
+            sp4C = 1;
+        }
+    }
+    if ((sp58 == NULL) && (sp4C == 0)) {
+        posterror("invalid syntax in statement", NULL, 1);
+        return;
+    }
+    if (Tokench != 'i') {
+        posterror("label expected", NULL, 1);
+        return;
+    }
+    if (func_00409118(&sp44) != 0) {
+        binasm_rec.unk8_5 = sp44;
+        if (sp4C != 0) {
+            func_00405178(0, arg0, sp5C->unk14, 0x48, 0xC, 0x48, sp48);
+        } else {
+            func_00405178(0, arg0, sp5C->unk14, sp58->unk14, 8, 0x48, 0);
+        }
+        gform_extn = 0;
+        return;
+    }
+    if ((&Tstring, &sp50) != 0) {
+        if (sp50->unk10 == 3) {
+            sp54 = sp50;
+        } else {
+            posterror("symbol is not a label", &Tstring, 1);
+            return;
+        }
+    } else {
+        EnterSym(&Tstring, &sp54, 1);
+    }
+
+    if (list_extsyms != 0) {
+        if (isdigit(Tstring)) {
+            func_004054E8(sp54->unk18, NULL);
+        } else {
+            func_004054E8(sp54->unk18, &Tstring);
+        }
+    }
+
+    nexttoken();
+    if (sp4C != 0) {
+        sp38 = atflag;
+        if (sp40 != 0) {
+            if (sp38 == 0) {
+                posterror("macro expansion needs at register after .set noat", NULL, 1);
+            }
+            atflag = 0;
+            func_00405178(0, 0x14C, 1, 0x48, 2, 0x48, sp3C);
+            func_00405178(0, 0x14C, 1, 0x48, 2, 0x48, sp48);
+            func_00405178(sp54->unk18, arg0, sp5C->unk14, 1, 8, 0x48, 0);
+            atflag = sp38;
+        } else {
+            func_00405178(sp54->unk18, arg0, sp5C->unk14, 0x48, 0xC, 0x48, sp48);
+        }
+    } else {
+        func_00405178(sp54->unk18, arg0, sp5C->unk14, sp58->unk14, 8, 0x48, 0);
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409850.s")
 
@@ -347,7 +610,7 @@ void func_00405A80(s32* arg0, s32 *arg1) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409ECC.s")
 
 
-void func_00409FD0(s32 arg0) {
+static void func_00409FD0(s32 arg0) {
     struct sym* temp_v0;
 
     temp_v0 = GetRegister();
@@ -356,7 +619,7 @@ void func_00409FD0(s32 arg0) {
     }
 }
 
-void func_0040A044(s32 arg0) {
+static void func_0040A044(s32 arg0) {
     struct sym* temp_v0;
 
     binasm_rec.unk0 = 0;
@@ -368,7 +631,7 @@ void func_0040A044(s32 arg0) {
     }
 }
 
-void func_0040A0D4(void) {
+static void func_0040A0D4(void) {
     u32 ret;
 
     binasm_rec.unk0 = 0;
@@ -396,7 +659,7 @@ static void func_0040A160(void) {
 }
 
 
-void func_0040A208(void) {
+static void func_0040A208(void) {
     s32 sp24;
 
     sp24 = GetExpr();
@@ -409,7 +672,7 @@ void func_0040A208(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A280.s")
 
-void func_0040A4B0(void) {
+static void func_0040A4B0(void) {
     if (LastLabel != 0) {
         func_00405574(0);
     }
@@ -431,7 +694,7 @@ void func_0040A4B0(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040AAD4.s")
 
-void func_0040ADFC(void) {
+static void func_0040ADFC(void) {
     if (Tokench != 'i') {
         posterror("identifer expected", NULL, 1);
     } else {
@@ -451,7 +714,7 @@ void func_0040ADFC(void) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040AF00.s")
 
 
-void func_0040B0F4(s32 arg0) {
+static void func_0040B0F4(s32 arg0) {
     u8 temp_v0;
 
     if (LastLabel != 0) {
@@ -490,7 +753,7 @@ void func_0040B0F4(s32 arg0) {
     } while (Tokench != 0x23);
 }
 
-void func_0040B340(void) {
+static void func_0040B340(void) {
     invent_locs = 0;
     GetExpr();
     if (Tokench != '"') {
@@ -501,7 +764,7 @@ void func_0040B340(void) {
 }
 
 
-void func_0040B554(s32 arg0) {
+static void func_0040B554(s32 arg0) {
     s32* sp24;
     s32* temp_v0;
 
@@ -630,7 +893,7 @@ static void func_0040B984(void) {
 
 }
 
-void func_0040BC84(void) {
+static void func_0040BC84(void) {
     struct sym* sp4C;
     struct sym* sp48;
 
@@ -669,19 +932,77 @@ void func_0040BC84(void) {
     } while (Tokench == ',');
 }
 
+s32 func_0040BEBC(s32* arg0, s32 arg1, s32 arg2) {
+    struct sym* sp24;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040BEBC.s")
+
+    if (Tokench == 0x69) {
+        if (LookUp((s32* ) &Tstring, &sp24) == 0) {
+            EnterSym((s32) &Tstring, (struct sym** ) &sp24, 1);
+        }
+
+        if (sp24->unk10 == 4) {
+            GetItem(arg1, arg2);
+            return 1;
+        }
+        if (sp24->unk10 == 3) {
+            *arg0 = sp24->unk18;
+            nexttoken();
+            func_00405A80(arg1, arg2);
+
+            if (Tokench == 0x2C) {
+                nexttoken();
+               return 1;
+            }
+        } else {
+            posterror("Bad id in expression", (s8* ) &Tstring, 1);
+            nexttoken();
+            return 0;
+        }
+    } else {
+        GetItem(arg1, arg2);
+    }
+    return 1;
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C048.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C218.s")
+void func_0040C218(void) {
+    u32 temp_v0;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C2E0.s")
+    invent_locs = 0;
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0x1C;
+    GetExpr();
+    binasm_rec.unk8 = CurrentFile;
+    if (Tokench == 0x3A) {
+        nexttoken();
+    }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040C360.s")
+    CurrentLine = GetExpr();
+    binasm_rec.unkC = CurrentLine;
+    put_binasmfyle();
+}
+
+static void func_0040C2E0(void) {
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0x13;
+    binasm_rec.unk8 = GetExpr();
+    binasm_rec.unkC = GetExpr();
+    put_binasmfyle();
+}
+
+static void func_0040C360(void) {
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk4_2 = 0x32;
+    binasm_rec.unk8 = GetExpr();
+    binasm_rec.unkC = GetExpr();
+    put_binasmfyle();
+}
 
 
-void func_0040C3E0(void) {
+static void func_0040C3E0(void) {
     binasm_rec.unk0 = 0;
     binasm_rec.unk4_2 =  0x33; //shift
     binasm_rec.unk8 = GetExpr();
@@ -749,7 +1070,7 @@ static void func_0040C830(s32 arg0) {
 }
 
 
-void func_0040C928(void) {
+static void func_0040C928(void) {
     struct sym* cur_symbol;
 
     binasm_rec.unk4_2 = 0x25;
@@ -1303,8 +1624,8 @@ void Parsestmt(void) {
     }
 }
 
-void func_0040E180(s8* arg0, s32 arg1, s32 arg2) {
-    s8 dest[0x100];
+void func_0040E180(const char* arg0, s32 arg1, s32 arg2) {
+    char dest[0x100];
 
     sprintf(&dest, arg0, arg1);
     postcerror(&dest, arg2);
@@ -1327,7 +1648,18 @@ s32 sym_undefined(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040E554.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040E760.s")
+//TODO.
+void* func_0040E760(u32 arg0) {
+    void* sp24;
+
+    sp24 = malloc(arg0);
+    if (sp24 == NULL) {
+        perror("check_malloc");
+        exit(2);
+    }
+    return sp24;
+}
+
 
 void sym_init(s32 arg0) {
     st_cuinit();
@@ -1336,7 +1668,147 @@ void sym_init(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/sym_finish.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/sym_define.s")
+s32 sym_define(s32 arg0, u32 arg1, s32 arg2) {
+    s32 sp3C;
+    s32 sp38;
+    s32 sp34;
+    s32 sp30;
+    char* sp2C;
+
+    sp2C = st_sym_idn(arg0, &sp38, &sp34, &sp3C, &sp30);
+    switch (arg1) {
+        case 5:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E554(arg0, 2, 5, sp3C, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, 5, sp3C, 1);
+                break;
+            }
+            func_0040E180("Conflicting definition of symbol %s", sp2C, 1);
+            return 0;
+
+        case 1:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E554(arg0, 5, 1, sp3C, 0);
+                break;
+            }
+            if ((sp34 == 0xE) && (sp38 == 0)) {
+                func_0040E554(arg0, 0xE, 1, sp3C, 1);
+                st_procbegin(arg0);
+                st_pdadd_idn(arg0);
+                break;
+            }
+            if ((sp34 == 6) && (sp38 == 0)) {
+                func_0040E230(arg0, 6, 0, sp3C, 1);
+                st_procbegin(arg0);
+                st_pdadd_idn(arg0);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 5, 1, sp3C, 0);
+                break;
+            }
+            func_0040E180("Conflicting definition of symbol %s", sp2C, 1);
+            return 0;
+
+        case 2:
+        case 13:
+        case 15:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E3F0(arg0, 2, arg1, sp3C);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, arg1, sp3C, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0x11)) {
+                func_0040E230(arg0, 1, arg1, sp3C, 1);
+                break;
+            }
+            func_0040E180("Conflicting definition of symbol %s", (s32) sp2C, 1);
+            return 0;
+
+        case 17:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, 0x11, arg2, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, 0x11, arg2, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0x11)) {
+                D_10000020 = 1;
+                func_0040E230(arg0, 1, 0x11, arg2, 1);
+                D_10000020 = 0;
+                break;
+            }
+            func_0040E180("Cannot use .comm on previously defined symbol %s", (s32) sp2C, 1);
+            return 0;
+
+        case 33:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E3F0(arg0, 2, 0x11, arg2);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, 3, arg2, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 3)) {
+                D_10000020 = 1;
+                func_0040E230(arg0, 1, 3, arg2, 1);
+                D_10000020 = 0;
+                break;
+            }
+            func_0040E180("Cannot use .lcomm on previously defined symbol %s", (s32) sp2C, 1);
+            return 0;
+
+        case 34:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E230(arg0, 1, 0, sp3C, 1);
+                break;
+            }
+            if (((sp34 != 1) || (sp38 != 0)) && ((sp34 != 1) || (sp38 != 0x11))) {
+                if ((sp34 == 0xE) && (sp38 == 0)) {
+                    func_0040E230(arg0, 6, 0, sp3C, 1);
+                    break;
+                }
+                func_0040E180(".globl must precede the definition of the symbol %s", sp2C, 1);
+                return 0;
+            }
+            break;
+
+        case 35:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                func_0040E230(arg0, 0xE, 0, sp3C, 1);
+                break;
+            }
+            if ((sp34 == 1) && (sp38 == 0)) {
+                func_0040E230(arg0, 6, 0, sp3C, 1);
+                break;
+            }
+            func_0040E180(".ent must precede the definition of the symbol %s", sp2C, 1);
+            return 0;
+
+        case 0:
+            if ((sp34 == 0) && (sp38 == 0)) {
+                return 1;
+            }
+            postcerror("scNil to scNil", NULL);
+            return 0;
+
+        default:
+            postcerror("Internal: bad action in sym_define", NULL);
+            return 0;
+    }
+
+    return 1;
+}
+
 
 
 void st_feinit() {

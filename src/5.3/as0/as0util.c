@@ -15,7 +15,7 @@ typedef struct {
 
 //extern
 extern u8 Tokench;
-extern s8 Tstring;
+extern s8 Tstring[];
 extern s32 Tstringlength;
 s32 linelength;
 u8 line[0x420];
@@ -24,12 +24,16 @@ static char var;
 static char buffer[1];
 static char buffer2[0x3FF-4];
 static char* save;
-s32 hashtable[0x10];
+struct sym *hashtable[];
 s32 nextinline;
 s8 token_tmp[0x10];
 FILE *CurrentFile;
 s32 debugflag;
 extern s32 map_glevel[];
+size_t binasm_count;
+FILE* binasmfyle;
+s32 in_repeat_block;
+size_t rep_size;
 
 
 //static s32 func_00411898(void) {}
@@ -81,14 +85,12 @@ s32 hash(char* arg0) {
     return k % 128;
 }
 
-
-s32 LookUp(u8* arg0, bar** arg1) {
-    bar* var_s0;
+s32 LookUp(char* name, struct sym** arg1) {
+    struct sym* var_s0;
 
     *arg1 = NULL;
-
-    for (var_s0 = hashtable[hash(arg0)] ; var_s0 != NULL ; var_s0 = var_s0->next) {
-        if (strcmp((s8* ) arg0, var_s0->unk4) == 0) {
+    for (var_s0 = hashtable[hash(name)] ; var_s0 != NULL ; var_s0 = var_s0->next) {
+        if (strcmp(name, var_s0->name) == 0) {
             *arg1 = var_s0;
             return true;
         }
@@ -172,8 +174,29 @@ char* alloc_new_string(char* arg0) {
     return sp20;
 }
 
+void EnterSym(s32 arg0, struct sym** arg1, s32 arg2) {
+    struct sym* sp2C;
+    s32 sp28;
+    // s32* temp_v0;
+    // s32** temp_v1;
+    if (LookUp(arg0, &sp2C) == 0) {
+        sp28 = hash(arg0);
+        sp2C = alloc_new_sym();
+        sp2C->next = hashtable[sp28];
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/EnterSym.s")
+        sp2C->name = alloc_new_string(arg0);
+        sp2C->unk10 = 3;
+        sp2C->unk8 = 0;
+        sp2C->unk14 = 0;
+        sp2C->unk18 = sym_enter(arg0, arg2);
+
+        hashtable[sp28] = sp2C;
+    }
+    if (sp2C->unk10 != 3) {
+        posterror("Address symbol expected", &Tstring, 1);
+    }
+    *arg1 = sp2C;
+}
 
 s32 GetRegister() {
     struct sym* sp24;
@@ -197,7 +220,77 @@ s32 GetRegister() {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00411898.s")
+s32 func_00411898(void) {
+    s32 minus; // sp+3C
+    s32 not; // sp+38
+    s32 sp34; // sp+34
+    struct sym* sp30; // sp+30
+    s32 ret; // sp+2C
+
+    sp34 = 0;
+    minus = 0;
+    not = 0;
+    if (Tokench == '-') {
+        minus = 1;
+        nexttoken();
+    } else if (Tokench == '+') {
+        nexttoken();
+    } else if (Tokench == '~') {
+        not = 1;
+        nexttoken();
+    }
+
+    // if (Tokench != 0x22) {
+        switch (Tokench) {                          /* irregular */
+            case '(':
+                nexttoken();
+                sp34 = func_0041244C();
+                if (Tokench != ')') {
+                    posterror("Right paren expected", NULL, 1);
+                }
+                break;
+    
+                case 'i':
+                if (LookUp(&Tstring, &sp30) == 0) {
+                    posterror("undefined symbol in expression", NULL, 1);
+                } else if (sp30->unk10 != 4) {
+                    posterror("Symbol must have absolute value", &Tstring, 1);
+                } else {
+                    sp34 = sp30->unk8;
+                }
+                break;
+
+            case 'd':
+            case 'h':
+                sp34 = func_0040F5D8(&Tstring, minus);
+                minus = 0;
+                break;
+
+            case '"':
+                minus = 0;
+                sp34 = Tstring;
+                if (Tstringlength >= 2) {
+                    posterror("String within expression may have only one character", &Tstring, 1);
+                }
+                break;
+
+            default:
+                posterror("Invalid symbol in expression", NULL, 1);
+                nexttoken();
+                break;
+        }
+    // } else {
+    // }
+    if (minus) {
+        ret = -sp34;
+    } else if (not) {
+        ret = ~sp34;
+    } else {
+        ret = sp34;
+    }
+    nexttoken();
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00411B84.s")
 
@@ -350,4 +443,18 @@ void dw_GetItem(u32 arg0, u32 arg1, s32* arg2) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/put_binasmfyle.s")
+void put_binasmfyle(void) {
+    if (in_repeat_block) {
+    size_t temp = rep_size;
+        if (temp >= rep_buffer.unk4) {
+            rep_buffer.unk0 = grow_array(&rep_buffer.unk4, temp, 0x10, rep_buffer.unk0, 0);
+        }
+        rep_buffer.unk0[rep_size] = binasm_rec;
+        rep_size++;
+    } else {
+        fwrite(&binasm_rec, 0x10U, 1U, binasmfyle);
+        memset(&binasm_rec, 0, 0x10U);
+        binasm_count++;
+    }
+}
+
