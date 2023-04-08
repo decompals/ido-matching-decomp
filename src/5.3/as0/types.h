@@ -20,23 +20,44 @@ typedef volatile s64 vs64;
 typedef float f32;
 typedef double f64;
 
-struct new_binasm {
-/* 0x0 */ s32 unk0;
-/* 0x5 */ u32 unk4_1: 10;
-/* 0x5 */ u32 unk4_2: 6;
-/* 0x5 */ u32 unk4_3: 16;
+struct binasm {
+    u32 unk0;
+    u32 unk4_FE_ : 7;
+    u32 unk4_01C0 : 3;
+    u32 unk5_003F : 6;
+    u32 unk6_C0 : 2;
+    u32 unk6_3C_ : 4;
+    u32 unk6_03FE : 9;
+    u32 unk6_0001_ : 1;
     union {
-    u32 unk8;
-    struct {
-/* 0x8 */ u32 unk8_1 : 7;
-/* 0x8 */ u32 unk8_2 : 1;
-/* 0x8 */ u32 unk8_3 : 8;
-/* 0x8 */ u32 unk8_4 : 2;
-/* 0x8 */ u32 unk8_5 : 14;
+        u32 unk8;
+        struct {
+            u32 unk8_FE : 7;
+            u32 unk8_01FC : 7;
+            u32 unk8_0003C000 : 4;
+            u32 unkA_3F80 : 7;
+            u32 unkB_007F : 7;
+        };
+        
+        struct {
+            // u32 unk8_FE : 7;
+            // u32 unk8_01FC : 7;
+            // u32 unk8_0003C000 : 4;
+            u32 unk8_FFFFC000_ : 18;
+            u32 unkA_3FFF : 14;
+        };
+    };
+    // u32 opt;
+    union {
+        u32 opt;
+        struct {
+            u32 unkC_FE : 7;
+            u32 unkC_01FC : 7;
+            u32 unkC_0003 : 2;
+        };
+    };
 };
-};
-/* 0xC */ u32 unkC;
-};
+
 
 struct sym {
 /* 0x0 */  struct sym* next;
@@ -48,78 +69,42 @@ struct sym {
 /* 0x18 */ s32 unk18;
 };
 
-u8 *sitype[0x3F] = {
-    "label",
-    ".sym",
-    ".globl",
-    ".cpload",
-    ".align",
-    ".ascii",
-    ".asciiz",
-    ".byte",
-    ".comm",
-    ".lcomm",
-    ".data",
-    ".double",
-    ".file",
-    ".float",
-    ".half",
-    ".cprestore",
-    ".gpword",
-    ".cpadd",
-    ".weakext",
-    ".loopno",
-    ".space",
-    ".text",
-    ".word",
-    "ocode",
-    ".end",
-    ".sdata",
-    ".rdata",
-    ".ent",
-    ".loc",
-    ".bgnb",
-    ".endb",
-    ".asm0",
-    ".set",
-    ".cpalias",
-    ".repeat",
-    ".endr",
-    ".lab",
-    ".vreg",
-    ".mask",
-    ".fmask",
-    ".err",
-    "globabs",
-    ".verstamp",
-     ".frame",
-    ".extended",
-    ".extern",
-    ".aent",
-    ".option",
-    ".noalias",
-    ".alias",
-    ".mtag",
-    ".malias",
-    ".struct",
-    ".livereg",
-    ".gjaldef",
-    ".gjallive",
-    ".gjrlive",
-    ".ishift_addr",
-    ".irestext",
-    ".dword",
-    ".prologue",
-    ".edata",
-    ".alloc",
+struct _struct_asm_info {
+    /* 0x0 */ char* name;
+    /* 0x4 */ u32 unk4_FE : 7;
+    /* 0x4 */ u32 unk4_1FFFFFF_ : 0x19;
 };
 
 extern struct {
-    struct new_binasm* unk0;
+    struct binasm* unk0;
     size_t unk4;
 } rep_buffer;
 void* memset(void*, int, size_t);
 
-struct new_binasm binasm_rec;
+//From libmld
+typedef struct {
+	unsigned long	rfd; /* index into the file table */
+	unsigned long	index; /* index int sym/aux/iss tables */
+} DNR;
+
+struct RETst_pext_iext {
+    char unk_0[4];
+    s32 unk_4;
+    char unk_8[4];
+    struct {
+        u32 unkC_FC : 6;
+        u32 unkC_03E0 : 5;
+        u32 unkC_1FFFFF_ : 21;
+    };
+};
+
+struct _struct_asm_info_0x8 {
+    /* 0x0 */ char* name;
+    /* 0x4 */ u32 unk4;
+};
+
+
+struct binasm binasm_rec;
+extern s32 gform_extn;
 
 #endif /* TYPES_H */

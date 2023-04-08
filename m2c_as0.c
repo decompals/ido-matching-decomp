@@ -4,11 +4,14 @@ Warning: missing "jr $ra" in last block (.initial).
 
 Warning: missing "jr $ra" in last block (.initial).
 
+Bad function call operand .L00403DFC
+Bad function call operand .L00403DFC
 struct _struct_asm_info_0x8 {
     /* 0x0 */ u8 *unk0;                             /* inferred */
     /* 0x4 */ u32 unk4;                             /* inferred */
 };                                                  /* size = 0x8 */
 
+? $$.LazyResolver();                                /* extern */
 s32 __ll_div(s32, u32, s32, u32);                   /* extern */
 s32 __ll_lshift(s32, u32, s32, u32);                /* extern */
 s32 __ll_mul(s32, u32, s32, u32);                   /* extern */
@@ -52,723 +55,1066 @@ s32 strtoll(u8 *, ?, ?);                            /* extern */
 s32 strtoull(?, ?);                                 /* extern */
 u32 time(?);                                        /* extern */
 u8 tolower(u8, s32);                                /* extern */
-void func_00403DFC();                               /* static */
+void EnterSym(? *arg0, ? **arg1, s32 arg2, ? *);    /* static */
+void GetBaseOrExpr(? **arg0, s32 *arg1);            /* static */
+s32 GetExpr(u32 arg1, u8 *);                        /* static */
+void GetItem(s32 *arg0, s32 *arg1);                 /* static */
+? *GetRegister(s32 *, s32, s32);                    /* static */
+s32 LookUp(? *arg0, ? **arg1, u32);                 /* static */
+void Parsestmt();                                   /* static */
+void __sgi_mld_st_commonbegin();                    /* static */
+void __start();                                     /* static */
+void _mcount();                                     /* static */
+s16 _md_st_currentifd(s32);                         /* static */
+void _md_st_error(? *arg0, ? **arg1, s32 *arg2, s32 arg3, s32 arg4); /* static */
+s32 _md_st_iextmax();                               /* static */
+s32 _md_st_ifdmax();                                /* static */
+void _md_st_internal(? *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4); /* static */
+? *_md_st_malloc(? *arg0, s32 *arg1, s32 arg2, s32 arg3); /* static */
+void _md_st_setfd(s32 arg0);                        /* static */
+? *_md_st_str_extiss(s32 arg0, s32, s16);           /* static */
+s32 _md_st_str_iss(s32 arg0);                       /* static */
+s32 _sgi_st_blockbegin(u32 arg2, s32 arg3);         /* static */
+void alloc_dispose(? **arg0, s32 **arg1);           /* static */
+void alloc_free(? *arg0);                           /* static */
+? *alloc_mark(? **arg0);                            /* static */
+? *alloc_new(s32 arg0, ? **arg1, s32, ? **);        /* static */
+? *alloc_new_string(u8 *arg0);                      /* static */
+? *alloc_new_sym();                                 /* static */
+? *alloc_next_scb(s32 arg0, ? **arg1);              /* static */
+? *alloc_page(s32 arg0);                            /* static */
+void alloc_release(? **arg0, ? *arg1);              /* static */
+? **alloc_resize(? **arg0, s32 arg1, ? **arg2);     /* static */
+void alloc_scb(? **arg0, s32 arg1, s32);            /* static */
+void assertion_failed(? *arg0, ? *arg1, s32 *arg2, s32); /* static */
+void call_name_and_line(s32 arg0);                  /* static */
+void call_perror(s32 arg1, u8 *, u8 *);             /* static */
+void consume(s32, u8);                              /* static */
+void do_dot_end(s32 arg0);                          /* static */
+s32 dot_soon(s32 arg0, u8, s32);                    /* static */
+s32 dw_GetExpr(s32 *arg0, s32 *arg1);               /* static */
+void dw_GetItem(s32 *arg2, s32 *, s32 *);           /* static */
+s32 e_addr(s32 arg0);                               /* static */
+s32 filesize(void **arg0);                          /* static */
+void func_00403F10();                               /* static */
+void func_00404008();                               /* static */
+void func_00404108(s32 arg0, u8 *arg1, s32 arg2);   /* static */
+void func_004041A8(? *arg0, s32 arg1);              /* static */
+void func_00404234(s32 arg0, s32 arg1);             /* static */
+void func_00404B80(s32 arg0, s32 arg1, u32 arg2, s32); /* static */
+void func_00405178(s32 *arg0, u32 arg1, s32 arg2, s32 arg3, u32 arg4, s32 arg5, s32 arg6); /* static */
+void func_004054E8(s32 *arg0, s32 arg1);            /* static */
+void func_00405574(s32 arg0, u32);                  /* static */
+void func_004055D4(u8 *arg0);                       /* static */
+void func_004056DC(u8 *arg0);                       /* static */
+s32 func_00405884(u32);                             /* static */
+void func_004058F0(u32 arg0, u8 *, s32 *);          /* static */
+void func_00405A80(s32 *arg1, s32 *);               /* static */
+void func_00405B54(s32 *arg2, s32 *, s32 *);        /* static */
+void func_00405C28(u8 *arg0, s32 arg1, s32 *arg2, s32 *arg3); /* static */
+s32 func_00405DE4(? **arg0, s32 *arg1, s32 *arg2, s32 *arg3); /* static */
+void func_00406034(u32, u8 *);                      /* static */
+void func_004061F8(u32 arg0, u8 *, s32 *);          /* static */
+void func_00406340(? **arg0, s32 *arg1);            /* static */
+void func_00406684();                               /* static */
+void func_00406728(u32 arg0, u8 *, s32 *);          /* static */
+void func_00406C48(u32 arg0, u8 *, s32 *);          /* static */
+void func_00406FE8(u32 arg0, u8 *, s32 *);          /* static */
+void func_00407334();                               /* static */
+void func_004075CC(u32 arg0, u8 *, s32 *);          /* static */
+void func_004076A0(u32 arg0, u8 *, s32 *);          /* static */
+void func_00407A20(u32 arg0, u8 *, s32 *);          /* static */
+void func_0040848C(s32 arg0, u8 *, s32 *);          /* static */
+void func_004085D8(u32 arg0, u8 *, s32 *);          /* static */
+void func_004086EC(u32 arg0, u8 *, s32 *);          /* static */
+void func_004088B8(u32 arg0, u8 *, s32 *);          /* static */
+void func_00408C80(u32 arg0, u8 *, s32 *);          /* static */
+s32 func_00409118(s32 *arg0, u8 *);                 /* static */
+void func_004092FC(u32 arg0, u8 *, s32 *);          /* static */
+void func_00409850(u32 arg0, u8 *, s32 *);          /* static */
+void func_00409B10(u32 arg0, u8 *, s32 *);          /* static */
+void func_00409ECC(u32 arg0, u8 *arg1, s32 *);      /* static */
+void func_00409FD0(u32 arg0, u8 *, s32 *);          /* static */
+void func_0040A044(s32 arg0, u8 *);                 /* static */
+void func_0040A0D4(u32, u8 *);                      /* static */
+void func_0040A160(u32, u8 *);                      /* static */
+void func_0040A208(u32, u8 *);                      /* static */
+void func_0040A280(u32, u8 *);                      /* static */
+void func_0040A4B0(u32, u8 *);                      /* static */
+void func_0040A530(u32, u8 *, s32 *);               /* static */
+void func_0040A5D4(u32, u8 *);                      /* static */
+void func_0040A6B8(s32 arg0);                       /* static */
+void func_0040A79C(s32 arg0, u8 *);                 /* static */
+void func_0040A958(u32, u8 *);                      /* static */
+void func_0040AAD4(s32 arg0, u8 *);                 /* static */
+void func_0040ADFC(u32, u8 *);                      /* static */
+void func_0040AF00(u32 arg0, u8 *);                 /* static */
+void func_0040B0F4(s32 arg0, u8 *);                 /* static */
+void func_0040B340(u32, u8 *);                      /* static */
+void func_0040B554(? *arg0);                        /* static */
+void func_0040B5F0(u32 arg0, u8 *);                 /* static */
+void func_0040B984(u32, u8 *);                      /* static */
+void func_0040BC84(u32, u8 *);                      /* static */
+s32 func_0040BEBC(? **arg0, s32 *arg1, s32 *arg2);  /* static */
+void func_0040C048(u32, u8 *);                      /* static */
+void func_0040C218(u32, u8 *);                      /* static */
+void func_0040C2E0(u32, u8 *);                      /* static */
+void func_0040C360(u32, u8 *);                      /* static */
+void func_0040C3E0(u32, u8 *);                      /* static */
+void func_0040C460(u32, u8 *);                      /* static */
+void func_0040C4CC(u32, u8 *);                      /* static */
+void func_0040C5E8(u32 arg0, u8 *);                 /* static */
+void func_0040C66C(s32 arg0, s32 arg1);             /* static */
+void func_0040C830(u32 arg0, u8 *);                 /* static */
+void func_0040C928(u32, u8 *);                      /* static */
+void func_0040C9D0(u32, u8 *);                      /* static */
+s32 func_0040CC44(? *arg0, ? **);                   /* static */
+void func_0040CCCC(u32, u8 *);                      /* static */
+void func_0040CDE4(s32 arg0, u8 *);                 /* static */
+void func_0040CEB4(u32, u8 *);                      /* static */
+void func_0040CF9C(u32, u8 *);                      /* static */
+void func_0040D110(u32, u8 *);                      /* static */
+void func_0040D284(? *arg0);                        /* static */
+void func_0040E180(? *arg0, u32 arg1, s32 arg2, s32); /* static */
+void func_0040E230(u32 arg1, s32 arg2, s32 arg3, s32 arg4, s32); /* static */
+void func_0040E3F0(u32 arg1, u32 arg2, u32 arg3, s32); /* static */
+void func_0040E554(u32 arg1, u32 arg2, u32 arg3, s32 arg4, s32); /* static */
+? *func_0040E760(s32);                              /* static */
+s32 func_0040F5D8(u8 *arg0, s32 arg1);              /* static */
+s32 func_0040F77C(u8 *arg0, s32 arg1);              /* static */
+void func_0040FB2C(s32);                            /* static */
+s32 func_0040FC20(s32 arg0);                        /* static */
+void func_0040FD98(s32, u8);                        /* static */
+void func_004100C8(s32, u8);                        /* static */
+void func_004101AC(s32);                            /* static */
+void func_00410270(u8 *arg0);                       /* static */
+s8 func_00410E80();                                 /* static */
+s32 func_00411898();                                /* static */
+s32 func_00411B84();                                /* static */
+u32 func_00411ECC();                                /* static */
+void func_0041213C();                               /* static */
+s32 func_00412144();                                /* static */
 s32 func_0041244C(u8 *);                            /* static */
 s32 func_00412548(u8 *);                            /* static */
+void func_00413060(u8 *arg0, s32 arg1);             /* static */
+void func_00413224(u8 *arg0);                       /* static */
 s32 func_00419E30(s32 arg0, s32 arg1, s32 arg2, ? *arg3, s32 arg4); /* static */
+s32 gethostsex();                                   /* static */
+? *grow_array(? **arg0, u32 arg1, s32 arg2, ? *arg3, s32 arg4); /* static */
+s32 hash(u8 *arg0);                                 /* static */
+u32 hex_to_num(u8 arg0, u8, s32);                   /* static */
+void itoa(u32 arg0, ? *arg1);                       /* static */
+s32 l_addr(s32 arg0);                               /* static */
+s32 ldfsymorder(s16 *arg0, s32 arg1);               /* static */
+void ltoa(u32 arg0, ? *arg1, u32);                  /* static */
+? main();                                           /* static */
+void make_file(u8 *);                               /* static */
+void make_local_label(? *arg0, s32 *arg1);          /* static */
+void new_error();                                   /* static */
+void nexttoken(s32 *arg3, u8 *);                    /* static */
+s32 opLookUp(? *arg0, ? **arg1);                    /* static */
+void postcerror(? **arg0, s32 arg1, u32, s32);      /* static */
+void posterror(? *arg0, u8 *arg1, s32 arg2, s32);   /* static */
+void put_binasmfyle(u32, u8 *, s32 *);              /* static */
+void readinline(u8 arg3);                           /* static */
+s32 s_addr(s32 arg0);                               /* static */
+void st_addcontinued();                             /* static */
+void st_addtq(s32 arg1);                            /* static */
+s32 st_auxadd(u32 arg0);                            /* static */
+void st_auxbtadd(s32 arg0);                         /* static */
+void st_auxbtsize(s32 arg1);                        /* static */
+s32 st_auxisymadd(s32 arg0, s32, void *);           /* static */
+s32 st_auxrndxadd(s32 arg0, s32 arg1);              /* static */
+void st_auxrndxadd_idn();                           /* static */
+s32 st_blockbegin(u32 arg2);                        /* static */
+s32 st_blockend(s32 arg0);                          /* static */
+void st_blockpop();                                 /* static */
+void st_changeaux(u32 arg1);                        /* static */
+void st_changeauxrndx(s32 arg0, s32 arg1, s32 arg2); /* static */
+void st_changedn(s32 arg1, s32 arg2);               /* static */
+? *st_cuinit();                                     /* static */
+s16 st_currentifd();                                /* static */
+? *st_currentpchdr();                               /* static */
+void st_endallfiles();                              /* static */
+void st_error(? *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4); /* static */
+s32 st_extadd(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4); /* static */
+s32 st_extstradd(? *arg0);                          /* static */
+void st_fdadd(? *arg0, s32 arg1, s32 arg2, s32 arg3); /* static */
+void st_feinit();                                   /* static */
+s32 st_fglobal_idn();                               /* static */
+s32 st_file_idn(? *arg0);                           /* static */
+s32 st_filebegin(? *arg0, s32 arg1, s32 arg2, s32 arg3); /* static */
+s32 st_fileend();                                   /* static */
+void st_fixextindex(s32 arg1);                      /* static */
+void st_fixextsc(s32 arg1);                         /* static */
+void st_fixiss(s32 arg1);                           /* static */
+void st_free();                                     /* static */
+s32 st_iaux_copyty(s16 arg0, s32 *arg1);            /* static */
+s32 st_idn_dn(s32 arg0, s32 arg1);                  /* static */
+void st_idn_index_fext(s32 arg0, s32 arg1);         /* static */
+void st_idn_rndx(u32 arg0);                         /* static */
+s32 st_iextmax();                                   /* static */
+s32 st_ifd_pcfd(void **arg0);                       /* static */
+s32 st_ifdmax();                                    /* static */
+void st_internal(? *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4, s32); /* static */
+void st_lineadd(? *arg0);                           /* static */
+? *st_malloc(? *arg0, s32 *arg1, s32 arg2, s32 arg3); /* static */
+? st_non_gp(void *arg0);                            /* static */
+u32 *st_paux_iaux(s32 arg0);                        /* static */
+u32 *st_paux_ifd_iaux(s32 arg0, s32 arg1, s32 *);   /* static */
+void **st_pcfd_ifd(s16 arg0, s32, s16);             /* static */
+void st_pdadd(s32 arg0);                            /* static */
+void st_pdadd_idn(u32);                             /* static */
+s32 *st_pdn_idn(s32 arg0);                          /* static */
+s32 st_pext_dn(s32 arg0, s32 arg1);                 /* static */
+void *st_pext_iext(s32 arg0, s32);                  /* static */
+s32 st_pline_ifd_iline(s32 *arg0, s32 arg1);        /* static */
+void *st_ppd_ifd_isym(s32 arg0, s32 arg1);          /* static */
+void st_printf_2(? *arg0, s32 arg1);                /* static */
+void st_printf_3(? *arg0, s32 arg1, s32 *arg2);     /* static */
+u32 st_procbegin(u32 arg0);                         /* static */
+s32 st_procend(s32 arg0);                           /* static */
+s32 *st_psym_idn_offset(s32 arg1);                  /* static */
+s32 *st_psym_ifd_isym(s32 arg0, s32 arg1);          /* static */
+s32 st_readbinary(s8 arg1);                         /* static */
+s32 st_readst(s32 arg0, s8 arg1, s32 arg2, ? *arg3, s32 arg4); /* static */
+s32 *st_rndx_idn(s32 *arg0, s32 arg1);              /* static */
+void st_set_non_gp(void *arg0);                     /* static */
+void st_setchdr(? *arg0);                           /* static */
+void st_setfd(s32 arg0, s32);                       /* static */
+void st_setidn(s32 arg0, s32 arg1);                 /* static */
+void st_setmsgname(? *arg0);                        /* static */
+void st_setstmagic(s16 arg0);                       /* static */
+void st_shifttq(s32 arg1);                          /* static */
+? *st_str_extiss(s32 arg0, s32, u32);               /* static */
+? *st_str_idn(s32, u8 *);                           /* static */
+? *st_str_ifd_iss(s32 arg0, s32 arg1);              /* static */
+s32 st_str_iss(s32 arg0);                           /* static */
+s32 st_stradd(? *arg0, void ***);                   /* static */
+u32 st_sym_idn(u32 *arg1, s32 *arg2, s32 *arg3, s32 *arg4, ? *); /* static */
+s32 st_symadd(s32 arg0, u32 arg1, u32 arg2, u32 arg3, s32 arg4); /* static */
+s32 st_textblock(u32 arg1, u32 arg2);               /* static */
+u32 st_tqhigh_iaux();                               /* static */
+void st_warning(? *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4); /* static */
+void st_writebinary(u8 *arg0, s32 arg1);            /* static */
+void st_writest(s32 arg0, s32 arg1);                /* static */
+void swap_aouthdr(void *arg0, ? arg1);              /* static */
+void swap_aux(void *arg0, u32 arg1, s32 arg2);      /* static */
+void swap_conflict(u32 *arg0, ? arg1);              /* static */
+void swap_dn(? *arg0, s32 arg1, s32 arg2);          /* static */
+void swap_dynamic(void *arg0, ? arg1);              /* static */
+void swap_dynsym(void *arg0, ? arg1);               /* static */
+void swap_ehdr(void *arg0);                         /* static */
+void swap_ext(? *arg0, s32 arg1, s32 arg2);         /* static */
+void swap_fd(? *arg0, s32 arg1, s32 arg2);          /* static */
+void swap_fi(? *arg0, s32 arg1, s32 arg2);          /* static */
+void swap_filehdr(void *arg0, ? arg1);              /* static */
+void swap_got(u32 *arg0, ? arg1);                   /* static */
+void swap_gpt(void *arg0, s32 arg1, ? arg2);        /* static */
+void swap_hdr(s16 *arg0, s32 arg1);                 /* static */
+void swap_liblist(void *arg0, ? arg1);              /* static */
+void swap_libscn(void *arg0, ? arg1);               /* static */
+void swap_msym(void *arg0, ? arg1);                 /* static */
+void swap_opt(? *arg0, s32 arg1, s32 arg2);         /* static */
+void swap_pd(? *arg0, s32 arg1, s32 arg2);          /* static */
+void swap_phdr(void *arg0);                         /* static */
+void swap_ranlib(void *arg0, s32 arg1);             /* static */
+void swap_reginfo(void *arg0, ? arg1);              /* static */
+void swap_rel_dyn(void *arg0, ? arg1);              /* static */
+void swap_reloc(void *arg0, s32 arg1, s32 arg2);    /* static */
+void swap_rpd(void *arg0, s32 arg1, ? arg2);        /* static */
+void swap_scnhdr(void *arg0, ? arg1);               /* static */
+void swap_shdr(void *arg0);                         /* static */
+void swap_sym(? *arg0, s32 arg1, s32 arg2);         /* static */
+? sym_define(s32 *arg0, s32 arg1, s32 arg2);        /* static */
+s32 *sym_enter(u8 *arg1, s32);                      /* static */
+void sym_finish(u8 *arg0, u8 *arg1);                /* static */
+void sym_init(s32 arg0);                            /* static */
+s32 sym_undefined(? *, ? *);                        /* static */
+void unscan(u8 arg0);                               /* static */
+s32 which_opt(u8 *arg0, u8 *);                      /* static */
+void xfree();                                       /* static */
+? *xmalloc(s32);                                    /* static */
+? *xrealloc(? *, s32);                              /* static */
 extern ? __ctype;
 extern ? __iob;
 extern s32 errno;
+static s32 binasm_count;
+static s32 nowarnflag;
+static s32 warnexitflag;
+static u8 isa;
+static s32 CurrentSegment;
+static s32 verbose;
+static s32 debugflag;
+static s32 atflag;
+static s32 isStruct;
+static s32 StructOrg;
+static ? *LastLabel;
+static s32 in_repeat_block;
+static s32 rep_count;
+static u32 rep_size;
+static ? *rep_buffer;
+static s32 invent_locs;
+static s32 gp_warn;
+static s32 linelength;
+static s32 nextinline;
+static u8 line[0x36C];
+static s32 CurrentFile;
+static s32 CurrentLine;
+static ? save;
+static u8 Tokench;
+static ? *Tstring[0x100];
+static s32 Tstringlength;
+static ? *token_tmp[0x100];
+static s32 printedline;
+static s32 severity;
+static ? *reg_ptr[0x20];
+static ? *hashtable[0x80];
+static ? *ophashtable[0x80];
+static s32 local_label[0x100];
+static ? *binasm_rec;
+static ? *binasmfyle;
+static ? *in_file;
+static s32 mednat;
+static s32 diag_flag;
+static s32 shftaddr;
+static ? *extsyms_file;
+static s32 list_extsyms;
+static u8 *B_1000A7EC;
+static u8 *B_1000A7F0;
+static u8 *B_1000A7F4;
+static u8 *B_1000A7F8;
+static s32 freg4;
+static s32 B_1000A810;
+static ? *B_1000A820;
+static s32 B_1000A824;
+static s32 B_1000A828;
+static ? *B_1000A82C;
+static s32 B_1000A830;
+static s32 B_1000A834;
+static ? B_1000A840;
+static ? B_1000A888;
+static u8 B_1000A8C8[0x44];
+static ? *B_1000A90C;
+static ? *B_1000A910;
+static ? *B_1000A914;
+static ? *B_1000A918[8];
+static u32 B_1000A938;
+static ? B_1000A940;
+static ? *B_1000A980[8];
+static ? *st_pchdr;
+static void **pcfdcur;
+static ? *malloc_scb;
 static s32 gform_extn = 0;
-static u8 *D_10000004[4] = { (u8 *)0x10004C80, (u8 *)0x10004C84, (u8 *)0x10004C90, (u8 *)0x10004C9C };
+static u8 *D_10000004[4] = { "", "operand 1", "operand 2", "operand 3" };
 static ? *D_10000014 = NULL;
 static s32 D_10000020 = 0;
 static s32 D_10000024 = 0;
 static u8 *sitype[0x3F] = {
-    (u8 *)0x10006A40,
-    (u8 *)0x10006A48,
-    (u8 *)0x10006A50,
-    (u8 *)0x10006A58,
-    (u8 *)0x10006A60,
-    (u8 *)0x10006A68,
-    (u8 *)0x10006A70,
-    (u8 *)0x10006A78,
-    (u8 *)0x10006A80,
-    (u8 *)0x10006A88,
-    (u8 *)0x10006A90,
-    (u8 *)0x10006A98,
-    (u8 *)0x10006AA0,
-    (u8 *)0x10006AA8,
-    (u8 *)0x10006AB0,
-    (u8 *)0x10006AB8,
-    (u8 *)0x10006AC4,
-    (u8 *)0x10006ACC,
-    (u8 *)0x10006AD4,
-    (u8 *)0x10006AE0,
-    (u8 *)0x10006AE8,
-    (u8 *)0x10006AF0,
-    (u8 *)0x10006AF8,
-    (u8 *)0x10006B00,
-    (u8 *)0x10006B08,
-    (u8 *)0x10006B10,
-    (u8 *)0x10006B18,
-    (u8 *)0x10006B20,
-    (u8 *)0x10006B28,
-    (u8 *)0x10006B30,
-    (u8 *)0x10006B38,
-    (u8 *)0x10006B40,
-    (u8 *)0x10006B48,
-    (u8 *)0x10006B50,
-    (u8 *)0x10006B5C,
-    (u8 *)0x10006B64,
-    (u8 *)0x10006B6C,
-    (u8 *)0x10006B74,
-    (u8 *)0x10006B7C,
-    (u8 *)0x10006B84,
-    (u8 *)0x10006B8C,
-    (u8 *)0x10006B94,
-    (u8 *)0x10006B9C,
-    (u8 *)0x10006BA8,
-    (u8 *)0x10006BB0,
-    (u8 *)0x10006BBC,
-    (u8 *)0x10006BC4,
-    (u8 *)0x10006BCC,
-    (u8 *)0x10006BD4,
-    (u8 *)0x10006BE0,
-    (u8 *)0x10006BE8,
-    (u8 *)0x10006BF0,
-    (u8 *)0x10006BF8,
-    (u8 *)0x10006C00,
-    (u8 *)0x10006C0C,
-    (u8 *)0x10006C18,
-    (u8 *)0x10006C24,
-    (u8 *)0x10006C30,
-    (u8 *)0x10006C40,
-    (u8 *)0x10006C4C,
-    (u8 *)0x10006C54,
-    (u8 *)0x10006C60,
-    (u8 *)0x10006C68,
+    "label",
+    ".sym",
+    ".globl",
+    ".cpload",
+    ".align",
+    ".ascii",
+    ".asciiz",
+    ".byte",
+    ".comm",
+    ".lcomm",
+    ".data",
+    ".double",
+    ".file",
+    ".float",
+    ".half",
+    ".cprestore",
+    ".gpword",
+    ".cpadd",
+    ".weakext",
+    ".loopno",
+    ".space",
+    ".text",
+    ".word",
+    "ocode",
+    ".end",
+    ".sdata",
+    ".rdata",
+    ".ent",
+    ".loc",
+    ".bgnb",
+    ".endb",
+    ".asm0",
+    ".set",
+    ".cpalias",
+    ".repeat",
+    ".endr",
+    ".lab",
+    ".vreg",
+    ".mask",
+    ".fmask",
+    ".err",
+    "globabs",
+    ".verstamp",
+    ".frame",
+    ".extended",
+    ".extern",
+    ".aent",
+    ".option",
+    ".noalias",
+    ".alias",
+    ".mtag",
+    ".malias",
+    ".struct",
+    ".livereg",
+    ".gjaldef",
+    ".gjallive",
+    ".gjrlive",
+    ".ishift_addr",
+    ".irestext",
+    ".dword",
+    ".prologue",
+    ".edata",
+    ".alloc",
 };
 static u8 *sregisters[0x49] = {
-    (u8 *)0x10006C70,
-    (u8 *)0x10006C74,
-    (u8 *)0x10006C78,
-    (u8 *)0x10006C7C,
-    (u8 *)0x10006C80,
-    (u8 *)0x10006C84,
-    (u8 *)0x10006C88,
-    (u8 *)0x10006C8C,
-    (u8 *)0x10006C90,
-    (u8 *)0x10006C94,
-    (u8 *)0x10006C98,
-    (u8 *)0x10006C9C,
-    (u8 *)0x10006CA0,
-    (u8 *)0x10006CA4,
-    (u8 *)0x10006CA8,
-    (u8 *)0x10006CAC,
-    (u8 *)0x10006CB0,
-    (u8 *)0x10006CB4,
-    (u8 *)0x10006CB8,
-    (u8 *)0x10006CBC,
-    (u8 *)0x10006CC0,
-    (u8 *)0x10006CC4,
-    (u8 *)0x10006CC8,
-    (u8 *)0x10006CCC,
-    (u8 *)0x10006CD0,
-    (u8 *)0x10006CD4,
-    (u8 *)0x10006CD8,
-    (u8 *)0x10006CDC,
-    (u8 *)0x10006CE0,
-    (u8 *)0x10006CE4,
-    (u8 *)0x10006CE8,
-    (u8 *)0x10006CEC,
-    (u8 *)0x10006CF0,
-    (u8 *)0x10006CF4,
-    (u8 *)0x10006CF8,
-    (u8 *)0x10006CFC,
-    (u8 *)0x10006D00,
-    (u8 *)0x10006D04,
-    (u8 *)0x10006D08,
-    (u8 *)0x10006D0C,
-    (u8 *)0x10006D10,
-    (u8 *)0x10006D14,
-    (u8 *)0x10006D18,
-    (u8 *)0x10006D20,
-    (u8 *)0x10006D28,
-    (u8 *)0x10006D30,
-    (u8 *)0x10006D38,
-    (u8 *)0x10006D40,
-    (u8 *)0x10006D48,
-    (u8 *)0x10006D50,
-    (u8 *)0x10006D58,
-    (u8 *)0x10006D60,
-    (u8 *)0x10006D68,
-    (u8 *)0x10006D70,
-    (u8 *)0x10006D78,
-    (u8 *)0x10006D80,
-    (u8 *)0x10006D88,
-    (u8 *)0x10006D90,
-    (u8 *)0x10006D98,
-    (u8 *)0x10006DA0,
-    (u8 *)0x10006DA8,
-    (u8 *)0x10006DB0,
-    (u8 *)0x10006DB8,
-    (u8 *)0x10006DC0,
-    (u8 *)0x10006DC8,
-    (u8 *)0x10006DD0,
-    (u8 *)0x10006DD8,
-    (u8 *)0x10006DE0,
-    (u8 *)0x10006DE8,
-    (u8 *)0x10006DF0,
-    (u8 *)0x10006DF8,
-    (u8 *)0x10006E00,
-    (u8 *)0x10006E08,
+    "$0",
+    "$1",
+    "$2",
+    "$3",
+    "$4",
+    "$5",
+    "$6",
+    "$7",
+    "$8",
+    "$9",
+    "$10",
+    "$11",
+    "$12",
+    "$13",
+    "$14",
+    "$15",
+    "$16",
+    "$17",
+    "$18",
+    "$19",
+    "$20",
+    "$21",
+    "$22",
+    "$23",
+    "$24",
+    "$25",
+    "$26",
+    "$27",
+    "$28",
+    "$29",
+    "$30",
+    "$31",
+    "$f0",
+    "$f1",
+    "$f2",
+    "$f3",
+    "$f4",
+    "$f5",
+    "$f6",
+    "$f7",
+    "$f8",
+    "$f9",
+    "$f10",
+    "$f11",
+    "$f12",
+    "$f13",
+    "$f14",
+    "$f15",
+    "$f16",
+    "$f17",
+    "$f18",
+    "$f19",
+    "$f20",
+    "$f21",
+    "$f22",
+    "$f23",
+    "$f24",
+    "$f25",
+    "$f26",
+    "$f27",
+    "$f28",
+    "$f29",
+    "$f30",
+    "$f31",
+    "$fcc0",
+    "$fcc1",
+    "$fcc2",
+    "$fcc3",
+    "$fcc4",
+    "$fcc5",
+    "$fcc6",
+    "$fcc7",
+    "   ",
 };
 static ? *sset_value[0x11] = {
-    (? *)0x10006E80,
-    (? *)0x10006E84,
-    (? *)0x10006E8C,
-    (? *)0x10006E98,
-    (? *)0x10006EA0,
-    (? *)0x10006EA8,
-    (? *)0x10006EAC,
-    (? *)0x10006EB4,
-    (? *)0x10006EBC,
-    (? *)0x10006EC4,
-    (? *)0x10006ECC,
-    (? *)0x10006ED4,
-    (? *)0x10006EE0,
-    (? *)0x10006EEC,
-    (? *)0x10006EF8,
-    (? *)0x10006F04,
-    (? *)0x10006F10,
+    "",
+    "reorder",
+    "noreorder",
+    "macro",
+    "nomacro",
+    "at",
+    "noat",
+    "move",
+    "nomove",
+    "bopt",
+    "nobopt",
+    "volatile",
+    "novolatile",
+    "transform",
+    "notransform",
+    "reposition",
+    "noreposition",
 };
-static u8 *sframereg = (u8 *)0x10006F48;
-static ? *sframesize = (? *)0x10006F54;
+static u8 *sframereg = "$framereg";
+static ? *sframesize = "$framesize";
 static struct _struct_asm_info_0x8 asm_info[0x1AF] = {
-    { (u8 *)0x10006F60, 0x08000420 },
-    { (u8 *)0x10006F64, 0x060A0421 },
-    { (u8 *)0x10006F68, 0x060A8421 },
-    { (u8 *)0x10006F70, 0x060C0421 },
-    { (u8 *)0x10006F74, 0x10000000 },
-    { (u8 *)0x10006F78, 0x101C8000 },
-    { (u8 *)0x10006F80, 0x101D0000 },
-    { (u8 *)0x10006F88, 0x101DB000 },
-    { (u8 *)0x10006F90, 0x101E3000 },
-    { (u8 *)0x10006F98, 0x101E8000 },
-    { (u8 *)0x10006FA0, 0x101F0000 },
-    { (u8 *)0x10006FA8, 0 },
-    { (u8 *)0x10006FAC, 0 },
-    { (u8 *)0x10006FB0, 0x0C258420 },
-    { (u8 *)0x10006FB4, 0x0C000420 },
-    { (u8 *)0x10006FB8, 0x0C000420 },
-    { (u8 *)0x10006FC0, 0x0E1B0400 },
-    { (u8 *)0x10006FC8, 0x0C000420 },
-    { (u8 *)0x10006FCC, 0x0C000420 },
-    { (u8 *)0x10006FD4, 0x0E270400 },
-    { (u8 *)0x10006FDC, 0x0C000420 },
-    { (u8 *)0x10006FE0, 0x0C000420 },
-    { (u8 *)0x10006FE8, 0x0E268400 },
-    { (u8 *)0x10006FF0, 0x0C000420 },
-    { (u8 *)0x10006FF4, 0x0C000420 },
-    { (u8 *)0x10006FFC, 0x0E1A8400 },
-    { (u8 *)0x10007004, 0x0C260420 },
-    { (u8 *)0x10007008, 0x58000 },
-    { (u8 *)0x10007010, 0x12318000 },
-    { (u8 *)0x10007014, 0x12320000 },
-    { (u8 *)0x10007018, 0x12328000 },
-    { (u8 *)0x1000701C, 0 },
-    { (u8 *)0x10007020, 0x06090421 },
-    { (u8 *)0x10007024, 0x06098421 },
-    { (u8 *)0x1000702C, 0x0A248400 },
-    { (u8 *)0x10007030, 0x0A250400 },
-    { (u8 *)0x10007034, 0x02000400 },
-    { (u8 *)0x10007038, 0x02330460 },
-    { (u8 *)0x1000703C, 0x02350460 },
-    { (u8 *)0x10007040, 0x02338460 },
-    { (u8 *)0x10007044, 0x02358460 },
-    { (u8 *)0x10007048, 0x04000400 },
-    { (u8 *)0x1000704C, 0x02348460 },
-    { (u8 *)0x10007050, 0x0A040400 },
-    { (u8 *)0x10007054, 0x02399060 },
-    { (u8 *)0x1000705C, 0x023A0460 },
-    { (u8 *)0x10007064, 0x1E9E0460 },
-    { (u8 *)0x1000706C, 0x14060400 },
-    { (u8 *)0x10007074, 0x14070400 },
-    { (u8 *)0x1000707C, 0x08000420 },
-    { (u8 *)0x10007084, 0x0A048400 },
-    { (u8 *)0x1000708C, 0x023B1060 },
-    { (u8 *)0x10007094, 0x023B8460 },
-    { (u8 *)0x1000709C, 0 },
-    { (u8 *)0x100070A0, 0x14068400 },
-    { (u8 *)0x100070A8, 0x14078400 },
-    { (u8 *)0x100070B0, 0x06000421 },
-    { (u8 *)0x100070B4, 0x06000421 },
-    { (u8 *)0x100070BC, 0x06000421 },
-    { (u8 *)0x100070C4, 0x08080420 },
-    { (u8 *)0x100070CC, 0x08088420 },
-    { (u8 *)0x100070D4, 0x08000420 },
-    { (u8 *)0x100070D8, 0x8000 },
-    { (u8 *)0x100070DC, 0x060D8421 },
-    { (u8 *)0x100070E0, 0x060C8421 },
-    { (u8 *)0x100070E4, 0x06090421 },
-    { (u8 *)0x100070E8, 0x06098421 },
-    { (u8 *)0x100070F0, 0x498000 },
-    { (u8 *)0x100070F4, 0x06000421 },
-    { (u8 *)0x100070F8, 0x06000421 },
-    { (u8 *)0x100070FC, 0x02368460 },
-    { (u8 *)0x10007100, 0x06000421 },
-    { (u8 *)0x10007104, 0x06000421 },
-    { (u8 *)0x10007108, 0x06000421 },
-    { (u8 *)0x10007110, 0x06000421 },
-    { (u8 *)0x10007114, 0x06000421 },
-    { (u8 *)0x1000711C, 0x02370460 },
-    { (u8 *)0x10007120, 0x06000421 },
-    { (u8 *)0x10007124, 0x06000421 },
-    { (u8 *)0x1000712C, 0x06010421 },
-    { (u8 *)0x10007130, 0x06000421 },
-    { (u8 *)0x10007134, 0x06000421 },
-    { (u8 *)0x1000713C, 0x06000421 },
-    { (u8 *)0x10007140, 0x06020421 },
-    { (u8 *)0x10007144, 0x06018421 },
-    { (u8 *)0x10007148, 0x060B0421 },
-    { (u8 *)0x1000714C, 0x060B8421 },
-    { (u8 *)0x10007154, 0x02380460 },
-    { (u8 *)0x10007158, 0x50000 },
-    { (u8 *)0x10007160, 0x060D0421 },
-    { (u8 *)0x10007164, 0x08000420 },
-    { (u8 *)0x10007168, 0x02340460 },
-    { (u8 *)0x1000716C, 0x02360460 },
-    { (u8 *)0x10007170, 0x02378460 },
-    { (u8 *)0x10007174, 0x02388460 },
-    { (u8 *)0x10007178, 0 },
-    { (u8 *)0x1000717C, 0x084584E0 },
-    { (u8 *)0x10007184, 0x08460480 },
-    { (u8 *)0x1000718C, 0x084684E0 },
-    { (u8 *)0x10007194, 0 },
-    { (u8 *)0x10007198, 0x084784E0 },
-    { (u8 *)0x100071A0, 0x08480480 },
-    { (u8 *)0x100071A8, 0x084884E0 },
-    { (u8 *)0x100071B0, 0x4C0000 },
-    { (u8 *)0x100071B8, 0x4A0000 },
-    { (u8 *)0x100071C0, 0x4A8000 },
-    { (u8 *)0x100071C8, 0x4B0000 },
-    { (u8 *)0x100071D0, 0x4B8000 },
-    { (u8 *)0x100071D8, 0x023C8860 },
-    { (u8 *)0x100071DC, 0x023D0860 },
-    { (u8 *)0x100071E0, 0 },
-    { (u8 *)0x100071E4, 0x023D9460 },
-    { (u8 *)0x100071EC, 0x023E2060 },
-    { (u8 *)0x100071F4, 0x9E8000 },
-    { (u8 *)0x100071FC, 0x9F0000 },
-    { (u8 *)0x10007204, 0x023E9460 },
-    { (u8 *)0x1000720C, 0x023F2060 },
-    { (u8 *)0x10007214, 0 },
-    { (u8 *)0x10007218, 0x02001460 },
-    { (u8 *)0x1000721C, 0x02001460 },
-    { (u8 *)0x10007220, 0x02001860 },
-    { (u8 *)0x10007224, 0x02001460 },
-    { (u8 *)0x10007228, 0x02001460 },
-    { (u8 *)0x1000722C, 0x02001860 },
-    { (u8 *)0x10007230, 0x065014A5 },
-    { (u8 *)0x10007238, 0x065094A5 },
-    { (u8 *)0x10007240, 0x065118C6 },
-    { (u8 *)0x10007248, 0x065194A5 },
-    { (u8 *)0x10007250, 0x065214A5 },
-    { (u8 *)0x10007258, 0x065298C6 },
-    { (u8 *)0x10007260, 0x065314A5 },
-    { (u8 *)0x10007268, 0x065394A5 },
-    { (u8 *)0x10007270, 0x065418C6 },
-    { (u8 *)0x10007278, 0x065494A5 },
-    { (u8 *)0x10007280, 0x065514A5 },
-    { (u8 *)0x10007288, 0x065598C6 },
-    { (u8 *)0x10007290, 0x080014A0 },
-    { (u8 *)0x10007298, 0x080014A0 },
-    { (u8 *)0x100072A0, 0x080018C0 },
-    { (u8 *)0x100072A8, 0x080014A0 },
-    { (u8 *)0x100072B0, 0x080014A0 },
-    { (u8 *)0x100072B8, 0x080018C0 },
-    { (u8 *)0x100072C0, 0x080014A0 },
-    { (u8 *)0x100072C8, 0x080014A0 },
-    { (u8 *)0x100072D0, 0x080018C0 },
-    { (u8 *)0x100072D8, 0x080014A0 },
-    { (u8 *)0x100072E0, 0x080014C0 },
-    { (u8 *)0x100072E8, 0x080014A0 },
-    { (u8 *)0x100072F0, 0x080014A0 },
-    { (u8 *)0x100072F8, 0x080014C0 },
-    { (u8 *)0x10007300, 0x080014A0 },
-    { (u8 *)0x10007308, 0x080018A0 },
-    { (u8 *)0x10007310, 0x080018A0 },
-    { (u8 *)0x10007318, 0x080018A0 },
-    { (u8 *)0x10007320, 0x080014A0 },
-    { (u8 *)0x10007328, 0x080014A0 },
-    { (u8 *)0x10007330, 0x080014C0 },
-    { (u8 *)0x10007338, 0x080030A5 },
-    { (u8 *)0x10007340, 0x080030A5 },
-    { (u8 *)0x10007348, 0x080030C6 },
-    { (u8 *)0x10007350, 0x080030A5 },
-    { (u8 *)0x10007358, 0x080030A5 },
-    { (u8 *)0x10007360, 0x080030C6 },
-    { (u8 *)0x10007368, 0x080030A5 },
-    { (u8 *)0x10007370, 0x080030A5 },
-    { (u8 *)0x10007378, 0x080030C6 },
-    { (u8 *)0x10007380, 0x080030A5 },
-    { (u8 *)0x10007388, 0x080030A5 },
-    { (u8 *)0x10007390, 0x080030C6 },
-    { (u8 *)0x10007398, 0x080030A5 },
-    { (u8 *)0x100073A0, 0x080030A5 },
-    { (u8 *)0x100073A8, 0x080030C6 },
-    { (u8 *)0x100073B0, 0x080030A5 },
-    { (u8 *)0x100073B8, 0x080030A5 },
-    { (u8 *)0x100073C0, 0x080030C6 },
-    { (u8 *)0x100073C8, 0x080030A5 },
-    { (u8 *)0x100073D0, 0x080030A5 },
-    { (u8 *)0x100073D8, 0x080030C6 },
-    { (u8 *)0x100073E0, 0x080030A5 },
-    { (u8 *)0x100073E8, 0x080030A5 },
-    { (u8 *)0x100073F0, 0x080030C6 },
-    { (u8 *)0x100073F8, 0x080030A5 },
-    { (u8 *)0x10007400, 0x080030A5 },
-    { (u8 *)0x10007408, 0x080030C6 },
-    { (u8 *)0x10007410, 0x080030A5 },
-    { (u8 *)0x1000741C, 0x080030A5 },
-    { (u8 *)0x10007428, 0x080030C6 },
-    { (u8 *)0x10007434, 0x080030A5 },
-    { (u8 *)0x1000743C, 0x080030A5 },
-    { (u8 *)0x10007444, 0x080030C6 },
-    { (u8 *)0x1000744C, 0x080030A5 },
-    { (u8 *)0x10007454, 0x080030A5 },
-    { (u8 *)0x1000745C, 0x080030C6 },
-    { (u8 *)0x10007464, 0x080030A5 },
-    { (u8 *)0x1000746C, 0x080030A5 },
-    { (u8 *)0x10007474, 0x080030C6 },
-    { (u8 *)0x1000747C, 0x080030A5 },
-    { (u8 *)0x10007484, 0x080030A5 },
-    { (u8 *)0x1000748C, 0x080030C6 },
-    { (u8 *)0x10007494, 0x080030A5 },
-    { (u8 *)0x1000749C, 0x080030A5 },
-    { (u8 *)0x100074A4, 0x080030C6 },
-    { (u8 *)0x100074AC, 0x080030A5 },
-    { (u8 *)0x100074B4, 0x080030A5 },
-    { (u8 *)0x100074BC, 0x080030C6 },
-    { (u8 *)0x100074C4, 0x042D0400 },
-    { (u8 *)0x100074C8, 0x02000460 },
-    { (u8 *)0x100074CC, 0x02000460 },
-    { (u8 *)0x100074D0, 0x02000460 },
-    { (u8 *)0x100074D8, 0x02000460 },
-    { (u8 *)0x100074DC, 0x02000460 },
-    { (u8 *)0x100074E0, 0x06298420 },
-    { (u8 *)0x100074E8, 0x062A0420 },
-    { (u8 *)0x100074F0, 0x062A8420 },
-    { (u8 *)0x100074F8, 0x062B0420 },
-    { (u8 *)0x10007500, 0x062B8420 },
-    { (u8 *)0x10007508, 0x062C0420 },
-    { (u8 *)0x1000750C, 0x062C8420 },
-    { (u8 *)0x10007514, 0 },
-    { (u8 *)0x10007518, 0x08000420 },
-    { (u8 *)0x10007520, 0x0E258400 },
-    { (u8 *)0x10007528, 0x0E260400 },
-    { (u8 *)0x10007530, 0x080014A0 },
-    { (u8 *)0x10007538, 0x080014A0 },
-    { (u8 *)0x10007540, 0x080018C0 },
-    { (u8 *)0x10007548, 0x084704E0 },
-    { (u8 *)0x10007550, 0x084904E0 },
-    { (u8 *)0x10007558, 0x0E1C0000 },
-    { (u8 *)0x1000755C, 0x0E1C0400 },
-    { (u8 *)0x10007564, 0x0E1B8400 },
-    { (u8 *)0x1000756C, 0x084808A0 },
-    { (u8 *)0x10007574, 0x084608A0 },
-    { (u8 *)0x1000757C, 0x060014A1 },
-    { (u8 *)0x10007588, 0x060014A1 },
-    { (u8 *)0x10007594, 0x060018C1 },
-    { (u8 *)0x100075A0, 0x060014A1 },
-    { (u8 *)0x100075AC, 0x060014A1 },
-    { (u8 *)0x100075B8, 0x060018C1 },
-    { (u8 *)0x100075C4, 0x060A8421 },
-    { (u8 *)0x100075CC, 0x060B8421 },
-    { (u8 *)0x100075D4, 0x060014A1 },
-    { (u8 *)0x100075E0, 0x060014A1 },
-    { (u8 *)0x100075EC, 0x060018C1 },
-    { (u8 *)0x100075F8, 0x060014A1 },
-    { (u8 *)0x10007604, 0x060014A1 },
-    { (u8 *)0x10007610, 0x060018C1 },
-    { (u8 *)0x1000761C, 0x087A04E0 },
-    { (u8 *)0x10007624, 0x087A84E0 },
-    { (u8 *)0x1000762C, 0 },
-    { (u8 *)0x10007630, 0x087B04E0 },
-    { (u8 *)0x10007638, 0x087B84E0 },
-    { (u8 *)0x10007640, 0 },
-    { (u8 *)0x10007644, 0x167C2400 },
-    { (u8 *)0x1000764C, 0x167CA800 },
-    { (u8 *)0x10007654, 0x167D2C00 },
-    { (u8 *)0x1000765C, 0x1A0F0420 },
-    { (u8 *)0x10007660, 0x1A0F8420 },
-    { (u8 *)0x10007668, 0x1A100420 },
-    { (u8 *)0x1000766C, 0x1A108420 },
-    { (u8 *)0x10007674, 0x1A110420 },
-    { (u8 *)0x10007678, 0x1A118420 },
-    { (u8 *)0x1000767C, 0x02390460 },
-    { (u8 *)0x10007680, 0x023A8460 },
-    { (u8 *)0x10007684, 0x060014A1 },
-    { (u8 *)0x10007690, 0x060014A1 },
-    { (u8 *)0x1000769C, 0x060018C1 },
-    { (u8 *)0x100076A8, 0x060014A1 },
-    { (u8 *)0x100076B4, 0x060014A1 },
-    { (u8 *)0x100076C0, 0x060018C1 },
-    { (u8 *)0x100076CC, 0x060014A1 },
-    { (u8 *)0x100076D8, 0x060014A1 },
-    { (u8 *)0x100076E4, 0x060018C1 },
-    { (u8 *)0x100076F0, 0x060014A1 },
-    { (u8 *)0x100076FC, 0x060014A1 },
-    { (u8 *)0x10007708, 0x060018C1 },
-    { (u8 *)0x10007714, 0x0C278420 },
-    { (u8 *)0x1000771C, 0x0E278400 },
-    { (u8 *)0x10007724, 0x0C280420 },
-    { (u8 *)0x1000772C, 0x0E280400 },
-    { (u8 *)0x10007734, 0x0C000420 },
-    { (u8 *)0x1000773C, 0x0C000420 },
-    { (u8 *)0x10007744, 0x0E288400 },
-    { (u8 *)0x1000774C, 0x0C000420 },
-    { (u8 *)0x10007754, 0x0C000420 },
-    { (u8 *)0x1000775C, 0x0E290400 },
-    { (u8 *)0x10007764, 0x0C000420 },
-    { (u8 *)0x1000776C, 0x0C000420 },
-    { (u8 *)0x10007774, 0x0E1F8400 },
-    { (u8 *)0x1000777C, 0x0E208400 },
-    { (u8 *)0x10007784, 0x0C000420 },
-    { (u8 *)0x1000778C, 0x0C000420 },
-    { (u8 *)0x10007794, 0x0E200400 },
-    { (u8 *)0x1000779C, 0x0E210400 },
-    { (u8 *)0x100077A4, 0x10218000 },
-    { (u8 *)0x100077AC, 0x10220000 },
-    { (u8 *)0x100077B4, 0x1022B000 },
-    { (u8 *)0x100077BC, 0x10233000 },
-    { (u8 *)0x100077C4, 0x10238000 },
-    { (u8 *)0x100077CC, 0x10240000 },
-    { (u8 *)0x100077D4, 0 },
-    { (u8 *)0x100077D8, 0 },
-    { (u8 *)0x100077DC, 0x023F8460 },
-    { (u8 *)0x100077E0, 0x02400460 },
-    { (u8 *)0x100077E4, 0x02408460 },
-    { (u8 *)0x100077E8, 0x023C0460 },
-    { (u8 *)0x100077EC, 0x02410460 },
-    { (u8 *)0x100077F0, 0x02418460 },
-    { (u8 *)0x100077F4, 0x02420460 },
-    { (u8 *)0x100077F8, 0x06308420 },
-    { (u8 *)0x10007800, 0x06310420 },
-    { (u8 *)0x10007808, 0x06120421 },
-    { (u8 *)0x10007810, 0x06128421 },
-    { (u8 *)0x10007818, 0x06130421 },
-    { (u8 *)0x10007820, 0x06138421 },
-    { (u8 *)0x10007828, 0x06140421 },
-    { (u8 *)0x10007830, 0x06148421 },
-    { (u8 *)0x10007838, 0x06150421 },
-    { (u8 *)0x10007840, 0x06170421 },
-    { (u8 *)0x10007848, 0x06178421 },
-    { (u8 *)0x10007850, 0x06180421 },
-    { (u8 *)0x10007858, 0x08188420 },
-    { (u8 *)0x10007860, 0x08190420 },
-    { (u8 *)0x10007868, 0x06000421 },
-    { (u8 *)0x10007870, 0x06000421 },
-    { (u8 *)0x10007878, 0 },
-    { (u8 *)0x1000787C, 0 },
-    { (u8 *)0x10007880, 0x084C8480 },
-    { (u8 *)0x10007888, 0x084D0480 },
-    { (u8 *)0x10007890, 0x084D84E0 },
-    { (u8 *)0x10007898, 0x084E04E0 },
-    { (u8 *)0x100078A0, 0x084E84E0 },
-    { (u8 *)0x100078A8, 0x084F04E0 },
-    { (u8 *)0x100078B0, 0x1C000400 },
-    { (u8 *)0x100078B4, 0x02000400 },
-    { (u8 *)0x100078B8, 0x8D8000 },
-    { (u8 *)0x100078C0, 0x06001081 },
-    { (u8 *)0x100078CC, 0x06001081 },
-    { (u8 *)0x100078D8, 0x06001081 },
-    { (u8 *)0x100078E4, 0x06001081 },
-    { (u8 *)0x100078F0, 0x06001081 },
-    { (u8 *)0x100078FC, 0x06001081 },
-    { (u8 *)0x10007908, 0x06001081 },
-    { (u8 *)0x10007914, 0x06001081 },
-    { (u8 *)0x10007920, 0x060010A1 },
-    { (u8 *)0x1000792C, 0x060010A1 },
-    { (u8 *)0x10007938, 0x060010A1 },
-    { (u8 *)0x10007944, 0x060010A1 },
-    { (u8 *)0x10007950, 0x08001080 },
-    { (u8 *)0x10007958, 0x08001080 },
-    { (u8 *)0x10007960, 0x080010A0 },
-    { (u8 *)0x10007968, 0x08001080 },
-    { (u8 *)0x10007970, 0x08001080 },
-    { (u8 *)0x10007978, 0x08001080 },
-    { (u8 *)0x10007980, 0x08001480 },
-    { (u8 *)0x10007988, 0x08001080 },
-    { (u8 *)0x10007990, 0x1E4F8460 },
-    { (u8 *)0x10007998, 0x04000000 },
-    { (u8 *)0x1000799C, 0x02000460 },
-    { (u8 *)0x100079A0, 0x02000460 },
-    { (u8 *)0x100079A4, 0x08000420 },
-    { (u8 *)0x100079AC, 0x08000420 },
-    { (u8 *)0x100079B4, 0x08000420 },
-    { (u8 *)0x100079BC, 0x06000421 },
-    { (u8 *)0x100079C4, 0x06000421 },
-    { (u8 *)0x100079CC, 0x06000421 },
-    { (u8 *)0x100079D4, 0x06000421 },
-    { (u8 *)0x100079DC, 0x06000421 },
-    { (u8 *)0x100079E4, 0x06000421 },
-    { (u8 *)0x100079EC, 0x06000421 },
-    { (u8 *)0x100079F4, 0x06128421 },
-    { (u8 *)0x100079FC, 0x06138421 },
-    { (u8 *)0x10007A04, 0x02000460 },
-    { (u8 *)0x10007A0C, 0x0600042C },
-    { (u8 *)0x10007A14, 0x0600042C },
-    { (u8 *)0x10007A1C, 0x06000421 },
-    { (u8 *)0x10007A24, 0x06000421 },
-    { (u8 *)0x10007A2C, 0x20001084 },
-    { (u8 *)0x10007A34, 0x20001084 },
-    { (u8 *)0x10007A3C, 0x200018C6 },
-    { (u8 *)0x10007A44, 0x20001084 },
-    { (u8 *)0x10007A4C, 0x20001084 },
-    { (u8 *)0x10007A54, 0x200018C6 },
-    { (u8 *)0x10007A5C, 0x20001084 },
-    { (u8 *)0x10007A64, 0x20001084 },
-    { (u8 *)0x10007A6C, 0x200018C6 },
-    { (u8 *)0x10007A74, 0x20001084 },
-    { (u8 *)0x10007A7C, 0x20001084 },
-    { (u8 *)0x10007A84, 0x200018C6 },
-    { (u8 *)0x10007A8C, 0x08001080 },
-    { (u8 *)0x10007A94, 0x08001080 },
-    { (u8 *)0x10007A9C, 0x08001080 },
-    { (u8 *)0x10007AA4, 0x08001080 },
-    { (u8 *)0x10007AAC, 0x0600108C },
-    { (u8 *)0x10007AB4, 0x0600108C },
-    { (u8 *)0x10007ABC, 0x0600108C },
-    { (u8 *)0x10007AC4, 0x0600108C },
-    { (u8 *)0x10007ACC, 0x06001081 },
-    { (u8 *)0x10007AD4, 0x06001081 },
-    { (u8 *)0x10007ADC, 0x06001081 },
-    { (u8 *)0x10007AE4, 0x06001081 },
-    { (u8 *)0x10007AEC, 0x22001021 },
-    { (u8 *)0x10007AF4, 0x22001021 },
-    { (u8 *)0x10007AFC, 0x22001021 },
-    { (u8 *)0x10007B04, 0x22001021 },
-    { (u8 *)0x10007B0C, 0x22000421 },
-    { (u8 *)0x10007B14, 0 },
-    { (u8 *)0x10007B1C, 0 },
-    { (u8 *)0x10007B24, 0 },
-    { (u8 *)0x10007B2C, 0 },
-    { (u8 *)0x10007B34, 0 },
-    { (u8 *)0x10007B3C, 0x06140421 },
-    { (u8 *)0x10007B44, 0x06148421 },
-    { (u8 *)0x10007B4C, 0x06150421 },
-    { (u8 *)0x10007B54, 0x109F8000 },
-    { (u8 *)0x10007B5C, 0x10A00000 },
-    { (u8 *)0x10007B64, 0x12A08000 },
-    { (u8 *)0x10007B68, 0x02A10460 },
-    { (u8 *)0x10007B70, 0x02A18460 },
-    { (u8 *)0x10007B78, 0x08A204E0 },
-    { (u8 *)0x10007B80, 0x08A284E0 },
-    { (u8 *)0x10007B88, 0x08A304E0 },
-    { (u8 *)0x10007B90, 0x08A384E0 },
-    { (u8 *)0x10007B98, 0x06028421 },
-    { (u8 *)0x10007BA0, 0x06030421 },
-    { (u8 *)0x10007BA8, 0x06038421 },
-    { (u8 *)0x10007BB0, 0x08A404E0 },
-    { (u8 *)0x10007BB8, 0x08A404E0 },
-    { (u8 *)0x10007BC0, 0x08A404E0 },
-    { (u8 *)0x10007BC8, 0x08A404E0 },
-    { (u8 *)0x10007BD0, 0 },
+    { "abs", 0x08000420 },
+    { "add", 0x060A0421 },
+    { "addu", 0x060A8421 },
+    { "and", 0x060C0421 },
+    { "b", (u32) &gform_extn },
+    { "bc0f", 0x101C8000 },
+    { "bc0t", 0x101D0000 },
+    { "bc1f", 0x101DB000 },
+    { "bc1t", 0x101E3000 },
+    { "bc2f", 0x101E8000 },
+    { "bc2t", 0x101F0000 },
+    { "", 0 },
+    { "", 0 },
+    { "beq", 0x0C258420 },
+    { "bge", 0x0C000420 },
+    { "bgeu", 0x0C000420 },
+    { "bgez", 0x0E1B0400 },
+    { "bgt", 0x0C000420 },
+    { "bgtu", 0x0C000420 },
+    { "bgtz", 0x0E270400 },
+    { "ble", 0x0C000420 },
+    { "bleu", 0x0C000420 },
+    { "blez", 0x0E268400 },
+    { "blt", 0x0C000420 },
+    { "bltu", 0x0C000420 },
+    { "bltz", 0x0E1A8400 },
+    { "bne", 0x0C260420 },
+    { "break", 0x58000 },
+    { "c0", 0x12318000 },
+    { "c1", 0x12320000 },
+    { "c2", 0x12328000 },
+    { "", 0 },
+    { "div", 0x06090421 },
+    { "divu", 0x06098421 },
+    { "j", 0x0A248400 },
+    { "jal", 0x0A250400 },
+    { "la", 0x02000400 },
+    { "lb", 0x02330460 },
+    { "lbu", 0x02350460 },
+    { "lh", 0x02338460 },
+    { "lhu", 0x02358460 },
+    { "li", 0x04000400 },
+    { "lw", 0x02348460 },
+    { "jr", 0x0A040400 },
+    { "lwc1", 0x02399060 },
+    { "lwc2", 0x023A0460 },
+    { "pref", 0x1E9E0460 },
+    { "mfhi", 0x14060400 },
+    { "mflo", 0x14070400 },
+    { "move", 0x08000420 },
+    { "jalr", 0x0A048400 },
+    { "swc1", 0x023B1060 },
+    { "swc2", 0x023B8460 },
+    { "", 0 },
+    { "mthi", 0x14068400 },
+    { "mtlo", 0x14078400 },
+    { "mul", 0x06000421 },
+    { "mulo", 0x06000421 },
+    { "mulou", 0x06000421 },
+    { "mult", 0x08080420 },
+    { "multu", 0x08088420 },
+    { "neg", 0x08000420 },
+    { "nop", 0x8000 },
+    { "nor", 0x060D8421 },
+    { "or", 0x060C8421 },
+    { "rem", 0x06090421 },
+    { "remu", 0x06098421 },
+    { "rfe", 0x498000 },
+    { "rol", 0x06000421 },
+    { "ror", 0x06000421 },
+    { "sb", 0x02368460 },
+    { "seq", 0x06000421 },
+    { "sge", 0x06000421 },
+    { "sgeu", 0x06000421 },
+    { "sgt", 0x06000421 },
+    { "sgtu", 0x06000421 },
+    { "sh", 0x02370460 },
+    { "sle", 0x06000421 },
+    { "sleu", 0x06000421 },
+    { "sll", 0x06010421 },
+    { "slt", 0x06000421 },
+    { "sltu", 0x06000421 },
+    { "sne", 0x06000421 },
+    { "sra", 0x06020421 },
+    { "srl", 0x06018421 },
+    { "sub", 0x060B0421 },
+    { "subu", 0x060B8421 },
+    { "sw", 0x02380460 },
+    { "syscall", 0x50000 },
+    { "xor", 0x060D0421 },
+    { "not", 0x08000420 },
+    { "lwl", 0x02340460 },
+    { "lwr", 0x02360460 },
+    { "swl", 0x02378460 },
+    { "swr", 0x02388460 },
+    { "", 0 },
+    { "mfc0", 0x084584E0 },
+    { "mfc1", 0x08460480 },
+    { "mfc2", 0x084684E0 },
+    { "", 0 },
+    { "mtc0", 0x084784E0 },
+    { "mtc1", 0x08480480 },
+    { "mtc2", 0x084884E0 },
+    { "sync", 0x4C0000 },
+    { "tlbr", 0x4A0000 },
+    { "tlbwi", 0x4A8000 },
+    { "tlbwr", 0x4B0000 },
+    { "tlbp", 0x4B8000 },
+    { "ld", 0x023C8860 },
+    { "sd", 0x023D0860 },
+    { "", 0 },
+    { "ldc1", 0x023D9460 },
+    { "ldc2", 0x023E2060 },
+    { "tlbr1", 0x9E8000 },
+    { "tlbp1", 0x9F0000 },
+    { "sdc1", 0x023E9460 },
+    { "sdc2", 0x023F2060 },
+    { "", 0 },
+    { "l.s", 0x02001460 },
+    { "l.d", 0x02001460 },
+    { "l.e", 0x02001860 },
+    { "s.s", 0x02001460 },
+    { "s.d", 0x02001460 },
+    { "s.e", 0x02001860 },
+    { "add.s", 0x065014A5 },
+    { "add.d", 0x065094A5 },
+    { "add.e", 0x065118C6 },
+    { "sub.s", 0x065194A5 },
+    { "sub.d", 0x065214A5 },
+    { "sub.e", 0x065298C6 },
+    { "mul.s", 0x065314A5 },
+    { "mul.d", 0x065394A5 },
+    { "mul.e", 0x065418C6 },
+    { "div.s", 0x065494A5 },
+    { "div.d", 0x065514A5 },
+    { "div.e", 0x065598C6 },
+    { "sqrt.s", 0x080014A0 },
+    { "sqrt.d", 0x080014A0 },
+    { "sqrt.e", 0x080018C0 },
+    { "mov.s", 0x080014A0 },
+    { "mov.d", 0x080014A0 },
+    { "mov.e", 0x080018C0 },
+    { "abs.s", 0x080014A0 },
+    { "abs.d", 0x080014A0 },
+    { "abs.e", 0x080018C0 },
+    { "cvt.s.d", 0x080014A0 },
+    { "cvt.s.e", 0x080014C0 },
+    { "cvt.s.w", 0x080014A0 },
+    { "cvt.d.s", 0x080014A0 },
+    { "cvt.d.e", 0x080014C0 },
+    { "cvt.d.w", 0x080014A0 },
+    { "cvt.e.s", 0x080018A0 },
+    { "cvt.e.d", 0x080018A0 },
+    { "cvt.e.w", 0x080018A0 },
+    { "cvt.w.s", 0x080014A0 },
+    { "cvt.w.d", 0x080014A0 },
+    { "cvt.w.e", 0x080014C0 },
+    { "c.f.s", 0x080030A5 },
+    { "c.f.d", 0x080030A5 },
+    { "c.f.e", 0x080030C6 },
+    { "c.un.s", 0x080030A5 },
+    { "c.un.d", 0x080030A5 },
+    { "c.un.e", 0x080030C6 },
+    { "c.eq.s", 0x080030A5 },
+    { "c.eq.d", 0x080030A5 },
+    { "c.eq.e", 0x080030C6 },
+    { "c.ueq.s", 0x080030A5 },
+    { "c.ueq.d", 0x080030A5 },
+    { "c.ueq.e", 0x080030C6 },
+    { "c.olt.s", 0x080030A5 },
+    { "c.olt.d", 0x080030A5 },
+    { "c.olt.e", 0x080030C6 },
+    { "c.ult.s", 0x080030A5 },
+    { "c.ult.d", 0x080030A5 },
+    { "c.ult.e", 0x080030C6 },
+    { "c.ole.s", 0x080030A5 },
+    { "c.ole.d", 0x080030A5 },
+    { "c.ole.e", 0x080030C6 },
+    { "c.ule.s", 0x080030A5 },
+    { "c.ule.d", 0x080030A5 },
+    { "c.ule.e", 0x080030C6 },
+    { "c.sf.s", 0x080030A5 },
+    { "c.sf.d", 0x080030A5 },
+    { "c.sf.e", 0x080030C6 },
+    { "c.ngle.s", 0x080030A5 },
+    { "c.ngle.d", 0x080030A5 },
+    { "c.ngle.e", 0x080030C6 },
+    { "c.seq.s", 0x080030A5 },
+    { "c.seq.d", 0x080030A5 },
+    { "c.seq.e", 0x080030C6 },
+    { "c.ngl.s", 0x080030A5 },
+    { "c.ngl.d", 0x080030A5 },
+    { "c.ngl.e", 0x080030C6 },
+    { "c.lt.s", 0x080030A5 },
+    { "c.lt.d", 0x080030A5 },
+    { "c.lt.e", 0x080030C6 },
+    { "c.nge.s", 0x080030A5 },
+    { "c.nge.d", 0x080030A5 },
+    { "c.nge.e", 0x080030C6 },
+    { "c.le.s", 0x080030A5 },
+    { "c.le.d", 0x080030A5 },
+    { "c.le.e", 0x080030C6 },
+    { "c.ngt.s", 0x080030A5 },
+    { "c.ngt.d", 0x080030A5 },
+    { "c.ngt.e", 0x080030C6 },
+    { "lui", 0x042D0400 },
+    { "ulw", 0x02000460 },
+    { "ulh", 0x02000460 },
+    { "ulhu", 0x02000460 },
+    { "usw", 0x02000460 },
+    { "ush", 0x02000460 },
+    { "addi", 0x06298420 },
+    { "addiu", 0x062A0420 },
+    { "slti", 0x062A8420 },
+    { "sltiu", 0x062B0420 },
+    { "andi", 0x062B8420 },
+    { "ori", 0x062C0420 },
+    { "xori", 0x062C8420 },
+    { "", 0 },
+    { "negu", 0x08000420 },
+    { "beqz", 0x0E258400 },
+    { "bnez", 0x0E260400 },
+    { "neg.s", 0x080014A0 },
+    { "neg.d", 0x080014A0 },
+    { "neg.e", 0x080018C0 },
+    { "cfc1", 0x084704E0 },
+    { "ctc1", 0x084904E0 },
+    { "bal", 0x0E1C0000 },
+    { "bgezal", 0x0E1C0400 },
+    { "bltzal", 0x0E1B8400 },
+    { "mtc1.d", 0x084808A0 },
+    { "mfc1.d", 0x084608A0 },
+    { "trunc.w.s", 0x060014A1 },
+    { "trunc.w.d", 0x060014A1 },
+    { "trunc.w.e", 0x060018C1 },
+    { "round.w.s", 0x060014A1 },
+    { "round.w.d", 0x060014A1 },
+    { "round.w.e", 0x060018C1 },
+    { "addou", 0x060A8421 },
+    { "subou", 0x060B8421 },
+    { "truncu.w.s", 0x060014A1 },
+    { "truncu.w.d", 0x060014A1 },
+    { "truncu.w.e", 0x060018C1 },
+    { "roundu.w.s", 0x060014A1 },
+    { "roundu.w.d", 0x060014A1 },
+    { "roundu.w.e", 0x060018C1 },
+    { "cfc0", 0x087A04E0 },
+    { "cfc2", 0x087A84E0 },
+    { "", 0 },
+    { "ctc0", 0x087B04E0 },
+    { "ctc2", 0x087B84E0 },
+    { "", 0 },
+    { "li.s", 0x167C2400 },
+    { "li.d", 0x167CA800 },
+    { "li.e", 0x167D2C00 },
+    { "tlt", 0x1A0F0420 },
+    { "tltu", 0x1A0F8420 },
+    { "tge", 0x1A100420 },
+    { "tgeu", 0x1A108420 },
+    { "teq", 0x1A110420 },
+    { "tne", 0x1A118420 },
+    { "ll", 0x02390460 },
+    { "sc", 0x023A8460 },
+    { "ceil.w.s", 0x060014A1 },
+    { "ceil.w.d", 0x060014A1 },
+    { "ceil.w.e", 0x060018C1 },
+    { "ceilu.w.s", 0x060014A1 },
+    { "ceilu.w.d", 0x060014A1 },
+    { "ceilu.w.e", 0x060018C1 },
+    { "floor.w.s", 0x060014A1 },
+    { "floor.w.d", 0x060014A1 },
+    { "floor.w.e", 0x060018C1 },
+    { "flooru.w.s", 0x060014A1 },
+    { "flooru.w.d", 0x060014A1 },
+    { "flooru.w.e", 0x060018C1 },
+    { "beql", 0x0C278420 },
+    { "beqzl", 0x0E278400 },
+    { "bnel", 0x0C280420 },
+    { "bnezl", 0x0E280400 },
+    { "blel", 0x0C000420 },
+    { "bleul", 0x0C000420 },
+    { "blezl", 0x0E288400 },
+    { "bgtl", 0x0C000420 },
+    { "bgtul", 0x0C000420 },
+    { "bgtzl", 0x0E290400 },
+    { "bltl", 0x0C000420 },
+    { "bltul", 0x0C000420 },
+    { "bltzl", 0x0E1F8400 },
+    { "bltzall", 0x0E208400 },
+    { "bgel", 0x0C000420 },
+    { "bgeul", 0x0C000420 },
+    { "bgezl", 0x0E200400 },
+    { "bgezall", 0x0E210400 },
+    { "bc0fl", 0x10218000 },
+    { "bc0tl", 0x10220000 },
+    { "bc1fl", 0x1022B000 },
+    { "bc1tl", 0x10233000 },
+    { "bc2fl", 0x10238000 },
+    { "bc2tl", 0x10240000 },
+    { "", 0 },
+    { "", 0 },
+    { "ldl", 0x023F8460 },
+    { "ldr", 0x02400460 },
+    { "lld", 0x02408460 },
+    { "lwu", 0x023C0460 },
+    { "sdl", 0x02410460 },
+    { "sdr", 0x02418460 },
+    { "scd", 0x02420460 },
+    { "daddi", 0x06308420 },
+    { "daddiu", 0x06310420 },
+    { "dadd", 0x06120421 },
+    { "daddu", 0x06128421 },
+    { "dsub", 0x06130421 },
+    { "dsubu", 0x06138421 },
+    { "dsll", 0x06140421 },
+    { "dsrl", 0x06148421 },
+    { "dsra", 0x06150421 },
+    { "dsllv", 0x06170421 },
+    { "dsrlv", 0x06178421 },
+    { "dsrav", 0x06180421 },
+    { "dmult", 0x08188420 },
+    { "dmultu", 0x08190420 },
+    { "ddiv", 0x06000421 },
+    { "ddivu", 0x06000421 },
+    { "", 0 },
+    { "", 0 },
+    { "dmtc1", 0x084C8480 },
+    { "dmfc1", 0x084D0480 },
+    { "dmtc0", 0x084D84E0 },
+    { "dmfc0", 0x084E04E0 },
+    { "dmtc2", 0x084E84E0 },
+    { "dmfc2", 0x084F04E0 },
+    { "dli", 0x1C000400 },
+    { "dla", 0x02000400 },
+    { "eret", 0x8D8000 },
+    { "trunc.l.s", 0x06001081 },
+    { "round.l.s", 0x06001081 },
+    { "ceil.l.s", 0x06001081 },
+    { "floor.l.s", 0x06001081 },
+    { "trunc.l.d", 0x06001081 },
+    { "round.l.d", 0x06001081 },
+    { "ceil.l.d", 0x06001081 },
+    { "floor.l.d", 0x06001081 },
+    { "trunc.l.e", 0x060010A1 },
+    { "round.l.e", 0x060010A1 },
+    { "ceil.l.e", 0x060010A1 },
+    { "floor.l.e", 0x060010A1 },
+    { "cvt.l.s", 0x08001080 },
+    { "cvt.l.d", 0x08001080 },
+    { "cvt.l.e", 0x080010A0 },
+    { "cvt.l.w", 0x08001080 },
+    { "cvt.s.l", 0x08001080 },
+    { "cvt.d.l", 0x08001080 },
+    { "cvt.e.l", 0x08001480 },
+    { "cvt.w.l", 0x08001080 },
+    { "cache", 0x1E4F8460 },
+    { "cia", 0x04000000 },
+    { "uld", 0x02000460 },
+    { "usd", 0x02000460 },
+    { "dabs", 0x08000420 },
+    { "dneg", 0x08000420 },
+    { "dnegu", 0x08000420 },
+    { "dmul", 0x06000421 },
+    { "dmulo", 0x06000421 },
+    { "dmulou", 0x06000421 },
+    { "drem", 0x06000421 },
+    { "dremu", 0x06000421 },
+    { "drol", 0x06000421 },
+    { "dror", 0x06000421 },
+    { "daddou", 0x06128421 },
+    { "dsubou", 0x06138421 },
+    { "ulwu", 0x02000460 },
+    { "movt", 0x0600042C },
+    { "movf", 0x0600042C },
+    { "movn", 0x06000421 },
+    { "movz", 0x06000421 },
+    { "madd.s", 0x20001084 },
+    { "madd.d", 0x20001084 },
+    { "madd.e", 0x200018C6 },
+    { "msub.s", 0x20001084 },
+    { "msub.d", 0x20001084 },
+    { "msub.e", 0x200018C6 },
+    { "nmadd.s", 0x20001084 },
+    { "nmadd.d", 0x20001084 },
+    { "nmadd.e", 0x200018C6 },
+    { "nmsub.s", 0x20001084 },
+    { "nmsub.d", 0x20001084 },
+    { "nmsub.e", 0x200018C6 },
+    { "recip.s", 0x08001080 },
+    { "recip.d", 0x08001080 },
+    { "rsqrt.s", 0x08001080 },
+    { "rsqrt.d", 0x08001080 },
+    { "movt.s", 0x0600108C },
+    { "movt.d", 0x0600108C },
+    { "movf.s", 0x0600108C },
+    { "movf.d", 0x0600108C },
+    { "movn.s", 0x06001081 },
+    { "movn.d", 0x06001081 },
+    { "movz.s", 0x06001081 },
+    { "movz.d", 0x06001081 },
+    { "lwxc1", 0x22001021 },
+    { "ldxc1", 0x22001021 },
+    { "swxc1", 0x22001021 },
+    { "sdxc1", 0x22001021 },
+    { "prefx", 0x22000421 },
+    { "dctr", 0 },
+    { "dctw", 0 },
+    { "tlbw", 0 },
+    { "nada", 0 },
+    { "ssnop", 0 },
+    { "dsll32", 0x06140421 },
+    { "dsrl32", 0x06148421 },
+    { "dsra32", 0x06150421 },
+    { "bc3f", 0x109F8000 },
+    { "bc3t", 0x10A00000 },
+    { "c3", 0x12A08000 },
+    { "lwc3", 0x02A10460 },
+    { "swc3", 0x02A18460 },
+    { "mfc3", 0x08A204E0 },
+    { "mtc3", 0x08A284E0 },
+    { "cfc3", 0x08A304E0 },
+    { "ctc3", 0x08A384E0 },
+    { "sllv", 0x06028421 },
+    { "srlv", 0x06030421 },
+    { "srav", 0x06038421 },
+    { "mfpc", 0x08A404E0 },
+    { "mtpc", 0x08A404E0 },
+    { "mfps", 0x08A404E0 },
+    { "mtps", 0x08A404E0 },
+    { "", 0 },
     { NULL, 0 },
 };
 static s32 map_glevel[4] = { 2, 1, 0, 3 };
 static s32 D_10001090 = 0;
 static s32 D_10001094 = 0;
-static s32 D_10001098[5] = { 0x10007C20, 0x10007C2C, 0x10007C34, 0x10007C3C, 0x10007C44 };
+static s32 D_10001098[5] = { (s32) "Internal", (s32) "Error", (s32) "Warning", (s32) "Info", (s32) "" };
 static ? *opt_strings[0x6D] = {
-    (? *)0x10007CBC,
-    (? *)0x10007CC0,
-    (? *)0x10007CC4,
-    (? *)0x10007CC8,
-    (? *)0x10007CCC,
-    (? *)0x10007CD0,
-    (? *)0x10007CD4,
-    (? *)0x10007CD8,
-    (? *)0x10007CDC,
-    (? *)0x10007CE0,
-    (? *)0x10007CE4,
-    (? *)0x10007CE8,
-    (? *)0x10007CEC,
-    (? *)0x10007CF4,
-    (? *)0x10007CF8,
-    (? *)0x10007CFC,
-    (? *)0x10007D00,
-    (? *)0x10007D04,
-    (? *)0x10007D0C,
-    (? *)0x10007D10,
-    (? *)0x10007D14,
-    (? *)0x10007D18,
-    (? *)0x10007D1C,
-    (? *)0x10007D20,
-    (? *)0x10007D24,
-    (? *)0x10007D28,
-    (? *)0x10007D2C,
-    (? *)0x10007D30,
-    (? *)0x10007D34,
-    (? *)0x10007D38,
-    (? *)0x10007D3C,
-    (? *)0x10007D40,
-    (? *)0x10007D44,
-    (? *)0x10007D48,
-    (? *)0x10007D4C,
-    (? *)0x10007D50,
-    (? *)0x10007D54,
-    (? *)0x10007D58,
-    (? *)0x10007D5C,
-    (? *)0x10007D60,
-    (? *)0x10007D64,
-    (? *)0x10007D68,
-    (? *)0x10007D6C,
-    (? *)0x10007D70,
-    (? *)0x10007D80,
-    (? *)0x10007D90,
-    (? *)0x10007DA4,
-    (? *)0x10007DB8,
-    (? *)0x10007DCC,
-    (? *)0x10007DD4,
-    (? *)0x10007DDC,
-    (? *)0x10007DE4,
-    (? *)0x10007DEC,
-    (? *)0x10007DF4,
-    (? *)0x10007DFC,
-    (? *)0x10007E08,
-    (? *)0x10007E14,
-    (? *)0x10007E20,
-    (? *)0x10007E30,
-    (? *)0x10007E3C,
-    (? *)0x10007E48,
-    (? *)0x10007E50,
-    (? *)0x10007E58,
-    (? *)0x10007E60,
-    (? *)0x10007E6C,
-    (? *)0x10007E78,
-    (? *)0x10007E80,
-    (? *)0x10007E88,
-    (? *)0x10007E94,
-    (? *)0x10007EA0,
-    (? *)0x10007EA8,
-    (? *)0x10007EB4,
-    (? *)0x10007EBC,
-    (? *)0x10007EC8,
-    (? *)0x10007ED0,
-    (? *)0x10007EDC,
-    (? *)0x10007EE4,
-    (? *)0x10007EF4,
-    (? *)0x10007F00,
-    (? *)0x10007F08,
-    (? *)0x10007F14,
-    (? *)0x10007F1C,
-    (? *)0x10007F24,
-    (? *)0x10007F2C,
-    (? *)0x10007F38,
-    (? *)0x10007F40,
-    (? *)0x10007F4C,
-    (? *)0x10007F58,
-    (? *)0x10007F60,
-    (? *)0x10007F68,
-    (? *)0x10007F70,
-    (? *)0x10007F7C,
-    (? *)0x10007F84,
-    (? *)0x10007F8C,
-    (? *)0x10007F94,
-    (? *)0x10007FA0,
-    (? *)0x10007FB0,
-    (? *)0x10007FC4,
-    (? *)0x10007FD0,
-    (? *)0x10007FD8,
-    (? *)0x10007FE4,
-    (? *)0x10007FF8,
-    (? *)0x10008000,
-    (? *)0x10008008,
-    (? *)0x10008010,
-    (? *)0x1000801C,
+    "-EB",
+    "-EL",
+    "-G",
+    "-K",
+    "-M",
+    "-NR",
+    "-O",
+    "-O0",
+    "-O1",
+    "-O2",
+    "-O3",
+    "-O4",
+    "-Olimit",
+    "-R",
+    "-RD",
+    "-T",
+    "-e",
+    "-fli",
+    "-f",
+    "-f0",
+    "-f1",
+    "-f2",
+    "-f3",
+    "-f4",
+    "-g",
+    "-g0",
+    "-g1",
+    "-g2",
+    "-g3",
+    "-l",
+    "-o",
+    "-p",
+    "-p0",
+    "-p1",
+    "-p2",
+    "-p3",
+    "-r",
+    "-t",
+    "-v",
+    "-w",
+    "-w1",
+    "-w2",
+    "-w3",
+    "-no_const_opts",
+    "-no_lui_opts",
+    "-no_div_rem_opts",
+    "-no_at_compression",
+    "-no_branch_target",
+    "-mips1",
+    "-mips2",
+    "-mips3",
+    "-mips4",
+    "-nopool",
+    "-align8",
+    "-align16",
+    "-align32",
+    "-align64",
+    "-align_common",
+    "-gp_warn",
+    "-non_pic",
+    "-r3000",
+    "-r4000",
+    "-r6000",
+    "-r6000LHU",
+    "-r6000LWL",
+    "-trapuv",
+    "-nopeep",
+    "-peepdbg",
+    "-noswpipe",
+    "-swpdbg",
+    "-nosymregs",
+    "-noxbb",
+    "-aggr_xbb",
+    "-xbbdbg",
+    "-newhilo",
+    "-domtag",
+    "-fpstall_nop",
+    "-noglobal",
+    "-nobopt",
+    "-dwalign",
+    "-excpt",
+    "-diag",
+    "-mednat",
+    "-dwopcode",
+    "-64bit",
+    "-fp32reg",
+    "-extsyms",
+    "-pic0",
+    "-pic1",
+    "-pic2",
+    "-big_got",
+    "-coff",
+    "-elf",
+    "-mscoff",
+    "-mscoff1",
+    "-multi_issue",
+    "-nonzero_scnbase",
+    "-new_mdebug",
+    "-abi",
+    "-tfprev10",
+    "-force_branch_fixup",
+    "-r4200",
+    "-r4600",
+    "-tfp",
+    "-r4300_mul",
+    "",
     NULL,
     NULL,
     NULL,
@@ -785,7 +1131,7 @@ static ? D_100013CC;                                /* unable to generate initia
 static ? D_10001400;                                /* unable to generate initializer */
 static s8 D_1000143C = 0;
 static s32 D_10001440 = 0;
-static s32 st_errname = 0x100087FC;
+static s32 st_errname = (s32) "libmld";
 static s16 stmagic = 0x7009;
 static ? msg_werr;                                  /* unable to generate initializer */
 static ? msg_err;                                   /* unable to generate initializer */
@@ -804,7 +1150,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x403DF0,
+    (? *) __start,
     NULL,
     NULL,
     NULL,
@@ -814,7 +1160,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x20,
     NULL,
     NULL,
-    (? *)0x403EF8,
+    (? *) _mcount,
     NULL,
     NULL,
     NULL,
@@ -824,7 +1170,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3E,
     NULL,
     NULL,
-    (? *)0x403F10,
+    (? *) func_00403F10,
     (? *)0x907F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -834,7 +1180,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x404008,
+    (? *) func_00404008,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -844,7 +1190,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x404108,
+    (? *) func_00404108,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -854,7 +1200,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4041A8,
+    (? *) func_004041A8,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -864,7 +1210,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x404234,
+    (? *) func_00404234,
     (? *)0x90FF0000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -874,7 +1220,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x404A0C,
+    (? *) main,
     (? *)0x90010000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -884,7 +1230,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x39,
     NULL,
     NULL,
-    (? *)0x404B80,
+    (? *) func_00404B80,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -894,7 +1240,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405178,
+    (? *) func_00405178,
     (? *)0x90010000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -904,7 +1250,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4054E8,
+    (? *) func_004054E8,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -914,7 +1260,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405574,
+    (? *) func_00405574,
     NULL,
     NULL,
     NULL,
@@ -924,7 +1270,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4055D4,
+    (? *) func_004055D4,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -934,7 +1280,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4056DC,
+    (? *) func_004056DC,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -944,7 +1290,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405884,
+    (? *) func_00405884,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -954,7 +1300,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4058F0,
+    (? *) func_004058F0,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -964,7 +1310,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405A80,
+    (? *) func_00405A80,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -974,7 +1320,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405B54,
+    (? *) func_00405B54,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -984,7 +1330,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405C28,
+    (? *) func_00405C28,
     (? *)0x900F0000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -994,7 +1340,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x405DE4,
+    (? *) func_00405DE4,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1004,7 +1350,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406034,
+    (? *) func_00406034,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1014,7 +1360,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4061F8,
+    (? *) func_004061F8,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1024,7 +1370,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406340,
+    (? *) func_00406340,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1034,7 +1380,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406684,
+    (? *) func_00406684,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1044,7 +1390,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406728,
+    (? *) func_00406728,
     (? *)0x90000000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -1054,7 +1400,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406C48,
+    (? *) func_00406C48,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1064,7 +1410,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x406FE8,
+    (? *) func_00406FE8,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1074,7 +1420,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x407334,
+    (? *) func_00407334,
     (? *)0x907F0000,
     (? *)0xFFFFFBE4,
     NULL,
@@ -1084,7 +1430,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4075CC,
+    (? *) func_004075CC,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1094,7 +1440,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4076A0,
+    (? *) func_004076A0,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1104,7 +1450,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x407A20,
+    (? *) func_00407A20,
     (? *)0x90000000,
     (? *)0xFFFFFFCC,
     NULL,
@@ -1114,7 +1460,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40848C,
+    (? *) func_0040848C,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1124,7 +1470,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4085D8,
+    (? *) func_004085D8,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1134,7 +1480,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4086EC,
+    (? *) func_004086EC,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1144,7 +1490,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4088B8,
+    (? *) func_004088B8,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1154,7 +1500,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x408C80,
+    (? *) func_00408C80,
     (? *)0x90010000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -1164,7 +1510,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x409118,
+    (? *) func_00409118,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1174,7 +1520,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4092FC,
+    (? *) func_004092FC,
     (? *)0x90000000,
     (? *)0xFFFFFFCC,
     NULL,
@@ -1184,7 +1530,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x409850,
+    (? *) func_00409850,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1194,7 +1540,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x409B10,
+    (? *) func_00409B10,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1204,7 +1550,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x409ECC,
+    (? *) func_00409ECC,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1214,7 +1560,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x409FD0,
+    (? *) func_00409FD0,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1224,7 +1570,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A044,
+    (? *) func_0040A044,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1234,7 +1580,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A0D4,
+    (? *) func_0040A0D4,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1244,7 +1590,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A160,
+    (? *) func_0040A160,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1254,7 +1600,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A208,
+    (? *) func_0040A208,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1264,7 +1610,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A280,
+    (? *) func_0040A280,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1274,7 +1620,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A4B0,
+    (? *) func_0040A4B0,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1284,7 +1630,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A530,
+    (? *) func_0040A530,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1294,7 +1640,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A5D4,
+    (? *) func_0040A5D4,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1304,7 +1650,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A6B8,
+    (? *) func_0040A6B8,
     (? *)0x900F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1314,7 +1660,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A79C,
+    (? *) func_0040A79C,
     (? *)0x90FF0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1324,7 +1670,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40A958,
+    (? *) func_0040A958,
     (? *)0x90FF0000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1334,7 +1680,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40AAD4,
+    (? *) func_0040AAD4,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1344,7 +1690,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40ADFC,
+    (? *) func_0040ADFC,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1354,7 +1700,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40AF00,
+    (? *) func_0040AF00,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1364,7 +1710,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40B0F4,
+    (? *) func_0040B0F4,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1374,7 +1720,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40B340,
+    (? *) func_0040B340,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1384,7 +1730,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40B3DC,
+    (? *) do_dot_end,
     (? *)0x900F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1394,7 +1740,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xD1,
     NULL,
     NULL,
-    (? *)0x40B554,
+    (? *) func_0040B554,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1404,7 +1750,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40B5F0,
+    (? *) func_0040B5F0,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1414,7 +1760,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40B984,
+    (? *) func_0040B984,
     (? *)0x901F0000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1424,7 +1770,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40BC84,
+    (? *) func_0040BC84,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1434,7 +1780,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40BEBC,
+    (? *) func_0040BEBC,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1444,7 +1790,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C048,
+    (? *) func_0040C048,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1454,7 +1800,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C218,
+    (? *) func_0040C218,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1464,7 +1810,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C2E0,
+    (? *) func_0040C2E0,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1474,7 +1820,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C360,
+    (? *) func_0040C360,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1484,7 +1830,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C3E0,
+    (? *) func_0040C3E0,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1494,7 +1840,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C460,
+    (? *) func_0040C460,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1504,7 +1850,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C4CC,
+    (? *) func_0040C4CC,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1514,7 +1860,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C5E8,
+    (? *) func_0040C5E8,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1524,7 +1870,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C66C,
+    (? *) func_0040C66C,
     (? *)0x903F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1534,7 +1880,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C830,
+    (? *) func_0040C830,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1544,7 +1890,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C928,
+    (? *) func_0040C928,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1554,7 +1900,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40C9D0,
+    (? *) func_0040C9D0,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1564,7 +1910,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40CC44,
+    (? *) func_0040CC44,
     (? *)0x900F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1574,7 +1920,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40CCCC,
+    (? *) func_0040CCCC,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1584,7 +1930,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40CDE4,
+    (? *) func_0040CDE4,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1594,7 +1940,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40CEB4,
+    (? *) func_0040CEB4,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1604,7 +1950,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40CF9C,
+    (? *) func_0040CF9C,
     (? *)0x90FF0000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1614,7 +1960,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40D110,
+    (? *) func_0040D110,
     (? *)0x90FF0000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1624,7 +1970,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40D284,
+    (? *) func_0040D284,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1634,7 +1980,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40D3EC,
+    (? *) Parsestmt,
     (? *)0x90000000,
     (? *)0xFFFFFBE4,
     NULL,
@@ -1644,7 +1990,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xC7,
     NULL,
     NULL,
-    (? *)0x40E180,
+    (? *) func_0040E180,
     (? *)0x90000000,
     (? *)0xFFFFFEFC,
     NULL,
@@ -1654,7 +2000,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40E1E0,
+    (? *) sym_undefined,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1664,7 +2010,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x198,
     NULL,
     NULL,
-    (? *)0x40E230,
+    (? *) func_0040E230,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1674,7 +2020,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40E3F0,
+    (? *) func_0040E3F0,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1684,7 +2030,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40E554,
+    (? *) func_0040E554,
     (? *)0x90010000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1694,7 +2040,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40E760,
+    (? *) func_0040E760,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1704,7 +2050,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40E7D0,
+    (? *) sym_init,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1714,7 +2060,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x9D,
     NULL,
     NULL,
-    (? *)0x40E814,
+    (? *) sym_finish,
     (? *)0x90FF0000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -1724,7 +2070,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xDC,
     NULL,
     NULL,
-    (? *)0x40EA24,
+    (? *) sym_enter,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1734,7 +2080,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x110,
     NULL,
     NULL,
-    (? *)0x40EA98,
+    (? *) sym_define,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -1744,7 +2090,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x12C,
     NULL,
     NULL,
-    (? *)0x40F180,
+    (? *) st_feinit,
     NULL,
     NULL,
     NULL,
@@ -1754,7 +2100,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2FD,
     NULL,
     NULL,
-    (? *)0x40F188,
+    (? *) itoa,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1764,7 +2110,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x307,
     NULL,
     NULL,
-    (? *)0x40F1D0,
+    (? *) hex_to_num,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1774,7 +2120,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x14A,
     NULL,
     NULL,
-    (? *)0x40F234,
+    (? *) make_local_label,
     (? *)0x90010000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1784,7 +2130,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1E3,
     NULL,
     NULL,
-    (? *)0x40F514,
+    (? *) unscan,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1794,7 +2140,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x31E,
     NULL,
     NULL,
-    (? *)0x40F580,
+    (? *) make_file,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1804,7 +2150,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xAC,
     NULL,
     NULL,
-    (? *)0x40F5D8,
+    (? *) func_0040F5D8,
     (? *)0x903F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1814,7 +2160,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40F77C,
+    (? *) func_0040F77C,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1824,7 +2170,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40F868,
+    (? *) hash,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1834,7 +2180,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x46,
     NULL,
     NULL,
-    (? *)0x40F9CC,
+    (? *) LookUp,
     (? *)0x90030000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1844,7 +2190,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xF8,
     NULL,
     NULL,
-    (? *)0x40FA7C,
+    (? *) opLookUp,
     (? *)0x90030000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1854,7 +2200,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1DA,
     NULL,
     NULL,
-    (? *)0x40FB2C,
+    (? *) func_0040FB2C,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1864,7 +2210,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40FBBC,
+    (? *) consume,
     NULL,
     NULL,
     NULL,
@@ -1874,7 +2220,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x343,
     NULL,
     NULL,
-    (? *)0x40FC20,
+    (? *) func_0040FC20,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1884,7 +2230,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x40FD98,
+    (? *) func_0040FD98,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1894,7 +2240,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4100C8,
+    (? *) func_004100C8,
     (? *)0x90070000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1904,7 +2250,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4101AC,
+    (? *) func_004101AC,
     (? *)0x90070000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1914,7 +2260,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x410270,
+    (? *) func_00410270,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -1924,7 +2270,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4102F4,
+    (? *) dot_soon,
     NULL,
     NULL,
     NULL,
@@ -1934,7 +2280,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x34B,
     NULL,
     NULL,
-    (? *)0x410380,
+    (? *) nexttoken,
     (? *)0x903F0000,
     (? *)0xFFFFFFCC,
     NULL,
@@ -1944,7 +2290,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x11A,
     NULL,
     NULL,
-    (? *)0x410E80,
+    (? *) func_00410E80,
     (? *)0x907F0000,
     (? *)0xFFFFFBE4,
     NULL,
@@ -1954,7 +2300,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x41125C,
+    (? *) readinline,
     (? *)0x900F0000,
     (? *)0xFFFFFBBC,
     NULL,
@@ -1964,7 +2310,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xBC,
     NULL,
     NULL,
-    (? *)0x411530,
+    (? *) alloc_new_sym,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1974,7 +2320,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4B,
     NULL,
     NULL,
-    (? *)0x4115A8,
+    (? *) alloc_new_string,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -1984,7 +2330,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xFF,
     NULL,
     NULL,
-    (? *)0x411630,
+    (? *) EnterSym,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -1994,7 +2340,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x155,
     NULL,
     NULL,
-    (? *)0x411778,
+    (? *) GetRegister,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2004,7 +2350,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x170,
     NULL,
     NULL,
-    (? *)0x411898,
+    (? *) func_00411898,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -2014,7 +2360,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x411B84,
+    (? *) func_00411B84,
     (? *)0x90000000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -2024,7 +2370,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x411ECC,
+    (? *) func_00411ECC,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2034,7 +2380,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x41213C,
+    (? *) func_0041213C,
     NULL,
     NULL,
     NULL,
@@ -2044,7 +2390,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x412144,
+    (? *) func_00412144,
     (? *)0x90070000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -2054,7 +2400,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x41244C,
+    (? *) func_0041244C,
     (? *)0x903F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2064,7 +2410,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x412548,
+    (? *) func_00412548,
     (? *)0x900F0000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2074,7 +2420,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x412698,
+    (? *) GetExpr,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2084,7 +2430,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x124,
     NULL,
     NULL,
-    (? *)0x412794,
+    (? *) dw_GetExpr,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2094,7 +2440,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x165,
     NULL,
     NULL,
-    (? *)0x412904,
+    (? *) GetBaseOrExpr,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2104,7 +2450,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x183,
     NULL,
     NULL,
-    (? *)0x412A54,
+    (? *) GetItem,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2114,7 +2460,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x137,
     NULL,
     NULL,
-    (? *)0x412AF0,
+    (? *) dw_GetItem,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2124,7 +2470,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x13F,
     NULL,
     NULL,
-    (? *)0x412B84,
+    (? *) put_binasmfyle,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2134,7 +2480,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8E,
     NULL,
     NULL,
-    (? *)0x412CB0,
+    (? *) filesize,
     (? *)0x90000000,
     (? *)0xFFFFFF6C,
     NULL,
@@ -2144,7 +2490,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3A8,
     NULL,
     NULL,
-    (? *)0x412D18,
+    (? *) ltoa,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2154,7 +2500,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x319,
     NULL,
     NULL,
-    (? *)0x412D58,
+    (? *) st_error,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2164,7 +2510,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3B7,
     NULL,
     NULL,
-    (? *)0x412E28,
+    (? *) st_warning,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2174,7 +2520,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3C0,
     NULL,
     NULL,
-    (? *)0x412EE0,
+    (? *) st_printf_2,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2184,7 +2530,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3CB,
     NULL,
     NULL,
-    (? *)0x412F24,
+    (? *) st_printf_3,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2194,7 +2540,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3D7,
     NULL,
     NULL,
-    (? *)0x412F70,
+    (? *) st_internal,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2204,7 +2550,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3E3,
     NULL,
     NULL,
-    (? *)0x413040,
+    (? *) l_addr,
     NULL,
     NULL,
     NULL,
@@ -2214,7 +2560,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3EF,
     NULL,
     NULL,
-    (? *)0x413048,
+    (? *) e_addr,
     NULL,
     NULL,
     NULL,
@@ -2224,7 +2570,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3F6,
     NULL,
     NULL,
-    (? *)0x413050,
+    (? *) s_addr,
     NULL,
     NULL,
     NULL,
@@ -2234,7 +2580,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x3FD,
     NULL,
     NULL,
-    (? *)0x413060,
+    (? *) func_00413060,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2244,7 +2590,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x413224,
+    (? *) func_00413224,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2254,7 +2600,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x4132C8,
+    (? *) call_name_and_line,
     (? *)0x90000000,
     (? *)0xFFFFFBFC,
     NULL,
@@ -2264,7 +2610,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1C7,
     NULL,
     NULL,
-    (? *)0x413320,
+    (? *) call_perror,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2274,7 +2620,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x82,
     NULL,
     NULL,
-    (? *)0x413388,
+    (? *) new_error,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2284,7 +2630,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1BD,
     NULL,
     NULL,
-    (? *)0x4133DC,
+    (? *) posterror,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2294,7 +2640,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x72,
     NULL,
     NULL,
-    (? *)0x413548,
+    (? *) postcerror,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2304,7 +2650,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1FC,
     NULL,
     NULL,
-    (? *)0x4135B0,
+    (? *) assertion_failed,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2314,7 +2660,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0xE7,
     NULL,
     NULL,
-    (? *)0x413670,
+    (? *) which_opt,
     (? *)0x900F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2324,7 +2670,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x59,
     NULL,
     NULL,
-    (? *)0x4136F8,
+    (? *) grow_array,
     (? *)0x90010000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2334,7 +2680,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x396,
     NULL,
     NULL,
-    (? *)0x413870,
+    (? *) st_cuinit,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2344,7 +2690,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x27B,
     NULL,
     NULL,
-    (? *)0x4138F0,
+    (? *) st_extadd,
     (? *)0x90010000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2354,7 +2700,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2CC,
     NULL,
     NULL,
-    (? *)0x413B00,
+    (? *) st_pext_iext,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2364,7 +2710,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x21D,
     NULL,
     NULL,
-    (? *)0x413B88,
+    (? *) st_idn_index_fext,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -2374,7 +2720,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2BA,
     NULL,
     NULL,
-    (? *)0x413CF8,
+    (? *) st_pdn_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2384,7 +2730,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x212,
     NULL,
     NULL,
-    (? *)0x413D90,
+    (? *) st_symadd,
     (? *)0x90010000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2394,7 +2740,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x252,
     NULL,
     NULL,
-    (? *)0x413FDC,
+    (? *) st_ifd_pcfd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2404,7 +2750,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x476,
     NULL,
     NULL,
-    (? *)0x414088,
+    (? *) st_pcfd_ifd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2414,7 +2760,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x464,
     NULL,
     NULL,
-    (? *)0x414148,
+    (? *) st_psym_ifd_isym,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2424,7 +2770,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x482,
     NULL,
     NULL,
-    (? *)0x41428C,
+    (? *) st_paux_iaux,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2434,7 +2780,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x493,
     NULL,
     NULL,
-    (? *)0x414394,
+    (? *) st_str_ifd_iss,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2444,7 +2790,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4A0,
     NULL,
     NULL,
-    (? *)0x414468,
+    (? *) st_ppd_ifd_isym,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2454,7 +2800,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4C1,
     NULL,
     NULL,
-    (? *)0x414540,
+    (? *) _md_st_internal,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2464,7 +2810,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x434,
     NULL,
     NULL,
-    (? *)0x414600,
+    (? *) _md_st_error,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2474,7 +2820,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x427,
     NULL,
     NULL,
-    (? *)0x4146C0,
+    (? *) _md_st_str_extiss,
     NULL,
     NULL,
     NULL,
@@ -2484,7 +2830,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4AF,
     NULL,
     NULL,
-    (? *)0x41470C,
+    (? *) _md_st_str_iss,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2494,7 +2840,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4D1,
     NULL,
     NULL,
-    (? *)0x4147E4,
+    (? *) _md_st_iextmax,
     NULL,
     NULL,
     NULL,
@@ -2504,7 +2850,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4E0,
     NULL,
     NULL,
-    (? *)0x41480C,
+    (? *) _md_st_currentifd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2514,7 +2860,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x452,
     NULL,
     NULL,
-    (? *)0x414860,
+    (? *) _md_st_malloc,
     (? *)0x90030000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2524,7 +2870,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x444,
     NULL,
     NULL,
-    (? *)0x4149C0,
+    (? *) _md_st_ifdmax,
     NULL,
     NULL,
     NULL,
@@ -2534,7 +2880,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x4F7,
     NULL,
     NULL,
-    (? *)0x4149E8,
+    (? *) _md_st_setfd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2544,7 +2890,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x505,
     NULL,
     NULL,
-    (? *)0x414A74,
+    (? *) __sgi_mld_st_commonbegin,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2554,7 +2900,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x512,
     NULL,
     NULL,
-    (? *)0x414AB8,
+    (? *) st_filebegin,
     (? *)0x90070000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2564,7 +2910,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x325,
     NULL,
     NULL,
-    (? *)0x414DA4,
+    (? *) st_endallfiles,
     (? *)0x901F0000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2574,7 +2920,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x29C,
     NULL,
     NULL,
-    (? *)0x414F80,
+    (? *) st_fileend,
     (? *)0x90000000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -2584,7 +2930,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x551,
     NULL,
     NULL,
-    (? *)0x415130,
+    (? *) st_textblock,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2594,7 +2940,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x566,
     NULL,
     NULL,
-    (? *)0x41523C,
+    (? *) _sgi_st_blockbegin,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2604,7 +2950,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x573,
     NULL,
     NULL,
-    (? *)0x415394,
+    (? *) st_blockbegin,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2614,7 +2960,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x586,
     NULL,
     NULL,
-    (? *)0x4154E4,
+    (? *) st_blockend,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -2624,7 +2970,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x594,
     NULL,
     NULL,
-    (? *)0x4156A0,
+    (? *) st_blockpop,
     NULL,
     NULL,
     NULL,
@@ -2634,7 +2980,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5A0,
     NULL,
     NULL,
-    (? *)0x4156CC,
+    (? *) st_procend,
     (? *)0x90010000,
     (? *)0xFFFFFFCC,
     NULL,
@@ -2644,7 +2990,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x1A6,
     NULL,
     NULL,
-    (? *)0x415948,
+    (? *) st_procbegin,
     (? *)0x90010000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -2654,7 +3000,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2E3,
     NULL,
     NULL,
-    (? *)0x415B78,
+    (? *) st_sym_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2664,7 +3010,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x207,
     NULL,
     NULL,
-    (? *)0x415C64,
+    (? *) st_str_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2674,7 +3020,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x404,
     NULL,
     NULL,
-    (? *)0x415CFC,
+    (? *) st_fglobal_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2684,7 +3030,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5C5,
     NULL,
     NULL,
-    (? *)0x415DA8,
+    (? *) st_psym_idn_offset,
     (? *)0xD0FF0000,
     (? *)0xFFFFFFD4,
     NULL,
@@ -2694,7 +3040,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5D4,
     NULL,
     NULL,
-    (? *)0x415FE4,
+    (? *) st_fixextindex,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2704,7 +3050,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5F8,
     NULL,
     NULL,
-    (? *)0x4160A4,
+    (? *) st_fixextsc,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2714,7 +3060,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x607,
     NULL,
     NULL,
-    (? *)0x416124,
+    (? *) st_pdadd_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2724,7 +3070,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2F0,
     NULL,
     NULL,
-    (? *)0x4161B0,
+    (? *) st_fixiss,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2734,7 +3080,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x61C,
     NULL,
     NULL,
-    (? *)0x416240,
+    (? *) st_changedn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2744,7 +3090,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x626,
     NULL,
     NULL,
-    (? *)0x416290,
+    (? *) st_file_idn,
     (? *)0x900F0000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2754,7 +3100,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x632,
     NULL,
     NULL,
-    (? *)0x416444,
+    (? *) st_tqhigh_iaux,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2764,7 +3110,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x63E,
     NULL,
     NULL,
-    (? *)0x416564,
+    (? *) st_shifttq,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2774,7 +3120,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x64D,
     NULL,
     NULL,
-    (? *)0x416620,
+    (? *) st_iaux_copyty,
     (? *)0x90070000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2784,7 +3130,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5B6,
     NULL,
     NULL,
-    (? *)0x416948,
+    (? *) st_changeaux,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2794,7 +3140,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x662,
     NULL,
     NULL,
-    (? *)0x41698C,
+    (? *) st_addtq,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2804,7 +3150,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x66F,
     NULL,
     NULL,
-    (? *)0x416A98,
+    (? *) st_changeauxrndx,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2814,7 +3160,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x678,
     NULL,
     NULL,
-    (? *)0x416BA0,
+    (? *) st_auxbtadd,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2824,7 +3170,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x246,
     NULL,
     NULL,
-    (? *)0x416C10,
+    (? *) st_auxisymadd,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2834,7 +3180,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x22A,
     NULL,
     NULL,
-    (? *)0x416C48,
+    (? *) st_auxrndxadd,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -2844,7 +3190,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x689,
     NULL,
     NULL,
-    (? *)0x416CDC,
+    (? *) st_auxbtsize,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2854,7 +3200,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x697,
     NULL,
     NULL,
-    (? *)0x416D30,
+    (? *) st_auxrndxadd_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2864,7 +3210,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x6A4,
     NULL,
     NULL,
-    (? *)0x416D78,
+    (? *) st_addcontinued,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2874,7 +3220,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x6B6,
     NULL,
     NULL,
-    (? *)0x416DC4,
+    (? *) st_currentifd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2884,7 +3230,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x238,
     NULL,
     NULL,
-    (? *)0x416E18,
+    (? *) st_ifdmax,
     NULL,
     NULL,
     NULL,
@@ -2894,7 +3240,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x52B,
     NULL,
     NULL,
-    (? *)0x416E40,
+    (? *) st_setfd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2904,7 +3250,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x535,
     NULL,
     NULL,
-    (? *)0x416EC8,
+    (? *) st_fdadd,
     (? *)0x90000000,
     (? *)0xFFFFFF2C,
     NULL,
@@ -2914,7 +3260,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x53E,
     NULL,
     NULL,
-    (? *)0x4175D4,
+    (? *) st_auxadd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2924,7 +3270,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x658,
     NULL,
     NULL,
-    (? *)0x417754,
+    (? *) st_pdadd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2934,7 +3280,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x613,
     NULL,
     NULL,
-    (? *)0x417934,
+    (? *) st_lineadd,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2944,7 +3290,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x6F7,
     NULL,
     NULL,
-    (? *)0x417AB0,
+    (? *) st_stradd,
     (? *)0x90070000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -2954,7 +3300,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x25C,
     NULL,
     NULL,
-    (? *)0x417C70,
+    (? *) st_non_gp,
     NULL,
     NULL,
     NULL,
@@ -2964,7 +3310,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x702,
     NULL,
     NULL,
-    (? *)0x417C98,
+    (? *) st_set_non_gp,
     NULL,
     NULL,
     NULL,
@@ -2974,7 +3320,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x70C,
     NULL,
     NULL,
-    (? *)0x417CB0,
+    (? *) st_paux_ifd_iaux,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2984,7 +3330,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5E7,
     NULL,
     NULL,
-    (? *)0x417DBC,
+    (? *) st_pline_ifd_iline,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -2994,7 +3340,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x71A,
     NULL,
     NULL,
-    (? *)0x417EC8,
+    (? *) st_str_iss,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3004,7 +3350,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x72D,
     NULL,
     NULL,
-    (? *)0x417FA0,
+    (? *) st_malloc,
     (? *)0x90030000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3014,7 +3360,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x547,
     NULL,
     NULL,
-    (? *)0x418104,
+    (? *) st_setchdr,
     NULL,
     NULL,
     NULL,
@@ -3024,7 +3370,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x738,
     NULL,
     NULL,
-    (? *)0x41811C,
+    (? *) st_currentpchdr,
     NULL,
     NULL,
     NULL,
@@ -3034,7 +3380,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x28C,
     NULL,
     NULL,
-    (? *)0x41813C,
+    (? *) st_free,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3044,7 +3390,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x743,
     NULL,
     NULL,
-    (? *)0x4184E8,
+    (? *) st_extstradd,
     (? *)0x90070000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3054,7 +3400,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2D6,
     NULL,
     NULL,
-    (? *)0x41861C,
+    (? *) st_str_extiss,
     NULL,
     NULL,
     NULL,
@@ -3064,7 +3410,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x266,
     NULL,
     NULL,
-    (? *)0x418668,
+    (? *) st_idn_dn,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -3074,7 +3420,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x55C,
     NULL,
     NULL,
-    (? *)0x4187A8,
+    (? *) st_idn_rndx,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -3084,7 +3430,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x74B,
     NULL,
     NULL,
-    (? *)0x4188F0,
+    (? *) st_rndx_idn,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -3094,7 +3440,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x757,
     NULL,
     NULL,
-    (? *)0x418A1C,
+    (? *) st_setidn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3104,7 +3450,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x5AC,
     NULL,
     NULL,
-    (? *)0x418AD8,
+    (? *) st_pext_dn,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3114,7 +3460,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x763,
     NULL,
     NULL,
-    (? *)0x418BA0,
+    (? *) st_iextmax,
     NULL,
     NULL,
     NULL,
@@ -3124,7 +3470,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x76E,
     NULL,
     NULL,
-    (? *)0x418BC8,
+    (? *) st_setmsgname,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3134,7 +3480,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x779,
     NULL,
     NULL,
-    (? *)0x418C84,
+    (? *) st_readbinary,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -3144,7 +3490,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x787,
     NULL,
     NULL,
-    (? *)0x418D18,
+    (? *) st_readst,
     (? *)0x900F0000,
     (? *)0xFFFFFF14,
     NULL,
@@ -3154,7 +3500,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x79A,
     NULL,
     NULL,
-    (? *)0x419E30,
+    (? *) func_00419E30,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3164,7 +3510,7 @@ static ? *alloc_anchor[0xD78] = {
     NULL,
     NULL,
     NULL,
-    (? *)0x419F0C,
+    (? *) st_writebinary,
     (? *)0x90000000,
     (? *)0xFFFFFFF4,
     NULL,
@@ -3174,7 +3520,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x2AB,
     NULL,
     NULL,
-    (? *)0x419FA0,
+    (? *) st_writest,
     (? *)0xD0FF0000,
     (? *)0xFFFFFE64,
     NULL,
@@ -3184,7 +3530,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x805,
     NULL,
     NULL,
-    (? *)0x41AFA4,
+    (? *) st_setstmagic,
     NULL,
     NULL,
     NULL,
@@ -3194,7 +3540,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x822,
     NULL,
     NULL,
-    (? *)0x41AFC4,
+    (? *) gethostsex,
     NULL,
     NULL,
     NULL,
@@ -3204,7 +3550,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x6C6,
     NULL,
     NULL,
-    (? *)0x41AFF4,
+    (? *) swap_filehdr,
     NULL,
     NULL,
     NULL,
@@ -3214,7 +3560,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x830,
     NULL,
     NULL,
-    (? *)0x41B0D8,
+    (? *) swap_aouthdr,
     NULL,
     NULL,
     NULL,
@@ -3224,7 +3570,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x83D,
     NULL,
     NULL,
-    (? *)0x41B350,
+    (? *) swap_scnhdr,
     NULL,
     NULL,
     NULL,
@@ -3234,7 +3580,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x84A,
     NULL,
     NULL,
-    (? *)0x41B4B8,
+    (? *) swap_libscn,
     NULL,
     NULL,
     NULL,
@@ -3244,7 +3590,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x856,
     NULL,
     NULL,
-    (? *)0x41B624,
+    (? *) swap_hdr,
     NULL,
     NULL,
     NULL,
@@ -3254,7 +3600,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7B5,
     NULL,
     NULL,
-    (? *)0x41BA54,
+    (? *) swap_fd,
     (? *)0x903F0000,
     (? *)0xFFFFFFA4,
     NULL,
@@ -3264,7 +3610,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7E4,
     NULL,
     NULL,
-    (? *)0x41C050,
+    (? *) swap_fi,
     NULL,
     NULL,
     NULL,
@@ -3274,7 +3620,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7EC,
     NULL,
     NULL,
-    (? *)0x41C184,
+    (? *) swap_sym,
     (? *)0x90030000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -3284,7 +3630,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7D2,
     NULL,
     NULL,
-    (? *)0x41C41C,
+    (? *) swap_ext,
     (? *)0x90030000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -3294,7 +3640,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7F4,
     NULL,
     NULL,
-    (? *)0x41C830,
+    (? *) swap_pd,
     NULL,
     NULL,
     NULL,
@@ -3304,7 +3650,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7CA,
     NULL,
     NULL,
-    (? *)0x41CA9C,
+    (? *) swap_dn,
     NULL,
     NULL,
     NULL,
@@ -3314,7 +3660,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7FD,
     NULL,
     NULL,
-    (? *)0x41CBE8,
+    (? *) swap_rpd,
     NULL,
     NULL,
     NULL,
@@ -3324,7 +3670,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x862,
     NULL,
     NULL,
-    (? *)0x41CDA0,
+    (? *) swap_opt,
     (? *)0x90030000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -3334,7 +3680,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7DB,
     NULL,
     NULL,
-    (? *)0x41D030,
+    (? *) swap_aux,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -3344,7 +3690,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x86B,
     NULL,
     NULL,
-    (? *)0x41D29C,
+    (? *) swap_reloc,
     (? *)0x90030000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -3354,7 +3700,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x874,
     NULL,
     NULL,
-    (? *)0x41D4C0,
+    (? *) swap_ranlib,
     NULL,
     NULL,
     NULL,
@@ -3364,7 +3710,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x87F,
     NULL,
     NULL,
-    (? *)0x41D53C,
+    (? *) swap_gpt,
     NULL,
     NULL,
     NULL,
@@ -3374,7 +3720,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x88B,
     NULL,
     NULL,
-    (? *)0x41D5BC,
+    (? *) swap_dynamic,
     NULL,
     NULL,
     NULL,
@@ -3384,7 +3730,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x894,
     NULL,
     NULL,
-    (? *)0x41D64C,
+    (? *) swap_rel_dyn,
     NULL,
     NULL,
     NULL,
@@ -3394,7 +3740,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8A1,
     NULL,
     NULL,
-    (? *)0x41D6B0,
+    (? *) swap_reginfo,
     NULL,
     NULL,
     NULL,
@@ -3404,7 +3750,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8AE,
     NULL,
     NULL,
-    (? *)0x41D7C8,
+    (? *) swap_dynsym,
     NULL,
     NULL,
     NULL,
@@ -3414,7 +3760,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8BB,
     NULL,
     NULL,
-    (? *)0x41D86C,
+    (? *) swap_conflict,
     NULL,
     NULL,
     NULL,
@@ -3424,7 +3770,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8C7,
     NULL,
     NULL,
-    (? *)0x41D8A4,
+    (? *) swap_got,
     NULL,
     NULL,
     NULL,
@@ -3434,7 +3780,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8D5,
     NULL,
     NULL,
-    (? *)0x41D8DC,
+    (? *) swap_liblist,
     NULL,
     NULL,
     NULL,
@@ -3444,7 +3790,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8DE,
     NULL,
     NULL,
-    (? *)0x41D9C4,
+    (? *) swap_msym,
     NULL,
     NULL,
     NULL,
@@ -3454,7 +3800,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8EB,
     NULL,
     NULL,
-    (? *)0x41DA28,
+    (? *) swap_ehdr,
     NULL,
     NULL,
     NULL,
@@ -3464,7 +3810,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8F5,
     NULL,
     NULL,
-    (? *)0x41DBB0,
+    (? *) swap_phdr,
     NULL,
     NULL,
     NULL,
@@ -3474,7 +3820,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x8FF,
     NULL,
     NULL,
-    (? *)0x41DD18,
+    (? *) swap_shdr,
     NULL,
     NULL,
     NULL,
@@ -3484,7 +3830,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x909,
     NULL,
     NULL,
-    (? *)0x41DEE4,
+    (? *) ldfsymorder,
     NULL,
     NULL,
     NULL,
@@ -3494,7 +3840,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x7BE,
     NULL,
     NULL,
-    (? *)0x41E2A4,
+    (? *) xrealloc,
     NULL,
     NULL,
     NULL,
@@ -3504,7 +3850,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x417,
     NULL,
     NULL,
-    (? *)0x41E2D8,
+    (? *) xfree,
     NULL,
     NULL,
     NULL,
@@ -3514,7 +3860,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x920,
     NULL,
     NULL,
-    (? *)0x41E2EC,
+    (? *) alloc_dispose,
     NULL,
     NULL,
     NULL,
@@ -3524,7 +3870,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x926,
     NULL,
     NULL,
-    (? *)0x41E5CC,
+    (? *) xmalloc,
     NULL,
     NULL,
     NULL,
@@ -3534,7 +3880,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x40F,
     NULL,
     NULL,
-    (? *)0x41E5E8,
+    (? *) alloc_new,
     NULL,
     NULL,
     NULL,
@@ -3544,7 +3890,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x934,
     NULL,
     NULL,
-    (? *)0x41E764,
+    (? *) alloc_page,
     (? *)0x90000000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -3554,7 +3900,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x96B,
     NULL,
     NULL,
-    (? *)0x41E81C,
+    (? *) alloc_free,
     NULL,
     NULL,
     NULL,
@@ -3564,7 +3910,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x976,
     NULL,
     NULL,
-    (? *)0x41E850,
+    (? *) alloc_scb,
     (? *)0x90000000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3574,7 +3920,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x981,
     NULL,
     NULL,
-    (? *)0x41E8E8,
+    (? *) alloc_mark,
     (? *)0x90000000,
     (? *)0xFFFFFFDC,
     NULL,
@@ -3584,7 +3930,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x94D,
     NULL,
     NULL,
-    (? *)0x41E9FC,
+    (? *) alloc_release,
     (? *)0x90030000,
     (? *)0xFFFFFFFC,
     NULL,
@@ -3594,7 +3940,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x958,
     NULL,
     NULL,
-    (? *)0x41EAD4,
+    (? *) alloc_next_scb,
     (? *)0x90000000,
     (? *)0xFFFFFFE4,
     NULL,
@@ -3604,7 +3950,7 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x93E,
     NULL,
     NULL,
-    (? *)0x41EBC8,
+    (? *) alloc_resize,
     (? *)0x90010000,
     (? *)0xFFFFFFEC,
     NULL,
@@ -4239,98 +4585,61 @@ static ? *alloc_anchor[0xD78] = {
     (? *)0x63620000,
     NULL,
 };
-static s32 binasm_count;
-static s32 nowarnflag;
-static s32 warnexitflag;
-static u8 isa;
-static s32 CurrentSegment;
-static s32 verbose;
-static s32 debugflag;
-static s32 atflag;
-static s32 isStruct;
-static s32 StructOrg;
-static ? *LastLabel;
-static s32 in_repeat_block;
-static s32 rep_count;
-static u32 rep_size;
-static ? *rep_buffer;
-static s32 invent_locs;
-static s32 gp_warn;
-static s32 linelength;
-static s32 nextinline;
-static u8 line[0x420];
-static s32 CurrentFile;
-static s32 CurrentLine;
-static ? save;
-static u8 Tokench;
-static ? *Tstring[0x100];
-static s32 Tstringlength;
-static ? *token_tmp[0x100];
-static s32 printedline;
-static s32 severity;
-static ? *reg_ptr[0x20];
-static ? *hashtable[0x80];
-static ? *ophashtable[0x80];
-static s32 local_label[0x100];
-static ? *binasm_rec;
-static ? *binasmfyle;
-static ? *in_file;
-static s32 mednat;
-static s32 diag_flag;
-static s32 shftaddr;
-static ? *extsyms_file;
-static s32 list_extsyms;
-static u8 *B_1000A7EC;
-static u8 *B_1000A7F0;
-static u8 *B_1000A7F4;
-static u8 *B_1000A7F8;
-static s32 freg4;
-static s32 B_1000A810;
-static ? *B_1000A820;
-static s32 B_1000A824;
-static s32 B_1000A828;
-static ? *B_1000A82C;
-static s32 B_1000A830;
-static s32 B_1000A834;
-static ? B_1000A840;
-static ? B_1000A888;
-static u8 B_1000A8C8[0x44];
-static ? *B_1000A90C;
-static ? *B_1000A910;
-static ? *B_1000A914;
-static ? *B_1000A918[8];
-static u32 B_1000A938;
-static ? B_1000A940;
-static ? *B_1000A980[8];
-static ? *st_pchdr;
-static void **pcfdcur;
-static ? *malloc_scb;
 
 void _ftext(void) {
 
 }
 
-void __start(void) {
-    func_00403DFC();
+void func_00403B30(void) {
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
+    $$.LazyResolver();
 }
 
-void func_00403DFC(void) {
-    s32 sp14;
-    ? sp4;
-    void *temp_a2;
-    void *temp_gp;
-
-    temp_gp = saved_reg_ra + 0x0FC0CCC4;
-    temp_a2 = &sp4 + 4 + (sp0 * 4);
-    *temp_gp->unk-7F80 = temp_a2;
-    *temp_gp->unk-7C3C = sp0;
-    unksp10 = temp_gp;
-    sp14 = 0;
-    *temp_gp->unk-7C38 = &sp4;
-    temp_gp->unk-7D24(sp0, &sp4, temp_a2);
-    unksp10->unk-7F00();
-    unksp10->unk-7F0C(unksp10->unk-7ECC(*unksp10->unk-7C3C, *unksp10->unk-7C38, *unksp10->unk-7F80));
-    M2C_BREAK();
+void __start(void) {
+    // Error: Bad function call operand .L00403DFC
+    // At instruction: bal .L00403DFC
 }
 
 void _mcount(void) {
@@ -7142,7 +7451,7 @@ void func_0040B984(void) {
         }
         if (temp_v0_2 == 0x69) {
             if (opLookUp(Tstring, &sp3C) == 0) {
-                posterror("bad section name\0\0\0\xad section name", NULL, 1);
+                posterror("bad section name\0bad section name", NULL, 1);
             } else if (sp3C->unk10 == 2) {
                 temp_v0_3 = sp3C->unk14;
                 switch (temp_v0_3) {                /* irregular */
@@ -8383,7 +8692,7 @@ void make_local_label(? *arg0, s32 *arg1) {
     var_a2 = temp_v0;
     sp23 = (token_tmp + sp24)->unk-1;
     if (temp_v0 >= 0x100U) {
-        posterror("Local label number is out of range\0\0No such label", (u8 *) token_tmp, 1);
+        posterror("Local label number is out of range\0No such label", (u8 *) token_tmp, 1);
         var_a2 = 0;
     }
     sp2C = var_a2;
@@ -10079,7 +10388,7 @@ void st_internal(? *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4) {
     fprintf(&__iob + 0x20, "libmld--");
     call_name_and_line(0);
     fprintf(&__iob + 0x20, arg0, arg1, arg2, arg3, arg4);
-    fprintf(&__iob + 0x20, "\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0Internal\0\0\0\x0error\0\0\0Warning\0Info");
+    fprintf(&__iob + 0x20, "\n");
     exit(1);
 }
 
@@ -10200,7 +10509,7 @@ void assertion_failed(s32 arg0, s32 arg1, s32 *arg2) {
     call_name_and_line(0);
     fprintf(&__iob + 0x20, "%s, line %1d:\n", arg1, arg2);
     if (arg0 != 0) {
-        fprintf(&__iob + 0x20, "    assertion (%s) failed\n\0\0-EB\0-EL\0-G\0\0-K\0\0-M\0\0-NR\0-O\0\0-O0\0-O1\0-O2\0-O3\0-O4\0-Olimit\0-R\0\0-RD\0-T\0\0-e\0\0-fli\0\0\0\0-f\0\0-f0\0-f1\0-f2\0-f3\0-f4\0-g\0\0-g0\0-g1\0-g2\0-g3\0-l\0\0-o\0\0-p\0\0-p0\0-p1\0-p2\0-p3\0-r\0\0-t\0\0-v\0\0-w\0\0-w1\0-w2\0-w3\0-no_const_opts\0\0-no_lui_opts\0\0\0\0-no_div_rem_opts\0\0\0\0-no_at_compression\0\0-no_branch_target\0\0\0-mips1\0\0-mips2\0\0-mips3\0\0-mips4\0\0-nopool\0-align8\0-align16\0\0\0\0-align32\0\0\0\0-align64\0\0\0\0-align_common\0\0\0-gp_warn\0\0\0\0-non_pic\0\0\0\0-r3000\0\0-r4000\0\0-r6000\0\0-r6000LHU\0\0\0-r6000LWL\0\0\0-trapuv\0-nopeep\0-peepdbg\0\0\0\0-noswpipe\0\0\0-swpdbg\0-nosymregs\0\0-noxbb\0\0-aggr_xbb\0\0\0-xbbdbg\0-newhilo\0\0\0\0-domtag\0-fpstall_nop\0\0\0\0-noglobal\0\0\0-nobopt\0-dwalign\0\0\0\0-excpt\0\0-diag\0\0\0-mednat\0-dwopcode\0\0\0-64bit\0\0-fp32reg\0\0\0\0-extsyms\0\0\0\0-pic0\0\0\0-pic1\0\0\0-pic2\0\0\0-big_got\0\0\0\0-coff\0\0\0-elf\0\0\0\0-mscoff\0-mscoff1\0\0\0\0-multi_issue\0\0\0\0-nonzero_scnbase\0\0\0\0-new_mdebug\0-abi\0\0\0\0-tfprev10\0\0\0-force_branch_fixup\0-r4200\0\0-r4600\0\0-tfp\0\0\0\0-r4300_mul", arg0);
+        fprintf(&__iob + 0x20, "    assertion (%s) failed\n", arg0);
     }
     fflush(&__iob + 0x20);
     exit(1);
@@ -10397,14 +10706,14 @@ void st_symadd(s32 arg0, u32 arg1, u32 arg2, u32 arg3, s32 arg4) {
     void *temp_v1_3;
 
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        _md_st_internal(&D_10001260);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        _md_st_internal("routine: no current routine, see fdadd or setfd\n");
+        _md_st_internal(&D_1000129C);
     }
     if (temp_v1->unk3C & 2) {
-        _md_st_internal("routine: cannot add to this entry it was readin from disk\n");
+        _md_st_internal(&D_100012D0);
     }
     var_a0 = temp_v1->unk0->unk14;
     if (var_a0 >= temp_v1->unk8) {
@@ -10429,17 +10738,17 @@ void st_symadd(s32 arg0, u32 arg1, u32 arg2, u32 arg3, s32 arg4) {
 
 s32 st_ifd_pcfd(void **arg0) {
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        _md_st_internal(&D_10001260);
     }
     if (pcfdcur == NULL) {
-        _md_st_internal("routine: no current routine, see fdadd or setfd\n");
+        _md_st_internal(&D_1000129C);
     }
     return (s32) (arg0 - st_pchdr->unk4) >> 6;
 }
 
 void **st_pcfd_ifd(s32 arg0) {
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg0);
+        _md_st_internal(&D_10001260, arg0);
     }
     if ((arg0 < 0) || (arg0 >= st_pchdr->unkC)) {
         _md_st_internal("st_pcfd_ifd: ifd (%d) out of range\n", arg0);
@@ -10453,7 +10762,7 @@ s32 *st_psym_ifd_isym(s32 arg0, s32 arg1) {
     void **var_v1;
 
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg1, arg0);
+        _md_st_internal(&D_10001260, arg1, arg0);
     }
     if (arg0 == 0x7FFFFFFF) {
         return st_pext_iext(arg1) + 4;
@@ -10469,10 +10778,10 @@ s32 *st_psym_ifd_isym(s32 arg0, s32 arg1) {
 
 u32 *st_paux_iaux(s32 arg0) {
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        _md_st_internal(&D_10001260);
     }
     if (pcfdcur == NULL) {
-        _md_st_internal("routine: no current routine, see fdadd or setfd\n");
+        _md_st_internal(&D_1000129C);
     }
     if ((arg0 < 0) || (arg0 >= (*pcfdcur)->unk30)) {
         _md_st_internal("st_paux_iaux: iaux (%d) out of range\n", arg0);
@@ -10485,7 +10794,7 @@ u32 *st_paux_iaux(s32 arg0) {
     void **temp_v0;
 
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg0);
+        _md_st_internal(&D_10001260, arg0);
     }
     if (arg0 == 0x7FFFFFFF) {
         return _md_st_str_extiss(arg1, arg1, (s16) arg0);
@@ -10505,7 +10814,7 @@ void *st_ppd_ifd_isym(s32 arg0, s32 arg1) {
     void *var_a0;
 
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg1);
+        _md_st_internal(&D_10001260, arg1);
     }
     temp_v0 = st_pcfd_ifd((s16) arg0);
     var_v1 = 0;
@@ -10554,11 +10863,11 @@ s32 _md_st_str_iss(s32 arg0) {
     void **temp_v1;
 
     if (st_pchdr->unk4 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        _md_st_internal(&D_10001310);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        _md_st_internal("routine: no current routine, see fdadd or setfd\n");
+        _md_st_internal(&D_1000134C);
     }
     temp_v0 = temp_v1->unk0->unkC;
     if (temp_v0 != 0) {
@@ -10637,7 +10946,7 @@ void _md_st_setfd(s32 arg0) {
 
     var_v0 = st_pchdr->unk4;
     if (var_v0 == 0) {
-        _md_st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        _md_st_internal(&D_10001310);
         var_v0 = st_pchdr->unk4;
     }
     pcfdcur = var_v0 + (arg0 << 6);
@@ -11512,7 +11821,7 @@ void st_setfd(s32 arg0) {
 
     var_v0 = st_pchdr->unk4;
     if (var_v0 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
         var_v0 = st_pchdr->unk4;
     }
     pcfdcur = var_v0 + (arg0 << 6);
@@ -11665,14 +11974,14 @@ void st_auxadd(u32 arg0) {
     void *temp_a1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        st_internal("routine: no current routine, see fdadd or setfd\n");
+        st_internal(&D_100013CC);
     }
     if (temp_v1->unk3C & 0x400) {
-        st_internal("routine: cannot add to this entry it was readin from disk\n");
+        st_internal(&D_10001400);
     }
     var_a0 = temp_v1->unk0->unk30;
     if (var_a0 >= temp_v1->unk10) {
@@ -11690,14 +11999,14 @@ void st_pdadd(s32 arg0) {
     void *temp_a1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        st_internal("routine: no current routine, see fdadd or setfd\n");
+        st_internal(&D_100013CC);
     }
     if (temp_v1->unk3C & 0x100) {
-        st_internal("routine: cannot add to this entry it was readin from disk\n");
+        st_internal(&D_10001400);
     }
     var_a0 = temp_v1->unk0->unk2A;
     if (var_a0 >= (u32) temp_v1->unk38) {
@@ -11716,14 +12025,14 @@ void st_lineadd(? *arg0) {
     void *temp_a1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        st_internal("routine: no current routine, see fdadd or setfd\n");
+        st_internal(&D_100013CC);
     }
     if (temp_v1->unk3C & 4) {
-        st_internal("routine: cannot add to this entry it was readin from disk\n");
+        st_internal(&D_10001400);
     }
     var_a0 = temp_v1->unk0->unk1C;
     if (var_a0 >= temp_v1->unk28) {
@@ -11746,14 +12055,14 @@ void st_stradd(? *arg0) {
     }
     temp_s2 = strlen(arg0) + 1;
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
     }
     temp_s0 = pcfdcur;
     if (temp_s0 == NULL) {
-        st_internal("routine: no current routine, see fdadd or setfd\n");
+        st_internal(&D_100013CC);
     }
     if (temp_s0->unk3C & 0x80) {
-        st_internal("routine: cannot add to this entry it was readin from disk\n");
+        st_internal(&D_10001400);
     }
     var_v1 = temp_s0->unk0->unkC;
     if (temp_s0->unk18 < (var_v1 + temp_s2)) {
@@ -11783,7 +12092,7 @@ u32 *st_paux_ifd_iaux(s32 *arg0, s32 arg1) {
     void **var_v1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg1, arg0);
+        st_internal(&D_10001390, arg1, arg0);
     }
     if (((s32) arg0 < 0) || (arg1 < 0) || ((s32) arg0 >= st_pchdr->unkC) || (var_v1 = st_pchdr->unk4 + ((s32) arg0 << 6), ((arg1 < (*var_v1)->unk30) == 0))) {
         sp24 = (s32) arg0 << 6;
@@ -11798,7 +12107,7 @@ s32 st_pline_ifd_iline(s32 *arg0, s32 arg1) {
     void **var_v1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n", arg1, arg0);
+        st_internal(&D_10001390, arg1, arg0);
     }
     if (((s32) arg0 < 0) || (arg1 < 0) || ((s32) arg0 >= st_pchdr->unkC) || (var_v1 = st_pchdr->unk4 + ((s32) arg0 << 6), ((arg1 < (*var_v1)->unk1C) == 0))) {
         sp24 = (s32) arg0 << 6;
@@ -11813,11 +12122,11 @@ s32 st_str_iss(s32 arg0) {
     void **temp_v1;
 
     if (st_pchdr->unk4 == 0) {
-        st_internal("routine: you didn't initialize with st_cuinit or st_readst\n");
+        st_internal(&D_10001390);
     }
     temp_v1 = pcfdcur;
     if (temp_v1 == NULL) {
-        st_internal("routine: no current routine, see fdadd or setfd\n");
+        st_internal(&D_100013CC);
     }
     temp_v0 = temp_v1->unk0->unkC;
     if (temp_v0 != 0) {
@@ -12083,7 +12392,7 @@ s32 st_pext_dn(s32 arg0, s32 arg1) {
         st_internal("st_pext_dn: rfd field (%d) isn't equal to ST_EXTIFD(%d)\n", arg0, (s32 *)0x7FFFFFFF);
     }
     if ((arg1 < 0) || (st_pchdr->unk1C < arg1)) {
-        st_internal("st_pext_dn: index out of range (%d)\n\0\0\0\0libmld", arg1);
+        st_internal("st_pext_dn: index out of range (%d)\n", arg1);
     }
     return st_pchdr->unk18 + (arg1 * 0x10);
 }
@@ -12723,8 +13032,6 @@ void st_writest(s32 arg0, s32 arg1) {
     ? *sp68;
     s32 sp58;
     ? **var_s0;
-    ? *temp_s1_3;
-    ? *temp_s2;
     ? *temp_v0;
     ? *temp_v0_14;
     ? *temp_v0_15;
@@ -12974,7 +13281,7 @@ block_19:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_7->unk34, 0x34, temp_s1_2, sp10C) != sp188->unk2A) {
                         sp120 = var_t3;
-                        st_error("cannot write pfield");
+                        st_error(&msg_werr);
                     }
                 }
                 sp1B4 += sp1B6;
@@ -12989,7 +13296,6 @@ block_19:
             sp144 = sp11C;
         }
     }
-    temp_s2 = "cannot write pfield";
     if (arg1 & 2) {
         sp11C += var_t3;
         var_t3 = 0;
@@ -13007,7 +13313,7 @@ block_19:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_9->unk4, 0xC, (u16) temp_a2_2, sp10C) != sp188->unk14) {
                         sp120 = var_t3;
-                        st_error(temp_s2);
+                        st_error(&msg_werr);
                     }
                 }
                 sp19C += sp1A0;
@@ -13039,7 +13345,7 @@ block_19:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_10->unk1C, 0xC, (u16) temp_a2_3, sp10C) != sp188->unk24) {
                         sp120 = var_t3;
-                        st_error(temp_s2);
+                        st_error(&msg_werr);
                     }
                 }
                 sp1AC += sp1B0;
@@ -13071,7 +13377,7 @@ block_19:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_11->unkC, 4, (u16) temp_a2_4, sp10C) != sp188->unk30) {
                         sp120 = var_t3;
-                        st_error(temp_s2);
+                        st_error(&msg_werr);
                     }
                 }
                 sp1B8 += sp1BC;
@@ -13103,7 +13409,7 @@ block_19:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_12->unk14, 1, (u16) temp_a2_5, sp10C) != sp188->unkC) {
                         sp120 = var_t3;
-                        st_error(temp_s2);
+                        st_error(&msg_werr);
                     }
                 }
                 sp194 += sp198;
@@ -13139,7 +13445,7 @@ block_19:
             var_s0_2 = -var_t3;
             if (fwrite(st_pchdr->unk24, 1, (u16) temp_v1_3, sp10C) != st_pchdr->unk28) {
                 sp120 = var_t3;
-                st_error("cannot write cur table\n");
+                st_error(&msg_err);
                 goto block_115;
             }
         } else {
@@ -13157,7 +13463,6 @@ block_115:
         }
         sp168 = var_t3;
     }
-    temp_s1_3 = "cannot write cur table\n";
     if (arg1 & 0x200) {
         temp_t8_2 = st_pchdr->unkC;
         temp_t9_6 = sp11C + var_t3;
@@ -13173,7 +13478,7 @@ block_115:
                 sp120 = temp_t7_3;
                 var_t3 = sp120;
                 if (fwrite(st_pchdr->unk8, 0x48, (u16) temp_v1_4, sp10C) != st_pchdr->unkC) {
-                    st_error(temp_s1_3);
+                    st_error(&msg_err);
                 }
             }
         }
@@ -13195,7 +13500,7 @@ block_115:
                     sp120 = var_t3;
                     if (fwrite(temp_v0_13->unk2C, 4, (u16) temp_a2_6, sp10C) != sp188->unk38) {
                         sp120 = var_t3;
-                        st_error(temp_s2);
+                        st_error(&msg_werr);
                     }
                 }
                 sp1C0 += sp1C4;
@@ -13226,7 +13531,7 @@ block_115:
                 sp120 = temp_t8_4;
                 var_t3 = sp120;
                 if (fwrite(temp_v0_14->unk18, 0x10, (u16) temp_v1_5, sp10C) != st_pchdr->unk1C) {
-                    st_error(temp_s1_3);
+                    st_error(&msg_err);
                 }
             }
         }
@@ -13247,7 +13552,7 @@ block_115:
                 sp13C = temp_t7_4;
                 temp_v1_6 = temp_v0_16->unk3C;
                 if ((temp_v1_6 != 0) && (fwrite(temp_v0_16->unk38, 8, (u16) temp_v1_6, sp10C) != st_pchdr->unk3C)) {
-                    st_error(temp_s1_3);
+                    st_error(&msg_err);
                 }
             }
         }
@@ -13255,7 +13560,7 @@ block_115:
     fflush(sp10C);
     fseek(sp10C, sp110, 0);
     unksp12A = 0x313;
-    sp128 = *"p\t";
+    sp128 = stmagic;
     if (fwrite(&sp128, 1, 0x60U, sp10C) != 0x60) {
         st_error("cannot write symbol header\n");
     }
@@ -13263,7 +13568,7 @@ block_115:
 }
 
 void st_setstmagic(s16 arg0) {
-    *"p\t" = arg0;
+    stmagic = arg0;
 }
 
 s32 gethostsex(void) {
@@ -14460,7 +14765,7 @@ void alloc_dispose(? **arg0, s32 **arg1) {
                 temp_v1 = var_a3->unkC;
                 var_t8 = temp_v1;
                 if (temp_v1 < 0) {
-                    var_t8 = -temp_v1;
+                    var_t8 = 0 - temp_v1;
                 }
                 if ((s32) (var_a3 + var_t8) < temp_a2) {
                     goto loop_6;
@@ -14473,7 +14778,7 @@ loop_6:
                         temp_t6 = var_a3->unkC;
                         var_t7 = temp_t6;
                         if (temp_t6 < 0) {
-                            var_t7 = -temp_t6;
+                            var_t7 = 0 - temp_t6;
                         }
                         if ((s32) (var_a3 + var_t7) < temp_a2) {
                             goto loop_6;
@@ -14491,7 +14796,7 @@ loop_6:
                     temp_v1_2 = var_a3->unkC;
                     var_t8_2 = temp_v1_2;
                     if (temp_v1_2 < 0) {
-                        var_t8_2 = -temp_v1_2;
+                        var_t8_2 = 0 - temp_v1_2;
                     }
                     if ((s32) (var_a3 + var_t8_2) < temp_a2) {
                         goto loop_17;
@@ -14504,7 +14809,7 @@ loop_17:
                             temp_t6_2 = var_a3->unkC;
                             var_t7_2 = temp_t6_2;
                             if (temp_t6_2 < 0) {
-                                var_t7_2 = -temp_t6_2;
+                                var_t7_2 = 0 - temp_t6_2;
                             }
                             if ((s32) (var_a3 + var_t7_2) < temp_a2) {
                                 goto loop_17;

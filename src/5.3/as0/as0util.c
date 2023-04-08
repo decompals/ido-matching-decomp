@@ -140,7 +140,20 @@ void consume(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00410270.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/dot_soon.s")
+int dot_soon(int arg0) {
+    char c;
+
+    for (; arg0 < linelength; arg0++) {
+        c = line[arg0];
+        if ((c == '.') || (c == 'e') || (c == 'E')) {
+            return 1;
+        }
+        if (!isdigit(c)) {
+            return 0;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/nexttoken.s")
 
