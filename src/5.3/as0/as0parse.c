@@ -1878,43 +1878,43 @@ static void Parse_option_directive(void) {
     free(dest);
     nexttoken();
     switch (as1_option) {                                 /* irregular */
-        case 0x7: //-O0
+        case OPTION_O0: //-O0
             binasm_rec.unk6_C0 = 1;
             binasm_rec.opt = 0;
             break;
-        case 0x8: //-O1
+        case OPTION_O1: //-O1
             binasm_rec.unk6_C0 = 1;
             binasm_rec.opt = 1;
             break;
-        case 0x6: //-O
-        case 0x9: //-O2
+        case OPTION_O: //-O
+        case OPTION_O2: //-O2
             binasm_rec.unk6_C0 = 1;
             binasm_rec.opt = 2;
             break;
-        case 0xA: //-O3
+        case OPTION_O3: //-O3
             binasm_rec.unk6_C0 = 1;
             binasm_rec.opt = 3;
             break;
-        case 0xB: //-O4
+        case OPTION_O4: //-O4
             binasm_rec.unk6_C0 = 1;
             binasm_rec.opt = 4;
             break;
 
-        case 0x57: //-pic0
+        case OPTION_pic0: //-pic0
             binasm_rec.unk6_C0 = 2;
             binasm_rec.opt = 0;
             break;
-        case 0x58: //-pic1
+        case OPTION_pic1: //-pic1
             binasm_rec.unk6_C0 = 2;
             binasm_rec.opt = 1;
             break;
-        case 0x59: //-pic2
+        case OPTION_pic2: //-pic2
             binasm_rec.unk6_C0 = 2;
             binasm_rec.opt = 2;
             break;
-        case 0x5A: //big_got
-        case 0x5B: //coff
-        case 0x5C: //elf
+        case OPTION_big_got: //big_got
+        case OPTION_coff: //coff
+        case OPTION_elf: //elf
             break;
         default:
             posterror("Unknown name in .option", NULL, 2);
