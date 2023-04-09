@@ -20,8 +20,12 @@ typedef volatile s64 vs64;
 typedef float f32;
 typedef double f64;
 
+
 struct binasm {
-    u32 unk0;
+    union {
+        u32 unk0;
+        u8 arr0[4];
+    };
     union {
         u32 unk4;
         struct {
@@ -37,7 +41,7 @@ struct binasm {
             u32 unk4_FFFF_ : 16;
             u32 unk6_FE: 7;
             u32 unk6_01FC : 7;
-            u32 unk7_01FC : 7;
+            u32 unk7_03_ : 2;
         };
     };
     union {
@@ -49,7 +53,6 @@ struct binasm {
             u32 unkA_3F80 : 7;
             u32 unkB_007F : 7;
         };
-        
         struct {
             u32 unk8_FFFFC000_ : 18;
             u32 unkA_3FFF : 14;
@@ -64,6 +67,8 @@ struct binasm {
         };
     };
 };
+
+
 
 
 struct sym {
@@ -111,7 +116,7 @@ struct _struct_asm_info_0x8 {
 };
 
 
-struct binasm binasm_rec;
+extern struct binasm binasm_rec;
 extern s32 gform_extn;
 
 #endif /* TYPES_H */

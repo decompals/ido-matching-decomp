@@ -94,6 +94,9 @@ s32 severity;
 static char *sframereg = "$framereg";
 static char *sframesize = "$framesize";
 s32 shftaddr;
+
+struct binasm binasm_rec;
+
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
 
@@ -992,7 +995,21 @@ static void func_00406728(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407334.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004075CC.s")
+static void func_004075CC(s32 arg0) {
+    struct sym* temp_v0;
+
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5_003F = 0x17;
+    binasm_rec.unk6_03FE = arg0;
+    temp_v0 = GetRegister();
+    if (temp_v0 != NULL) {
+        binasm_rec.unk8_FE = temp_v0->unk14;
+    }
+    binasm_rec.unk8_01FC = 0x48;
+    binasm_rec.unk8_0003C000 = 2;
+    func_00407334();
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004076A0.s")
 
@@ -1002,9 +1019,47 @@ static void func_00406728(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004085D8.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004086EC.s")
+static void func_004086EC(s32 arg0) {
+    struct sym* reg1; // sp+44?
+    struct sym* reg2; // sp+40
+    struct sym* reg3; // sp+3C
+    s32 sp38;
+    s32 sp34;
 
-void func_004088B8(s32 arg0) {
+    if (arg0 == 0x194) {
+        sp38 = GetExpr();
+        if ((sp38 < 0) || (sp38 > 31)) {
+            posterror("hint field not in range 0..31", NULL, 2);
+        }
+        sp34 = sp38 & 0x1F;
+    } else {
+        if ((reg1 = GetRegister()) == NULL) {
+            return;
+        }
+        sp34 = reg1->unk14;
+    }
+
+    if ((reg2 = GetRegister()) == NULL) {
+        return;
+    }
+    if (Tokench != '(') {
+        posterror("expecting '(' before base register", NULL, 1);
+        return;
+    }
+    nexttoken();
+    if ((reg3 = GetRegister()) == NULL) {
+        return;
+    }
+    if (Tokench != ')') {
+        posterror("expecting ')' after base register", NULL, 1);
+        return;
+    }
+    nexttoken();
+    func_00405178(0, arg0, sp34, reg3->unk14, 3, reg2->unk14, 0);
+}
+
+
+static void func_004088B8(s32 arg0) {
     struct sym* sp4C;
     struct sym* sp48;
     struct sym* sp44;
@@ -1345,7 +1400,31 @@ static void func_0040A79C(s32 arg0) {
     } while (Tokench == 0x2C);
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A958.s")
+
+void func_0040A958(void) {
+    s32 sp4C;
+    s32 sp48;
+
+    if (LastLabel != 0) {
+        func_00405574(0);
+    }
+    do {
+        GetItem(&sp48, &sp4C);
+        if (isStruct) {
+            StructOrg = StructOrg + ((sp4C < 1) ? 1 : sp4C);
+        } else {
+            if (sp48 < -128 || sp48 > 255) {
+                posterror("value must be -128..255", NULL, 1);
+                sp48 = 0;
+            }
+            binasm_rec.unk0 = 0;
+            binasm_rec.unk5_003F = 7;
+            binasm_rec.unk8 = sp48;
+            binasm_rec.opt = sp4C;
+            put_binasmfyle();
+        }
+    } while (Tokench != '#');
+}
 
 void func_0040AAD4(s32 arg0) {
     struct sym* sp34;
@@ -1430,7 +1509,48 @@ static void func_0040ADFC(void) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040AF00.s")
+void func_0040AF00(s32 iop) {
+    if (LastLabel != 0) {
+        func_00405574(0);
+    }
+    isStruct = 0;
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5_003F = iop;
+    if (iop == 0x15) {
+        binasm_rec.unk8 = (Tokench != '#') ? Tstringlength : 0;
+    }
+    if ((iop == 0x15) && (Tokench != '#')) {
+        int i;
+
+        put_binasmfyle();
+        for (i = 0; i < Tstringlength; i++) {
+            binasm_rec.arr0[i] = Tstring[i];
+        }
+        nexttoken();
+    }
+    put_binasmfyle();
+
+    switch (iop) {
+        case 0x15:
+            CurrentSegment = 1;
+            break;
+        case 0xA:
+            CurrentSegment = 2;
+            break;
+        case 0x19:
+            CurrentSegment = 0xD;
+            break;
+        case 0x1A:
+            CurrentSegment = 0xF;
+            break;
+        default:
+            if (iop != 0x1A) {
+                assertion_failed("iop == irdata", "as0parse.c", 2627);
+            }
+            break;
+    }
+}
+
 
 
 static void func_0040B0F4(s32 arg0) {
@@ -1555,7 +1675,7 @@ static void func_0040B5F0(s32 arg0) {
             posterror(".aent must be inside .ent/.end block", &Tstring, 2);
             arg0 = 0x1B;
         }
-        if (LookUp(&Tstring, &sp24) == 0) {
+        if (LookUp(Tstring, &sp24) == 0) {
             EnterSym(&Tstring, &sp24, 1);
         }
         if (sp24->unk10 != 3) {
@@ -2182,7 +2302,7 @@ void Parsestmt(void) {
         case 0x15:                  /* switch 1 */
         case 0x19:                  /* switch 1 */
         case 0x1A:                  /* switch 1 */
-            func_0040AF00();
+            func_0040AF00(temp_a0);
             break;
         case 0x4:                   /* switch 1 */
             func_0040A5D4();

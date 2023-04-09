@@ -70,21 +70,21 @@ void make_file(u8* arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040F77C.s")
 
-s32 hash(char* arg0) {
-    s32 k;
-    s32 var_a3;
+int hash(char* calc) {
+    int k;
+    int i;
 
-    var_a3 = strlen(arg0);
-    if (var_a3 <= 0) {
+    i = strlen(calc);
+    if (i <= 0) {
         assertion_failed("i > 0", "as0util.c", 0xE5);
     }
 
-    k = (arg0[1] * 0xD)
-        + (arg0[MIN(var_a3, 2)] * 0x11)
-        + (arg0[MIN(var_a3, 3)] * 0xB)
-        + (arg0[MAX(var_a3 - 2, 1)] * 3)
-        + (arg0[MAX(var_a3 - 1, 1)] * 7)
-        + (arg0[var_a3] * 0x13);
+    k = (calc[1] * 0xD)
+        + (calc[MIN(i, 2)] * 0x11)
+        + (calc[MIN(i, 3)] * 0xB)
+        + (calc[MAX(i - 2, 1)] * 3)
+        + (calc[MAX(i - 1, 1)] * 7)
+        + (calc[i] * 0x13);
 
     return k % 128;
 }
