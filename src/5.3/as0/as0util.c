@@ -1,3 +1,7 @@
+/*
+* @file: as0util.c
+*
+*/
 #include <stdio.h>
 #include <stdbool.h>
 #include <ctype.h>
@@ -146,10 +150,10 @@ int dot_soon(int arg0) {
     for (; arg0 < linelength; arg0++) {
         c = line[arg0];
         if ((c == '.') || (c == 'e') || (c == 'E')) {
-            return 1;
+            return true;
         }
         if (!isdigit(c)) {
-            return 0;
+            return false;
         }
     }
     return 0;
@@ -211,7 +215,7 @@ void EnterSym(s32 arg0, struct sym** arg1, s32 arg2) {
     *arg1 = sp2C;
 }
 
-s32 GetRegister() {
+struct sym *GetRegister() {
     struct sym* sp24;
     void* sp20;
 
@@ -413,7 +417,32 @@ s32 GetExpr() {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/dw_GetExpr.s")
+s32 dw_GetExpr(s32* arg0, u32* arg1) {
+    u64 sp20;
+
+    if ((Tokench == 'i') 
+        || (Tokench == 'd') 
+        || (Tokench == 'h') 
+        || (Tokench == '+') 
+        || (Tokench == '-') 
+        || (Tokench == '~') 
+        || (Tokench == '(') 
+        || (Tokench == '"')) {
+        sp20 = func_00412548();
+        func_0041213C();
+        if (Tokench == ',') {
+            nexttoken();
+        }
+    } else {
+        posterror("Invalid symbol in expression", NULL, 1);
+        nexttoken();
+    }
+
+    *arg0 = sp20 >> 0x20;
+    *arg1 = sp20;
+
+    return (*arg0 != 0) && ((*arg0 != -1) || (s32)sp20 >= 0);
+}
 
 void GetBaseOrExpr(bar** arg0, s32* arg1) {
     *arg0 = NULL;

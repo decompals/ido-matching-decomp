@@ -1,3 +1,7 @@
+/*
+* @file: as0text.c
+* @brief: Contains the main print functions
+*/
 #include <stdio.h>
 #include <stdbool.h>
 #include "types.h"

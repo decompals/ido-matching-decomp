@@ -22,11 +22,7 @@ struct unk_00405574 {
 /* 0x0 */ char unk0[8];
 /* 0x8 */ s32 unk8;
 /* 0xC */ s32 unkC;
-
-
 };
-
-#define EOF -1
 
 //static void func_00404234(void);
 
@@ -97,7 +93,7 @@ struct sym *reg_ptr[0x48];
 s32 severity;
 static char *sframereg = "$framereg";
 static char *sframesize = "$framesize";
-
+s32 shftaddr;
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
 
@@ -170,7 +166,7 @@ static int func_00404108(int arg0, char* name, int arg2) {
     hashtable[sp20] = temp_v0;
 }
 
-void func_004041A8(char* arg0, s32 arg1) {
+static void func_004041A8(char* arg0, s32 arg1) {
     s32 stackPad;
     s32 sp20;
     struct sym* cur_symbol;
@@ -453,7 +449,7 @@ static void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
         }
         break;
     case 2:
-        if (((s32) isa < 3) && ((arg1 < 0) || (arg1 >= 0x20) || (arg1 & UNK_FLAG))) {
+        if ((isa < ISA_MIPS3) && ((arg1 < 0) || (arg1 >= 0x20) || (arg1 & UNK_FLAG))) {
             posterror("Should be even gp register", D_10000004[arg0], 1);
         }
         break;
@@ -472,7 +468,7 @@ static void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
         }
         break;
     case 8:
-        if (((s32) isa < 3) && ((arg1 < 0) || (arg1 >= 0x20) || (arg1 & UNK_FLAG))) {
+        if ((isa < ISA_MIPS3) && ((arg1 < 0) || (arg1 >= 0x20) || (arg1 & UNK_FLAG))) {
             posterror("Should be even coprocessor register", D_10000004[arg0], 1);
         }
         break;
@@ -482,14 +478,14 @@ static void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
         }
         break;
     case 5:
-        if ((s32) isa < 3) {
+        if (isa < ISA_MIPS3) {
             if ((arg1 < 0x20) || (arg1 >= 0x40) || (arg1 & UNK_FLAG)) {
                 posterror("Should be even floating point register", D_10000004[arg0], 1);
             }
         }
         break;
     case 6:
-        if ((s32) isa >= 3) {
+        if (isa >= ISA_MIPS3) {
             if ((arg1 < 0x20) || (arg1 >= 0x40) || (arg1 & UNK_FLAG)) {
                 posterror("Should be even floating point register", D_10000004[arg0], 1);
             }
@@ -498,19 +494,19 @@ static void func_00404B80(s32 arg0, s32 arg1, s32 arg2) {
         }
         break;
     case 9:
-        if (((s32) isa < 3) && (arg1 >= 0x20) && (arg1 & UNK_FLAG)) {
+        if ((isa < ISA_MIPS3) && (arg1 >= 0x20) && (arg1 & UNK_FLAG)) {
             posterror("Should be fp double or gp single register", D_10000004[arg0], 1);
         }
         break;
     case 10:
-        if ((s32) isa < 3) {
+        if (isa < ISA_MIPS3) {
             if (arg1 & UNK_FLAG) {
                 posterror("Should be multiple-of-2 register", D_10000004[arg0], 1);
             }
         }
         break;
     case 11:
-        if ((s32) isa >= 3) {
+        if (isa >= 3) {
             if (arg1 & UNK_FLAG) {
                 posterror("Should be multiple-of-2 register", D_10000004[arg0], 1);
             }
@@ -608,7 +604,7 @@ static void func_00405178(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u32 arg4, s32 
 }
 
 
-static void func_004054E8(s32 arg0, u8* arg1) {
+static void func_004054E8(struct sym *arg0, u8* arg1) {
     u8* var_a2;
 
     fprintf(extsyms_file, "%1d %1d", binasm_count, arg0);
@@ -760,7 +756,46 @@ static void func_00405B54(u32 arg0, u32 arg1, s32 *arg2) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405C28.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405DE4.s")
+static s32 func_00405DE4(s32* arg0, s32 arg1, s32 arg2, s32* arg3) {
+    struct sym* sp2C;
+
+    if (Tokench == 'i') {
+        if (!LookUp(Tstring, &sp2C)) {
+            EnterSym(Tstring, &sp2C, 1);
+        }
+
+        if (sp2C->unk10 == 4) {
+            dw_GetItem(arg1, arg2, arg3);
+        } else if (sp2C->unk10 == 3) {
+            *arg0 = sp2C->unk18;
+            nexttoken();
+            func_00405B54(arg1, arg2, arg3);
+        } else {
+            posterror("Bad id in expression", NULL, 1);
+            nexttoken();
+            return 0;
+        }
+    } else {
+        if (Tokench == '"') {
+            func_00405C28(Tstring, strlen(Tstring), arg1, arg2);
+            nexttoken();
+        } else {
+            dw_GetExpr(arg1, arg2);
+        }
+
+        if (Tokench == ':') {
+            nexttoken();
+            *arg3 = GetExpr();
+        } else {
+            *arg3 = 1;
+        }
+    }
+    if (Tokench == ',') {
+        nexttoken();
+    }
+    return 1;
+}
+
 
 static void func_00406034(void) {
     s32 sp54;
@@ -969,7 +1004,66 @@ static void func_00406728(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004086EC.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004088B8.s")
+void func_004088B8(s32 arg0) {
+    struct sym* sp4C;
+    struct sym* sp48;
+    struct sym* sp44;
+    s32 sp40;
+    u32 sp3C;
+    s32 sp38;
+    s32 sp34;
+    // s32 var_v1;
+    // void* temp_v0;
+
+    if ((sp4C = GetRegister()) == NULL) {
+        return;
+    }
+    sp48 = NULL;
+    if ((Tokench == 'i') && LookUp(Tstring, &sp44) && (sp44->unk10 == 0)) {
+        sp48 = sp44;
+        nexttoken();
+        if (Tokench == ',') {
+            nexttoken();
+        }
+    }
+
+    if ((Tokench == 'i') || (Tokench == 'd')
+        || (Tokench == 'h') || (Tokench == '+')
+        || (Tokench == '-') || (Tokench == '~')
+        || (Tokench == '"') || (Tokench == '(')) {
+        if (isa <= ISA_MIPS2) {
+            sp38 = 0;
+            sp40 = GetExpr();
+        } else {
+            sp38 = dw_GetExpr(&sp3C, &sp40);
+        }
+
+        if ((sp48 != NULL) && ((sp40 < 0) || (sp40 > 0x400) || sp38)) {
+            posterror("code field in trap instruction not in 0..1023", NULL, 2);
+        }
+
+        if (sp38) {
+            sp34 = atflag;
+            if (!sp34) {
+                posterror("macro expansion needs at register after .set noat", NULL, 1);
+            }
+
+            atflag = 0;
+            func_00405178(0, 0x14C, 1, 0x48, 2, 0x48, sp3C);
+            func_00405178(0, 0x14C, 1, 0x48, 2, 0x48, sp40);
+            func_00405178(0, arg0, sp4C->unk14, 1, 4, 0x48, 8);
+            atflag = sp34;
+        } else if (sp48 != NULL) {
+            func_00405178(0, arg0, sp4C->unk14, sp48->unk14, 4, 0x48, sp40);
+        } else {
+            func_00405178(0, arg0, sp4C->unk14, 0x48, 2, 0x48, sp40);
+        }
+    } else if (sp48 == NULL) {
+        posterror("invalid syntax in statement", NULL, 1);
+    } else {
+        func_00405178(0, arg0, sp4C->unk14, sp48->unk14, 4, 0x48, 8);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00408C80.s")
 
@@ -1007,7 +1101,7 @@ static void func_004092FC(s32 arg0) {
             || (Tokench == 'h')
             || (Tokench == '+')
             || (Tokench == '-')) {
-            if (isa < 3) {
+            if (isa < ISA_MIPS3) {
                 sp40 = 0;
                 sp48 = GetExpr();
             } else {
@@ -1140,7 +1234,7 @@ static void func_0040A208(void) {
     }
 }
 
-void func_0040A280(void) {
+static void func_0040A280(void) {
     struct sym* sp34;
     struct sym* sp30;
     u32 sp2C;
@@ -1192,17 +1286,132 @@ static void func_0040A4B0(void) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A530.s")
+static void func_0040A530(void) {
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A5D4.s")
+    if ((var_v1 =  GetExpr()) != 1) {
+        posterror(".shift_addr expression not 1", NULL, 1);
+
+    }
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5_003F =  0x39;
+    binasm_rec.unk8 = var_v1;
+    put_binasmfyle();
+    shftaddr = 1;
+}
+
+static void func_0040A5D4(void) {
+    s32 temp_v0;
+
+        temp_v0 = GetExpr();
+    if ((temp_v0 < 0) || (temp_v0 > 12)) {
+        posterror("align expression not 0..12", NULL, 1);
+        return;
+    }
+    if (isStruct) {
+        StructOrg = ((((s32)StructOrg + (temp_v0 << temp_v0)) - 1) >> temp_v0) << temp_v0;
+    } else {
+        binasm_rec.unk0 = 0;
+        binasm_rec.unk5_003F = 4;
+        binasm_rec.unk8 = temp_v0;
+        put_binasmfyle();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A6B8.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A79C.s")
+static void func_0040A79C(s32 arg0) {
+
+    if (LastLabel != 0) {
+        func_00405574(0);
+    }
+
+    do {
+        if (Tokench != 0x22) {
+            posterror("string literal expected", NULL, 1);
+        } else if (isStruct != 0) {
+            StructOrg += Tstringlength;
+            if (arg0 != 0) {
+                StructOrg = StructOrg + 1;
+            }
+        } else if (arg0 != 0) {
+            func_0040A6B8(6);
+        } else {
+            func_0040A6B8(5);
+        }
+        if (Tokench != 0x23) {
+            nexttoken();
+        }
+    } while (Tokench == 0x2C);
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A958.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040AAD4.s")
+void func_0040AAD4(s32 arg0) {
+    struct sym* sp34;
+    u32 sp30;
+    u32 sp2C;
+    u32 sp28;
+
+    if (Tokench != 'i') {
+        posterror("identifer expected", NULL, 1);
+        if (Tokench != '#') {
+            nexttoken();
+        }
+        return;
+    }
+    if (LookUp(Tstring, &sp34) == 0) {
+        EnterSym(Tstring, &sp34, arg0 != 9);
+    }
+    if (list_extsyms != 0) {
+        func_004054E8(sp34->unk18, Tstring);
+    }
+    nexttoken();
+    if (Tokench == ',') {
+        nexttoken();
+    }
+    sp28 = 0;
+    if ((arg0 == 0x2D) && (Tokench == '#')) {
+        sp2C = 0;
+    } else {
+        sp2C = GetExpr();
+    }
+
+    if (Tokench == 'i') {
+        if ((Tstring[0] == 'S') && (Tstring[1] == '\0')) {
+            sp28 = 1;
+        } else {
+            posterror("optional argument not S, ignored.", NULL, 2);
+        }
+        nexttoken();
+    }
+
+    if (sp34->unk10 != 3) {
+        posterror("invalid symbol for .comm/.lcomm/.extern ", Tstring, 1);
+        return;
+    }
+
+    binasm_rec.unk0 = sp34->unk18;
+    binasm_rec.unk5_003F = arg0;
+    binasm_rec.unk8 = sp2C;
+    binasm_rec.opt = sp28;
+    put_binasmfyle();
+    switch (arg0) {                         /* irregular */
+    case 8:
+        sp30 = 0x11;
+        break;
+    case 9:
+        sp30 = 0x21;
+        break;
+    case 0x2D:
+        sp30 = 0x22;
+        break;
+    default:
+        assertion_failed("false", "as0parse.c", 0xA08);
+        break;
+    }
+    sym_define(sp34->unk18, sp30, sp2C);
+}
 
 static void func_0040ADFC(void) {
     if (Tokench != 'i') {
@@ -1757,8 +1966,22 @@ static void func_0040CCCC(void) {
     put_binasmfyle();
 }
 
+static void func_0040CDE4(s32 arg0) {
+    struct sym* temp_v0;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040CDE4.s")
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5_003F = arg0;
+
+    if ((temp_v0 = GetRegister()) != NULL) {
+        binasm_rec.unk6_FE = temp_v0->unk14;
+
+        if ((temp_v0 = GetRegister()) != NULL) {
+            binasm_rec.unk6_01FC = temp_v0->unk14;
+            put_binasmfyle();
+        }
+    }
+}
+
 
 static void func_0040CEB4(void) {
     int temp_v0;
@@ -1890,6 +2113,7 @@ static void func_0040D284(u8* arg0) {
     }
     put_binasmfyle();
 }
+
 
 void Parsestmt(void) {
     char sp38[0x400];
@@ -2082,7 +2306,11 @@ void Parsestmt(void) {
             func_0040C5E8(temp_a0);
             break;
         case '9':                  /* switch 1 */
-            mednat != false ? func_0040A530() : assertion_failed("false", "as0parse.c", 3537);
+            if(mednat != false) {
+                func_0040A530();
+            } else {
+                 assertion_failed("false", "as0parse.c", 3537);
+            }
             break;
         case ':':                  /* switch 1 */
 
@@ -2190,7 +2418,6 @@ void Parsestmt(void) {
         posterror("assembler op/directive expected", sp38, 1);
     }
 }
-
 static void func_0040E180(const char* arg0, s32 arg1, s32 arg2) {
     char dest[0x100];
 

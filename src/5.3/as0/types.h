@@ -22,13 +22,24 @@ typedef double f64;
 
 struct binasm {
     u32 unk0;
-    u32 unk4_FE_ : 7;
-    u32 unk4_01C0 : 3;
-    u32 unk5_003F : 6;
-    u32 unk6_C0 : 2;
-    u32 unk6_3C_ : 4;
-    u32 unk6_03FE : 9;
-    u32 unk6_0001_ : 1;
+    union {
+        u32 unk4;
+        struct {
+            u32 unk4_FE_ : 7;
+            u32 unk4_01C0 : 3;
+            u32 unk5_003F : 6;
+            u32 unk6_C0 : 2;
+            u32 unk6_3C_ : 4;
+            u32 unk6_03FE : 9;
+            u32 unk7_0001_ : 1;
+        };
+        struct {
+            u32 unk4_FFFF_ : 16;
+            u32 unk6_FE: 7;
+            u32 unk6_01FC : 7;
+            u32 unk7_01FC : 7;
+        };
+    };
     union {
         u32 unk8;
         struct {
@@ -40,14 +51,10 @@ struct binasm {
         };
         
         struct {
-            // u32 unk8_FE : 7;
-            // u32 unk8_01FC : 7;
-            // u32 unk8_0003C000 : 4;
             u32 unk8_FFFFC000_ : 18;
             u32 unkA_3FFF : 14;
         };
     };
-    // u32 opt;
     union {
         u32 opt;
         struct {
