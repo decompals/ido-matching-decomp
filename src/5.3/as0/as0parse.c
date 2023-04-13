@@ -11,6 +11,11 @@
 #include "arrays.h" //better
 #include "opt.h"
 #include "protos.h"
+#include "sym.h"
+#include "stsupport.h"
+#include "cmplrs/stext.h"
+
+
 
 typedef struct {
     s8 pad[0xC];
@@ -99,6 +104,8 @@ struct binasm binasm_rec;
 
 // static void func_00405574(s32 arg0) {}
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
+
+extern void sym_finish(char* arg0, char* arg1);
 
 static void func_00403F10(void) {
     struct _struct_asm_info* var_s2;
@@ -1225,7 +1232,72 @@ static void func_004092FC(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409850.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409B10.s")
+
+static void func_00409B10(s32 arg0) {
+    struct sym* sp4C;
+    struct sym* sp48;
+    struct sym* sp44;
+    s32 sp34;
+    s32 sp3C;
+    s32 sp38;
+    // s32 var_v1;
+
+    if (Tokench != 'i') {
+        posterror("condition code or label expected", NULL, 1);
+        return;
+    }
+
+    sp34 = (arg0 == 8) || (arg0 == 7) || (arg0 == 0x128) || (arg0 == 0x127);
+
+    if (sp34) {
+        sp3C = 0x40;
+
+        if ((LookUp(Tstring, &sp44)) && (sp44->unk10 == 0)) {
+            nexttoken();
+            if (Tokench == 0x2C) {
+                nexttoken();
+            }
+            sp3C = sp44->unk14;
+        }
+    }
+    if (Tokench != 'i') {
+        posterror("label expected", NULL, 1);
+        return;
+    }
+    if (func_00409118(&sp38) != 0) {
+        binasm_rec.unkA_3FFF  = sp38;
+        if (sp34) {
+            func_00405178(0, arg0, sp3C, 0x48, 9, 0x48, 0);
+        } else {
+            func_00405178(0, arg0, 0x48, 0x48, 0xA, 0x48, 0);
+        }
+        gform_extn = 0;
+        return;
+    }
+    if (LookUp(Tstring, &sp48)) {
+        if (sp48->unk10 == 3) {
+            sp4C = sp48;
+        } else {
+            posterror("symbol is not a label", Tstring, 1);
+            return;
+        }
+    } else {
+        EnterSym(Tstring, &sp4C, 1);
+    }
+    if (list_extsyms != 0) {
+        if (isdigit(Tstring[0])) {
+            func_004054E8(sp4C->unk18, NULL);
+        } else {
+            func_004054E8(sp4C->unk18, Tstring);
+        }
+    }
+    nexttoken();
+    if (sp34) {
+        func_00405178(sp4C->unk18, arg0, sp3C, 0x48, 9, 0x48, 0);
+    } else {
+        func_00405178(sp4C->unk18, arg0, 0x48, 0x48, 0xA, 0x48, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409ECC.s")
 
@@ -2576,7 +2648,7 @@ void func_0040E3F0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040E554.s")
 
 //TODO.
-static void* func_0040E760(u32 arg0) {
+static s32* func_0040E760(u32 arg0) {
     void* sp24;
 
     sp24 = malloc(arg0);
@@ -2593,7 +2665,37 @@ void sym_init(s32 arg0) {
     D_10000024 = arg0 != 0;
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/sym_finish.s")
+void sym_finish(char* arg0, char* arg1) {
+    s32 temp_a1;
+    s32 sp60;
+    s32 sp5C;
+    s32 sp58;
+    s32 sp54;
+    s32 len;
+    s32 i;
+
+    if (arg1 == 0) {
+        len = strlen(arg0);
+        arg1 = strcpy(func_0040E760(len) + 3, arg0);
+        if (arg0[len - 1] == 'G') {
+            arg1[len - 1] = 'T';
+        } else {
+            strcat(arg1, ".T");
+        }
+    }
+    for (i = 2; i < st_currentpchdr()->cdn; i++) {
+        temp_a1 = st_sym_idn(i, &sp5C, &sp58, &sp60, &sp54);
+        if (sp5C == 0) {
+            if (sp58 == 0) {
+                func_0040E230(i, 1, sp5C, sp60, 1);
+            } else if ((sp58 != 1) && (sp58 != 6)) {
+                func_0040E180("Symbol %s never defined", temp_a1, 1);
+            }
+        }
+    }
+    st_endallfiles();
+    st_writebinary(arg1, -1);
+}
 
 s32 sym_define(s32 arg0, u32 arg1, s32 arg2) {
     s32 sp3C;

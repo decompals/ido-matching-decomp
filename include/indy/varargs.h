@@ -18,7 +18,7 @@ extern "C" {
 /*	The copyright notice above does not evidence any   	*/
 /*	actual or intended publication of such source code.	*/
 
-#ident "$Revision: 7.8 $"
+#ident "$Revision: 7.9 $"
 
 /* ANSI C Notes:
  *
@@ -58,6 +58,7 @@ extern "C" {
  *	-returns 1 if floating point
  *	-returns 2 if aggregate
  */
+#include <sgidefs.h>
 #define _INT 0
 #define _FP  1
 #define _STRUCT 2
@@ -72,7 +73,11 @@ extern "C" {
 typedef char *va_list;
 #endif /* !_VA_LIST_ */
 
+#if (_MIPS_SIM == _MIPS_SIM_NABI32)
+#define va_dcl 	long long va_alist;
+#else
 #define va_dcl 	long va_alist;
+#endif
 #define va_end(__list)
 
 #ifndef __lint
@@ -80,7 +85,7 @@ typedef char *va_list;
 #if defined(_COMPILER_VERSION) && (_COMPILER_VERSION>=400) /* Ragnarok */
 
 /* Identify the register size: */
-#if _MIPS_SZPTR == 64
+#if (_MIPS_SIM != _MIPS_SIM_ABI32)
 # define __VA_REGBYTES	8
   /* Scalar parameters smaller than register size are right-justified
    * for big-endian targets.  Observe that variable FP parameters are
@@ -96,7 +101,7 @@ typedef char *va_list;
 # else /* ! big-endian */
 #   define __VA_PADJUST(mode)	0
 # endif /* ! big-endian */
-#else /* _MIPS_SZPTR == 32 */
+#else /* _MIPS_SIM == _MIPS_SIM_ABI32 */
 # define __VA_REGBYTES	4
   /* For a 32-bit target with sizeof(int) = register size, no
    * right-justification is ever required:
@@ -112,9 +117,9 @@ typedef unsigned long __va_iptr_t;
  * do by adjusting the start address of the va_list using the
  * the compiler built-in function _VA_INIT_STATE described above:
  */
-#if _MIPS_SZPTR == 64
+#if (_MIPS_SIM != _MIPS_SIM_ABI32)
 # define __VA_SADJUST	0
-#else /* _MIPS_SZPTR == 32 */
+#else /* _MIPS_SIM == _MIPS_SIM_ABI32 */
 # define __VA_SADJUST	_VA_INIT_STATE
 #endif
 
@@ -141,14 +146,14 @@ typedef unsigned long __va_iptr_t;
 #define __VA_STACK_ARG(vp,mode)	( vp = (va_list) \
 	(__VA_PALIGN(vp,mode)+__VA_PADJUST(mode)+sizeof(mode)) )
 
-#if _MIPS_SZPTR == 64
+#if (_MIPS_SIM != _MIPS_SIM_ABI32)
   /* For 64-bit programs, we make no effort to cope specially with
    * leading FP parameters.  Variable FP parameters are not supported
    * without ANSI prototypes.
    */
 # define va_arg(vp,mode) ((mode *)(void *)__VA_STACK_ARG(vp,mode))[-1]
 
-#else /* _MIPS_SZPTR == 32 */
+#else /* _MIPS_SIM == _MIPS_SIM_ABI32 */
   /* __VA_DOUBLE_ARG checks the status in the lower-order 2 bits
    * of the "list" pointer, and correctly extracts arguments with
    * type double either from the arguements stack, or from the

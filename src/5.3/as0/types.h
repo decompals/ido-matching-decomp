@@ -93,11 +93,13 @@ extern struct {
 } rep_buffer;
 void* memset(void*, int, size_t);
 
+#if 0
 //From libmld
 typedef struct {
 	unsigned long	rfd; /* index into the file table */
 	unsigned long	index; /* index int sym/aux/iss tables */
 } DNR;
+#endif
 
 struct RETst_pext_iext {
     char unk_0[4];

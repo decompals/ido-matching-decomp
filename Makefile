@@ -33,7 +33,7 @@ BUILD   := build
 ASM     := asm
 CONTEXT := context
 
-CC       := $(RECOMP)/build/7.1/out/cc
+CC       := $(RECOMP)/build/$(VERSION)/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
 
 AS         := $(MIPS_BINUTILS_PREFIX)as

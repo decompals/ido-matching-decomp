@@ -1,0 +1,158 @@
+#ident man/relnotes/nrelnoterules: $Revision: 1.10 $
+
+INSTALL = $(TOOLROOT)/etc/install
+
+# force sanity
+SHELL = /bin/sh
+
+# this is all of the common rules for the new (as of 4.0)
+# release notes templates.  The actual makefile defines RELPROD,
+# the list of chapters, and includes this file.
+
+IDB_PATH = /usr/relnotes/$(RELPROD)
+
+# The following operations are supported:
+#   make		makes the online relnotes (same as make default)
+#   make check		check to be sure all the templates stuff is gone
+
+#   make contents.out	makes the table of contents, list of tables,
+#			and list of figures.
+#   make index.out	makes the index.
+#   make cover.out	makes the cover sheet.
+#   make credit.out	makes the credits page.
+#   make book		makes all of the above.
+
+#   make <anything>.psv	makes the corresponding .out file, and then
+#			psview's it.  Similarly .xp uses xpsview
+#   make book.psv and book.xp make book, and then invoke the viewer
+
+#   make ch3.out	makes a specific chapter.
+
+#   make clobber	destroy all reproduceable files, so that
+#			everything can be rebuilt from scratch.
+
+# For the "online" side of the world:
+#   make default	make all of the packed online chapters and TC
+#   make install	make and install the online chapters and TC.
+#   make relnotes	makes online relnotes, then views them.
+
+OUT	= $(CMM:.cmm=.out) $(AMM:.amm=.out)
+AUX	= $(OUT:.out=.aux)
+Z	= $(OUT:.out=.z)
+
+
+MACRODIR = $(CMPLRSROOT)/man/macros
+CFRONT	= $(MACRODIR)/cFront
+RELMACROS = $(MACRODIR)/macros.relnotes
+TCMACROS = $(MACRODIR)/TC.online
+
+IXTOOL = $(CMPLRSROOT)/man/tools/ixtool
+
+# order correctly for viewing with the ps viewers
+BOOK =  cover.out credit.out contents.out $(OUT) index.out 
+
+# these need to be macros, so they can be overridden
+# psview is for 3.3 systems; xpsview for 4.0
+PSVIEWOPTS = -F1.2 -0,2-6,11
+
+# this scale and geom works to show 7.5"x9" pages on a 1280x1024
+# display.  The -igc is necessary to view the entire document
+# as one file; otherwise xpsview stops at the first %Trailer
+XPSVIEWOPTS = -igc -skipc -ps 7.5 9 -sc 1.05 -geom 770x1024
+XPSVIEW = xpsview
+
+default: $(Z) TC
+
+# run check on make install; it doesn't take too long, and it
+# may catch some problems in the build logs.
+install: default check
+	$(INSTALL) -m 444 -F $(IDB_PATH) $(Z) TC
+
+relnotes: default
+	pcat $(CMM:.cmm=.z) $(AMM:.amm=.z) | cat TC - | col -x | \
+	    $${MANPAGER:-more} -s
+
+book:	$(BOOK)
+
+clean:
+	rm -f *.CKP *.BAK
+
+clobber: clean
+	rm -f *.out *.aux *.z TC contents index
+
+check:
+	(egrep '<.*here>|XXX' *.x $(CMM) $(AMM) Product.macros | egrep -v '\.\\"|the form \(SCR \\f.XXXX' || true)
+
+# note that if the macros change, rebuild everything
+$(OUT) index.out contents.out cover.out credits.out: Product.macros $(CFRONT)
+$(Z):	Product.macros $(RELMACROS)
+
+contents: $(OUT)
+	rm -f contents
+	sed -n -e 's///g' -e '/^TC /s/TC //p' $(AUX) >> contents
+	sed -n -e 's///g' -e '/^FG /s/FG //p' $(AUX) >> contents
+	sed -n -e 's///g' -e '/^TB /s/TB //p' $(AUX) >> contents
+
+contents.out: contents
+	psroff $(PSFLAGS) -t -mm -rx2 $(CFRONT) contents > contents.out
+
+index: $(OUT)
+	$(IXTOOL) $(AUX) > index
+
+index.out: index
+	psroff $(PSFLAGS) -t -mm -rx3 $(CFRONT) index > index.out
+
+# Make the online TC.  The online macros are very simple, and just gather
+# up the calls to ".H 1 " to output the current chapter number and title,
+# separated by a " (t) ".  We slurp out the pseudo-font changes with col -bx,
+# and then translate the fake tabs "(t)" into real ones.
+TC: $(CMM) $(AMM)
+	echo ".H A" | nroff Product.macros $(TCMACROS) $(CMM) - $(AMM) | \
+		col -bx |  sed -n 's: (t) :	:p' > TC
+
+# Built-in rules, for turning any ".this" into a ".that".
+.SUFFIXES: .psv .p .xp .xpsv .out .amm .cmm .x .z
+
+# Turn chapter or appendix source into a postcript output file.
+#
+# The egrep lines collect "everything but" from the aux files, and show them
+# on stderr; otherwise error messages would be hidden in the .aux files.
+.cmm.out:
+	pic $*.cmm | tbl | eqn | \
+		psroff $(PSFLAGS) -t -mm $(CFRONT) - 1>$*.out 2>$*.aux 
+	@egrep -v '^(TC|IX|TB|FG|EQ|EX) ' $*.aux 1>&2 || true
+
+.amm.out:
+	pic $(CFRONT) $*.amm | \
+		tbl | eqn | psroff $(PSFLAGS) -t -mm -rx1 - 1>$*.out 2>$*.aux 
+	@egrep -v '^(TC|IX|TB|FG|EQ|EX) ' $*.aux 1>&2 || true
+
+# turn non-mm source into postscript output files:
+
+# use CFRONT for the TI and PD strings; that means
+# we need to use eqn for the delim that is in CFRONT
+.x.out:
+	eqn $(CFRONT) $*.x | psroff -t - > $*.out 
+
+# Show a postscript file right now
+.out.psv:
+	psview $(PSVIEWOPTS) $?
+
+.out.xpsv .out.xp:
+	 $(XPSVIEW) $(XPSVIEWOPTS) $?
+
+# look at the complete relnote package on the screen
+book.psv: book
+	cat $(BOOK) | psview $(PSVIEWOPTS)
+
+book.xpsv book.xp: book
+	cat $(BOOK) | $(XPSVIEW) $(XPSVIEWOPTS) -
+
+# Turn chapter or appendix source into packed nroff files for the online notes:
+.cmm.z:
+	pic $*.cmm | tbl | eqn | nroff -mm $(RELMACROS) - 1> $*
+	rm -f $*.z ; pack -f $*
+
+.amm.z:
+	pic $*.amm | tbl | eqn | nroff -mm $(RELMACROS) - 1> $*
+	rm -f $*.z ; pack -f $*

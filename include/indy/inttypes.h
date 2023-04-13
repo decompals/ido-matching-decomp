@@ -2,8 +2,8 @@
  * ====================================================================
  *
  * Module: inttypes.h
- * $Revision: 1.1 $
- * $Date: 1993/09/28 15:41:28 $
+ * $Revision: 1.3 $
+ * $Date: 1996/01/05 02:12:42 $
  *
  * Revision history:
  *  14-Sep-92 - Original Version
@@ -30,8 +30,8 @@
  * ====================================================================
  */
 
-#ifndef __inttypes_INCLUDED
-#define __inttypes_INCLUDED
+#ifndef __INTTYPES_H__
+#define __INTTYPES_H__
 
 /* The following values encode the current revision of the template.
  * The first "official" release will be 1.0.  Subsequent releases will
@@ -58,18 +58,28 @@
  * the size of a pointer.
  */
 
+#include <sgidefs.h>
+
+#ifndef __inttypes_INCLUDED
+#define __inttypes_INCLUDED
+/*
+ * These definitions are also in sys/types.h and need to be kept consistent
+ */
+
 typedef	signed char		int8_t;	
 typedef	unsigned char		uint8_t;
 typedef	signed short		int16_t;
 typedef	unsigned short		uint16_t;
 typedef	signed int		int32_t;
 typedef	unsigned int		uint32_t;
-typedef	signed long long int	int64_t;
-typedef	unsigned long long int	uint64_t;
-typedef signed long long int	intmax_t;
-typedef unsigned long long int	uintmax_t;
+typedef	__int64_t           	int64_t;
+typedef	__uint64_t            	uint64_t;
+typedef __int64_t           	intmax_t;
+typedef __uint64_t            	uintmax_t;
 typedef signed long int		intptr_t;
 typedef unsigned long int	uintptr_t;
+
+#endif
 
 /* Define limits for the types, in the manner of limits.h: */
 #define INT8_MIN	(-127-1)
@@ -221,4 +231,4 @@ extern	div32_t  div_32	 ( int32_t numer,  int32_t denom );
 extern	div64_t  div_64	 ( int64_t numer,  int64_t denom );
 extern	divmax_t div_max ( intmax_t numer, intmax_t denom );
 
-#endif /* __inttypes_INCLUDED */
+#endif /* __INTTYPES_H__ */
