@@ -1229,8 +1229,54 @@ static void func_004092FC(s32 arg0) {
     }
 }
 
+void func_00409850(s32 arg0) {
+    struct sym* sp3C;
+    struct sym* sp38;
+    struct sym* sp34;
+    s32 sp30;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409850.s")
+
+    if (arg0 == 0xE3) {
+        sp3C = reg_ptr[0];
+    } else {
+        if ((sp3C = GetRegister()) == NULL) {
+            return;
+        }
+        if (((arg0 == 0xE5) || (arg0 == 0x120) || (arg0 == 0xE4) || (arg0 == 0x124)) && (sp3C == reg_ptr[0x20-1])) {
+            posterror("$31 not allowed in conditional branch and link", NULL, 2);
+        }
+    }
+
+    if (Tokench != 'i') {
+        posterror("label expected", NULL, 1);
+        return;
+    }
+    if (func_00409118(&sp30) != 0) {
+        binasm_rec.unkA_3FFF = sp30;
+        func_00405178(0, arg0, sp3C->unk14, 0x48, 9, 0x48, 0);
+        gform_extn = 0;
+    } else {
+        if (LookUp(Tstring, &sp34)) {
+            if (sp34->unk10 == 3) {
+                sp38 = sp34;
+            } else {
+                posterror("symbol is not a label", Tstring, 1);
+                return;
+            }
+        } else {
+            EnterSym(Tstring, &sp38, 1);
+        }
+        if (list_extsyms != 0) {
+            if (isdigit(Tstring[0])) {
+                func_004054E8(sp38->unk18, NULL);
+            } else {
+                func_004054E8(sp38->unk18, Tstring);
+            }
+        }
+        nexttoken();
+        func_00405178(sp38->unk18, arg0, sp3C->unk14, 0x48, 9, 0x48, 0);
+    }
+}
 
 
 static void func_00409B10(s32 arg0) {
