@@ -997,7 +997,82 @@ static void func_00406728(s32 arg0) {
     gform_extn = 0;
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406C48.s")
+static void func_00406C48(s32 arg0) {
+    s32 pad4C;
+    struct sym* sp48;
+    s32 sp44;
+    s32 sp40; // u32?
+    struct sym* sp3C;
+    s32 pad38;
+
+    sp40 = 0;
+    sp48 = NULL;
+    sp3C = NULL;
+
+    sp44 = GetExpr();
+    if ((sp44 < 0) || (sp44 > 0x1F)) {
+        posterror("Cache/Pref instruction has invalid value", NULL, 1);
+    }
+    if (Tokench == 'i') {
+        if (!LookUp(Tstring, &sp3C)) {
+            EnterSym(Tstring, &sp3C, 1);
+            if (gp_warn != 0) {
+                posterror("Load/store of an undefined symbol", sp3C->name, 2);
+            }
+        }
+
+        if (sp3C->unk10 == 4) {
+            sp3C = NULL;
+        } else if (sp3C->unk10 == 3) {
+            nexttoken();
+            if ((Tokench != '+')
+                && (Tokench != '-')
+                && (Tokench != '(')
+                && (Tokench != '#')) {
+                posterror("invalid external expression", NULL, 1);
+                return;
+            }
+        }
+    }
+    if ((Tokench == 'i')
+        || (Tokench == 'd')
+        || (Tokench == 'h')
+        || (Tokench == '+')
+        || (Tokench == '-')
+        || (Tokench == '~')
+        || (Tokench == '"')
+        || (Tokench == '(')) {
+            GetBaseOrExpr(&sp48, &sp40);
+        if ((sp48 == NULL) && (Tokench == '(')) {
+            nexttoken();
+            if ((sp48 = GetRegister()) == NULL) {
+                return;
+            }
+            if (Tokench != ')') {
+                posterror("')' expected", Tstring, 1);
+                return;
+            }
+            nexttoken();
+        }
+    }
+
+    if (sp3C == NULL) {
+        if (sp48 == NULL) {
+            sp48 = reg_ptr;
+        }
+    }
+    sp40 &= 0xFFFF;
+    if (sp3C != NULL) {
+        if (sp48 == NULL) {
+            func_00405178(sp3C->unk18, arg0, sp44, 0x48, 0xE, 0x48, sp40);
+        } else {
+            func_00405178(sp3C->unk18, arg0, sp44, sp48->unk14, 0xE, 0x48, sp40);
+        }
+    } else {
+        func_00405178(0, arg0, sp44, sp48->unk14, 0xE, 0x48, sp40);
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406FE8.s")
 
