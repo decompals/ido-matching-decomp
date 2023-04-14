@@ -22,44 +22,35 @@ s32 severity;
 s32 warnexitflag;
 s8* opt_strings;
 
-
 static void func_00413060(u8* arg0, s32 arg1) {
-    if (verbose != 0) {
+    if (verbose) {
         if (arg1 != 3) {
             if (D_10001094 != 0) {
                 fprintf(stderr, "\n");
                 D_10001094 = 0;
             }
-            goto block_5;
-        }
-        if (D_10001094 == 0) {
-            goto block_5;
-        }
-    } else {
-block_5:
-        if (severity < arg1) {
-            severity = severity;
-        } else {
-            severity = arg1;
-        }
-        if (arg1 != 3) {
-            fprintf(stderr, "%s", "as0: ", arg1);
-        }
-        if (arg1 == 1) {
-            debugflag = false;
-            goto block_14;
-        }
-        if (arg1 == 3) {
-            D_10001094 = 1;
-        } else {
-block_14:
-            fprintf(stderr, "%s: ", D_10001098[arg1], arg1);
-            if (*arg0 != 0) {
-                fprintf(stderr, "%s", arg0);
-            }
-            fprintf(stderr, ", line %1d:", CurrentLine);
+        } else if (D_10001094 != 0) {
+            return;
         }
     }
+    severity = MIN(severity, arg1);
+
+    if (arg1 != 3) {
+        fprintf(stderr, "%s", "as0: ", arg1);
+    }
+
+    if (arg1 == 1) {
+        debugflag = 0;
+    } else if (arg1 == 3) {
+        D_10001094 = 1;
+        return;
+    }
+
+    fprintf(stderr, "%s: ", D_10001098[arg1], arg1);
+    if (*arg0 != 0) {
+        fprintf(stderr, "%s", arg0);
+    }
+    fprintf(stderr, ", line %1d:", CurrentLine);
 }
 
 static void func_00413224(u8* arg0) {
@@ -81,8 +72,8 @@ void call_name_and_line(s32 arg0) {
     u8 sp20[1020];
 
 
-    func_00413224(&sp20);
-    func_00413060(&sp20, arg0);
+    func_00413224(sp20);
+    func_00413060(sp20, arg0);
 }
 
 void call_perror(s32 arg0, u8* arg1) {
@@ -122,7 +113,7 @@ void postcerror(char* error, char* arg1) {
     }
 }
 
-void assertion_failed(char *assert_name, char *file, s32 line) {
+void assertion_failed(char *assert_name, char *file, int line) {
     call_name_and_line(0);
     fprintf(stderr, "%s, line %1d:\n", file, line);
     if (assert_name != 0) {
@@ -136,7 +127,7 @@ s32 which_opt(char* arg0) {
     s32 i;
     char** var_s1;
 
-    var_s1 = &opt_strings;
+    var_s1 = opt_strings;
     for (i = 0; i <= 105; i++) {
         if (strcmp(arg0, *var_s1) == 0) {
             return i;

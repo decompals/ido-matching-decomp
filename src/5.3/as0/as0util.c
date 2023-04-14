@@ -28,7 +28,7 @@ static char var;
 static char buffer[1];
 static char buffer2[0x3FF-4];
 static char* save;
-struct sym *hashtable[];
+struct sym *hashtable[0x100];
 s32 nextinline;
 s8 token_tmp[0x10];
 FILE *CurrentFile;

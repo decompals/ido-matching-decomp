@@ -14,7 +14,7 @@
 #include "sym.h"
 #include "stsupport.h"
 #include "cmplrs/stext.h"
-
+#include "cmplrs/binasm.h"
 
 
 typedef struct {
@@ -106,6 +106,7 @@ struct binasm binasm_rec;
 // static s32 func_0040CC44(u8** arg0, struct binasm* binasm_rec) {}
 
 extern void sym_finish(char* arg0, char* arg1);
+
 
 static void func_00403F10(void) {
     struct _struct_asm_info* var_s2;
@@ -1017,8 +1018,79 @@ static void func_004075CC(s32 arg0) {
     func_00407334();
 }
 
+static void func_004076A0(s32 fasm) {
+    s32 stackPad;
+    struct sym* sp48;
+    struct sym* sp44;
+    u32 sp40;
+    s32 var_a0;
+    u32 sp38;
+    u32 sp34;
+    struct sym* sp30;
+    sp40 = 0;
+    sp44 = NULL;
+    sp30 = NULL;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004076A0.s")
+    sp48 = GetRegister();
+    if (sp48 != 0) {
+        sp48 = sp48->unk14;
+
+        if ((diag_flag != 0) && (fasm == zlui) && (Tokench == 'i')) {
+            if (LookUp(Tstring, &sp30) != 0) {
+                if (sp30->unk10 == 0) {
+                    nexttoken();
+                    if (Tokench == ',') {
+                        nexttoken();
+                    }
+                } else {
+                    sp30 = NULL;
+                }
+            } else {
+                sp30 = NULL;
+            }
+        }
+        if (Tokench == '%') {
+            func_00406340(&sp44, &sp40);
+        } else if (isa < ISA_MIPS3) {
+            sp40 = GetExpr();
+        } else if (dw_GetExpr(&sp38, &sp34)) {
+            if (fasm == zlui) {
+                posterror("lui expression not in 0..65535", NULL, 1);
+            }
+            if (fasm != zli) {
+                assertion_failed("fasm == zli", "as0parse.c", 1094);
+            }
+            func_00405178(0, 0x14C, sp48, 0x48, 2, 0x48, sp38);
+            func_00405178(0, 0x14C, sp48, 0x48, 2, 0x48, sp34);
+            return;
+        } else {
+            sp40 = sp34;
+        }
+
+        if (fasm == zlui) {
+            if (sp44 == NULL) {
+                if ((sp40 >> 0x10) != 0) {
+                    posterror("lui expression not in 0..65535", NULL, 1);
+                }
+                sp40 <<= 0x10;
+            }
+        }
+
+        if (sp44 != NULL) {
+            var_a0 = sp44->unk18;
+        } else {
+            var_a0 = 0;
+        }
+
+        if ((fasm == 0xCD) && (sp30 != NULL)) {
+            func_00405178(var_a0, fasm, sp48, sp30->unk14, 4, 0x48, sp40);
+        } else {
+            func_00405178(var_a0, fasm, sp48, 0x48, 2, 0x48, sp40);
+        }
+        gform_extn = 0;
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407A20.s")
 
@@ -1150,7 +1222,7 @@ static void func_004092FC(s32 arg0) {
     if ((sp5C = GetRegister()) == NULL) {
         return;
     }
-    if ((Tokench == 'i') && (LookUp(&Tstring, &sp50) != 0) && (sp50->unk10 == 0)) {
+    if ((Tokench == 'i') && (LookUp(Tstring, &sp50) != 0) && (sp50->unk10 == 0)) {
         sp58 = sp50;
         nexttoken();
         if (Tokench == ',') {
@@ -1198,7 +1270,7 @@ static void func_004092FC(s32 arg0) {
             return;
         }
     } else {
-        EnterSym(&Tstring, &sp54, 1);
+        EnterSym(Tstring, &sp54, 1);
     }
 
     if (list_extsyms != 0) {
@@ -1345,8 +1417,24 @@ static void func_00409B10(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409ECC.s")
+void func_00409ECC(s32 arg0) {
+    u32 temp_v0;
 
+    if ((Tokench == 0x69)
+        || (Tokench == 0x64)
+        || (Tokench == 0x68)
+        || (Tokench == 0x2B)
+        || (Tokench == 0x2D)) {
+        temp_v0 = GetExpr();
+    } else {
+        posterror("expression required", NULL, 1);
+        return;
+    }
+    if ((temp_v0 >> 0x19) != 0) {
+        posterror("coprocessor operation > 25 bits", NULL, 1);
+    }
+    func_00405178(0, arg0, 0x48, 0x48, 2, 0x48, temp_v0);
+}
 
 static void func_00409FD0(s32 arg0) {
     struct sym* temp_v0;
@@ -1794,7 +1882,7 @@ static void func_0040B5F0(s32 arg0) {
             arg0 = 0x1B;
         }
         if (LookUp(Tstring, &sp24) == 0) {
-            EnterSym(&Tstring, &sp24, 1);
+            EnterSym(Tstring, &sp24, 1);
         }
         if (sp24->unk10 != 3) {
             posterror("invalid symbol for .[a]ent ", &Tstring, 1);
@@ -1829,8 +1917,8 @@ static void func_0040B984(void) {
         if (Tokench != 'i') {
             posterror("identifer expected", NULL, 1);
         } else {
-            if (LookUp(&Tstring, &cur_symbol) == 0) {
-                EnterSym(&Tstring, &cur_symbol, 1);
+            if (LookUp(Tstring, &cur_symbol) == 0) {
+                EnterSym(Tstring, &cur_symbol, 1);
             }
             sym_define(cur_symbol->unk18, 0x22, 0);
             if (cur_symbol->unk10 == 3) {
@@ -1885,7 +1973,7 @@ static void func_0040BC84(void) {
         if (Tokench != 'i') {
             posterror("identifer expected", NULL, 1);
         } else {
-            if (LookUp((s32* ) &Tstring, &sp4C) == 0) {
+            if (LookUp(Tstring, &sp4C) == 0) {
                 EnterSym((s32) &Tstring, (struct sym** ) &sp4C, 1);
             }
             sym_define(sp4C->unk18, 0x22U, 0);
@@ -1896,7 +1984,7 @@ static void func_0040BC84(void) {
                 if (Tokench == ',') {
                     nexttoken();
                 }
-                if (LookUp((s32* ) &Tstring, &sp48) == 0) {
+                if (LookUp(Tstring, &sp48) == 0) {
                     EnterSym((s32) &Tstring, (struct sym** ) &sp48, 1);
                 }
                 if (sp48 != sp4C) {
@@ -1921,7 +2009,7 @@ static s32 func_0040BEBC(s32* arg0, s32 arg1, s32 arg2) {
 
 
     if (Tokench == 0x69) {
-        if (LookUp((s32* ) &Tstring, &sp24) == 0) {
+        if (LookUp(Tstring, &sp24) == 0) {
             EnterSym((s32) &Tstring, (struct sym** ) &sp24, 1);
         }
 
@@ -2009,16 +2097,16 @@ static void func_0040C4CC(void) {
     binasm_rec.unk8 = GetExpr();
     if (binasm_rec.unk8 != 0) {
         sp24 = NULL;
-        if (LookUp(&Tstring, &sp24) == 0) {
-            EnterSym(&Tstring, (struct sym** ) &sp24, 0);
+        if (LookUp(Tstring, &sp24) == 0) {
+            EnterSym(Tstring, (struct sym** ) &sp24, 0);
         }
 
         binasm_rec.unk0 = sp24->unk18;
         sp24 = NULL;
 
         nexttoken();
-        if (LookUp(&Tstring, &sp24) == 0) {
-            EnterSym(&Tstring, &sp24, 1);
+        if (LookUp(Tstring, &sp24) == 0) {
+            EnterSym(Tstring, &sp24, 1);
         }
         binasm_rec.opt = sp24->unk18;
     }
