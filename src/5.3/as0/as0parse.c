@@ -3,14 +3,13 @@
  *
  * */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include "types.h"
-#include "arrays.h" //better
-#include "opt.h"
-#include "protos.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "ctype.h"
+#include "as0/types.h"
+#include "as0/arrays.h" //better
+#include "as0/opt.h"
+#include "as0/protos.h"
 #include "sym.h"
 #include "stsupport.h"
 #include "cmplrs/stext.h"
@@ -39,6 +38,10 @@ static s32 D_10000024; //.data
 static const char* D_10000004[4] = {"", "operand 1", "operand 2", "operand 3"}; //lol?
 static s32* D_10000014;
 static s32 D_10000020;
+
+#define true 1
+#define false 0
+
 
 s32 severity;
 s32 verbose;

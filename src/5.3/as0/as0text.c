@@ -2,9 +2,8 @@
 * @file: as0text.c
 * @brief: Contains the main print functions
 */
-#include <stdio.h>
-#include <stdbool.h>
-#include "types.h"
+#include "stdio.h"
+#include "as0/types.h"
 
 s32 CurrentFile;
 s32 CurrentLine;
@@ -128,10 +127,10 @@ int which_opt(char* name) {
     char** opt = opt_strings;
 
     for (i = 0; i <= 105; i++) {
-        if (strcmp(arg0, *var_s1) == 0) {
+        if (strcmp(name, *opt) == 0) {
             return i;
         }
-        var_s1++;
+        opt++;
     }
     return 105;
 }

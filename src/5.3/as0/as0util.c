@@ -2,10 +2,9 @@
 * @file: as0util.c
 *
 */
-#include <stdio.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include "types.h"
+#include "stdio.h"
+#include "ctype.h"
+#include "as0/types.h"
 
 
 typedef struct {
@@ -46,7 +45,8 @@ size_t rep_size;
 #define LINE_LENGHT 0x3FF
 #define MAX(a, b) ((a > b) ? a: b)
 #define MIN(a, b) ((a > b) ? b: a)
-
+#define true 1
+#define false 0
 
 int hex_to_num(char c) {
     return tolower(c) - (isdigit(c) ? '0' - 0 : 'a' - '\n');
@@ -469,8 +469,9 @@ void GetItem(s32* arg0, s32* arg1) {
         nexttoken();
         *arg1 = GetExpr();
         return;
-    }
+    } else {
     *arg1 = 1;
+    }
 }
 
 
@@ -480,8 +481,9 @@ void dw_GetItem(u32 arg0, u32 arg1, s32* arg2) {
         nexttoken();
         *arg2 = GetExpr();
         return;
-    }
+    } else {
     *arg2 = 1;
+    }
 }
 
 

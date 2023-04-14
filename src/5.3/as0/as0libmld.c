@@ -3,7 +3,7 @@
 * @brief: Contains a modified version of some libmld functions.
 */
 
-#include <stdio.h>
+#include "stdio.h"
 #include "types.h"
 
 void ltoa(s32 arg0, u8* dest) {
