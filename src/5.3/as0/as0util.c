@@ -62,8 +62,8 @@ void unscan(u8 arg0) {
     Tokench = arg0;
 }
 
-void make_file(u8* arg0) {
-    CurrentFile = st_filebegin(arg0, 3, 1, map_glevel[debugflag]);
+void make_file(const char* file_name) {
+    CurrentFile = st_filebegin(file_name, 3, 1, map_glevel[debugflag]);
 }
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040F5D8.s")

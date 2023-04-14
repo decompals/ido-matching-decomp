@@ -33,7 +33,7 @@ BUILD   := build
 ASM     := asm
 CONTEXT := context
 
-CC       := $(RECOMP)/build/$(VERSION)/out/cc
+CC       := $(RECOMP)/build/7.1/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
 
 AS         := $(MIPS_BINUTILS_PREFIX)as
@@ -72,7 +72,13 @@ LDFLAGS := -nostdlib -L$(RECOMP)/ido/$(VERSION)/usr/lib/ -lc
 
 ASMPROCFLAGS := 
 OPTFLAGS := -O1
+
+ifeq ($(VERSION),7.1)
+MIPS_VERSION := -mips2
+else ifeq ($(VERSION),5.3)
 MIPS_VERSION := -mips1
+CC := $(CC_OLD)
+endif
 
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
