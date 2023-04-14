@@ -123,11 +123,10 @@ void assertion_failed(char *assert_name, char *file, int line) {
     exit(1);
 }
 
-s32 which_opt(char* arg0) {
-    s32 i;
-    char** var_s1;
+int which_opt(char* name) {
+    int i;
+    char** opt = opt_strings;
 
-    var_s1 = opt_strings;
     for (i = 0; i <= 105; i++) {
         if (strcmp(arg0, *var_s1) == 0) {
             return i;
