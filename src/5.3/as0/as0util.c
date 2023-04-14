@@ -448,7 +448,7 @@ void GetBaseOrExpr(bar** arg0, s32* arg1) {
     *arg0 = NULL;
     if (Tokench == ')') {
         nexttoken();
-        if ((Tokench == 'i') && (LookUp(&Tstring, arg0) != 0) && arg0[0]->unk10 == 0) {
+        if ((Tokench == 'i') && !LookUp(Tstring, arg0) && ((*arg0)->unk10 == 0)) {
             nexttoken();
             if (Tokench != ')') {
                 posterror("Expected \")\" after base register", 0, 1);
