@@ -3,14 +3,6 @@
  * @brief Compiler driver for IDO 7.1.
  */
 
-/* Handwritten */
-
-// function __start # 0
-// #pragma GLOBAL_ASM("asm/7.1/functions/cc/__start.s")
-
-// function _mcount # 1
-// #pragma GLOBAL_ASM("asm/7.1/functions/cc/_mcount.s")
-
 #include "signal.h"
 #include "wait.h"
 #include "sex.h"
@@ -21,13 +13,15 @@
 #include "errno.h"
 #include "unistd.h"
 #include "ctype.h"
+#include "fcntl.h"
+#include "sys/file.h"
 #include "sys/stat.h"
-#include "sys/fcntl.h"
 #include "sys/ioctl.h"
 #include "ucontext.h"
 #include "sys/procfs.h"
 #include "string.h"
 #include "malloc.h"
+
 
 #ifndef TRUE
 #define TRUE 1
@@ -52,66 +46,85 @@ typedef struct {
     char** entries;
 } list;
 
-extern int getpagesize(void);
+#if __STDC_VERSION__ >= 201112L
+#include <stdnoreturn.h>
+extern noreturn void exit(int);
+#endif
 
 void process_config(int argc, char** argv);
 void add_info(char* str);
 void parse_command(int argc, char** argv);
 void get_host_chiptype(void);
-void newrunlib(void);
-char getsuf(const char* path);
-char* mksuf(const char* path, char value);
-
-void compose_G0_libs(const char* arg0);
+// error
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2);
-
-static char* func_0042FD7C(const char* name, char** dirs);
-static void func_00432C94(void);
-
-void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
-
-char* mkstr();
+void newrunlib(void);
+void compose_G0_libs(const char* arg0);
+// compose_reg_libs
+// mkstr
 void mklist(list* arg0);
-void addstr(); // (list* arg0, char* str), but sometimes called incorrectly
+// addstr
 void addspacedstr(list* arg0, char* str);
 char* newstr(const char* src);
 int save_place(list* arg0);
 void set_place(list* arg0, char* str, int place);
 void addlist(list* arg0, list* arg1);
 void adduldlist(list* arg0, list* arg1, list* arg2);
+int nodup(list* arg0, const char* str);
+char getsuf(const char* path);
+char* mksuf(const char* path, char value);
 char* savestr(const char* src, size_t extra_length);
 void mktempstr(void);
-
-static const char* func_00430414(char* arg0, int arg1);
-static void func_00431A3C(int argc, char** argv);
-static void func_00431B38(int first, int count);
-static void func_00431D00(const char* arg0);
-static void func_00431DD8(void);
-static int func_00432940(pid_t arg0);
-static void func_00432BDC();
-static void func_00432D3C(const char* arg0, int count);
-static char* func_00433534(const char* arg0);
-
-char* make_ii_file_name(const char* arg0);
-void update_instantiation_info_file(const char* arg0, const char* arg1);
-
+int run(char* name, char* const argv[], char* input, char* output, char* err_output);
+int edit_src(const char* program, const char* srcpath, int lino_mode);
 void get_lino(char* arg0, const char* arg1, int arg2);
 void show_err(const char* path);
 void handler(void);
 void cleanup(void);
 void whats(void);
-void settimes();
+void settimes(void);
 void dotime(const char* programName);
+static char* func_0042FD7C(const char* name, char** dirs);
+int isdir(const char* path);
 int regular_file(const char* path);
-
+int regular_not_writeable(const char* path);
+// basename
+// dirname
+static const char* func_00430414(char* arg0, int arg1);
+int force_use_cfront(int argc, char** argv);
 void exec_OCC(int argc, char** argv);
 int add_cxx_symbol_options(void);
+// init_curr_dir
 char* full_path(const char* relative_path);
 void add_static_opt(char* opt);
-
 void record_static_fileset(const char* arg0);
 int touch(const char* arg0);
 void add_prelinker_objects(list* arg0, list* arg1);
+// quoted_length
+// quote_shell_arg
+static void func_00431A3C(int argc, char** argv);
+static void func_00431B38(int first, int count);
+// func_00431B88
+static void func_00431D00(const char* arg0);
+static void func_00431DD8(void);
+// skip_old_ii_controls
+char* make_ii_file_name(const char* arg0);
+void update_instantiation_info_file(const char* arg0, const char* arg1);
+static int func_00432940(pid_t arg0);
+static void func_00432BDC(void);
+static void func_00432C94(void);
+static void func_00432D3C(const char* arg0, int count);
+static char* func_00433534(const char* arg0);
+
+// Functions which cannot use proper prototypes
+#if 0
+void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
+char* mkstr(const char*, ...);
+void addstr(list* arg0, char* str);
+#else
+void error();  // variadic but not defined as such
+char* mkstr(); // old-style varargs
+void addstr(); // sometimes called incorrectly
+#endif
 
 typedef int UNK_TYPE;
 
@@ -2095,7 +2108,8 @@ int main(int argc, char** argv) {
         if ((systype != NULL) && !irix4) {
             var_s1 = systype;
             while (*var_s1 != '\0') {
-                *var_s1++ = toupper(*var_s1);
+                *var_s1 = toupper(*var_s1);
+                var_s1++;
             }
             if ((ansichoice == ANSICHOICE_KR) || (ansichoice == ANSICHOICE_XANSI)) {
                 addstr(&execlist, mkstr("-DSYSTYPE_", systype, NULL));
@@ -2300,7 +2314,8 @@ int main(int argc, char** argv) {
             if (systype != NULL) {
                 var_s1 = systype;
                 while (*var_s1 != '\0') {
-                    *var_s1++ = toupper(*var_s1);
+                    *var_s1 = toupper(*var_s1);
+                    var_s1++;
                 }
             } else {
                 addstr(&execlist, "-D_SYSTYPE_SVR4");
@@ -3648,7 +3663,7 @@ int main(int argc, char** argv) {
                 {
                     execlist.length = 0;
                     addstr(&execlist, "pfa");
-                    spF0[0] = spFC + '1';
+                    spF0[0] = (char)(spFC + '1');
                     if (mp_flag & 2) {
                         spF8 = mksuf(srcfiles.entries[i], 'l');
                         if (mp_prepass_count > spFC) {
@@ -6387,11 +6402,12 @@ void parse_command(int argc, char** argv) {
                                                 // -WxD
                                                 if (argv[var_s0][2] == '\0') {
                                                     if ((var_s0 + 1) < argc) {
-                                                        int sp114;
+                                                        unsigned int sp114;
                                                         char* sp110;
 
                                                         sp114 = strtoul(argv[var_s0 + 1], &sp110, 16);
-                                                        if (((sp110 - argv[var_s0 + 1]) != strlen(argv[var_s0 + 1])) ||
+                                                        if (((size_t)(sp110 - argv[var_s0 + 1]) !=
+                                                             strlen(argv[var_s0 + 1])) ||
                                                             ((sp114 == 0) && (sp110 == argv[var_s0 + 1])) ||
                                                             (*argv[var_s0 + 1] == '-') || (*argv[var_s0 + 1] == '+')) {
                                                             error(ERRORCAT_WARNING, NULL, 0, NULL, 0,
@@ -9791,12 +9807,18 @@ void mklist(list* arg0) {
     }
     arg0->capacity = LIST_INITIAL_CAPACITY;
     arg0->length = 0;
-    *arg0->entries = NULL;
+    arg0->entries[0] = NULL;
 }
 
 // function addstr # 14
 // Add a single string entry to a list.
-void addstr(list* arg0, char* str) {
+// Called incorrectly.
+void addstr(arg0, str)
+    // clang-format off
+    list* arg0;
+    char* str;
+// clang-format on
+{
     if ((arg0->length + 1) >= arg0->capacity) {
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14595, "out of memory\n");
@@ -10183,7 +10205,8 @@ char* savestr(const char* src, size_t extra_length) {
     return dest;
 }
 
-static char pad0, pad1, pad2;
+//! FAKE: bss-shifting padding
+static char bss_pad0, bss_pad1;
 
 // function mktempstr # 25
 void mktempstr(void) {
@@ -10254,7 +10277,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     if (vflag) {
         fprintf(stderr, "%s ", arg0);
         spA4 = arg1 + 1;
-        while (*spA4 != '\0') {
+        while (*spA4 != NULL) {
             fprintf(stderr, "%s ", *spA4++);
         }
 
@@ -10301,7 +10324,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
                 cleanup();
                 exit(1);
             }
-            dup2(sp94, fileno_unlocked(stdin));
+            dup2(sp94, fileno(stdin));
         }
 
         if (arg3 != NULL) {
@@ -10314,7 +10337,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
                 cleanup();
                 exit(1);
             }
-            dup2(sp90, fileno_unlocked(stdout));
+            dup2(sp90, fileno(stdout));
         }
 
         if (arg4 != NULL) {
@@ -10327,7 +10350,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
                 cleanup();
                 exit(1);
             }
-            dup2(sp8C, fileno_unlocked(stderr));
+            dup2(sp8C, fileno(stderr));
         }
 
         execvp(arg0, arg1);
@@ -10432,7 +10455,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 }
 
 // function edit_src # 27
-int edit_src(const char* arg0, char* arg1, int arg2) {
+int edit_src(const char* arg0, const char* arg1, int arg2) {
     char sp58[16];
     pid_t forkPid;
     pid_t sp50;
@@ -11150,10 +11173,10 @@ void record_static_fileset(const char* arg0) {
     free(spD4);
     rewind(sp28DC);
     rewind(sp28E0);
-    ftruncate(sp28DC->_file, 0);
+    ftruncate(fileno(sp28DC), 0);
 
     while ((sp28E4 = fread(spD8, 1, 0x2800, sp28E0)) > 0) {
-        if (fwrite(&spD8, 1, sp28E4, sp28DC) != sp28E4) {
+        if ((int)fwrite(&spD8, 1, sp28E4, sp28DC) != sp28E4) {
             error(ERRORCAT_ERROR, 0, 0, "record_static_fileset", 0, "error in writing cvstatic fileset file %s\n",
                   D_1000C2E8);
             perror(D_1000C2F0);
@@ -11244,26 +11267,25 @@ size_t quoted_length(const char* arg0, int* arg1) {
 }
 
 // function quote_shell_arg # 52
-size_t quote_shell_arg(const char* arg0, char* arg1) {
-    char ch;
-    int sp28;
+size_t quote_shell_arg(const char* p, char* buf) {
+    char c;
+    int quoted = FALSE;
     size_t len;
 
-    sp28 = 0;
-    len = quoted_length(arg0, &sp28);
-    if (sp28 != 0) {
-        *arg1++ = '""';
+    len = quoted_length(p, &quoted);
+    if (quoted) {
+        *buf++ = '"';
     }
 
-    while ((ch = *arg0++)) { // != 0 does not match
-        if ((ch == '"') || (ch == '\\') || (ch == '`') || (ch == '$')) {
-            *arg1++ = '\\';
+    while ((c = *p++)) { // != 0 does not match
+        if ((c == '"') || (c == '\\') || (c == '`') || (c == '$')) {
+            *buf++ = '\\';
         }
-        *arg1++ = ch;
+        *buf++ = c;
     }
 
-    if (sp28 != 0) {
-        *arg1++ = '"';
+    if (quoted) {
+        *buf++ = '"';
     }
     return len;
 }
@@ -11336,7 +11358,7 @@ static void func_00431D00(const char* arg0) {
 // function func_00431DD8 # 57
 static void func_00431DD8(void) {
     int sp34 = 0;
-    int sp30 = 0;
+    int sp30 = 0; // Unused
     int sp2C = 0;
     int i;
     char* sp24;
@@ -11664,9 +11686,3 @@ static char* func_00433534(const char* arg0) {
 
     return ret;
 }
-
-/* File boundary, -O2 */
-
-// gethostsex
-
-//#pragma GLOBAL_ASM("asm/7.1/functions/cc/__Release_ID.s")
