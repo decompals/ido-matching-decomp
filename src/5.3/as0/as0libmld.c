@@ -4,7 +4,7 @@
 */
 
 #include "stdio.h"
-#include "types.h"
+#include "as0/types.h"
 
 void ltoa(s32 arg0, u8* dest) {
     sprintf(dest, "%d", arg0);

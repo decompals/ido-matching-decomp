@@ -7,41 +7,39 @@
 #include "as0/types.h"
 
 
+
 typedef struct {
-/* 0x0 */  struct bar *next;
+/* 0x0 */  struct unk_struct *next;
 /* 0x4 */  s32 unk4;
 /* 0x5 */  u8 fill[0x5];
 /* 0x10 */ s32 unk10;
 /* 0x11 */ u8 pad[0x12];
-}bar;
+}unk_struct;
 
 
 //extern
 extern u8 Tokench;
 extern s8 Tstring[];
 extern s32 Tstringlength;
-s32 linelength;
-u8 line[0x420];
-s32 ophashtable[0x100];
+extern s32 linelength;
+extern u8 line[0x420];
+extern s32 ophashtable[0x100];
 static char var;
 static char buffer[1];
 static char buffer2[0x3FF-4];
 static char* save;
-struct sym *hashtable[0x100];
-s32 nextinline;
-s8 token_tmp[0x10];
-FILE *CurrentFile;
-s32 debugflag;
+extern sym *hashtable[0x100];
+extern s32 nextinline;
+extern s8 token_tmp[0x10];
+extern FILE *CurrentFile;
+extern s32 debugflag;
 extern s32 map_glevel[];
-size_t binasm_count;
-FILE* binasmfyle;
-s32 in_repeat_block;
-size_t rep_size;
-
-
-//static s32 func_00411898(void) {}
-
-
+extern size_t binasm_count;
+extern FILE* binasmfyle;
+extern s32 in_repeat_block;
+extern size_t rep_size;
+extern s32 errno;
+extern s64 func_00412548(void);
 #define LINE_LENGHT 0x3FF
 #define MAX(a, b) ((a > b) ? a: b)
 #define MIN(a, b) ((a > b) ? b: a)
@@ -68,15 +66,34 @@ void make_file(const char* file_name) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040F5D8.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040F77C.s")
+s64 func_0040F77C(char* arg0, int arg1) {
+    s64 var_v1;
+
+    errno = 0;
+    if (Tokench == 'h') {
+        var_v1 =  strtoull(arg0, NULL, 0x10);
+    } else {
+        var_v1 = strtoll(arg0, NULL, 0);
+    }
+    if (errno == '"') {
+        posterror("Number out of range", arg0, 1);
+    }
+    if (arg1) {
+        var_v1 =  -var_v1;
+    }
+    return var_v1;
+}
+
 
 int hash(char* calc) {
     int k;
     int i;
 
     i = strlen(calc);
+
+    
     if (i <= 0) {
-        assertion_failed("i > 0", "as0util.c", 0xE5);
+        assertion_failed("i > 0", "as0util.c", 229);
     }
 
     k = (calc[1] * 0xD)
@@ -89,8 +106,8 @@ int hash(char* calc) {
     return k % 128;
 }
 
-s32 LookUp(char* name, struct sym** arg1) {
-    struct sym* var_s0;
+s32 LookUp(char* name, sym** arg1) {
+    sym* var_s0;
 
     *arg1 = NULL;
     for (var_s0 = hashtable[hash(name)] ; var_s0 != NULL ; var_s0 = var_s0->next) {
@@ -103,8 +120,8 @@ s32 LookUp(char* name, struct sym** arg1) {
 }
 
 
-s32 opLookUp(s8* arg0, bar** arg1) {
-    bar* op;
+s32 opLookUp(s8* arg0, unk_struct** arg1) {
+    unk_struct* op;
 
     *arg1 = NULL;
 
@@ -138,11 +155,28 @@ void consume(void) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040FD98.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004100C8.s")
+void func_004100C8(void) {
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004101AC.s")
+    Tokench = 'd';
+     while ((nextinline < linelength) && (line[nextinline] >= '0') && (line[nextinline] < '9')) {
+        consume();
+     }
+    func_0040FB2C();
+}
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00410270.s")
+void func_004101AC(void) {
+    while ((nextinline < linelength) && (line[nextinline] >= 0x30) && (line[nextinline] < 0x3A)) {
+        consume();
+    }
+}
+
+void func_00410270(u8* arg0) {
+    if (Tstringlength >= 0x400) {
+        Tstringlength = 0x3FF;
+        posterror("Truncating token", arg0, 1);
+    }
+    arg0[Tstringlength] = 0;
+}
 
 int dot_soon(int arg0) {
     char c;
@@ -191,8 +225,8 @@ char* alloc_new_string(char* arg0) {
     return sp20;
 }
 
-void EnterSym(s32 arg0, struct sym** arg1, s32 arg2) {
-    struct sym* sp2C;
+void EnterSym(s32 arg0, sym** arg1, s32 arg2) {
+    sym* sp2C;
     s32 sp28;
     // s32* temp_v0;
     // s32** temp_v1;
@@ -215,9 +249,9 @@ void EnterSym(s32 arg0, struct sym** arg1, s32 arg2) {
     *arg1 = sp2C;
 }
 
-struct sym *GetRegister() {
-    struct sym* sp24;
-    void* sp20;
+sym *GetRegister() {
+    sym* sp24;
+    sym* sp20;
 
     sp20 = NULL;
     if (Tokench != 'i') {
@@ -237,11 +271,11 @@ struct sym *GetRegister() {
 }
 
 
-s32 func_00411898(void) {
+static s32 func_00411898(void) {
     s32 minus; // sp+3C
     s32 not; // sp+38
     s32 sp34; // sp+34
-    struct sym* sp30; // sp+30
+    sym* sp30; // sp+30
     s32 ret; // sp+2C
 
     sp34 = 0;
@@ -309,7 +343,75 @@ s32 func_00411898(void) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00411B84.s")
+static s64 func_00411B84(void) {
+    s32 sp44; // sp+44
+    s32 sp40; // sp+40
+    s64 sp38; // sp+38
+    sym* sp34; // sp+34
+    s64 ret; // sp+28
+
+    sp38 = 0;
+    sp44 = 0;
+    sp40 = 0;
+    if (Tokench == '-') {
+        sp44 = 1;
+        nexttoken();
+    } else if (Tokench == '+') {
+        nexttoken();
+    } else if (Tokench == '~') {
+        sp40 = 1;
+        nexttoken();
+    }
+
+    switch (Tokench) {
+        case '(':
+            nexttoken();
+            sp38 = func_00412548();
+            if (Tokench != ')') {
+                posterror("Right paren expected", NULL, 1);
+            }
+            break;
+
+        case 'i':
+            if (!LookUp(Tstring, &sp34)) {
+                posterror("undefined symbol in expression", NULL, 1);
+            } else if (sp34->unk10 != 4) {
+                posterror("Symbol must have absolute value", Tstring, 1);
+            } else {
+                sp38 = sp34->unk8;
+            }
+            break;
+
+        case 'd':
+        case 'h':
+            sp38 = func_0040F77C(Tstring, sp44);
+            sp44 = 0;
+            break;
+
+        case '"':
+            sp38 = Tstring[0];
+            sp44 = 0;
+            if (Tstringlength >= 2) {
+                posterror("String within expression may have only one character", Tstring, 1);
+            }
+            break;
+
+        default:
+            posterror("Invalid symbol in expression", NULL, 1);
+            nexttoken();
+            break;
+    }
+
+    if (sp44) {
+        ret = -sp38;
+    } else if (sp40) {
+        ret = ~sp38;
+    } else {
+        ret = sp38;
+    }
+    nexttoken();
+    return ret;
+}
 
 static s32 func_00411ECC() {
     char temp_s1;
@@ -362,11 +464,62 @@ static s32 func_00411ECC() {
     return var_s2;
 }
 
-void func_0041213C(void) {
+static int func_0041213C(void) {
 
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00412144.s")
+static s64 func_00412144(void) {
+    s64 var_s2;
+    s64 var_s0;
+    s64 temp_v0;
+    char temp_s1;
+
+    var_s2 = func_00411B84();
+    func_0041213C();
+
+    while ((Tokench == '*')
+        || (Tokench == '/')
+        || (Tokench == '%')
+        || (Tokench == '<')
+        || (Tokench == '>')
+        || (Tokench == '^')
+        || (Tokench == '&')
+        || (Tokench == '|')
+        ) {
+        var_s0 = var_s2;
+        temp_s1 = Tokench;
+        nexttoken();
+        temp_v0 = func_00411B84();
+        switch (temp_s1) {
+        case '*':
+            var_s2 = var_s0 * temp_v0;
+            break;
+        case '/':
+            var_s2 = var_s0 / temp_v0;
+            break;
+        case '%':
+            var_s2 = var_s0 % temp_v0;
+            break;
+        case '<':
+            var_s2 = var_s0 << temp_v0;
+            break;
+        case '>':
+            var_s2 = (u64) var_s0 >> temp_v0;
+            break;
+        case '^':
+            var_s2 = var_s0 ^ temp_v0;
+            break;
+        case '&':
+            var_s2 = var_s0 & temp_v0;
+            break;
+        case '|':
+            var_s2 = var_s0 | temp_v0;
+            break;
+        }
+    }
+    return var_s2;
+}
+
 
 s32 func_0041244C(void) {
     s32 var_s2 = func_00411ECC();
@@ -392,7 +545,36 @@ s32 func_0041244C(void) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00412548.s")
+s64 func_00412548(void) {
+    s64 sp38;
+    s64 sp30;
+    s64 temp_v0;
+    char temp_s0;
+
+    sp38 = func_00412144();
+    func_0041213C();
+
+    while ((Tokench == '+') || (Tokench == '-')) {
+        sp30 = sp38;
+        temp_s0 = Tokench;
+
+        nexttoken();
+        temp_v0 = func_00412144();
+
+        switch (temp_s0) {
+            case '+':
+                sp38 = sp30 + temp_v0;
+                break;
+
+            case '-':
+                sp38 = sp30 - temp_v0;
+                break;
+        }
+
+    }
+
+    return sp38;
+}
 
 s32 GetExpr() {
     s32 sp24 = false;
@@ -444,7 +626,7 @@ s32 dw_GetExpr(s32* arg0, u32* arg1) {
     return (*arg0 != 0) && ((*arg0 != -1) || (s32)sp20 >= 0);
 }
 
-void GetBaseOrExpr(bar** arg0, s32* arg1) {
+void GetBaseOrExpr(unk_struct** arg0, s32* arg1) {
     *arg0 = NULL;
     if (Tokench == ')') {
         nexttoken();
@@ -489,15 +671,15 @@ void dw_GetItem(u32 arg0, u32 arg1, s32* arg2) {
 
 void put_binasmfyle(void) {
     if (in_repeat_block) {
-    size_t temp = rep_size;
-        if (temp >= rep_buffer.unk4) {
-            rep_buffer.unk0 = grow_array(&rep_buffer.unk4, temp, 0x10, rep_buffer.unk0, 0);
+    size_t size = rep_size;
+        if (size >= rep_buffer.unk4) {
+            rep_buffer.unk0 = grow_array(&rep_buffer.unk4, size, 0x10, rep_buffer.unk0, 0);
         }
         rep_buffer.unk0[rep_size] = binasm_rec;
         rep_size++;
     } else {
-        fwrite(&binasm_rec, 0x10U, 1U, binasmfyle);
-        memset(&binasm_rec, 0, 0x10U);
+        fwrite(&binasm_rec, sizeof(binasm_rec), 1U, binasmfyle);
+        memset(&binasm_rec, 0, sizeof(binasm_rec));
         binasm_count++;
     }
 }

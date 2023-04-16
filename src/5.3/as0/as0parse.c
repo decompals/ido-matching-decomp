@@ -66,7 +66,7 @@ s32 CurrentSegment;
 s32 binasm_count;
 
 FILE* extsyms_file;
-struct sym *hashtable[];
+sym *hashtable[0x100]; //default
 s32 gform_extn;
 s32 ophashtable[0x100];
 s32 freg4;
@@ -97,7 +97,7 @@ s32 linelength;
 s32 local_label[0x100];
 s32 mednat;
 s32 nowarnflag;
-struct sym *reg_ptr[0x48];
+sym *reg_ptr[0x48];
 s32 severity;
 static char *sframereg = "$framereg";
 static char *sframesize = "$framesize";
@@ -116,7 +116,7 @@ static void func_00403F10(void) {
     s32 operand_hash;
     s32 index;
     char* name;
-    struct sym* cur_symbol;
+    sym* cur_symbol;
 
     for (index = 0, var_s2 = asm_info; index < 0x1AE; index++, var_s2++) {
        name = var_s2->name;
@@ -142,7 +142,7 @@ static void func_00404008(void) {
     s32 directives_hash;
     s32 index;
     u8* asm_directives;
-    struct sym* cur_symbol;
+    sym* cur_symbol;
 
 
     for(index = 0 ; index < 0x3F ; index++) {
@@ -164,7 +164,7 @@ static void func_00404008(void) {
 }
 
 static int func_00404108(int arg0, char* name, int arg2) {
-    struct sym* temp_v0;
+    sym* temp_v0;
     s32 sp20;
 
     sp20 = hash(name);
@@ -183,7 +183,7 @@ static int func_00404108(int arg0, char* name, int arg2) {
 static void func_004041A8(char* arg0, s32 arg1) {
     s32 stackPad;
     s32 sp20;
-    struct sym* cur_symbol;
+    sym* cur_symbol;
 
 
     sp20 = hash(arg0);
@@ -417,7 +417,7 @@ static void func_00404234(int argc, char** argv) {
 }
 
 
-s32 main(int argc, char** arg1) {
+int main(int argc, char** arg1) {
     func_00404234(argc, arg1);
     while (!feof(in_file)) {
 
@@ -611,14 +611,14 @@ static void func_00405178(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u32 arg4, s32 
             break;
 
         default:
-            assertion_failed("false", "as0parse.c", 0xED);
+            assertion_failed("false", "as0parse.c", 237);
             break;
     }
     put_binasmfyle();
 }
 
 
-static void func_004054E8(struct sym *arg0, u8* arg1) {
+static void func_004054E8(sym *arg0, u8* arg1) {
     u8* var_a2;
 
     fprintf(extsyms_file, "%1d %1d", binasm_count, arg0);
@@ -645,7 +645,7 @@ void func_00405574(s32 arg0) {
 }
 
 static void func_004055D4(s8* symbol_name) {
-    struct sym* cur_symbol;
+    sym* cur_symbol;
     s32 hash_sym;
 
     if (LookUp(symbol_name, &cur_symbol) != 0) {
@@ -666,7 +666,7 @@ static void func_004055D4(s8* symbol_name) {
 }
 
 static void func_004056DC(char* arg0) {
-    struct sym* sp2C;
+    sym* sp2C;
     s32 sp28;
     s32 sp24 = LookUp(arg0, &sp2C);
 
@@ -771,7 +771,7 @@ static void func_00405B54(u32 arg0, u32 arg1, s32 *arg2) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00405C28.s")
 
 static s32 func_00405DE4(s32* arg0, s32 arg1, s32 arg2, s32* arg3) {
-    struct sym* sp2C;
+    sym* sp2C;
 
     if (Tokench == 'i') {
         if (!LookUp(Tstring, &sp2C)) {
@@ -857,7 +857,7 @@ static void func_00406034(void) {
 
 
 static void func_004061F8(s32 arg0) {
-    struct sym* sp3C;
+    sym* sp3C;
     s32 sp38;
     s32 sp34;
 
@@ -878,7 +878,7 @@ static void func_004061F8(s32 arg0) {
 }
 
 
-static void func_00406340(struct sym** arg0, s32* arg1) {
+static void func_00406340(sym** arg0, s32* arg1) {
     *arg0 = 0;
     *arg1 = 0;
     nexttoken();
@@ -908,12 +908,12 @@ static void func_00406684(void) {
 
 static void func_00406728(s32 arg0) {
     s32 pad;
-    struct sym* sp50;
+    sym* sp50;
     s32 sp4C;
     s32 sp48;
-    struct sym* sp44;
+    sym* sp44;
     s32 sp40;
-    struct sym* temp_v0;
+    sym* temp_v0;
 
     sp4C = 0;
     sp50 = NULL;
@@ -1002,10 +1002,10 @@ static void func_00406728(s32 arg0) {
 
 static void func_00406C48(s32 arg0) {
     s32 pad4C;
-    struct sym* sp48;
+    sym* sp48;
     s32 sp44;
     s32 sp40; // u32?
-    struct sym* sp3C;
+    sym* sp3C;
     s32 pad38;
 
     sp40 = 0;
@@ -1082,7 +1082,7 @@ static void func_00406C48(s32 arg0) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407334.s")
 
 static void func_004075CC(s32 arg0) {
-    struct sym* temp_v0;
+    sym* temp_v0;
 
     binasm_rec.unk0 = 0;
     binasm_rec.unk5_003F = 0x17;
@@ -1098,13 +1098,13 @@ static void func_004075CC(s32 arg0) {
 
 static void func_004076A0(s32 fasm) {
     s32 stackPad;
-    struct sym* sp48;
-    struct sym* sp44;
+    sym* sp48;
+    sym* sp44;
     u32 sp40;
     s32 var_a0;
     u32 sp38;
     u32 sp34;
-    struct sym* sp30;
+    sym* sp30;
     sp40 = 0;
     sp44 = NULL;
     sp30 = NULL;
@@ -1177,9 +1177,9 @@ static void func_004076A0(s32 fasm) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004085D8.s")
 
 static void func_004086EC(s32 arg0) {
-    struct sym* reg1; // sp+44?
-    struct sym* reg2; // sp+40
-    struct sym* reg3; // sp+3C
+    sym* reg1; // sp+44?
+    sym* reg2; // sp+40
+    sym* reg3; // sp+3C
     s32 sp38;
     s32 sp34;
 
@@ -1217,9 +1217,9 @@ static void func_004086EC(s32 arg0) {
 
 
 static void func_004088B8(s32 arg0) {
-    struct sym* sp4C;
-    struct sym* sp48;
-    struct sym* sp44;
+    sym* sp4C;
+    sym* sp48;
+    sym* sp44;
     s32 sp40;
     u32 sp3C;
     s32 sp38;
@@ -1282,10 +1282,10 @@ static void func_004088B8(s32 arg0) {
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409118.s")
 
 static void func_004092FC(s32 arg0) {
-    struct sym* sp5C;
-    struct sym* sp58;
-    struct sym* sp54;
-    struct sym* sp50;
+    sym* sp5C;
+    sym* sp58;
+    sym* sp54;
+    sym* sp50;
     s32 sp4C;
     s32 sp48;
     s32 sp44;
@@ -1380,9 +1380,9 @@ static void func_004092FC(s32 arg0) {
 }
 
 void func_00409850(s32 arg0) {
-    struct sym* sp3C;
-    struct sym* sp38;
-    struct sym* sp34;
+    sym* sp3C;
+    sym* sp38;
+    sym* sp34;
     s32 sp30;
 
 
@@ -1430,9 +1430,9 @@ void func_00409850(s32 arg0) {
 
 
 static void func_00409B10(s32 arg0) {
-    struct sym* sp4C;
-    struct sym* sp48;
-    struct sym* sp44;
+    sym* sp4C;
+    sym* sp48;
+    sym* sp44;
     s32 sp34;
     s32 sp3C;
     s32 sp38;
@@ -1515,7 +1515,7 @@ void func_00409ECC(s32 arg0) {
 }
 
 static void func_00409FD0(s32 arg0) {
-    struct sym* temp_v0;
+    sym* temp_v0;
 
     temp_v0 = GetRegister();
     if (temp_v0 != NULL) {
@@ -1524,7 +1524,7 @@ static void func_00409FD0(s32 arg0) {
 }
 
 static void func_0040A044(s32 arg0) {
-    struct sym* temp_v0;
+    sym* temp_v0;
 
     binasm_rec.unk0 = 0;
     binasm_rec.unk5_003F = arg0;
@@ -1550,7 +1550,7 @@ static void func_0040A0D4(void) {
 
 
 static void func_0040A160(void) {
-    struct sym* var_v1;
+    sym* var_v1;
 
 
     binasm_rec.unk5_003F = 0x21;
@@ -1574,10 +1574,10 @@ static void func_0040A208(void) {
 }
 
 static void func_0040A280(void) {
-    struct sym* sp34;
-    struct sym* sp30;
+    sym* sp34;
+    sym* sp30;
     u32 sp2C;
-    struct sym* sp28;
+    sym* sp28;
 
     if ((sp34 = GetRegister()) == NULL) {
         return;
@@ -1711,7 +1711,7 @@ void func_0040A958(void) {
 }
 
 void func_0040AAD4(s32 arg0) {
-    struct sym* sp34;
+    sym* sp34;
     u32 sp30;
     u32 sp2C;
     u32 sp28;
@@ -1770,7 +1770,7 @@ void func_0040AAD4(s32 arg0) {
         sp30 = 0x22;
         break;
     default:
-        assertion_failed("false", "as0parse.c", 0xA08);
+        assertion_failed("false", "as0parse.c", 2568);
         break;
     }
     sym_define(sp34->unk18, sp30, sp2C);
@@ -1929,7 +1929,7 @@ static void func_0040B554(s32 arg0) {
 }
 
 static void func_0040B5F0(s32 arg0) {
-    struct sym* sp24;
+    sym* sp24;
     // u8 temp_v1;
 
 
@@ -1988,7 +1988,7 @@ static void func_0040B5F0(s32 arg0) {
 
 
 static void func_0040B984(void) {
-    struct sym* cur_symbol;
+    sym* cur_symbol;
     s32 sp38;
 
     do {
@@ -2044,15 +2044,15 @@ static void func_0040B984(void) {
 }
 
 static void func_0040BC84(void) {
-    struct sym* sp4C;
-    struct sym* sp48;
+    sym* sp4C;
+    sym* sp48;
 
     do {
         if (Tokench != 'i') {
             posterror("identifer expected", NULL, 1);
         } else {
             if (LookUp(Tstring, &sp4C) == 0) {
-                EnterSym((s32) &Tstring, (struct sym** ) &sp4C, 1);
+                EnterSym((s32) &Tstring, (sym** ) &sp4C, 1);
             }
             sym_define(sp4C->unk18, 0x22U, 0);
             if (sp4C->unk10 == 3) {
@@ -2063,7 +2063,7 @@ static void func_0040BC84(void) {
                     nexttoken();
                 }
                 if (LookUp(Tstring, &sp48) == 0) {
-                    EnterSym((s32) &Tstring, (struct sym** ) &sp48, 1);
+                    EnterSym((s32) &Tstring, (sym** ) &sp48, 1);
                 }
                 if (sp48 != sp4C) {
                     binasm_rec.unk8 = sp48->unk18;
@@ -2083,12 +2083,12 @@ static void func_0040BC84(void) {
 }
 
 static s32 func_0040BEBC(s32* arg0, s32 arg1, s32 arg2) {
-    struct sym* sp24;
+    sym* sp24;
 
 
     if (Tokench == 0x69) {
         if (LookUp(Tstring, &sp24) == 0) {
-            EnterSym((s32) &Tstring, (struct sym** ) &sp24, 1);
+            EnterSym((s32) &Tstring, (sym** ) &sp24, 1);
         }
 
         if (sp24->unk10 == 4) {
@@ -2168,7 +2168,7 @@ static void func_0040C460(void) {
 }
 
 static void func_0040C4CC(void) {
-    struct sym* sp24;
+    sym* sp24;
 
     binasm_rec.unk0 = 0;
     binasm_rec.unk5_003F = 0x3d;
@@ -2176,7 +2176,7 @@ static void func_0040C4CC(void) {
     if (binasm_rec.unk8 != 0) {
         sp24 = NULL;
         if (LookUp(Tstring, &sp24) == 0) {
-            EnterSym(Tstring, (struct sym** ) &sp24, 0);
+            EnterSym(Tstring, (sym** ) &sp24, 0);
         }
 
         binasm_rec.unk0 = sp24->unk18;
@@ -2251,7 +2251,7 @@ static void func_0040C830(s32 arg0) {
 
 
 static void func_0040C928(void) {
-    struct sym* cur_symbol;
+    sym* cur_symbol;
 
     binasm_rec.unk5_003F = 0x25;
 
@@ -2371,7 +2371,7 @@ static void func_0040CCCC(void) {
 }
 
 static void func_0040CDE4(s32 arg0) {
-    struct sym* temp_v0;
+    sym* temp_v0;
 
     binasm_rec.unk0 = 0;
     binasm_rec.unk5_003F = arg0;
@@ -2493,7 +2493,7 @@ static void func_0040D110(void) {
 }
 
 static void func_0040D284(u8* arg0) {
-    struct sym* cur_symbol;
+    sym* cur_symbol;
 
     if (LookUp(arg0, &cur_symbol) == 0) {
         EnterSym(arg0, &cur_symbol, 0);
@@ -2521,7 +2521,7 @@ static void func_0040D284(u8* arg0) {
 
 void Parsestmt(void) {
     char sp38[0x400];
-    struct sym* cur_symbol;
+    sym* cur_symbol;
     s32 temp_a0;
     s32 expression_eval;
     // s32 temp_v0;

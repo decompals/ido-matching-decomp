@@ -21,7 +21,7 @@ s32 severity;
 s32 warnexitflag;
 s8* opt_strings;
 
-static void func_00413060(u8* arg0, s32 arg1) {
+static void func_00413060(const char* arg0, s32 arg1) {
     if (verbose) {
         if (arg1 != 3) {
             if (D_10001094 != 0) {
