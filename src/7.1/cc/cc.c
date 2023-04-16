@@ -3,16 +3,27 @@
  * @brief Compiler driver for IDO 7.1.
  */
 
+#ifdef NATIVE_BUILD
+#include <stddef.h>
+//#define __SIGNAL_H__
+#endif
+
 // Headers which should be available in modern systems
 #include <string.h>
 #include <malloc.h>
+
+// #include "indy/sys/signal.h"
 #include <signal.h>
+
 #include <wait.h>
 #include <sys/times.h>
 #include <stdlib.h>
 #include <utime.h>
 #include <errno.h>
-#include <unistd.h>
+
+// #include <unistd.h>
+#include "indy/unistd.h"
+
 #include <ctype.h>
 #include <sys/fcntl.h>
 // #include "sys/file.h"
@@ -25,6 +36,15 @@
 #define GET_ERRNO_STR(errnoValue) strerror(errnoValue)
 // Value from IRIX's libc
 #define sys_nerr 0x00000098
+
+// TODO: do this properly
+#define SIG_PF void *
+
+// TODO: do this properly
+typedef struct {
+	__uint32_t word[16];
+} sysset_t;
+
 #else
 #include "indy/varargs.h"
 #define GET_ERRNO_STR(errnoValue) sys_errlist[errnoValue]
