@@ -1216,7 +1216,14 @@ int main(int argc, char** argv) {
         cpp_stdflag = "-std0";
     }
 
+#ifdef NATIVE_BUILD
+    static char systype_whatever[] = "svr4";
+    systype = systype_whatever;
+#else
+    // SKETCHY: modifying a rodata string
     systype = "svr4";
+#endif
+
     svr4_systype = TRUE;
 
     process_config(argc, argv);
