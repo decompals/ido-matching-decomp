@@ -770,8 +770,10 @@ int compiler;
 
 char* tempstr[34]; // Possibly a struct?
 
+#ifdef __sgi
 static prmap_sgi_t B_1000CAC0[100];
 static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, sizeof(B_1000CAC0) };
+#endif
 
 static char* D_1000C1D0 = NULL; // full path of current working directory
 int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
@@ -10471,6 +10473,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         sp84 = sigset(SIGINT, SIG_IGN);
         sp88 = sigset(SIGTERM, SIG_IGN);
 
+#ifdef __sgi
         if (memory_flag != 0) {
             sp74 = func_00432940(spA0);
             sp7C = ioctl(sp74, PIOCMAP_SGI, &D_1000C1C8);
@@ -10495,6 +10498,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             ioctl(sp74, PIOCRUN, NULL);
             close(sp74);
         }
+#else
+        /* not supported under linux */
+        memory_flag = 0;
+#endif
 
         while ((sp9C = wait(&sp80)) != spA0) {
             if (sp9C == -1) {
@@ -11575,6 +11582,7 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
 }
 
 // function func_00432940 # 61
+// stop_on_exit
 static int func_00432940(pid_t arg0) {
     int fd;            // sp29C
     char pathname[20]; // sp288
@@ -11590,6 +11598,7 @@ static int func_00432940(pid_t arg0) {
         exit(1);
     }
 
+#ifdef __sgi
     premptyset(&syscalls);
     praddset(&syscalls, 2); // size 2?
 
@@ -11598,9 +11607,11 @@ static int func_00432940(pid_t arg0) {
         kill(arg0, 9);
         exit(1);
     }
+#endif
 
     func_00432C94();
 
+#ifdef __sgi
     if (ioctl(fd, PIOCWSTOP, &status) < 0) {
         perror("PIOCWSTOP");
         kill(arg0, 9);
@@ -11623,6 +11634,7 @@ static int func_00432940(pid_t arg0) {
         perror("unknown problem\n");
         exit(1);
     }
+#endif
 
     return fd;
 }
@@ -11657,6 +11669,7 @@ static void func_00432C94(void) {
 
 // function func_00432D3C # 64
 static void func_00432D3C(const char* arg0, int count) {
+#ifdef __sgi
     int i;
     int identified_segment;
     unsigned int flags;
@@ -11769,6 +11782,7 @@ static void func_00432D3C(const char* arg0, int count) {
             (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
                 0x400);
     }
+#endif
 }
 
 // function func_00433534 # 65
