@@ -45,6 +45,8 @@ typedef struct {
 	__uint32_t word[16];
 } sysset_t;
 
+#define getc_locked(p) getc(p)
+#define putc_locked(x, p) putc(x, p)
 #else
 #include "indy/varargs.h"
 #define GET_ERRNO_STR(errnoValue) sys_errlist[errnoValue]
@@ -9820,6 +9822,12 @@ va_dcl // K&R syntax
     va_end(args);
 
     return ret;
+}
+#else
+char* mkstr() {
+    static char placeholder[] = "placeholder string, mkstr is not yet implemented";
+
+    return placeholder;
 }
 #endif /* PERMUTER */
 
