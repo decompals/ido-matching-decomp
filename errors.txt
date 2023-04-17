@@ -1,2 +1,2 @@
 /usr/bin/ld: cc.o: in function `main':
-cc.c:(.text+0xd6f): warning: the use of `mktemp' is dangerous, better use `mkstemp' or `mkdtemp'
+/home/angie/Documents/n64decomp/ido-matching-decomp/src/7.1/cc/cc.c:1083: warning: the use of `mktemp' is dangerous, better use `mkstemp' or `mkdtemp'

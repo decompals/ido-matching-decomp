@@ -153,12 +153,17 @@ static char* func_00433534(const char* arg0);
 // Functions which cannot use proper prototypes
 #if 0
 void error(int arg0, const char* arg1, int arg2, const char* arg3, int arg4, const char* arg5, ...);
-char* mkstr(const char*, ...);
 void addstr(list* arg0, char* str);
+char* mkstr(const char*, ...);
 #else
 void error();  // variadic but not defined as such
-char* mkstr(); // old-style varargs
 void addstr(); // sometimes called incorrectly
+#endif
+
+#ifdef NATIVE_BUILD
+char* mkstr(const char* arg0, ...);
+#else
+char* mkstr(); // old-style varargs
 #endif
 
 typedef int UNK_TYPE;
@@ -9824,10 +9829,54 @@ va_dcl // K&R syntax
     return ret;
 }
 #else
-char* mkstr() {
-    static char placeholder[] = "placeholder string, mkstr is not yet implemented";
+char* mkstr(const char* arg0, ...) {
+    char* ret;
+    size_t len = 1;
+    va_list ap;
+    const char* arg;
 
-    return placeholder;
+    len += strlen(arg0);
+
+    va_start(ap, arg0);
+
+    while (1) {
+        arg = va_arg(ap, const char *);
+
+        if (arg == NULL) {
+            break;
+        }
+
+        len += strlen(arg);
+    }
+    va_end(ap);
+
+    ret = malloc(len);
+    if (ret == NULL) {
+        error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
+        if (errno < sys_nerr) {
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
+        }
+        exit(1);
+    }
+    *ret = 0;
+
+    strcat(ret, arg0);
+
+    va_start(ap, arg0);
+    while (1) {
+        const char* arg;
+
+        arg = va_arg(ap, const char *);
+        if (arg == NULL) {
+            break;
+        }
+
+        strcat(ret, arg);
+    }
+
+    va_end(ap);
+
+    return ret;
 }
 #endif /* PERMUTER */
 
