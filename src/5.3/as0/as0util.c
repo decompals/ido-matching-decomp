@@ -18,6 +18,8 @@ typedef struct {
 
 
 //extern
+extern s32 CurrentLine;
+extern s32 invent_locs;
 extern u8 Tokench;
 extern s8 Tstring[];
 extern s32 Tstringlength;
@@ -28,10 +30,10 @@ static char var;
 static char buffer[1];
 static char buffer2[0x3FF-4];
 static char* save;
-extern sym *hashtable[0x100];
+extern sym* hashtable[0x100];
 extern s32 nextinline;
 extern s8 token_tmp[0x10];
-extern FILE *CurrentFile;
+extern FILE* CurrentFile;
 extern s32 debugflag;
 extern s32 map_glevel[];
 extern size_t binasm_count;
@@ -40,7 +42,10 @@ extern s32 in_repeat_block;
 extern size_t rep_size;
 extern s32 errno;
 extern s64 func_00412548(void);
+extern FILE* in_file;
+
 #define LINE_LENGHT 0x3FF
+#define BUF_COUNT 0x400
 #define MAX(a, b) ((a > b) ? a: b)
 #define MIN(a, b) ((a > b) ? b: a)
 #define true 1
@@ -151,9 +156,82 @@ void consume(void) {
     nextinline++;
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040FC20.s")
+int func_0040FC20(int radix) {
+    int digit = 1;
+    s32 first_inline = nextinline;
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040FD98.s")
+    while (digit && (nextinline <= linelength)) {
+        char c = line[nextinline];
+
+        if (isdigit(c)) {
+            consume();
+        } else if (isxdigit(c)) {
+            if (radix == 10) {
+                posterror("Hex digit in decimal literal", NULL, 1);
+            }
+            line[nextinline] = tolower(c);
+            consume();
+        } else {
+            digit = 0;
+        }
+    }
+    return first_inline < nextinline;
+}
+
+
+void func_0040FD98(void) {
+    s32 sp2C; // sp+2C
+    s32 pad1; // sp+28
+    s32 radix; // sp+24
+
+    Tokench = 'h';
+    token_tmp[1] = 'x';
+    Tstringlength = 2;
+    nextinline++;
+
+    sp2C =  func_0040FC20(16);
+    if ((linelength >= nextinline) && (line[nextinline] == '.')) {
+        Tokench = 'f';
+        consume();
+        sp2C |= func_0040FC20(16);
+    }
+    if ((sp2C != 0) && (linelength >= nextinline)) {
+        line[nextinline] = tolower(line[nextinline]);
+        if ((line[nextinline]) == 'h') {
+            Tokench = 'f';
+            consume();
+            if (linelength < nextinline) {
+                sp2C = 0;
+            } else {
+                radix = 10;
+                if (nextinline < linelength) {
+                    line[nextinline + 1] = tolower(line[nextinline + 1]);
+                    if ((line[nextinline] == '0') && (line[nextinline + 1] == 'x')) {
+                        radix = 16;
+                        consume();
+                        consume();
+                    }
+                }
+                if (radix == 10) {
+                    if ((line[nextinline] == '+') || (line[nextinline] == '-')) {
+                        consume();
+                    }
+                }
+                sp2C = func_0040FC20(radix);
+            }
+        }
+    }
+    if (!sp2C) {
+        posterror("Badly delimited hexadecimal literal", NULL, 1);
+    } else {
+        func_0040FB2C();
+    }
+    if ((Tokench == 'f') && (Tstringlength >= 0x400)) {
+        posterror("Hex floating point literal too long", NULL, 1);
+        Tstringlength = 0x3FF;
+    }
+}
+
 
 void func_004100C8(void) {
 
@@ -195,8 +273,88 @@ int dot_soon(int arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/nexttoken.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00410E80.s")
+/**
+ * Reads a cpp-generated file comment of the form
+ * `# <line_number> "<file_name>"`
+ * or
+ * `# line <line_number> "<file_name>"`
+ *
+ * - the spaces may contain any number of spaces or tabs
+ * - line_number must contain only decimal digits
+ * - file name may not contain spaces or tabs or newlines
+ *
+ * @return the next char after the part of the filename recorded,
+ *         or the next char after the final `'"'`
+ */
+char func_00410E80(void) {
+    char c;
+    int i;
+    int line_number;
+    char buf[BUF_COUNT]; // sp+44
 
+    for (c = fgetc(in_file);
+        (c == ' ') || (c == '\t');
+        c = fgetc(in_file)) {}
+
+    if (c == 'l') {
+        if (((char)fgetc(in_file) != 'i')
+            || ((char)fgetc(in_file) != 'n')
+            || ((char)fgetc(in_file) != 'e')) {
+            posterror("Expected cpp-generated line number", NULL, 1);
+            exit(1);
+        }
+        for (c = fgetc(in_file);
+            (c == ' ') || (c == '\t');
+            c = fgetc(in_file)) {}
+    }
+
+    if (!(isdigit(c))) {
+        posterror("Expected cpp-generated line number", NULL, 1);
+        exit(1);
+    }
+
+    // convert line number's decimal digits into integer
+    line_number = 0;
+    do {
+        line_number = (line_number * 10) + (c - '0');
+        c = fgetc(in_file);
+    } while (isdigit(c));
+
+    while ((c == ' ') || (c == '\t')) {
+        c = fgetc(in_file);
+    }
+
+    // Look for filename
+    if (c != '"') {
+        posterror("Expected cpp-generated file name", NULL, 1);
+        return c;
+    }
+
+    c = fgetc(in_file);
+    i = 0;
+    while ((c != '"') && (c != ' ') && (c != '\n') && (c != 0xFF)) { // eof
+        if (i < BUF_COUNT - 1) {
+            buf[i] = c;
+        }
+        i++;
+        c = fgetc(in_file);
+    }
+
+    if (i >= BUF_COUNT) {
+        buf[BUF_COUNT - 1] = '\0';
+        posterror("Truncating cpp-generated filename", buf, 2);
+    } else {
+        buf[i] = '\0';
+    }
+
+    // Record line number and file
+    CurrentLine = line_number - 2;
+    if (invent_locs != 0) {
+        make_file(buf);
+    }
+
+    return (c == '"') ? fgetc(in_file) : c;
+}
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/readinline.s")
 
 char* alloc_new_sym(void) {
@@ -228,8 +386,7 @@ char* alloc_new_string(char* arg0) {
 void EnterSym(s32 arg0, sym** arg1, s32 arg2) {
     sym* sp2C;
     s32 sp28;
-    // s32* temp_v0;
-    // s32** temp_v1;
+
     if (LookUp(arg0, &sp2C) == 0) {
         sp28 = hash(arg0);
         sp2C = alloc_new_sym();
@@ -291,7 +448,6 @@ static s32 func_00411898(void) {
         nexttoken();
     }
 
-    // if (Tokench != 0x22) {
         switch (Tokench) {                          /* irregular */
             case '(':
                 nexttoken();
@@ -464,6 +620,7 @@ static s32 func_00411ECC() {
     return var_s2;
 }
 
+//stub
 static int func_0041213C(void) {
 
 }

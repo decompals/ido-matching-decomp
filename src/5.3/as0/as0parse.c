@@ -1077,7 +1077,73 @@ static void func_00406C48(s32 arg0) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00406FE8.s")
+void func_00406FE8(s32 arg0) {
+    sym* sp3C;
+    s32 sp38;
+    sym* sp34;
+
+    sp38 = 0;
+    sp3C = NULL;
+    sp34 = NULL;
+    if (Tokench == 'i') {
+        if (!LookUp(Tstring, &sp34)) {
+            EnterSym(Tstring, &sp34, 1);
+            if (gp_warn != 0) {
+                posterror("Load/store of an undefined symbol", sp34->name, 2);
+            }
+        }
+
+        if (sp34->unk10 == 4) {
+            sp34 = NULL;
+        } else if ( sp34->unk10 == 3) {
+            nexttoken();
+            if ((Tokench != '+')
+                && (Tokench != '-')
+                && (Tokench != '(')
+                && (Tokench != '#')) {
+                posterror("invalid external expression", NULL, 1);
+                return;
+            }
+        }
+    }
+
+    if ((Tokench != 'i')
+        && (Tokench != 'd')
+        && (Tokench != 'h')
+        && (Tokench != '+')
+        && (Tokench != '-')
+        && (Tokench != '~')
+        && (Tokench != '"')
+        && (Tokench != '(')) {
+        GetBaseOrExpr(&sp3C, &sp38);
+        if ((sp3C == NULL) && (Tokench == '(')) {
+            nexttoken();
+            if ((sp3C = GetRegister()) == NULL) {
+                return;
+            }
+            if (Tokench != ')') {
+                posterror("')' expected", Tstring, 1);
+                return;
+            }
+            nexttoken();
+        }
+    }
+    if (sp34 == NULL) {
+        if (sp3C == NULL) {
+            sp3C = reg_ptr[0];
+        }
+    }
+    if (sp34 != NULL) {
+        if (sp3C == NULL) {
+            func_00405178(sp34->unk18, arg0, 0x48, 0x48, 1, 0x48, sp38);
+        } else {
+            func_00405178(sp34->unk18, arg0, 0x48, sp3C->unk14, 1, 0x48, sp38);
+        }
+    } else {
+        func_00405178(0, arg0, 0x48, sp3C->unk14, 0, 0x48, sp38);
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407334.s")
 
