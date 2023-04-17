@@ -10270,8 +10270,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     int sp94;
     int sp90;
     int sp8C;
+#ifdef __sgi
     SIG_PF sp88;
     SIG_PF sp84;
+#endif
     int sp80;
     int sp7C;
     const char* sp78;
@@ -10376,8 +10378,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         cleanup();
         exit(1);
     } else {
+#ifdef __sgi
         sp84 = sigset(SIGINT, SIG_IGN);
         sp88 = sigset(SIGTERM, SIG_IGN);
+#endif
 
         if (memory_flag != 0) {
             sp74 = stop_on_exit(spA0);
@@ -10415,8 +10419,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             }
         }
 
+#ifdef __sgi
         sigset(SIGINT, sp84);
         sigset(SIGTERM, sp88);
+#endif
 
         if (time_flag) {
             dotime(arg0);
