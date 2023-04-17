@@ -736,6 +736,10 @@ static prmap_sgi_t mapbuf[100];
 static prmap_sgi_arg_t mapbuf_desc = { (caddr_t)mapbuf, sizeof(mapbuf) };
 #define DATA_ADDRESS ((char *)0x10000000)
 #define TEXT_ADDRESS ((char *)0x400000)
+
+#define LOGFILE "/usr/adm/SYSLOG"
+#else
+#define LOGFILE "<TODO, determine the modern equivalent of '/usr/adm/SYSLOG' / '/var/log/messages'>"
 #endif
 
 static char* D_1000C1D0 = NULL; // full path of current working directory
@@ -10449,7 +10453,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             fprintf(stderr, "Fatal error in: %s ", arg0);
             printf(" child died due to signal %d.\n", sp98);
             if (sp98 == SIGKILL) {
-                printf("Probably caused by running out of swap space -- check /usr/adm/SYSLOG.\n");
+                printf("Probably caused by running out of swap space -- check " LOGFILE ".\n");
                 exit(sp98);
             }
             if (sp98 == SIGINT) {
