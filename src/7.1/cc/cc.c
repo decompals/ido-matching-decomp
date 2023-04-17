@@ -734,8 +734,8 @@ char* tempstr[34]; // Possibly a struct?
 #ifdef __sgi
 static prmap_sgi_t mapbuf[100];
 static prmap_sgi_arg_t mapbuf_desc = { (caddr_t)mapbuf, sizeof(mapbuf) };
-#define DATA_ADDRESS ((char *)0x10000000)
-#define TEXT_ADDRESS ((char *)0x400000)
+#define DATA_ADDRESS ((uintptr_t)0x10000000)
+#define TEXT_ADDRESS ((uintptr_t)0x400000)
 
 #define LOGFILE "/usr/adm/SYSLOG"
 #else
@@ -10412,8 +10412,8 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             ioctl(sp74, PIOCRUN, NULL);
             close(sp74);
 #else
-		  /* not supported under non-sgi */
-		  memory_flag = 0;
+            /* not supported under non-sgi */
+            memory_flag = 0;
 #endif
         }
 
