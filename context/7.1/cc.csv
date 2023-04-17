@@ -2557,7 +2557,7 @@ symbol,0x432830,None,.L00432830,@branchlabel,None,None,None,0x4,0x32830,.text,Tr
 symbol,0x432834,None,.L00432834,@branchlabel,None,None,None,0x4,0x32834,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432848,None,.L00432848,@branchlabel,None,None,None,0x4,0x32848,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432904,None,.L00432904,@branchlabel,None,None,None,0x4,0x32904,.text,True,False,True,False,2,None,False,False,False,False
-symbol,0x432940,None,func_00432940,@function,None,None,0x29C,0x29C,0x32940,.text,True,False,True,False,1,None,False,True,False,True
+symbol,0x432940,None,stop_on_exit,@function,None,None,0x29C,0x29C,0x32940,.text,True,False,True,False,1,None,False,True,False,True
 symbol,0x4329EC,None,.L004329EC,@branchlabel,None,None,None,0x4,0x329EC,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x4329F8,None,.L004329F8,@branchlabel,None,None,None,0x4,0x329F8,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432A10,None,.L00432A10,@branchlabel,None,None,None,0x4,0x32A10,.text,True,False,True,False,1,None,False,False,False,False
@@ -2566,11 +2566,11 @@ symbol,0x432AF4,None,.L00432AF4,@branchlabel,None,None,None,0x4,0x32AF4,.text,Tr
 symbol,0x432B44,None,.L00432B44,@branchlabel,None,None,None,0x4,0x32B44,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432B94,None,.L00432B94,@branchlabel,None,None,None,0x4,0x32B94,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432BC8,None,.L00432BC8,@branchlabel,None,None,None,0x4,0x32BC8,.text,True,False,True,False,1,None,False,False,False,False
-symbol,0x432BDC,None,func_00432BDC,@function,None,None,0xB8,0xB8,0x32BDC,.text,True,False,True,False,1,None,False,True,False,True
+symbol,0x432BDC,None,my_psema,@function,None,None,0xB8,0xB8,0x32BDC,.text,True,False,True,False,1,None,False,True,False,True
 symbol,0x432C6C,None,.L00432C6C,@branchlabel,None,None,None,0x4,0x32C6C,.text,True,False,True,False,1,None,False,False,False,False
-symbol,0x432C94,None,func_00432C94,@function,None,None,0xA8,0xA8,0x32C94,.text,True,False,True,False,1,None,False,True,False,True
+symbol,0x432C94,None,my_vsema,@function,None,None,0xA8,0xA8,0x32C94,.text,True,False,True,False,1,None,False,True,False,True
 symbol,0x432D14,None,.L00432D14,@branchlabel,None,None,None,0x4,0x32D14,.text,True,False,True,False,1,None,False,False,False,False
-symbol,0x432D3C,None,func_00432D3C,@function,None,None,0x7F8,0x7F8,0x32D3C,.text,True,False,True,False,1,None,False,True,False,True
+symbol,0x432D3C,None,print_mem,@function,None,None,0x7F8,0x7F8,0x32D3C,.text,True,False,True,False,1,None,False,True,False,True
 symbol,0x432DAC,None,.L00432DAC,@branchlabel,None,None,None,0x4,0x32DAC,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432DFC,None,.L00432DFC,@branchlabel,None,None,None,0x4,0x32DFC,.text,True,False,True,False,1,None,False,False,False,False
 symbol,0x432E44,None,.L00432E44,@branchlabel,None,None,None,0x4,0x32E44,.text,True,False,True,False,1,None,False,False,False,False
@@ -5197,7 +5197,7 @@ symbol,0x1000C1B8,default_svr4,default_svr4,,None,0x4,None,0x4,0x3C1B8,.data,Tru
 symbol,0x1000C1BC,irix4,irix4,,None,0x4,None,0x4,0x3C1BC,.data,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000C1C0,runlib,runlib,,None,0x4,None,0x4,0x3C1C0,.data,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000C1C4,runlib_base,runlib_base,,None,0x4,None,0x4,0x3C1C4,.data,True,True,False,False,0,None,False,True,True,False
-symbol,0x1000C1C8,None,D_1000C1C8,,None,None,None,0x4,0x3C1C8,.data,True,False,True,False,1,None,False,True,False,True
+symbol,0x1000C1C8,None,mapbuf_desc,,None,None,None,0x4,0x3C1C8,.data,True,False,True,False,1,None,False,True,False,True
 symbol,0x1000C1D0,None,D_1000C1D0,,WORD,None,None,0x1,0x3C1D0,.data,True,False,True,False,11,None,False,True,False,True
 symbol,0x1000C1D4,run_sopt,run_sopt,,None,0x4,None,0x4,0x3C1D4,.data,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000C1D8,None,D_1000C1D8,,WORD,None,None,0x1,0x3C1D8,.data,True,False,True,False,10,None,False,True,False,True
@@ -5215,7 +5215,7 @@ symbol,0x1000CA50,None,D_1000CA50,,WORD,None,None,0x1,0x0,,False,False,True,Fals
 symbol,0x1000CA8C,None,D_1000CA8C,,WORD,None,None,0x1,0x0,,False,False,True,False,2,None,False,False,False,False
 symbol,0x1000CA94,None,D_1000CA94,,WORD,None,None,0x1,0x0,,False,False,True,False,1,None,False,False,False,False
 symbol,0x1000CA9C,None,D_1000CA9C,,WORD,None,None,0x1,0x0,,False,False,True,False,1,None,False,False,False,False
-symbol,0x1000CAC0,None,B_1000CAC0,,None,None,None,0x4,0x3CAB8,.bss,True,False,True,False,18,None,False,True,False,True
+symbol,0x1000CAC0,None,mapbuf,,None,None,None,0x4,0x3CAB8,.bss,True,False,True,False,18,None,False,True,False,True
 symbol,0x1000E3C0,perr_msg,perr_msg,,None,0x100,None,0x100,0x3E3B8,.bss,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000E4C0,None,B_1000E4C0,,WORD,None,None,0x1,0x3E4B8,.bss,True,False,True,False,6,None,False,True,False,True
 symbol,0x1000E4C4,None,B_1000E4C4,,WORD,None,None,0x1,0x3E4BC,.bss,True,False,True,False,7,None,False,True,False,True
@@ -5358,7 +5358,7 @@ symbol,0x1000EC78,as1flags,as1flags,,None,0xC,None,0xC,0x3EC70,.bss,True,True,Fa
 symbol,0x1000EC84,None,B_1000EC84,,None,None,None,0x4,0x3EC7C,.bss,True,False,True,False,0,None,False,False,False,False
 symbol,0x1000EC88,ldflags,ldflags,,None,0xC,None,0xC,0x3EC80,.bss,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000EC94,None,B_1000EC94,,None,None,None,0x4,0x3EC8C,.bss,True,False,True,False,0,None,False,False,False,False
-symbol,0x1000EC98,None,B_1000EC98,,None,None,None,0x4,0x3EC90,.bss,True,False,True,False,7,None,False,True,False,True
+symbol,0x1000EC98,None,Pipe,,None,None,None,0x4,0x3EC90,.bss,True,False,True,False,7,None,False,True,False,True
 symbol,0x1000ECA0,nldflags,nldflags,,None,0xC,None,0xC,0x3EC98,.bss,True,True,False,False,0,None,False,True,True,False
 symbol,0x1000ECAC,None,B_1000ECAC,,None,None,None,0x4,0x3ECA4,.bss,True,False,True,False,0,None,False,False,False,False
 symbol,0x1000ECB0,ftocflags,ftocflags,,None,0xC,None,0xC,0x3ECA8,.bss,True,True,False,False,0,None,False,True,True,False

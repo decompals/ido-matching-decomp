@@ -110,10 +110,10 @@ static void func_00431DD8(void);
 // skip_old_ii_controls
 char* make_ii_file_name(const char* arg0);
 void update_instantiation_info_file(const char* arg0, const char* arg1);
-static int func_00432940(pid_t arg0);
-static void func_00432BDC(void);
-static void func_00432C94(void);
-static void func_00432D3C(const char* arg0, int count);
+static int stop_on_exit(pid_t arg0);
+static void my_psema(void);
+static void my_vsema(void);
+static void print_mem(const char* arg0, int count);
 static char* func_00433534(const char* arg0);
 
 // Functions which cannot use proper prototypes
@@ -539,7 +539,7 @@ int c_inline = FALSE; //!< flag, boolean. Whether to run `umerge`. Set by `cfe`/
 int tfp_flag = FALSE; //!< flag, boolean. Set by "-tfp"
 int abi_flag = 0;
 int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
-int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
+int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in print_mem
 int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
 
 static int B_1000E4C0;    //!< argc
@@ -731,13 +731,17 @@ int compiler;
 
 char* tempstr[34]; // Possibly a struct?
 
-static prmap_sgi_t B_1000CAC0[100];
-static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, sizeof(B_1000CAC0) };
+#ifdef __sgi
+static prmap_sgi_t mapbuf[100];
+static prmap_sgi_arg_t mapbuf_desc = { (caddr_t)mapbuf, sizeof(mapbuf) };
+#define DATA_ADDRESS ((char *)0x10000000)
+#define TEXT_ADDRESS ((char *)0x400000)
+#endif
 
 static char* D_1000C1D0 = NULL; // full path of current working directory
 int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
 
-static int B_1000EC98[2]; // pipe
+static int Pipe[2]; // pipe
 
 // (these feel like in-function statics but I can't get that to match wrt bss reordering)
 static char* D_1000C1D8 = NULL; // progname
@@ -10296,7 +10300,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     if (!execute_flag) {
         return 0;
     }
-    if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
+    if ((memory_flag != 0) && (pipe(Pipe) < 0)) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "pipe failed for -showm");
         return -1;
     }
@@ -10312,7 +10316,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
     if (spA0 == 0) {
         if (memory_flag != 0) {
-            func_00432BDC();
+            my_psema();
         }
 
         if (arg2 != NULL) {
@@ -10376,8 +10380,9 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         sp88 = sigset(SIGTERM, SIG_IGN);
 
         if (memory_flag != 0) {
-            sp74 = func_00432940(spA0);
-            sp7C = ioctl(sp74, PIOCMAP_SGI, &D_1000C1C8);
+            sp74 = stop_on_exit(spA0);
+#ifdef __sgi
+            sp7C = ioctl(sp74, PIOCMAP_SGI, &mapbuf_desc);
             if (sp7C < 0) {
                 perror("PIOCMAP_SGI");
                 kill(spA0, SIGKILL);
@@ -10398,6 +10403,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
             ioctl(sp74, PIOCRUN, NULL);
             close(sp74);
+#else
+		  /* not supported under non-sgi */
+		  memory_flag = 0;
+#endif
         }
 
         while ((sp9C = wait(&sp80)) != spA0) {
@@ -10414,7 +10423,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
         }
 
         if (memory_flag != 0) {
-            func_00432D3C(arg0, sp7C);
+            print_mem(arg0, sp7C);
         }
 
         if (WIFSTOPPED(sp80)) {
@@ -11478,48 +11487,50 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
     free(sp50);
 }
 
-// function func_00432940 # 61
-static int func_00432940(pid_t arg0) {
+static int stop_on_exit(pid_t pid) {
     int fd;            // sp29C
     char pathname[20]; // sp288
     prstatus_t status; // sp68
     int sp64 = 0;      // set and not used
     sysset_t syscalls; // sp24
 
-    sprintf(pathname, "/proc/%-d", arg0);
+    sprintf(pathname, "/proc/%-d", pid);
     fd = open(pathname, O_RDWR | O_EXCL);
     if (fd == -1) {
         perror("Opening /proc");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
+#ifdef __sgi
     premptyset(&syscalls);
     praddset(&syscalls, 2); // size 2?
 
     if (ioctl(fd, PIOCSENTRY, &syscalls) < 0) {
         perror("PIOCSENTRY");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
+#endif
 
-    func_00432C94();
+    my_vsema();
 
+#ifdef __sgi
     if (ioctl(fd, PIOCWSTOP, &status) < 0) {
         perror("PIOCWSTOP");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
     if (status.pr_why != PR_SYSENTRY) {
         perror("program halted prematurely");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
     if (status.pr_what != 2) { // PR_SIGNALLED ?
         perror("program halted in wrong system call");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
@@ -11527,40 +11538,39 @@ static int func_00432940(pid_t arg0) {
         perror("unknown problem\n");
         exit(1);
     }
+#endif
 
     return fd;
 }
 
-// function func_00432BDC # 62
 // test pipe read
-static void func_00432BDC(void) {
+static void my_psema(void) {
     char buf;
     int failure;
 
-    close(B_1000EC98[1]);
-    failure = (read(B_1000EC98[0], &buf, 1) != 1);
+    close(Pipe[1]);
+    failure = (read(Pipe[0], &buf, 1) != 1);
     if (failure) {
         perror("read on pipe failed");
         exit(1);
     }
-    close(B_1000EC98[0]);
+    close(Pipe[0]);
 }
 
-// function func_00432C94 # 63
 // test pipe write
-static void func_00432C94(void) {
+static void my_vsema(void) {
     char buf;
 
-    close(B_1000EC98[0]);
-    if (write(B_1000EC98[1], &buf, 1) != 1) {
+    close(Pipe[0]);
+    if (write(Pipe[1], &buf, 1) != 1) {
         perror("write on pipe failed");
         exit(1);
     }
-    close(B_1000EC98[1]);
+    close(Pipe[1]);
 }
 
-// function func_00432D3C # 64
-static void func_00432D3C(const char* arg0, int count) {
+static void print_mem(const char* arg0, int count) {
+#ifdef __sgi
     int i;
     int identified_segment;
     unsigned int flags;
@@ -11588,20 +11598,20 @@ static void func_00432D3C(const char* arg0, int count) {
 
     for (i = 0; i < count; i++) {
         identified_segment = FALSE;
-        flags = B_1000CAC0[i].pr_mflags & 0xFFFF;
+        flags = mapbuf[i].pr_mflags & 0xFFFF;
         if (flags == (MA_PRIMARY | 0xD)) {
-            text_size += B_1000CAC0[i].pr_vsize * pagesize;
+            text_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
 
         if (flags == (MA_READ | MA_EXEC | MA_SHARED)) {
-            so_text_size += B_1000CAC0[i].pr_vsize * pagesize;
+            so_text_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
 
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
-                so_data_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr < DATA_ADDRESS) {
+                so_data_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
@@ -11612,43 +11622,43 @@ static void func_00432D3C(const char* arg0, int count) {
             || (flags == (MA_READ | MA_WRITE | MA_SHARED)) 
             || (flags == (MA_READ | MA_SHARED))) {
             // clang-format on
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
-                mmap_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr < DATA_ADDRESS) {
+                mmap_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         flags &= ~MA_PRIMARY;
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
-                data_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr >= DATA_ADDRESS) {
+                data_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         if (flags == (MA_READ | MA_WRITE | MA_BREAK | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
-                brk_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr >= DATA_ADDRESS) {
+                brk_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         if (flags == (MA_READ | MA_WRITE | MA_STACK)) {
-            stack_size += B_1000CAC0[i].pr_vsize * pagesize;
+            stack_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
         if (!identified_segment) {
             fprintf(stderr, "-showm: Unidentified: segment %d\n", i);
         }
         if (memflag || !identified_segment) {
-            fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, B_1000CAC0[i].pr_vaddr);
-            fprintf(stderr, "pr_size[%d]= %lx\n", i, B_1000CAC0[i].pr_size);
-            fprintf(stderr, "pr_off[%d]= %lx\n", i, B_1000CAC0[i].pr_off);
-            fprintf(stderr, "pr_mflags[%d]= %lx\n", i, B_1000CAC0[i].pr_mflags);
-            fprintf(stderr, "pr_vsize[%d]= %lx\n", i, B_1000CAC0[i].pr_vsize);
-            fprintf(stderr, "pr_psize[%d]= %lx\n", i, B_1000CAC0[i].pr_psize);
-            fprintf(stderr, "pr_wsize[%d]= %lx\n", i, B_1000CAC0[i].pr_wsize);
-            fprintf(stderr, "pr_rsize[%d]= %lx\n", i, B_1000CAC0[i].pr_rsize);
-            fprintf(stderr, "pr_msize[%d]= %lx\n", i, B_1000CAC0[i].pr_msize);
-            fprintf(stderr, "pr_dev[%d]= %lx\n", i, B_1000CAC0[i].pr_dev);
-            fprintf(stderr, "pr_ino[%d]= %lx\n", i, B_1000CAC0[i].pr_ino);
+            fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, mapbuf[i].pr_vaddr);
+            fprintf(stderr, "pr_size[%d]= %lx\n", i, mapbuf[i].pr_size);
+            fprintf(stderr, "pr_off[%d]= %lx\n", i, mapbuf[i].pr_off);
+            fprintf(stderr, "pr_mflags[%d]= %lx\n", i, mapbuf[i].pr_mflags);
+            fprintf(stderr, "pr_vsize[%d]= %lx\n", i, mapbuf[i].pr_vsize);
+            fprintf(stderr, "pr_psize[%d]= %lx\n", i, mapbuf[i].pr_psize);
+            fprintf(stderr, "pr_wsize[%d]= %lx\n", i, mapbuf[i].pr_wsize);
+            fprintf(stderr, "pr_rsize[%d]= %lx\n", i, mapbuf[i].pr_rsize);
+            fprintf(stderr, "pr_msize[%d]= %lx\n", i, mapbuf[i].pr_msize);
+            fprintf(stderr, "pr_dev[%d]= %lx\n", i, mapbuf[i].pr_dev);
+            fprintf(stderr, "pr_ino[%d]= %lx\n", i, mapbuf[i].pr_ino);
             fprintf(stderr, "\n");
         }
     }
@@ -11673,6 +11683,9 @@ static void func_00432D3C(const char* arg0, int count) {
             (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
                 0x400);
     }
+#else
+    fprintf(stderr, "-showm not implemented under not-sgi machines\n");
+#endif
 }
 
 // function func_00433534 # 65

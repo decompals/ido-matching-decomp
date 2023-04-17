@@ -9109,7 +9109,7 @@ s32 run(s8* arg0, s8** arg1, s8* arg2, s8* arg3, s8* arg4) {
     if (execute_flag == 0) {
         goto block_81;
     }
-    if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
+    if ((memory_flag != 0) && (pipe(Pipe) < 0)) {
         error(1, NULL, 0, NULL, 0, "pipe failed for -showm");
         return -1;
     }
@@ -9123,7 +9123,7 @@ s32 run(s8* arg0, s8** arg1, s8* arg2, s8* arg3, s8* arg4) {
     }
     if (spA0 == 0) {
         if (memory_flag != 0) {
-            func_00432BDC();
+            my_psema();
         }
         if (arg2 != NULL) {
             sp94 = open(arg2, 0);
@@ -9182,8 +9182,8 @@ s32 run(s8* arg0, s8** arg1, s8* arg2, s8* arg3, s8* arg4) {
     sp84 = sigset(2, (void (*)())1);
     sp88 = sigset(0xF, (void (*)())1);
     if (memory_flag != 0) {
-        sp74 = func_00432940(spA0);
-        sp7C = ioctl(sp74, 0x71F9, &D_1000C1C8);
+        sp74 = stop_on_exit(spA0);
+        sp7C = ioctl(sp74, 0x71F9, &mapbuf_desc);
         if (sp7C < 0) {
             perror("PIOCMAP_SGI");
             kill(spA0, 9);
@@ -9225,7 +9225,7 @@ block_62:
         dotime(arg0);
     }
     if (memory_flag != 0) {
-        func_00432D3C(arg0, sp7C);
+        print_mem(arg0, sp7C);
     }
     temp_t0 = sp80;
     if ((temp_t0 & 0xFF) == 0x7F) {
@@ -10511,7 +10511,7 @@ void update_instantiation_info_file(s8* arg0, s8* arg1) {
     free(sp50);
 }
 
-s32 func_00432940(s32 arg0) {
+s32 stop_on_exit(s32 arg0) {
     s32 sp29C;
     s8 sp288;
     ? sp68;
@@ -10539,7 +10539,7 @@ s32 func_00432940(s32 arg0) {
         kill(arg0, 9);
         exit(1);
     }
-    func_00432C94();
+    my_vsema();
     if (ioctl(sp29C, 0x7103, &sp68) < 0) {
         perror("PIOCWSTOP");
         kill(arg0, 9);
@@ -10562,31 +10562,31 @@ s32 func_00432940(s32 arg0) {
     return sp29C;
 }
 
-void func_00432BDC(void) {
+void my_psema(void) {
     ? sp27;
     s32 sp20;
 
-    close(B_1000EC98->unk_4);
-    sp20 = read(B_1000EC98->unk_0, &sp27, 1U) != 1;
+    close(Pipe->unk_4);
+    sp20 = read(Pipe->unk_0, &sp27, 1U) != 1;
     if (sp20 != 0) {
         perror("read on pipe failed");
         exit(1);
     }
-    close(B_1000EC98->unk_0);
+    close(Pipe->unk_0);
 }
 
-void func_00432C94(void) {
+void my_vsema(void) {
     ? sp27;
 
-    close(B_1000EC98->unk_0);
-    if (write(B_1000EC98->unk_4, &sp27, 1U) != 1) {
+    close(Pipe->unk_0);
+    if (write(Pipe->unk_4, &sp27, 1U) != 1) {
         perror("write on pipe failed");
         exit(1);
     }
-    close(B_1000EC98->unk_4);
+    close(Pipe->unk_4);
 }
 
-void func_00432D3C(s8* arg0, s32 count) {
+void print_mem(s8* arg0, s32 count) {
     s32 sp74;
     s32 sp70;
     s32 sp6C;
@@ -10623,7 +10623,7 @@ void func_00432D3C(s8* arg0, s32 count) {
     if (count > 0) {
         do {
             sp70 = 0;
-            temp_t2 = &B_1000CAC0[sp74];
+            temp_t2 = &mapbuf[sp74];
             temp_t4 = temp_t2->pr_mflags & 0xFFFF;
             sp6C = temp_t4;
             if (temp_t4 == 0x80D) {
@@ -10632,17 +10632,17 @@ void func_00432D3C(s8* arg0, s32 count) {
             }
             if (sp6C == 0xD) {
                 sp70 = 1;
-                sp54 += B_1000CAC0[sp74].pr_vsize * sp68;
+                sp54 += mapbuf[sp74].pr_vsize * sp68;
             }
             if (sp6C == 0x2003) {
-                temp_t6 = &B_1000CAC0[sp74];
+                temp_t6 = &mapbuf[sp74];
                 if ((u32) temp_t6->pr_vaddr < 0x10000000U) {
                     sp70 = 1;
                     sp50 += temp_t6->pr_vsize * sp68;
                 }
             }
             if ((sp6C == 3) || (sp6C == 1) || (sp6C == 0xB) || (sp6C == 9)) {
-                temp_t9 = &B_1000CAC0[sp74];
+                temp_t9 = &mapbuf[sp74];
                 if ((u32) temp_t9->pr_vaddr < 0x10000000U) {
                     sp70 = 1;
                     sp48 += temp_t9->pr_vsize * sp68;
@@ -10651,14 +10651,14 @@ void func_00432D3C(s8* arg0, s32 count) {
             temp_t6_2 = sp6C & ~0x800;
             sp6C = temp_t6_2;
             if (temp_t6_2 == 0x2003) {
-                temp_t0 = &B_1000CAC0[sp74];
+                temp_t0 = &mapbuf[sp74];
                 if ((u32) temp_t0->pr_vaddr >= 0x10000000U) {
                     sp70 = 1;
                     sp60 += temp_t0->pr_vsize * sp68;
                 }
             }
             if (sp6C == 0x2013) {
-                temp_t3 = &B_1000CAC0[sp74];
+                temp_t3 = &mapbuf[sp74];
                 if ((u32) temp_t3->pr_vaddr >= 0x10000000U) {
                     sp70 = 1;
                     sp5C += temp_t3->pr_vsize * sp68;
@@ -10666,23 +10666,23 @@ void func_00432D3C(s8* arg0, s32 count) {
             }
             if (sp6C == 0x23) {
                 sp70 = 1;
-                sp58 += B_1000CAC0[sp74].pr_vsize * sp68;
+                sp58 += mapbuf[sp74].pr_vsize * sp68;
             }
             if (sp70 == 0) {
                 fprintf(__iob + 0x20, "-showm: Unidentified: segment %d\n", sp74);
             }
             if ((sp44 != 0) || (sp70 == 0)) {
-                fprintf(__iob + 0x20, "pr_vaddr[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_vaddr);
-                fprintf(__iob + 0x20, "pr_size[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_size);
-                fprintf(__iob + 0x20, "pr_off[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_off);
-                fprintf(__iob + 0x20, "pr_mflags[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_mflags);
-                fprintf(__iob + 0x20, "pr_vsize[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_vsize);
-                fprintf(__iob + 0x20, "pr_psize[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_psize);
-                fprintf(__iob + 0x20, "pr_wsize[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_wsize);
-                fprintf(__iob + 0x20, "pr_rsize[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_rsize);
-                fprintf(__iob + 0x20, "pr_msize[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_msize);
-                fprintf(__iob + 0x20, "pr_dev[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_dev);
-                fprintf(__iob + 0x20, "pr_ino[%d]= %lx\n", sp74, B_1000CAC0[sp74].pr_ino);
+                fprintf(__iob + 0x20, "pr_vaddr[%d]= %lx\n", sp74, mapbuf[sp74].pr_vaddr);
+                fprintf(__iob + 0x20, "pr_size[%d]= %lx\n", sp74, mapbuf[sp74].pr_size);
+                fprintf(__iob + 0x20, "pr_off[%d]= %lx\n", sp74, mapbuf[sp74].pr_off);
+                fprintf(__iob + 0x20, "pr_mflags[%d]= %lx\n", sp74, mapbuf[sp74].pr_mflags);
+                fprintf(__iob + 0x20, "pr_vsize[%d]= %lx\n", sp74, mapbuf[sp74].pr_vsize);
+                fprintf(__iob + 0x20, "pr_psize[%d]= %lx\n", sp74, mapbuf[sp74].pr_psize);
+                fprintf(__iob + 0x20, "pr_wsize[%d]= %lx\n", sp74, mapbuf[sp74].pr_wsize);
+                fprintf(__iob + 0x20, "pr_rsize[%d]= %lx\n", sp74, mapbuf[sp74].pr_rsize);
+                fprintf(__iob + 0x20, "pr_msize[%d]= %lx\n", sp74, mapbuf[sp74].pr_msize);
+                fprintf(__iob + 0x20, "pr_dev[%d]= %lx\n", sp74, mapbuf[sp74].pr_dev);
+                fprintf(__iob + 0x20, "pr_ino[%d]= %lx\n", sp74, mapbuf[sp74].pr_ino);
                 fprintf(__iob + 0x20, "\n");
             }
             temp_t1 = sp74 + 1;
