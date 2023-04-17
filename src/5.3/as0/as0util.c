@@ -355,7 +355,81 @@ char func_00410E80(void) {
 
     return (c == '"') ? fgetc(in_file) : c;
 }
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/readinline.s")
+
+
+void readinline(void) {
+    char c; //sp+46F
+    char prev_c;
+    int found_eol; // sp+468
+    int i;
+    int pad;
+    char buf[0x420]; // sp+40
+    int var_t0; // sp+3C // not in a character constant or an escaped character
+
+    i = 0;
+    prev_c = ' ';
+    var_t0 = true;
+    found_eol = false;
+    printedline = false;
+
+    while (!found_eol) {
+        c = fgetc(in_file);
+        if ((c == '\t') || (c == '\f')) {
+            c = ' ';
+        } else if ((c == '"') && (prev_c != '\\')) {
+            var_t0 = !var_t0;
+        } else if ((c == '\n') || (c == 0xFF)) {
+            found_eol = true;
+        } else if (var_t0 && ((c == ';') || (c == '#'))) {
+            found_eol = true;
+        }
+
+        prev_c = c;
+        if (!found_eol) {
+            if (i < 0x41F) { // avoid out-of-bounds stack writes
+                buf[i] = c;
+            }
+            i++;
+        }
+    }
+
+    // cpp-generated line/file comments
+    if ((c == '#') && (i == 0)) {
+        c = func_00410E80();
+    }
+
+    if ((c == ';') || (c == 0xFF)) {
+        if (!B_1000A810) {
+            CurrentLine++;
+        }
+        B_1000A810 = true;
+    } else {
+        while ((c != '\n') && (c != 0xFF)) {
+            c = fgetc(in_file);
+        }
+
+        if ((invent_locs != 0) && !B_1000A810) {
+            CurrentLine++;
+        }
+        B_1000A810 = false;
+    }
+
+    if (i > 0x41F) {
+        i = 0x41F;
+        posterror("Line too long", NULL, 2);
+    }
+
+    buf[i] = '\0';
+    strcpy(line, buf);
+    linelength = i;
+
+    // recurse if empty line
+    if ((linelength == 0) && (c != 0xFF)) {
+        readinline();
+    }
+    nextinline = 0;
+}
+
 
 char* alloc_new_sym(void) {
     void* ptr;
