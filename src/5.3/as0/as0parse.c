@@ -1235,6 +1235,7 @@ static void func_004076A0(s32 fasm) {
     }
 }
 
+//if's
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407A20.s")
 

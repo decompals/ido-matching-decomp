@@ -43,6 +43,9 @@ extern size_t rep_size;
 extern s32 errno;
 extern s64 func_00412548(void);
 extern FILE* in_file;
+extern s32 local_label[];
+extern s32 printedline;
+static int B_1000A810; // boolean, only used in this function
 
 #define LINE_LENGHT 0x3FF
 #define BUF_COUNT 0x400
@@ -56,7 +59,56 @@ int hex_to_num(char c) {
 }
 
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/make_local_label.s")
+void make_local_label(char* arg0, size_t* arg1) {
+    u32 sp2C; // sp+2C
+    u32 var_a3; // sp28
+    size_t sp24; // sp+24
+    char sp23; // sp+23
+    size_t strlength; // sp20
+    char* temp_a1;
+
+    sp24 = strlen(arg0);
+    if (strcmp(token_tmp, arg0) != 0) {
+        strcpy(token_tmp, arg0);
+    }
+    sp2C = atol(token_tmp);
+    sp23 = token_tmp[sp24 - 1];
+
+    if (sp2C > 0xFF) {
+        posterror("Local label number is out of range\0No such label", token_tmp, 1);
+        sp2C = 0;
+    }
+
+    ltoa(sp2C, token_tmp);
+
+    if (sp23 == 'b') {
+        var_a3 = local_label[sp2C] - 1;
+    } else if (sp23 == 'f') {
+        var_a3 = local_label[sp2C];
+    } else {
+        var_a3 = local_label[sp2C];
+        if (local_label[sp2C] >= 0x7FFFFFFF) {
+            posterror("Too many local labels", token_tmp, 1);
+        } else {
+            local_label[sp2C]++;
+        }
+    }
+
+    strlength = strlen(token_tmp);
+    token_tmp[strlength] = '$';
+    strlength++;
+    *arg1 = strlength + 10;
+    token_tmp[*arg1] = '\0';
+
+    for (sp2C = 10; sp2C > 0; sp2C--) {
+        token_tmp[strlength + sp2C - 1] = (var_a3 % 10) + '0';
+        var_a3 /= 10;
+    }
+    if (strcmp(token_tmp, arg0) != 0) {
+        strcpy(arg0, token_tmp);
+    }
+}
+
 
 void unscan(u8 arg0) {
     var = Tokench;
@@ -69,7 +121,53 @@ void make_file(const char* file_name) {
     CurrentFile = st_filebegin(file_name, 3, 1, map_glevel[debugflag]);
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040F5D8.s")
+u32 func_0040F5D8(char* arg0, int arg1) {
+    u32 temp_v0_2; // digit
+    u32 var_s2; // read number
+    u32 var_s4; // digit count/return
+    u32 var_s5; // radix
+
+    var_s2 = 0;
+
+    // Determine radix and set digit to begin on
+    if (arg0[0] == '0') {
+        if ((arg0[1] == 'x') || (arg0[1] == 'X')) {
+            var_s5 = 16;
+            var_s4 = 2;
+        } else {
+            var_s5 = 8;
+            var_s4 = 1;
+        }
+    } else {
+        var_s5 = 10;
+        var_s4 = 0;
+    }
+
+    if (1) {}
+
+    while (arg0[var_s4] != '\0') {
+        temp_v0_2 = hex_to_num(arg0[var_s4]);
+        if ((((0x7FFFFFFF / var_s5) * 2) + 1 < var_s2) || ((-1 - (var_s2 * var_s5)) < temp_v0_2)) {
+            posterror("Overflow", arg0, 1);
+            return var_s4;
+        }
+        var_s2 = var_s2 * var_s5 + temp_v0_2;
+        var_s4++;
+    }
+
+    if ((var_s5 == 10) && (var_s2 & 0x80000000) && (var_s2 != 0x80000000)) {
+        posterror("Large decimal set sign bit", arg0, 2);
+    }
+
+    var_s4 = var_s2;
+    if (arg1 != 0) {
+        if (var_s2 != 0x80000000) {
+            var_s4 = - var_s2;
+        }
+    }
+
+    return var_s4;
+}
 
 s64 func_0040F77C(char* arg0, int arg1) {
     s64 var_v1;
