@@ -1346,7 +1346,48 @@ static void func_004088B8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00408C80.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00409118.s")
+s32 func_00409118(s32* arg0) {
+    s32 var_v1;
+    s32 var_v1_2;
+    s32 temp_v0;
+
+    if ((Tstringlength != 1) || ((u8) *Tstring != 0x2E)) {
+        return 0;
+    }
+    nexttoken();
+    var_v1 = 0;
+    if (Tokench == '-') {
+        var_v1 = 1;
+    } else if (Tokench != '+') {
+        posterror("+/- expected after .", NULL, 1);
+        return 1;
+    }
+
+    nexttoken();
+    if (Tokench != 'd') {
+        posterror("branch offset not specified", NULL, 1);
+        return 1;
+    }
+
+    temp_v0 = GetExpr();
+    if (temp_v0 & 3) {
+        posterror("relative offset not multiple of 4", NULL, 1);
+        return 1;
+    }
+    if (temp_v0 >= 0x8001) {
+        posterror("relative offset beyond 32768", NULL, 1);
+        return 1;
+    }
+    if ((var_v1 != 0) || (temp_v0 == 0)) {
+        gform_extn = 4;
+        var_v1_2 = temp_v0 / 4;
+    } else {
+        gform_extn = 3;
+        var_v1_2 = (s32) (temp_v0 - 4) / 4;
+    }
+    *arg0 = var_v1_2;
+    return 1;
+}
 
 static void func_004092FC(s32 arg0) {
     sym* sp5C;
