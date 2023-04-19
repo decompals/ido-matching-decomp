@@ -821,7 +821,7 @@ static void func_00406034(void) {
     if (LastLabel != 0) {
         func_00405574(2);
     }
-    while(1) {
+    while(true) {
     sp4C = 0;
     sp48 = 0;
     sp50 = 1;
@@ -1346,7 +1346,7 @@ static void func_004088B8(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00408C80.s")
 
-s32 func_00409118(s32* arg0) {
+static s32 func_00409118(s32* arg0) {
     s32 var_v1;
     s32 var_v1_2;
     s32 temp_v0;
