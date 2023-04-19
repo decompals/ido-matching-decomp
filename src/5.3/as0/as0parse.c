@@ -1351,7 +1351,7 @@ static s32 func_00409118(s32* arg0) {
     s32 var_v1_2;
     s32 temp_v0;
 
-    if ((Tstringlength != 1) || ((u8) *Tstring != 0x2E)) {
+    if ((Tstringlength != 1) || (Tstring[0] != '.')) {
         return 0;
     }
     nexttoken();
