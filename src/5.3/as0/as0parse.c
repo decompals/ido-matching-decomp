@@ -1239,7 +1239,39 @@ static void func_004076A0(s32 fasm) {
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_00407A20.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040848C.s")
+void func_0040848C(s32 arg0) {
+    sym* var_t0;
+    sym* var_v1;
+    s32 pad;
+    s32 var_a2;
+
+    if ((var_t0 = GetRegister()) == NULL) {
+        return;
+    }
+
+    if (Tokench != '#') {
+        if ((var_v1 = GetRegister()) == NULL) {
+            return;
+        }
+    } else {
+        var_v1 = var_t0;
+    }
+
+    if ((arg0 >= 0x9D) && (arg0 < 0xCD)) {
+        var_a2 = 0x40;
+        if (Tokench != '#') {
+            var_a2 = var_t0->unk14;
+            var_t0 = var_v1;
+            if ((var_v1 = GetRegister()) == NULL) {
+                return;
+            }
+        }
+        func_00405178(0, arg0, var_a2, var_t0->unk14, 3, var_v1->unk14, 0);
+    } else {
+        func_00405178(0, arg0, var_t0->unk14, var_v1->unk14, 5, 0x48, 0);
+    }
+}
+
 
 #pragma GLOBAL_ASM("asm/5.3/functions/as0/func_004085D8.s")
 
@@ -1765,7 +1797,26 @@ static void func_0040A5D4(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/func_0040A6B8.s")
+void func_0040A6B8(u32 arg0) {
+    s32 i;
+    s32 j;
+
+    binasm_rec.unk0 = 0;
+    binasm_rec.unk5_003F = arg0;
+    binasm_rec.unk8 = Tstringlength;
+
+    j = sizeof(binasm_rec);
+    for (i = 0; i < Tstringlength; i++) {
+        if (j == sizeof(binasm_rec)) {
+            put_binasmfyle();
+            j = 0;
+        }
+        ((u8*)&binasm_rec)[j] = Tstring[i];
+        j++;
+    }
+    put_binasmfyle();
+}
+
 
 static void func_0040A79C(s32 arg0) {
 

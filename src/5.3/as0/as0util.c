@@ -29,7 +29,6 @@ extern s32 ophashtable[0x100];
 static char var;
 static char buffer[1];
 static char buffer2[0x3FF-4];
-static char* save;
 extern sym* hashtable[0x100];
 extern s32 nextinline;
 extern s8 token_tmp[0x10];
@@ -110,10 +109,10 @@ void make_local_label(char* arg0, size_t* arg1) {
 }
 
 
-void unscan(u8 arg0) {
-    var = Tokench;
-    strcpy(buffer, &Tstring);
-    save = Tstringlength;
+void unscan(char arg0) {
+    save.tokench = Tokench;
+    strcpy(save.tstring, Tstring);
+    save.length = Tstringlength;
     Tokench = arg0;
 }
 
@@ -247,9 +246,9 @@ void func_0040FB2C(void) {
 
 
 void consume(void) {
-    if (Tstringlength < LINE_LENGHT)
+    if (Tstringlength < LINE_LENGHT) {
         token_tmp[Tstringlength] = line[nextinline];
-
+    }
     Tstringlength++;
     nextinline++;
 }
@@ -369,7 +368,277 @@ int dot_soon(int arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/5.3/functions/as0/nexttoken.s")
+void nexttoken(void) {
+    int i; // remaining digits in hex/octal escape code
+    int num; // numeric value of octal/hex character code
+    char c;
+    s32 pad[3];
+    int sp4C;
+
+    sp4C = 0;
+    if (save.tokench != '\0') {
+        Tokench = save.tokench;
+        save.tokench = '\0';
+        strcpy(Tstring, &save.tstring);
+        Tstringlength = save.length;
+        return;
+    }
+
+    Tstringlength = 0;
+
+    // skip spaces
+    while((nextinline < linelength) && (line[nextinline] == ' ')){
+        nextinline++;
+    }
+
+    // Terminate line in a comment
+    if (nextinline >= linelength) {
+        Tokench = '#';
+        goto end;
+    }
+
+    c = line[nextinline];
+    Tstringlength = 1;
+    token_tmp[0] = c;
+    nextinline++;
+
+    switch (c) {
+        case '%':
+        case '&':
+        case '(':
+        case ')':
+        case '*':
+        case '+':
+        case ',':
+        case '-':
+        case '/':
+        case ':':
+        case ';':
+        case '<':
+        case '=':
+        case '>':
+        case '|':
+        case '^':
+        case '~':
+            if (((c == '<') && (line[nextinline] == '<')) || ((c == '>') && (line[nextinline] == '>'))) {
+                nextinline++;
+            }
+            Tokench = c;
+            break;
+
+        default:
+            if (((c >= '1') && (c <= '9'))
+                || ((nextinline < linelength)
+                    && (((c == '.') && isdigit(line[nextinline]))
+                    || ((c == '0') && dot_soon(nextinline))))
+                ) {
+
+                if (c == '.') {
+                    Tokench = 'f';
+                    consume();
+                    func_004101AC();
+                } else {
+                    Tokench = 'd';
+                    func_004101AC();
+
+                    if (linelength < nextinline) {
+                        break;
+                    }
+
+                    if ((line[nextinline] == 'b') || (line[nextinline] == 'f')) {
+                        consume();
+                        Tokench = 'i';
+                        func_00410270(token_tmp);
+                        make_local_label(token_tmp, &Tstringlength);
+                        func_0040FB2C();
+                        break;
+                    }
+
+                    if ((line[nextinline] != '.') && (line[nextinline] != 'e') && (line[nextinline] != 'E')) {
+                        func_0040FB2C();
+                        break;
+                    }
+
+                    Tokench = 'f';
+                    if (line[nextinline] == '.') {
+                        consume();
+                        func_004101AC();
+                    }
+                }
+
+                if (nextinline < linelength){
+                    if ((line[nextinline] == 'e') || (line[nextinline] == 'E')) {
+                        line[nextinline] = 'e';
+                        consume();
+                        if (nextinline < linelength) {
+                            if ((line[nextinline] == '+') || (line[nextinline] == '-')) {
+                                consume();
+                            }
+                        }
+                        if (!(nextinline < linelength) || !(isdigit(line[nextinline]))) {
+                            posterror("Missing exponent in floating-point literal", NULL, 1);
+                            Tstringlength -= 1;
+                            break;
+                        }
+                        func_004101AC();
+                    }
+                }
+                func_0040FB2C();
+                break;
+            }
+
+            if (c == '0') {
+                sp4C = 1;
+                if ((nextinline < linelength) && ((line[nextinline] == 'x') || (line[nextinline] == 'X'))) {
+                    func_0040FD98();
+                } else {
+                    func_004100C8();
+                }
+                break;
+            }
+
+            if ((isalpha(c)) || (c == '.') || (c == '_') || (c == '$')) {
+                Tokench = 'i';
+                while ((nextinline < linelength)) {
+                    c = line[nextinline];
+                    if ((isalnum(c)) || (c == '.') || (c == '_') || (c == '$')) {
+                        consume();
+                        continue;
+                    }
+                    goto end;
+                }
+                break;
+            }
+            break;
+        case '"':
+            // strings
+            Tokench = '"';
+            Tstringlength = 0;
+            while (nextinline < linelength) {
+                c = line[nextinline];
+                if (c == '"') {
+                    nextinline++;
+                    if (Tstringlength == 0) {
+                        posterror("zero length string", NULL, 2);
+                    }
+                    goto end;
+                }
+
+                // hex and octal escape sequences
+                if (c == '\\') {
+                    nextinline++;
+                    if (nextinline >= linelength) {
+                        posterror("literal string not terminated", NULL, 1);
+                        goto end;
+                    }
+
+                    c = line[nextinline];
+                    switch (c) {
+                        case 'a':
+                            c = '\a';
+                            break;
+                        case 'b':
+                            c = '\b';
+                            break;
+                        case 'f':
+                            c = '\f';
+                            break;
+                        case 'n':
+                            c = '\n';
+                            break;
+                        case 'r':
+                            c = '\r';
+                            break;
+                        case 't':
+                            c = '\t';
+                            break;
+                        case 'v':
+                            c = '\v';
+                            break;
+                        case '\"':
+                        case '\'':
+                        case '\\':
+                            break;
+
+                        default:
+                            if (((c >= '0') && (c <= '7')) || (c == 'x') || (c == 'X')) {
+                                sp4C = 1;
+                                num = 0;
+
+                                if (((c >= '0') && (c <= '7'))){
+                                    i = 3;
+                                    // octal
+                                    while (i > 0) {
+                                        num = num * 8 + c - '0';
+                                        nextinline++;
+                                        if (nextinline >= linelength) {
+                                            posterror("literal string not terminated", NULL, 1);
+                                            goto end;
+                                        }
+                                        c = line[nextinline];
+                                        i--;
+                                        if (((c < '0') || (c > '7'))) {
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    nextinline++;
+                                    c = line[nextinline];
+                                    i = 2;
+                                    // hex
+                                    while (isxdigit(c) && (i > 0)) {
+                                        num = (num * 16) + hex_to_num(c);
+                                        nextinline++;
+                                        if (nextinline >= linelength) {
+                                            posterror("literal string not terminated", NULL, 1);
+                                            goto end;
+                                        }
+                                        c = line[nextinline];
+                                        i--;
+                                    }
+                                }
+
+                                nextinline--;
+                                if (num < 0x100) {
+                                    c = num;
+                                } else {
+                                    posterror(" number in string too big", NULL, 1);
+                                    goto end;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                if (Tstringlength < 0x3FF) {
+                    token_tmp[Tstringlength] = c;
+                }
+                Tstringlength++;
+                nextinline++;
+            }
+
+            if (Tstringlength > 0x3FF) {
+                posterror("literal string too long", NULL, 1);
+                Tstringlength = 0x3FF;
+                break;
+            }
+            if (nextinline >= linelength) {
+                posterror("Missing \" at end of string", NULL, 1);
+                break;
+            }
+            break;
+    }
+
+end:
+    if ((Tokench == 'i') || (Tokench == 'h') || (Tokench == 'd') || (Tokench == 'f') || (Tokench == '"')) {
+        func_00410270(token_tmp);
+        if (sp4C) {
+            memcpy(Tstring, token_tmp, Tstringlength + 1);
+        } else {
+            strcpy(Tstring, token_tmp);
+        }
+    }
+}
 
 /**
  * Reads a cpp-generated file comment of the form
