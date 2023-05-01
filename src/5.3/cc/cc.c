@@ -62,7 +62,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/STR_1000061C.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cc/_ftext.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cc/_ftext.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/func_00405560.s")
 
@@ -319,4 +320,3 @@
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/STR_10007AF0.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cc/gethostsex.s")
-

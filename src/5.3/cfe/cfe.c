@@ -1,6 +1,7 @@
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/RO_10009230.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/_ftext.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/_ftext.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00408ED0.s")
 
@@ -840,15 +841,19 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_write.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/free_buffer.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/free_buffer.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00411828.s")
+// Error: late rodata to text ratio is too high: 12 / 27 must be <= 1/3
+// add .late_rodata_alignment (4|8) to the .late_rodata block to double the allowed ratio.
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00411828.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_004118A4.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00411FD0.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00412400.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00412400.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00412408.s")
 
@@ -872,7 +877,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00414FB8.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00415068.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00415068.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00415070.s")
 
@@ -1870,7 +1876,9 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/display_tree.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00421378.s")
+// Error: late rodata to text ratio is too high: 106 / 310 must be <= 1/3
+// add .late_rodata_alignment (4|8) to the .late_rodata block to double the allowed ratio.
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00421378.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/debugger.s")
 
@@ -2192,7 +2200,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/catchall.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00425E10.s")
+// Error: too short .text block
+//#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00425E10.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/lint_not_initializing.s")
 
@@ -2298,7 +2307,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/expression.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00440D58.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00440D58.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00440D60.s")
 
@@ -2348,7 +2358,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/make_boolean.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00447AA0.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00447AA0.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00447AA8.s")
 
@@ -2358,7 +2369,9 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00448144.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0044823C.s")
+// Error: late rodata to text ratio is too high: 28 / 22 must be <= 1/3
+// add .late_rodata_alignment (4|8) to the .late_rodata block to double the allowed ratio.
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0044823C.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/STR_10011DA0.s")
 
@@ -2594,7 +2607,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00454AF4.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00454CCC.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00454CCC.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_buffer_fixupBackslashReturn.s")
 
@@ -3020,7 +3034,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_symentry_print_macdef_total_len.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_symentry_delete.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_symentry_delete.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/cpp_symentry_symbolLookup.s")
 
@@ -3068,7 +3083,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00466628.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00466E24.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00466E24.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00466E2C.s")
 
@@ -3364,7 +3380,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/codegen.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00475E04.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00475E04.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00475E0C.s")
 
@@ -3440,7 +3457,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_004794CC.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/st_feinit.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/st_feinit.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/init_mips_st.s")
 
@@ -3490,13 +3508,17 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/STR_10014734.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D06C.s")
+// Error: late rodata to text ratio is too high: 31 / 59 must be <= 1/3
+// add .late_rodata_alignment (4|8) to the .late_rodata block to double the allowed ratio.
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D06C.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D168.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D36C.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D4BC.s")
+// Error: late rodata to text ratio is too high: 16 / 18 must be <= 1/3
+// add .late_rodata_alignment (4|8) to the .late_rodata block to double the allowed ratio.
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D4BC.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_0047D514.s")
 
@@ -3602,7 +3624,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00497F64.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/enter_runtimes.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/enter_runtimes.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/get_runtime_id.s")
 
@@ -3618,7 +3641,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_004986BC.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00498768.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00498768.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/func_00498774.s")
 
@@ -4580,7 +4604,8 @@
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/st_ppd_ifd_isym.s")
 
-#pragma GLOBAL_ASM("asm/5.3/functions/cfe/__st_range_mbt_ascii.s")
+// Error: too short .text block
+// #pragma GLOBAL_ASM("asm/5.3/functions/cfe/__st_range_mbt_ascii.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/st_dump.s")
 
@@ -5071,4 +5096,3 @@
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/ucw_strwrite.s")
 
 #pragma GLOBAL_ASM("asm/5.3/functions/cfe/STR_1001AC80.s")
-
