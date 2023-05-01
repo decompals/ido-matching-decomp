@@ -763,7 +763,6 @@ typedef enum ErrorCategory {
     /* 5 */ ERRORCAT_ERRNO // Used for printing `GET_ERRNO_STR(errno)`
 } ErrorCategory;
 
-// function main # 2
 /**
  * Main fuction for `cc`. Structure is roughly
  * 1. Argument parsing
@@ -5406,7 +5405,6 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-// function process_config # 3
 void process_config(int argc, char** argv) {
     register int i;
     register char* var_s1;
@@ -5493,7 +5491,6 @@ void process_config(int argc, char** argv) {
     }
 }
 
-// function add_info # 4
 void add_info(char* str) {
     addstr(&upasflags, str);
     addstr(&fcomflags, str);
@@ -5508,7 +5505,6 @@ void add_info(char* str) {
     addstr(&ldflags, str);
 }
 
-// function parse_command # 5
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
     register int var_s0;   // option index
@@ -8784,12 +8780,10 @@ void parse_command(int argc, char** argv) {
     }
 }
 
-// function get_host_chiptype # 6
 // Blank function
 void get_host_chiptype(void) {
 }
 
-// function error # 7
 
 #ifndef PERMUTER
 
@@ -8875,7 +8869,6 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 }
 #endif /* PERMUTER */
 
-// function relocate_passes # 8
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     register int pad;
     register const char* var_s1;
@@ -9637,7 +9630,6 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     }
 }
 
-// function newrunlib # 9
 void newrunlib(void) {
     if (fiveflag) {
         runlib_base = "usr/5lib";
@@ -9656,7 +9648,6 @@ void newrunlib(void) {
     relocate_passes("rP1EXCOnMFISU", NULL, NULL);
 }
 
-// function compose_G0_libs # 10
 void compose_G0_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
@@ -9703,7 +9694,6 @@ void compose_G0_libs(const char* arg0) {
     }
 }
 
-// function compose_reg_libs # 11
 void compose_reg_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
@@ -9748,7 +9738,6 @@ void compose_reg_libs(const char* arg0) {
     }
 }
 
-// function mkstr # 12
 /*
  * The compiler built-in symbol _VA_INIT_STATE:
  *  -returns 1 if the va_alist marker is the first
@@ -9804,7 +9793,6 @@ va_dcl // K&R syntax
 #define LIST_CAPACITY_INCR 20
 #define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
 
-// function mklist # 13
 // Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
 void mklist(list* arg0) {
     if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
@@ -9819,7 +9807,6 @@ void mklist(list* arg0) {
     arg0->entries[0] = NULL;
 }
 
-// function addstr # 14
 // Add a single string entry to a list.
 // Called incorrectly.
 void addstr(arg0, str)
@@ -9843,7 +9830,6 @@ void addstr(arg0, str)
     arg0->entries[arg0->length] = NULL;
 }
 
-// function addspacedstr # 15
 /**
  * Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
  *
@@ -9876,7 +9862,6 @@ void addspacedstr(list* arg0, char* str) {
     } while ((str = str_end) != NULL);
 }
 
-// function newstr # 16
 /**
  * Copy a string
  *
@@ -9895,7 +9880,6 @@ char* newstr(const char* src) {
     return dest;
 }
 
-// function save_place # 17
 /**
  * Add one new uninitialised entry to a list
  *
@@ -9922,7 +9906,6 @@ int save_place(list* arg0) {
     return new_entry_index;
 }
 
-// function set_place # 18
 /**
  * Set a specified entry of a list to a particular string
  *
@@ -9938,7 +9921,6 @@ void set_place(list* arg0, char* str, int place) {
     arg0->entries[place] = str;
 }
 
-// function addlist # 19
 // Append all the entries in arg1 to arg0.
 void addlist(list* arg0, list* arg1) {
     int i;
@@ -9963,7 +9945,6 @@ void addlist(list* arg0, list* arg1) {
     arg0->entries[arg0->length] = NULL;
 }
 
-// function adduldlist # 20
 /**
  * Adds entries from arg1 and arg2 onto the end of arg0:
  * - up to the first NULL from arg2,
@@ -10010,7 +9991,6 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
     arg0->entries[arg0->length] = NULL;
 }
 
-// function nodup # 21
 /**
  * Search for a string in a list.
  *
@@ -10030,7 +10010,6 @@ int nodup(list* arg0, const char* str) {
     return TRUE;
 }
 
-// function getsuf # 22
 /**
  * Find the file extension (suffix) of a path.
  * - Most single-letter extensions will be returned as-is (with the exception of 'C').
@@ -10104,7 +10083,6 @@ char getsuf(const char* path) {
     return '\0';
 }
 
-// function mksuf # 23
 /**
  * Given a file path and a value, returns a basename with an extension specified by the value.
  *
@@ -10198,7 +10176,6 @@ char* mksuf(const char* path, char value) {
     return sp44;
 }
 
-// function savestr # 24
 // Copy a string, adding extra_length bytes to the allocation.
 char* savestr(const char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
@@ -10217,7 +10194,6 @@ char* savestr(const char* src, size_t extra_length) {
 //! FAKE: bss-shifting padding
 static char bss_pad0, bss_pad1;
 
-// function mktempstr # 25
 void mktempstr(void) {
     tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", NULL));
     tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", NULL));
@@ -10265,7 +10241,6 @@ void mktempstr(void) {
     }
 }
 
-// function run # 26
 int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     char* const* spA4;
     pid_t spA0;
@@ -10474,7 +10449,6 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     }
 }
 
-// function edit_src # 27
 int edit_src(const char* arg0, const char* arg1, int arg2) {
     char sp58[16];
     pid_t forkPid;
@@ -10544,7 +10518,6 @@ int edit_src(const char* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function get_lino # 28
 #define GET_LINO_BUF_SIZE 0x800
 // arg2 is probably a size_t
 void get_lino(char* arg0, const char* arg1, int arg2) {
@@ -10629,7 +10602,6 @@ void get_lino(char* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function show_err # 29
 #define SHOW_ERR_BUF_SIZE 0x10000
 void show_err(const char* path) {
     int desc;
@@ -10649,13 +10621,11 @@ void show_err(const char* path) {
 }
 #undef BUF_SIZE
 
-// function handler # 30
 void handler(void) {
     cleanup();
     exit(3);
 }
 
-// function cleanup # 31
 void cleanup(void) {
     if (!Kflag) {
         if (passout != NULL) {
@@ -10721,7 +10691,6 @@ void cleanup(void) {
     }
 }
 
-// function whats # 32
 void whats(void) {
     int sp24 = runerror;
 
@@ -10744,12 +10713,10 @@ void whats(void) {
 int time0;
 struct tms tm0;
 
-// function settimes # 33
 void settimes() {
     time0 = times(&tm0);
 }
 
-// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -10768,7 +10735,6 @@ void dotime(const char* programName) {
             ((milis + seconds) / ((double)clockTimeDiff / CLOCK_TICKS)) * 100.0);
 }
 
-// function func_0042FD7C # 35
 // Search for a lib in directories (?)
 static char* func_0042FD7C(const char* name, char** dirs) {
     int fildes;
@@ -10801,7 +10767,6 @@ static char* func_0042FD7C(const char* name, char** dirs) {
     return path;
 }
 
-// function isdir # 36
 /**
  * Checks if `path` is a directory.
  *
@@ -10822,7 +10787,6 @@ int isdir(const char* path) {
     return FALSE;
 }
 
-// function regular_not_writeable # 37
 int regular_not_writeable(const char* arg0) {
     int sp24;
 
@@ -10837,7 +10801,6 @@ int regular_not_writeable(const char* arg0) {
     return 1;
 }
 
-// function regular_file # 38
 int regular_file(const char* path) {
     int spAC;
     struct stat statbuf;
@@ -10854,7 +10817,6 @@ int regular_file(const char* path) {
 
 static char B_1000E5E0[0x400];
 
-// function basename # 39
 // Obtain the base name of a file path, i.e. the part after the final '/'
 char* basename(const char* path) {
     register char* ret;
@@ -10883,7 +10845,6 @@ char* basename(const char* path) {
     return ret;
 }
 
-// function dirname # 40
 // Obtain the directory name of a file path, i.e. the part before the final '/'
 const char* dirname(const char* path) {
     register char* ret;
@@ -10949,7 +10910,6 @@ prod_name[] = {
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
 };
 
-// function func_00430414 # 41
 static const char* func_00430414(char* arg0, int arg1) {
     int i;
     int sp28;
@@ -10979,7 +10939,6 @@ static const char* func_00430414(char* arg0, int arg1) {
     return NULL;
 }
 
-// function force_use_cfront # 42
 /**
  * Whether to force using cfront over the built-in C++ compiler. Can be set by `USE_CFRONT` environment variable, or
  * various flags.
@@ -11016,7 +10975,6 @@ int force_use_cfront(int argc, char** argv) {
     return FALSE;
 }
 
-// function exec_OCC # 43
 void exec_OCC(int argc, char** argv) {
     char spB8[0x400];
     char pad[0x88]; // !
@@ -11027,7 +10985,6 @@ void exec_OCC(int argc, char** argv) {
     error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "could not exec %s", spB8);
 }
 
-// function add_cxx_symbol_options # 44
 int add_cxx_symbol_options(void) {
     addstr(&execlist, "-cxx");
     if (!D_1000BF90 && (strcmp(LD, "old_ld") != 0)) {
@@ -11041,7 +10998,6 @@ static char* D_1000C2E8 = NULL;
 static char* D_1000C2EC = NULL;
 static char* D_1000C2F0 = NULL; // basename of progname (?)
 
-// function init_curr_dir # 45
 // Sets D_1000C2F0 to current executable's basename and D_1000C1D0 to the current working directiory
 void init_curr_dir(void) {
     if (D_1000C2F0 == NULL) {
@@ -11067,7 +11023,6 @@ void init_curr_dir(void) {
     }
 }
 
-// function full_path # 46
 char* full_path(const char* relative_path) {
     char* path;
 
@@ -11080,14 +11035,12 @@ char* full_path(const char* relative_path) {
     return path;
 }
 
-// function add_static_opt # 47
 void add_static_opt(char* opt) {
     if (!D_1000BF88) {
         addstr(&staticopts, opt);
     }
 }
 
-// function record_static_fileset # 48
 void record_static_fileset(const char* arg0) {
     int sp28E4;
     FILE* sp28E0;
@@ -11213,7 +11166,6 @@ void record_static_fileset(const char* arg0) {
     free(D_1000C2EC);
 }
 
-// function touch # 49
 int touch(const char* arg0) {
     time_t curtime = time(NULL);
     struct utimbuf sp34;
@@ -11235,7 +11187,6 @@ int touch(const char* arg0) {
     return 0;
 }
 
-// function add_prelinker_objects # 50
 void add_prelinker_objects(list* arg0, list* arg1) {
     int i;
 
@@ -11262,7 +11213,6 @@ void add_prelinker_objects(list* arg0, list* arg1) {
     }
 }
 
-// function quoted_length # 51
 size_t quoted_length(const char* arg0, int* arg1) {
     unsigned int len = 0;
     unsigned char ch;
@@ -11286,7 +11236,6 @@ size_t quoted_length(const char* arg0, int* arg1) {
     return len;
 }
 
-// function quote_shell_arg # 52
 size_t quote_shell_arg(const char* p, char* buf) {
     char c;
     int quoted = FALSE;
@@ -11310,7 +11259,6 @@ size_t quote_shell_arg(const char* p, char* buf) {
     return len;
 }
 
-// function func_00431A3C # 53
 static void func_00431A3C(int argc, char** argv) {
     int i;
 
@@ -11327,7 +11275,6 @@ static void func_00431A3C(int argc, char** argv) {
     B_1000E4C4[B_1000E4C0] = NULL;
 }
 
-// function func_00431B38 # 54
 static void func_00431B38(int first, int count) {
     int i;
 
@@ -11336,7 +11283,6 @@ static void func_00431B38(int first, int count) {
     }
 }
 
-// function func_00431B88 # 55
 
 // arg2 is verbosity?
 static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
@@ -11362,7 +11308,6 @@ static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function func_00431D00 # 56
 static void func_00431D00(const char* arg0) {
     FILE* file = fopen(tempstr[33], "w");
 
@@ -11375,7 +11320,6 @@ static void func_00431D00(const char* arg0) {
     }
 }
 
-// function func_00431DD8 # 57
 static void func_00431DD8(void) {
     int sp34 = 0;
     int sp30 = 0; // Unused
@@ -11405,7 +11349,6 @@ static void func_00431DD8(void) {
     }
 }
 
-// function skip_old_ii_controls # 58
 // Search file for the first "----" and move position to the line after it
 void skip_old_ii_controls(FILE* arg0) {
     int ch;
@@ -11435,7 +11378,6 @@ void skip_old_ii_controls(FILE* arg0) {
     }
 }
 
-// function make_ii_file_name # 59
 // path/to/file -> path/to/ii_files/file.ii
 // path/to/file.o -> path/to/ii_files/file.ii
 char* make_ii_file_name(const char* arg0) {
@@ -11453,7 +11395,6 @@ char* make_ii_file_name(const char* arg0) {
     return mkstr(dirname(arg0), "/ii_files/", sp2C, 0);
 }
 
-// function update_instantiation_info_file # 60
 // TODO: name vars
 
 void update_instantiation_info_file(const char* arg0, const char* arg1) {
@@ -11698,7 +11639,6 @@ static void print_mem(const char* arg0, int count) {
 #endif
 }
 
-// function func_00433534 # 65
 // Prepends "--" to a string by copying.
 static char* func_00433534(const char* arg0) {
     char* ret = (char*)malloc(strlen(arg0) + 3);
