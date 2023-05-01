@@ -14,18 +14,18 @@ CC_CHECK_COMP ?= gcc
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe
-# else ifeq ($(VERSION),5.3)
-# 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+else ifeq ($(VERSION),5.3)
+#	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+	IDO_TC      := cc cfe
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
 endif
 
 
 #### Tools ####
-ifeq ($(shell type mips-linux-gnu-ld >/dev/null 2>/dev/null; echo $$?), 0)
-  MIPS_BINUTILS_PREFIX := mips-linux-gnu-
-else
-  $(error Please install or build mips-linux-gnu)
+MIPS_BINUTILS_PREFIX ?= mips-linux-gnu-
+ifneq ($(shell type $(MIPS_BINUTILS_PREFIX)ld >/dev/null 2>/dev/null; echo $$?), 0)
+$(error Please install or build mips-linux-gnu)
 endif
 
 RECOMP  := tools/recomp
