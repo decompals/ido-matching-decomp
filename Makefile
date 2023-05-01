@@ -28,11 +28,11 @@ ifneq ($(shell type $(MIPS_BINUTILS_PREFIX)ld >/dev/null 2>/dev/null; echo $$?),
 $(error Please install or build mips-linux-gnu)
 endif
 
-RECOMP  	:= tools/recomp
-BUILD   	:= build
-ASM    		:= asm
-SYMBOLS     := symbols
-CONTEXT 	:= context
+RECOMP  := tools/recomp
+BUILD   := build
+ASM     := asm
+SYMBOLS := symbols
+CONTEXT := context
 
 CC       := $(RECOMP)/build/7.1/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
