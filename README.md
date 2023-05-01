@@ -21,8 +21,8 @@ Lower priority but also of interest:
 
 Of these,
 
-- `cc`, `cfe` are written in C, `cfe` also contains Yacc components.
-- `uopt`, `ugen`, `as1`, `as0`, `uld`, `umerge`, `upas`, are written in Pascal.
+- `cc`, `cfe`, `as0` are written in C, `cfe` also contains Yacc components.
+- `uopt`, `ugen`, `as1`, `uld`, `umerge`, `upas`, are written in Pascal.
 - `ld` is unknown at present
 
 ## State of the repository
@@ -37,8 +37,8 @@ The following table specify if each binary has been matched or not, and if it ha
 | `ugen`  | :x: | :x: | :x: | :x: |
 | `as1`   | :x: | :x: | :x: | :x: |
 | `as0`   | :x: | :x: | :x: | :x: |
-| `uld`   | :x: | :x: | :x: | :x: |
 | `ld`    | :x: | :x: | :x: | :x: |
+| `uld`   | :x: | :x: | :x: | :x: |
 | `upas`  | :x: | :x: | :x: | :x: |
 
 ## Build dependencies
