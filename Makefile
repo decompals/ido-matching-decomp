@@ -28,10 +28,11 @@ ifneq ($(shell type $(MIPS_BINUTILS_PREFIX)ld >/dev/null 2>/dev/null; echo $$?),
 $(error Please install or build mips-linux-gnu)
 endif
 
-RECOMP  := tools/recomp
-BUILD   := build
-ASM     := asm
-CONTEXT := context
+RECOMP  	:= tools/recomp
+BUILD   	:= build
+ASM    		:= asm
+SYMBOLS     := symbols
+CONTEXT 	:= context
 
 CC       := $(RECOMP)/build/7.1/out/cc
 CC_OLD   := $(RECOMP)/build/5.3/out/cc
@@ -144,10 +145,10 @@ $(BUILD)/%.o: %.c
 
 # cc is special and is stored in a different folder
 $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
-	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/cc.splits.csv --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
 
 $(ASM)/$(VERSION)/%/.disasm:
-	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/$*.splits.csv --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
 
 
 
