@@ -11694,7 +11694,7 @@ static void print_mem(const char* arg0, int count) {
                 0x400);
     }
 #else
-    fprintf(stderr, "-showm not implemented under not-sgi machines\n");
+    fprintf(stderr, "-showm not implemented for non-SGI machines\n");
 #endif
 }
 
