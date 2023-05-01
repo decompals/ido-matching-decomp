@@ -15,8 +15,8 @@ since this process is the most useful for other decompilation projects.
 Lower priority but also of interest:
 
 - `as0` - assembler for handwritten assembly
-- `uld` (ucode linker) and `umerge` (procedure merger) for `-O3`
 - `ld` (linker) for outputting linked object files
+- `uld` (ucode linker) and `umerge` (procedure merger) for `-O3`
 - `upas` frontend for Pascal, possibly of interest since much of IDO is Pascal
 
 Of these,
