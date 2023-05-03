@@ -8,18 +8,16 @@
 
 static s32 B_10023CF0;
 static s32 B_10023CF4;
-static s32 B_10023CF8;
-extern s32 ctnt;
+static void* B_10023CF8;
+extern void* ctnt;
 extern s32 imm_psym;
 
 void func_004161F0(void) {
-    s32 x;
     B_10023CF0 = 0;
     B_10023CF4 = 0;
     ctnt = recalloc(ctnt, 0, 0x280);
-    x = B_10023CF8;
-    if (x != 0) {
-        xfree(x);
+    if (B_10023CF8 != NULL) {
+        xfree(B_10023CF8);
     }
     B_10023CF8 = 0;
     imm_psym = recalloc(imm_psym, 0, 0x140);

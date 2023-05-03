@@ -21,4 +21,9 @@ typedef float f32;
 typedef double f64;
 
 
+struct unk_struct_1 {
+   unsigned unk0_C0 : 6;
+};
+
+
 #endif /* TYPES_H */
