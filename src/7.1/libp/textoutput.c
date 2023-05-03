@@ -1,31 +1,5 @@
-
-#define stdin	(&__iob[0])	
-#define stdout	(&__iob[1])	
-#define stderr	(&__iob[2])	
-
-typedef struct
-{
-    int        _cnt;    /* number of available characters in buffer */
-    unsigned char    *_ptr;    /* next character from/to here in buffer */
-    unsigned char    *_base;    /* the buffer */
-    unsigned char    _flag;    /* the state of the stream */
-    unsigned char    _file;    /* UNIX System file descriptor */
-} FILE;
-
-#define _NFILE 100
-extern FILE	__iob[_NFILE];
-extern int __us_rsthread_stdio;
-
-#define putc(x, p)	(--(p)->_cnt < 0 ? __flsbuf((x), (p)) \
-				: (int)(*(p)->_ptr++ = (x)))
-#define putc_locked(x, p)     	(__us_rsthread_stdio ? __semputc(x,p) : \
-			(--(p)->_cnt < 0 ? __flsbuf((x), (p)) \
-					  : (int)(*(p)->_ptr++ = (x))))
-
-int __flsbuf(int, void *);
-int __semputc(int, void *);
-int fprintf(void *, const char *, ...);
-#define NULL (void*)0
+#include "stdio.h"
+#include "string.h"
 
 // write_chars
 static void func_00471400(FILE* file, char* string, int arg2) {
@@ -134,7 +108,7 @@ void write_string(FILE *file, char *string, unsigned int arg2, int arg3) {
             ptr--;
         }
         arg3 = ptr - string;
-    } else if (arg2 < arg3) {
+    } else if (arg2 < (unsigned int)arg3) {
         func_00471580(file, 0x20, arg3 - arg2);
         arg3 = arg2;
     }
@@ -159,6 +133,6 @@ void write_enum(FILE *file, int arg1, char *arg2, int arg3) {
         while (*arg2++ == ' ') {}
         arg2--;
     }
-    
+
     write_string(file, arg2, strlen(arg2), arg3);
 }

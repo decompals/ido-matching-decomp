@@ -11494,7 +11494,7 @@ static int func_00432940(pid_t arg0) {
     }
 
     premptyset(&syscalls);
-    praddset(&syscalls, 2); // size 2?
+    (void)praddset(&syscalls, 2); // size 2?
 
     if (ioctl(fd, PIOCSENTRY, &syscalls) < 0) {
         perror("PIOCSENTRY");

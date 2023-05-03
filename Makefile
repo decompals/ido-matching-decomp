@@ -59,7 +59,7 @@ MIPS_BUILTIN_DEFS += -D__mips=2 -D_MIPSEB -DMIPSEB -D_CFE
 MIPS_BUILTIN_DEFS += -DPERMUTER=1
 #	The -MMD flags additionaly creates a .d file with the same name as the .o file.
 CC_CHECK          := $(CC_CHECK_COMP)
-CC_CHECK_FLAGS    := -MMD -fno-builtin -fsyntax-only -fsigned-char -std=c11 -m32 -DNON_MATCHING -DCC_CHECK=1
+CC_CHECK_FLAGS    := -MMD -fno-builtin -fsyntax-only -funsigned-char -std=c11 -m32 -DNON_MATCHING -DCC_CHECK=1
 ifneq ($(WERROR), 0)
 	CHECK_WARNINGS += -Werror
 endif
