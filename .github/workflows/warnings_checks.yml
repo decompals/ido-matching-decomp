@@ -21,4 +21,5 @@ jobs:
 
     - name: Check for warnings
       # Passing CC="@:" prevents actually compiling the C files
-      run: make -j $(nproc) WERROR=1 VERSION=${{ matrix.version }} CC="@:"
+      # Passing an empty MIPS_BINUTILS_PREFIX bypasses the check for having mips binutils installed
+      run: make -j $(nproc) WERROR=1 VERSION=${{ matrix.version }} CC="@:" MIPS_BINUTILS_PREFIX=
