@@ -1,27 +1,4 @@
-/*
-* @file: as1peep.c
-*
-*/
-#include "stdio.h"
-#include "as1/types.h"
-#include "as1/protos.h"
-
-static s32 B_10023CF0;
-static s32 B_10023CF4;
-static void* B_10023CF8;
-extern void* ctnt;
-extern s32 imm_psym;
-
-void func_004161F0(void) {
-    B_10023CF0 = 0;
-    B_10023CF4 = 0;
-    ctnt = recalloc(ctnt, 0, 0x280);
-    if (B_10023CF8 != NULL) {
-        xfree(B_10023CF8);
-    }
-    B_10023CF8 = 0;
-    imm_psym = recalloc(imm_psym, 0, 0x140);
-}
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/func_004161F0.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00416294.s")
 

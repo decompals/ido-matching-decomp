@@ -1,65 +1,20 @@
-/*
-* @file: as1libmld.c
-* @brief: Simmiliar to as0, contains a modified version of some libmld functions
-*/
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/filesize.s")
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "unistd.h"
-#include "sys/stat.h"
-#include "as1/types.h"
-#include "as1/protos.h"
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/ltoa.s")
 
-int filesize(FILE** file) {
-    struct stat buf;
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/st_error.s")
 
-    if (file != NULL) {
-        if (*file != NULL) {
-            if (fstat((*file)->_file, &buf) == 0) {
-                return buf.st_size;
-            }
-        }
-    }
-    return EOF;
-}
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/st_warning.s")
 
-void ltoa(const char* src, char* dest) {
-    sprintf(dest, "%d", src);
-}
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/st_printf_2.s")
 
-void st_error(const char* str, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    fprintf(stderr, "libmld--");
-    call_name_and_line(1);
-    fprintf(stderr, str, arg1, arg2, arg3, arg4);
-    fprintf(stderr, "\n");
-    exit(1);
-}
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/st_printf_3.s")
 
-void st_warning(const char* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    fprintf(stderr, "\nlibmld--");
-    call_name_and_line(2);
-    fprintf(stderr, arg0, arg1, arg2, arg3, arg4);
-    fprintf(stderr, "\n");
-}
+#pragma GLOBAL_ASM("asm/7.1/functions/as1/st_internal.s")
 
-void st_printf_2(const char* str, int arg1) {
-    fprintf(stderr, str, arg1);
-}
-
-void st_printf_3(const char* str, int arg1, int arg2) {
-    fprintf(stderr, str, arg1, arg2);
-}
-
-void st_internal(const char* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    fprintf(stderr, "libmld--");
-    call_name_and_line(0);
-    fprintf(stderr, arg0, arg1, arg2, arg3, arg4);
-    fprintf(stderr, "\n");
-    exit(1);
-}
 
 int l_addr(int arg0) {
-   return arg0;
+  return arg0;
 }
 
 int e_addr(int arg0) {

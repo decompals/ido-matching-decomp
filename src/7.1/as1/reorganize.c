@@ -3,9 +3,9 @@
 *
 */
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "as1/types.h"
+struct unk_1 {
+    unsigned unk0_C0 : 6;
+};
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/reorganize_init.s")
 
@@ -75,7 +75,7 @@
 
 //#pragma GLOBAL_ASM("asm/7.1/functions/as1/cannot_trap.s")
 
-int stores_to_memory(struct unk_struct_1 arg0) {
+int stores_to_memory(struct unk_1 arg0) {
     switch (arg0.unk0_C0) {
     case 0x28:
     case 0x29:
@@ -97,7 +97,7 @@ int stores_to_memory(struct unk_struct_1 arg0) {
     }
 }
 
-int loads_from_memory(struct unk_struct_1 arg0) {
+int loads_from_memory(struct unk_1 arg0) {
 
     switch (arg0.unk0_C0) {
     case 0x1A:
