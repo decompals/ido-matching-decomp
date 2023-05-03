@@ -72,9 +72,8 @@ ASMPROCFLAGS :=
 OPTFLAGS := -O1
 MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
-DEFINES := -DGLOBAL_ASM_FILE
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
-CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) $(DEFINES)
+CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS)
 
 
 # -- Location of original IDO binaries
