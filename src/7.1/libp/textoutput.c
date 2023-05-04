@@ -12,12 +12,12 @@ static void func_00471400(FILE* file, char* string, int arg2) {
             file->_cnt += arg2;
             if (file->_cnt > 0) {
                 arg2 -= file->_cnt;
-                ptr = (char*)file->_ptr;
+                ptr = file->_ptr;
                 end = file->_cnt + string;
                 do {
                     *ptr++ = *string++;
                 } while (string != end);
-                file->_ptr = (unsigned char*)ptr;
+                file->_ptr = ptr;
             }
 
             file->_cnt = -1;
@@ -29,12 +29,12 @@ static void func_00471400(FILE* file, char* string, int arg2) {
             file->_cnt -= arg2;
         }
 
-        ptr = (char*)file->_ptr;
+        ptr = file->_ptr;
         end = string + arg2;
         do {
             *ptr++ = *string++;
         } while (string != end);
-        file->_ptr = (unsigned char*)ptr;
+        file->_ptr = ptr;
     }
 }
 
@@ -49,12 +49,12 @@ static void func_00471580(FILE* file, int ch, int arg2) {
             file->_cnt += arg2;
             if (file->_cnt > 0) {
                 arg2 -= file->_cnt;
-                ptr = (char*)file->_ptr;
+                ptr = file->_ptr;
                 end = file->_cnt + ptr;
                 do {
                     *ptr++ = ch;
                 } while (ptr != end);
-                file->_ptr = (unsigned char*)ptr;
+                file->_ptr = ptr;
             }
 
             file->_cnt = -1;
@@ -66,12 +66,12 @@ static void func_00471580(FILE* file, int ch, int arg2) {
             file->_cnt -= arg2;
         }
 
-        ptr = (char*)file->_ptr;
+        ptr = file->_ptr;
         end = ptr + arg2;
         do {
             *ptr++ = ch;
         } while (ptr != end);
-        file->_ptr = (unsigned char*)ptr;
+        file->_ptr = ptr;
     }
 }
 
