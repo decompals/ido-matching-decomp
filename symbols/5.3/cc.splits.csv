@@ -1,5 +1,8 @@
 offset,vram,.text
-005550,00405550,cc
+005550,00405550,ftext
+005560,00405560,entry
+005B30,00405B30,cc
+036F80,00436F80,mld
 
 offset,vram,.dummy
 036FB0,00436FB0,init
@@ -9,6 +12,7 @@ offset,vram,.data
 
 offset,vram,.rodata
 037560,10000560,cc
+03EAF0,10007AF0,release_id
 
 offset,vram,.dummy
 03EB40,10007B40,gottable
