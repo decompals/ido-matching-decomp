@@ -6,7 +6,7 @@ static void func_00471400(FILE* file, char* string, int arg2) {
     char* ptr;
     char* end;
 
-    if (file->_flag & 2) {
+    if (file->_flag & _IOWRT) {
         file->_cnt -= arg2;
         while (file->_cnt < 0) {
             file->_cnt += arg2;
@@ -43,7 +43,7 @@ static void func_00471580(FILE* file, int ch, int arg2) {
     char* ptr;
     char* end;
 
-    if ((file->_flag & 2) && (arg2 > 0)) {
+    if ((file->_flag & _IOWRT) && (arg2 > 0)) {
         file->_cnt -= arg2;
         while (file->_cnt < 0) {
             file->_cnt += arg2;
@@ -76,7 +76,7 @@ static void func_00471580(FILE* file, int ch, int arg2) {
 }
 
 void writeln(FILE* file) {
-    if (!(file->_flag & 2)) {
+    if (!(file->_flag & _IOWRT)) {
         fprintf(stderr, "writeln called on file not open for writing.\n");
         return;
     }
