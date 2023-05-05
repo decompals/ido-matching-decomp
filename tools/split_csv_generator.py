@@ -24,22 +24,21 @@ def main():
         if sectionType == spimdisasm.elf32.Elf32SectionHeaderType.PROGBITS:
             if sectionName in {".text", ".data", ".rodata"}:
                 print(f"offset,vram,{sectionName}")
-                print(f"{header.offset:06X},{header.addr:06X},{programName}")
+                print(f"{header.offset:06X},{header.addr:08X},{programName}")
             else:
                 print(f"offset,vram,.dummy")
-                print(f"{header.offset:06X},{header.addr:06X},{sectionName[1:]}")
+                print(f"{header.offset:06X},{header.addr:08X},{sectionName[1:]}")
             print()
 
         elif sectionType == spimdisasm.elf32.Elf32SectionHeaderType.NOBITS:
 
             print(f"offset,vram,{sectionName}")
-            print(f"{header.offset:06X},{header.addr:06X},{programName}")
+            print(f"{header.offset:06X},{header.addr:08X},{programName}")
             print()
 
             offsetEnd = header.offset + header.size
             addrEnd = header.addr + header.size
-            print(f"{offsetEnd:06X},{addrEnd:06X},.end")
-            print()
+            print(f"{offsetEnd:06X},{addrEnd:08X},.end")
 
 
 if __name__ == "__main__":

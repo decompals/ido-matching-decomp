@@ -11,9 +11,9 @@ offset,vram,.rodata
 0BE230,10009230,cfe
 
 offset,vram,.dummy
-0CFCd0,1001ACD0,gottable
+0CFCD0,1001ACD0,got
 
 offset,vram,.bss
 0D0790,1001B790,cfe
 
-E4800,1002F800,.end
+0E4800,1002F800,.end
