@@ -2,7 +2,7 @@ offset,vram,.text
 005550,00405550,ftext
 005560,00405560,entry
 005B30,00405B30,cc
-036F80,00436F80,mld
+036F80,00436F80,mld/sex
 
 offset,vram,.dummy
 036FB0,00436FB0,init
