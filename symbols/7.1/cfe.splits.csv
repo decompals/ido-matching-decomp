@@ -1,3 +1,9 @@
+offset,vram,.dummy
+000134,00400134,interp
+
+offset,vram,.dummy
+0091DC,004091DC,MIPS.stubs
+
 offset,vram,.text
 009750,00409750,cfe_009750
 009880,00409880,cfe_009880
@@ -54,7 +60,7 @@ offset,vram,.text
 0A4210,004A4210,cfe_0A4210
 
 offset,vram,.dummy
-0a4a60,004a4a60,init
+0A4A60,004A4A60,init
 
 offset,vram,.rodata
 0A5000,10005000,cfe_0A5000
@@ -114,12 +120,12 @@ offset,vram,.rodata
 0B72C0,100172C0,cfe_0B72C0
 
 offset,vram,.data
-0b7320,10017320,cfe
+0B7320,10017320,cfe_0B7320
 
 offset,vram,.dummy
-0c0490,10020490,gottable
+0C0490,10020490,got
 
 offset,vram,.bss
-0c0efc,10020f00,cfe
+0C0EFC,10020F00,cfe_10020F00
 
 0D4F5C,10034F60,.end

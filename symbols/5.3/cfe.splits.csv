@@ -1,3 +1,6 @@
+offset,vram,.dummy
+000120,00400120,interp
+
 offset,vram,.text
 008EC0,00408EC0,cfe_008EC0
 008ED0,00408ED0,cfe_008ED0
@@ -24,7 +27,7 @@ offset,vram,.dummy
 0B4A40,004B4A40,init
 
 offset,vram,.data
-0B5000,10000000,cfe
+0B5000,10000000,cfe_0B5000
 
 offset,vram,.rodata
 0BE230,10009230,cfe_0BE230
@@ -86,6 +89,6 @@ offset,vram,.dummy
 0CFCD0,1001ACD0,got
 
 offset,vram,.bss
-0D0790,1001B790,cfe
+0D0790,1001B790,cfe_1001B790
 
 0E4800,1002F800,.end

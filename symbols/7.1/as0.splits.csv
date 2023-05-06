@@ -1,0 +1,28 @@
+offset,vram,.dummy
+000134,00400134,interp
+
+offset,vram,.dummy
+003CF0,00403CF0,MIPS.stubs
+
+offset,vram,.text
+003FD0,00403FD0,as0_003FD0
+
+offset,vram,.dummy
+01D320,0041D320,init
+
+offset,vram,.rodata
+01E000,1000E000,as0_01E000
+
+offset,vram,.data
+0221F0,100121F0,as0_0221F0
+
+offset,vram,.dummy
+0236A0,100136A0,got
+
+offset,vram,.bss
+023A24,10013A30,as0_10013A30
+
+025564,10015570,.end
+# offset,vram,.dummy
+# 024000,00000000,rtproc
+
