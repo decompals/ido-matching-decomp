@@ -15,6 +15,7 @@ def main():
     programName = elfPath.name
 
     elfBytes = spimdisasm.common.Utils.readFileAsBytearray(elfPath)
+    assert len(elfBytes) > 0, f"Could not read file {elfPath}"
     elfFile = spimdisasm.elf32.Elf32File(elfBytes)
 
     foundEnd = False
