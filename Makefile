@@ -14,23 +14,24 @@ CC_CHECK_COMP ?= gcc
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe
-# else ifeq ($(VERSION),5.3)
-# 	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+else ifeq ($(VERSION),5.3)
+#	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+	IDO_TC      := cc cfe
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
 endif
 
 
 #### Tools ####
-ifeq ($(shell type mips-linux-gnu-ld >/dev/null 2>/dev/null; echo $$?), 0)
-  MIPS_BINUTILS_PREFIX := mips-linux-gnu-
-else
-  $(error Please install or build mips-linux-gnu)
+MIPS_BINUTILS_PREFIX ?= mips-linux-gnu-
+ifneq ($(shell type $(MIPS_BINUTILS_PREFIX)ld >/dev/null 2>/dev/null; echo $$?), 0)
+$(error Please install or build mips-linux-gnu)
 endif
 
 RECOMP  := tools/recomp
 BUILD   := build
 ASM     := asm
+SYMBOLS := symbols
 CONTEXT := context
 
 CC       := $(RECOMP)/build/7.1/out/cc
@@ -43,7 +44,7 @@ OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
-DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser
+DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
@@ -144,10 +145,10 @@ $(BUILD)/%.o: %.c
 
 # cc is special and is stored in a different folder
 $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
-	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/cc.splits.csv --split-functions $(ASM)/$(VERSION)/functions/cc --save-context $(CONTEXT)/$(VERSION)/cc.csv $< $(dir $@)
 
 $(ASM)/$(VERSION)/%/.disasm:
-	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --split-functions $(ASM)/$(VERSION)/functions --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
+	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/$*.splits.csv --split-functions $(ASM)/$(VERSION)/functions/$* --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
 
 
 
