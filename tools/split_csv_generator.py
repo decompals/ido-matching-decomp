@@ -18,7 +18,7 @@ def main():
     assert len(elfBytes) > 0, f"Could not read file {elfPath}"
     elfFile = spimdisasm.elf32.Elf32File(elfBytes)
 
-    foundEnd = False
+    commentOut = ""
 
     for header in elfFile.sectionHeaders:
         sectionType = spimdisasm.elf32.Elf32SectionHeaderType.fromValue(header.type)
@@ -26,15 +26,11 @@ def main():
 
         if sectionType == spimdisasm.elf32.Elf32SectionHeaderType.PROGBITS:
             if sectionName in {".text", ".data", ".rodata"}:
-                print(f"{'# ' if foundEnd else ''}", end="")
-                print(f"offset,vram,{sectionName}")
-                print(f"{'# ' if foundEnd else ''}", end="")
-                print(f"{header.offset:06X},{header.addr:08X},{programName}_{header.offset:06X}")
+                print(f"{commentOut}offset,vram,{sectionName}")
+                print(f"{commentOut}{header.offset:06X},{header.addr:08X},{programName}_{header.offset:06X}")
             else:
-                print(f"{'# ' if foundEnd else ''}", end="")
-                print(f"offset,vram,.dummy")
-                print(f"{'# ' if foundEnd else ''}", end="")
-                print(f"{header.offset:06X},{header.addr:08X},{sectionName[1:]}")
+                print(f"{commentOut}offset,vram,.dummy")
+                print(f"{commentOut}{header.offset:06X},{header.addr:08X},{sectionName[1:]}")
             print()
 
         elif sectionType == spimdisasm.elf32.Elf32SectionHeaderType.NOBITS:
@@ -47,7 +43,7 @@ def main():
             addrEnd = header.addr + header.size
             print(f"{offsetEnd:06X},{addrEnd:08X},.end")
 
-            foundEnd = True
+            commentOut = "# "
 
 
 if __name__ == "__main__":
