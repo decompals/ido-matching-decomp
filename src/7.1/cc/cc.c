@@ -11455,7 +11455,7 @@ static int stop_on_exit(pid_t pid) {
 
 #ifdef __sgi
     premptyset(&syscalls);
-    praddset(&syscalls, 2); // size 2?
+    (void)praddset(&syscalls, 2); // size 2?
 
     if (ioctl(fd, PIOCSENTRY, &syscalls) < 0) {
         perror("PIOCSENTRY");
