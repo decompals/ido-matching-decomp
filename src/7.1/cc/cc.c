@@ -22,6 +22,7 @@
 #include "string.h"
 #include "malloc.h"
 
+#define GET_ERRNO_STR(errnoValue) sys_errlist[errnoValue]
 
 #ifndef TRUE
 #define TRUE 1
@@ -109,10 +110,10 @@ static void func_00431DD8(void);
 // skip_old_ii_controls
 char* make_ii_file_name(const char* arg0);
 void update_instantiation_info_file(const char* arg0, const char* arg1);
-static int func_00432940(pid_t arg0);
-static void func_00432BDC(void);
-static void func_00432C94(void);
-static void func_00432D3C(const char* arg0, int count);
+static int stop_on_exit(pid_t arg0);
+static void my_psema(void);
+static void my_vsema(void);
+static void print_mem(const char* arg0, int count);
 static char* func_00433534(const char* arg0);
 
 // Functions which cannot use proper prototypes
@@ -538,7 +539,7 @@ int c_inline = FALSE; //!< flag, boolean. Whether to run `umerge`. Set by `cfe`/
 int tfp_flag = FALSE; //!< flag, boolean. Set by "-tfp"
 int abi_flag = 0;
 int NoMoreOptions = FALSE;      //!< flag, pseudoboolean
-int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in func_00432D3C
+int memory_flag = 0;            // Probably meant to be boolean, but is checked for being larger than 1 in print_mem
 int default_call_shared = TRUE; //!< flag, boolean. Default to "-call_shared"?
 
 static int B_1000E4C0;    //!< argc
@@ -730,13 +731,21 @@ int compiler;
 
 char* tempstr[34]; // Possibly a struct?
 
-static prmap_sgi_t B_1000CAC0[100];
-static prmap_sgi_arg_t D_1000C1C8 = { (caddr_t)B_1000CAC0, sizeof(B_1000CAC0) };
+#ifdef __sgi
+static prmap_sgi_t mapbuf[100];
+static prmap_sgi_arg_t mapbuf_desc = { (caddr_t)mapbuf, sizeof(mapbuf) };
+#define DATA_ADDRESS ((uintptr_t)0x10000000)
+#define TEXT_ADDRESS ((uintptr_t)0x400000)
+
+#define LOGFILE "/usr/adm/SYSLOG"
+#else
+#define LOGFILE "<TODO, determine the modern equivalent of '/usr/adm/SYSLOG' / '/var/log/messages'>"
+#endif
 
 static char* D_1000C1D0 = NULL; // full path of current working directory
 int run_sopt = FALSE;           //!< flag, boolean. Whether to run the scalar optimiser `copt`. Enabled by "-sopt"
 
-static int B_1000EC98[2]; // pipe
+static int Pipe[2]; // pipe
 
 // (these feel like in-function statics but I can't get that to match wrt bss reordering)
 static char* D_1000C1D8 = NULL; // progname
@@ -751,10 +760,9 @@ typedef enum ErrorCategory {
     /* 2 */ ERRORCAT_WARNING,
     /* 3 */ ERRORCAT_INFO, // Unsued
     /* 4 */ ERRORCAT_FIX,  // Unused
-    /* 5 */ ERRORCAT_ERRNO // Used for printing `sys_errlist[errno]`
+    /* 5 */ ERRORCAT_ERRNO // Used for printing `GET_ERRNO_STR(errno)`
 } ErrorCategory;
 
-// function main # 2
 /**
  * Main fuction for `cc`. Structure is roughly
  * 1. Argument parsing
@@ -5397,7 +5405,6 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-// function process_config # 3
 void process_config(int argc, char** argv) {
     register int i;
     register char* var_s1;
@@ -5484,7 +5491,6 @@ void process_config(int argc, char** argv) {
     }
 }
 
-// function add_info # 4
 void add_info(char* str) {
     addstr(&upasflags, str);
     addstr(&fcomflags, str);
@@ -5499,7 +5505,6 @@ void add_info(char* str) {
     addstr(&ldflags, str);
 }
 
-// function parse_command # 5
 // Process most of the options passed, the vast majority of which begin with '-'
 void parse_command(int argc, char** argv) {
     register int var_s0;   // option index
@@ -8775,12 +8780,10 @@ void parse_command(int argc, char** argv) {
     }
 }
 
-// function get_host_chiptype # 6
 // Blank function
 void get_host_chiptype(void) {
 }
 
-// function error # 7
 
 #ifndef PERMUTER
 
@@ -8828,7 +8831,7 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
             fprintf(stderr, "%s: Error: error (), %d: Out of memory\n", D_1000C1D8, 13332);
 
             if (errno < sys_nerr) {
-                fprintf(stderr, "%s: %s\n", D_1000C1D8, sys_errlist[errno]);
+                fprintf(stderr, "%s: %s\n", D_1000C1D8, GET_ERRNO_STR(errno));
             }
             exit(1);
         }
@@ -8866,7 +8869,6 @@ void error(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, argA, arg
 }
 #endif /* PERMUTER */
 
-// function relocate_passes # 8
 void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     register int pad;
     register const char* var_s1;
@@ -9628,7 +9630,6 @@ void relocate_passes(const char* arg0, const char* arg1, const char* arg2) {
     }
 }
 
-// function newrunlib # 9
 void newrunlib(void) {
     if (fiveflag) {
         runlib_base = "usr/5lib";
@@ -9647,7 +9648,6 @@ void newrunlib(void) {
     relocate_passes("rP1EXCOnMFISU", NULL, NULL);
 }
 
-// function compose_G0_libs # 10
 void compose_G0_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
@@ -9694,7 +9694,6 @@ void compose_G0_libs(const char* arg0) {
     }
 }
 
-// function compose_reg_libs # 11
 void compose_reg_libs(const char* arg0) {
     for (; *arg0 != '\0'; arg0++) {
         switch (*arg0) {
@@ -9739,7 +9738,6 @@ void compose_reg_libs(const char* arg0) {
     }
 }
 
-// function mkstr # 12
 /*
  * The compiler built-in symbol _VA_INIT_STATE:
  *  -returns 1 if the va_alist marker is the first
@@ -9774,7 +9772,7 @@ va_dcl // K&R syntax
     if (ret == NULL) {
         error(ERRORCAT_ERROR, NULL, 0, "mkstr ()", 0x38BC, "out of memory\n");
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
         exit(1);
     }
@@ -9795,13 +9793,12 @@ va_dcl // K&R syntax
 #define LIST_CAPACITY_INCR 20
 #define LIST_INITIAL_CAPACITY LIST_CAPACITY_INCR
 
-// function mklist # 13
 // Initialise a specified list with capacity LIST_INITIAL_CAPACITY and length 0.
 void mklist(list* arg0) {
     if ((arg0->entries = malloc(LIST_INITIAL_CAPACITY * sizeof(char*))) == NULL) {
         error(ERRORCAT_ERROR, NULL, 0, "mklist ()", 14561, "out of memory\n");
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
         exit(1);
     }
@@ -9810,7 +9807,6 @@ void mklist(list* arg0) {
     arg0->entries[0] = NULL;
 }
 
-// function addstr # 14
 // Add a single string entry to a list.
 // Called incorrectly.
 void addstr(arg0, str)
@@ -9823,7 +9819,7 @@ void addstr(arg0, str)
         if ((arg0->entries = realloc(arg0->entries, (arg0->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == 0) {
             error(ERRORCAT_ERROR, NULL, 0, "addstr()", 14595, "out of memory\n");
             if (errno < sys_nerr) {
-                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
             }
             exit(1);
         }
@@ -9834,7 +9830,6 @@ void addstr(arg0, str)
     arg0->entries[arg0->length] = NULL;
 }
 
-// function addspacedstr # 15
 /**
  * Add a space-separated string to a list, dividing it up into separate entries by space characters (' ')
  *
@@ -9855,7 +9850,7 @@ void addspacedstr(list* arg0, char* str) {
                 NULL) {
                 error(ERRORCAT_ERROR, NULL, 0, "addspacedstr()", 14639, "out of memory\n");
                 if (errno < sys_nerr) {
-                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
                 }
                 exit(1);
             }
@@ -9867,7 +9862,6 @@ void addspacedstr(list* arg0, char* str) {
     } while ((str = str_end) != NULL);
 }
 
-// function newstr # 16
 /**
  * Copy a string
  *
@@ -9886,7 +9880,6 @@ char* newstr(const char* src) {
     return dest;
 }
 
-// function save_place # 17
 /**
  * Add one new uninitialised entry to a list
  *
@@ -9901,7 +9894,7 @@ int save_place(list* arg0) {
             error(ERRORCAT_ERROR, NULL, 0, "save_place()", 14695, "out of memory\n");
 
             if (errno < sys_nerr) {
-                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
             }
             exit(1);
         }
@@ -9913,7 +9906,6 @@ int save_place(list* arg0) {
     return new_entry_index;
 }
 
-// function set_place # 18
 /**
  * Set a specified entry of a list to a particular string
  *
@@ -9929,7 +9921,6 @@ void set_place(list* arg0, char* str, int place) {
     arg0->entries[place] = str;
 }
 
-// function addlist # 19
 // Append all the entries in arg1 to arg0.
 void addlist(list* arg0, list* arg1) {
     int i;
@@ -9939,7 +9930,7 @@ void addlist(list* arg0, list* arg1) {
                                      (arg0->capacity + arg1->capacity + LIST_CAPACITY_INCR) * sizeof(char*))) == NULL) {
             error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14756, "out of memory\n");
             if (errno < sys_nerr) {
-                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
             }
             exit(1);
         }
@@ -9954,7 +9945,6 @@ void addlist(list* arg0, list* arg1) {
     arg0->entries[arg0->length] = NULL;
 }
 
-// function adduldlist # 20
 /**
  * Adds entries from arg1 and arg2 onto the end of arg0:
  * - up to the first NULL from arg2,
@@ -9972,7 +9962,7 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
                                             sizeof(char*))) == NULL) {
             error(ERRORCAT_ERROR, NULL, 0, "addlist ()", 14795, "out of memory\n");
             if (errno < sys_nerr) {
-                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
             }
             exit(1);
         }
@@ -10001,7 +9991,6 @@ void adduldlist(list* arg0, list* arg1, list* arg2) {
     arg0->entries[arg0->length] = NULL;
 }
 
-// function nodup # 21
 /**
  * Search for a string in a list.
  *
@@ -10021,7 +10010,6 @@ int nodup(list* arg0, const char* str) {
     return TRUE;
 }
 
-// function getsuf # 22
 /**
  * Find the file extension (suffix) of a path.
  * - Most single-letter extensions will be returned as-is (with the exception of 'C').
@@ -10095,7 +10083,6 @@ char getsuf(const char* path) {
     return '\0';
 }
 
-// function mksuf # 23
 /**
  * Given a file path and a value, returns a basename with an extension specified by the value.
  *
@@ -10189,7 +10176,6 @@ char* mksuf(const char* path, char value) {
     return sp44;
 }
 
-// function savestr # 24
 // Copy a string, adding extra_length bytes to the allocation.
 char* savestr(const char* src, size_t extra_length) {
     char* dest = malloc(strlen(src) + extra_length + 1);
@@ -10197,7 +10183,7 @@ char* savestr(const char* src, size_t extra_length) {
     if (dest == NULL) {
         error(ERRORCAT_ERROR, NULL, 0, "savestr ()", 15014, "out of memory\n");
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
         exit(1);
     }
@@ -10208,7 +10194,6 @@ char* savestr(const char* src, size_t extra_length) {
 //! FAKE: bss-shifting padding
 static char bss_pad0, bss_pad1;
 
-// function mktempstr # 25
 void mktempstr(void) {
     tempstr[0] = mktemp(mkstr(tmpdir, "ctmstXXXXXX", NULL));
     tempstr[1] = mktemp(mkstr(tmpdir, "ctmuXXXXXX", NULL));
@@ -10256,7 +10241,6 @@ void mktempstr(void) {
     }
 }
 
-// function run # 26
 int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     char* const* spA4;
     pid_t spA0;
@@ -10265,8 +10249,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     int sp94;
     int sp90;
     int sp8C;
+#ifdef __sgi
     SIG_PF sp88;
     SIG_PF sp84;
+#endif
     int sp80;
     int sp7C;
     const char* sp78;
@@ -10295,7 +10281,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     if (!execute_flag) {
         return 0;
     }
-    if ((memory_flag != 0) && (pipe(B_1000EC98) < 0)) {
+    if ((memory_flag != 0) && (pipe(Pipe) < 0)) {
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "pipe failed for -showm");
         return -1;
     }
@@ -10304,14 +10290,14 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     if (spA0 == -1) { // fork failed
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "no more processes\n");
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
         return -1;
     }
 
     if (spA0 == 0) {
         if (memory_flag != 0) {
-            func_00432BDC();
+            my_psema();
         }
 
         if (arg2 != NULL) {
@@ -10319,7 +10305,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             if (sp94 == -1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't open input file: %s\n", arg2);
                 if (errno < sys_nerr) {
-                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
                 }
                 cleanup();
                 exit(1);
@@ -10332,7 +10318,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             if (sp90 == -1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create output file: %s\n", arg3);
                 if (errno < sys_nerr) {
-                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
                 }
                 cleanup();
                 exit(1);
@@ -10345,7 +10331,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             if (sp8C == -1) {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't create error file: %s\n", arg4);
                 if (errno < sys_nerr) {
-                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
                 }
                 cleanup();
                 exit(1);
@@ -10364,19 +10350,22 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             } else {
                 error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "can't find or exec: %s\n", arg0);
                 if (errno < sys_nerr) {
-                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+                    error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
                 }
             }
         }
         cleanup();
         exit(1);
     } else {
+#ifdef __sgi
         sp84 = sigset(SIGINT, SIG_IGN);
         sp88 = sigset(SIGTERM, SIG_IGN);
+#endif
 
         if (memory_flag != 0) {
-            sp74 = func_00432940(spA0);
-            sp7C = ioctl(sp74, PIOCMAP_SGI, &D_1000C1C8);
+            sp74 = stop_on_exit(spA0);
+#ifdef __sgi
+            sp7C = ioctl(sp74, PIOCMAP_SGI, &mapbuf_desc);
             if (sp7C < 0) {
                 perror("PIOCMAP_SGI");
                 kill(spA0, SIGKILL);
@@ -10397,6 +10386,10 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
 
             ioctl(sp74, PIOCRUN, NULL);
             close(sp74);
+#else
+            /* not supported under non-sgi */
+            memory_flag = 0;
+#endif
         }
 
         while ((sp9C = wait(&sp80)) != spA0) {
@@ -10405,15 +10398,17 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             }
         }
 
+#ifdef __sgi
         sigset(SIGINT, sp84);
         sigset(SIGTERM, sp88);
+#endif
 
         if (time_flag) {
             dotime(arg0);
         }
 
         if (memory_flag != 0) {
-            func_00432D3C(arg0, sp7C);
+            print_mem(arg0, sp7C);
         }
 
         if (WIFSTOPPED(sp80)) {
@@ -10433,7 +10428,7 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
             fprintf(stderr, "Fatal error in: %s ", arg0);
             printf(" child died due to signal %d.\n", sp98);
             if (sp98 == SIGKILL) {
-                printf("Probably caused by running out of swap space -- check /usr/adm/SYSLOG.\n");
+                printf("Probably caused by running out of swap space -- check " LOGFILE ".\n");
                 exit(sp98);
             }
             if (sp98 == SIGINT) {
@@ -10454,7 +10449,6 @@ int run(char* arg0, char* const arg1[], char* arg2, char* arg3, char* arg4) {
     }
 }
 
-// function edit_src # 27
 int edit_src(const char* arg0, const char* arg1, int arg2) {
     char sp58[16];
     pid_t forkPid;
@@ -10468,7 +10462,7 @@ int edit_src(const char* arg0, const char* arg1, int arg2) {
     if (forkPid == (pid_t)-1) { // fork failed
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "fork to edit failed\n");
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
         return -1;
     }
@@ -10485,7 +10479,7 @@ int edit_src(const char* arg0, const char* arg1, int arg2) {
         }
         error(ERRORCAT_ERROR, NULL, 0, NULL, 0, "failed to exec: %s\n", arg0);
         if (errno < sys_nerr) {
-            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", sys_errlist[errno]);
+            error(ERRORCAT_ERRNO, NULL, 0, NULL, 0, "%s\n", GET_ERRNO_STR(errno));
         }
 
         exit(1);
@@ -10524,7 +10518,6 @@ int edit_src(const char* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function get_lino # 28
 #define GET_LINO_BUF_SIZE 0x800
 // arg2 is probably a size_t
 void get_lino(char* arg0, const char* arg1, int arg2) {
@@ -10609,7 +10602,6 @@ void get_lino(char* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function show_err # 29
 #define SHOW_ERR_BUF_SIZE 0x10000
 void show_err(const char* path) {
     int desc;
@@ -10629,13 +10621,11 @@ void show_err(const char* path) {
 }
 #undef BUF_SIZE
 
-// function handler # 30
 void handler(void) {
     cleanup();
     exit(3);
 }
 
-// function cleanup # 31
 void cleanup(void) {
     if (!Kflag) {
         if (passout != NULL) {
@@ -10701,7 +10691,6 @@ void cleanup(void) {
     }
 }
 
-// function whats # 32
 void whats(void) {
     int sp24 = runerror;
 
@@ -10724,12 +10713,10 @@ void whats(void) {
 int time0;
 struct tms tm0;
 
-// function settimes # 33
 void settimes() {
     time0 = times(&tm0);
 }
 
-// function dotime # 34
 #define CLOCK_TICKS 100
 
 void dotime(const char* programName) {
@@ -10748,7 +10735,6 @@ void dotime(const char* programName) {
             ((milis + seconds) / ((double)clockTimeDiff / CLOCK_TICKS)) * 100.0);
 }
 
-// function func_0042FD7C # 35
 // Search for a lib in directories (?)
 static char* func_0042FD7C(const char* name, char** dirs) {
     int fildes;
@@ -10781,7 +10767,6 @@ static char* func_0042FD7C(const char* name, char** dirs) {
     return path;
 }
 
-// function isdir # 36
 /**
  * Checks if `path` is a directory.
  *
@@ -10802,7 +10787,6 @@ int isdir(const char* path) {
     return FALSE;
 }
 
-// function regular_not_writeable # 37
 int regular_not_writeable(const char* arg0) {
     int sp24;
 
@@ -10817,7 +10801,6 @@ int regular_not_writeable(const char* arg0) {
     return 1;
 }
 
-// function regular_file # 38
 int regular_file(const char* path) {
     int spAC;
     struct stat statbuf;
@@ -10834,7 +10817,6 @@ int regular_file(const char* path) {
 
 static char B_1000E5E0[0x400];
 
-// function basename # 39
 // Obtain the base name of a file path, i.e. the part after the final '/'
 char* basename(const char* path) {
     register char* ret;
@@ -10863,7 +10845,6 @@ char* basename(const char* path) {
     return ret;
 }
 
-// function dirname # 40
 // Obtain the directory name of a file path, i.e. the part before the final '/'
 const char* dirname(const char* path) {
     register char* ret;
@@ -10929,7 +10910,6 @@ prod_name[] = {
     { "edgcpfe.alt", "/usr/lib/DCC/edgcpfe.alt", "C++" },
 };
 
-// function func_00430414 # 41
 static const char* func_00430414(char* arg0, int arg1) {
     int i;
     int sp28;
@@ -10959,7 +10939,6 @@ static const char* func_00430414(char* arg0, int arg1) {
     return NULL;
 }
 
-// function force_use_cfront # 42
 /**
  * Whether to force using cfront over the built-in C++ compiler. Can be set by `USE_CFRONT` environment variable, or
  * various flags.
@@ -10996,7 +10975,6 @@ int force_use_cfront(int argc, char** argv) {
     return FALSE;
 }
 
-// function exec_OCC # 43
 void exec_OCC(int argc, char** argv) {
     char spB8[0x400];
     char pad[0x88]; // !
@@ -11007,7 +10985,6 @@ void exec_OCC(int argc, char** argv) {
     error(ERRORCAT_WARNING, NULL, 0, NULL, 0, "could not exec %s", spB8);
 }
 
-// function add_cxx_symbol_options # 44
 int add_cxx_symbol_options(void) {
     addstr(&execlist, "-cxx");
     if (!D_1000BF90 && (strcmp(LD, "old_ld") != 0)) {
@@ -11021,7 +10998,6 @@ static char* D_1000C2E8 = NULL;
 static char* D_1000C2EC = NULL;
 static char* D_1000C2F0 = NULL; // basename of progname (?)
 
-// function init_curr_dir # 45
 // Sets D_1000C2F0 to current executable's basename and D_1000C1D0 to the current working directiory
 void init_curr_dir(void) {
     if (D_1000C2F0 == NULL) {
@@ -11047,7 +11023,6 @@ void init_curr_dir(void) {
     }
 }
 
-// function full_path # 46
 char* full_path(const char* relative_path) {
     char* path;
 
@@ -11060,14 +11035,12 @@ char* full_path(const char* relative_path) {
     return path;
 }
 
-// function add_static_opt # 47
 void add_static_opt(char* opt) {
     if (!D_1000BF88) {
         addstr(&staticopts, opt);
     }
 }
 
-// function record_static_fileset # 48
 void record_static_fileset(const char* arg0) {
     int sp28E4;
     FILE* sp28E0;
@@ -11193,7 +11166,6 @@ void record_static_fileset(const char* arg0) {
     free(D_1000C2EC);
 }
 
-// function touch # 49
 int touch(const char* arg0) {
     time_t curtime = time(NULL);
     struct utimbuf sp34;
@@ -11215,7 +11187,6 @@ int touch(const char* arg0) {
     return 0;
 }
 
-// function add_prelinker_objects # 50
 void add_prelinker_objects(list* arg0, list* arg1) {
     int i;
 
@@ -11242,7 +11213,6 @@ void add_prelinker_objects(list* arg0, list* arg1) {
     }
 }
 
-// function quoted_length # 51
 size_t quoted_length(const char* arg0, int* arg1) {
     unsigned int len = 0;
     unsigned char ch;
@@ -11266,7 +11236,6 @@ size_t quoted_length(const char* arg0, int* arg1) {
     return len;
 }
 
-// function quote_shell_arg # 52
 size_t quote_shell_arg(const char* p, char* buf) {
     char c;
     int quoted = FALSE;
@@ -11290,7 +11259,6 @@ size_t quote_shell_arg(const char* p, char* buf) {
     return len;
 }
 
-// function func_00431A3C # 53
 static void func_00431A3C(int argc, char** argv) {
     int i;
 
@@ -11307,7 +11275,6 @@ static void func_00431A3C(int argc, char** argv) {
     B_1000E4C4[B_1000E4C0] = NULL;
 }
 
-// function func_00431B38 # 54
 static void func_00431B38(int first, int count) {
     int i;
 
@@ -11316,7 +11283,6 @@ static void func_00431B38(int first, int count) {
     }
 }
 
-// function func_00431B88 # 55
 
 // arg2 is verbosity?
 static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
@@ -11342,7 +11308,6 @@ static void func_00431B88(FILE* arg0, const char* arg1, int arg2) {
     }
 }
 
-// function func_00431D00 # 56
 static void func_00431D00(const char* arg0) {
     FILE* file = fopen(tempstr[33], "w");
 
@@ -11355,7 +11320,6 @@ static void func_00431D00(const char* arg0) {
     }
 }
 
-// function func_00431DD8 # 57
 static void func_00431DD8(void) {
     int sp34 = 0;
     int sp30 = 0; // Unused
@@ -11385,7 +11349,6 @@ static void func_00431DD8(void) {
     }
 }
 
-// function skip_old_ii_controls # 58
 // Search file for the first "----" and move position to the line after it
 void skip_old_ii_controls(FILE* arg0) {
     int ch;
@@ -11415,7 +11378,6 @@ void skip_old_ii_controls(FILE* arg0) {
     }
 }
 
-// function make_ii_file_name # 59
 // path/to/file -> path/to/ii_files/file.ii
 // path/to/file.o -> path/to/ii_files/file.ii
 char* make_ii_file_name(const char* arg0) {
@@ -11433,7 +11395,6 @@ char* make_ii_file_name(const char* arg0) {
     return mkstr(dirname(arg0), "/ii_files/", sp2C, 0);
 }
 
-// function update_instantiation_info_file # 60
 // TODO: name vars
 
 void update_instantiation_info_file(const char* arg0, const char* arg1) {
@@ -11477,48 +11438,50 @@ void update_instantiation_info_file(const char* arg0, const char* arg1) {
     free(sp50);
 }
 
-// function func_00432940 # 61
-static int func_00432940(pid_t arg0) {
+static int stop_on_exit(pid_t pid) {
     int fd;            // sp29C
     char pathname[20]; // sp288
     prstatus_t status; // sp68
     int sp64 = 0;      // set and not used
     sysset_t syscalls; // sp24
 
-    sprintf(pathname, "/proc/%-d", arg0);
+    sprintf(pathname, "/proc/%-d", pid);
     fd = open(pathname, O_RDWR | O_EXCL);
     if (fd == -1) {
         perror("Opening /proc");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
+#ifdef __sgi
     premptyset(&syscalls);
     (void)praddset(&syscalls, 2); // size 2?
 
     if (ioctl(fd, PIOCSENTRY, &syscalls) < 0) {
         perror("PIOCSENTRY");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
+#endif
 
-    func_00432C94();
+    my_vsema();
 
+#ifdef __sgi
     if (ioctl(fd, PIOCWSTOP, &status) < 0) {
         perror("PIOCWSTOP");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
     if (status.pr_why != PR_SYSENTRY) {
         perror("program halted prematurely");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
     if (status.pr_what != 2) { // PR_SIGNALLED ?
         perror("program halted in wrong system call");
-        kill(arg0, 9);
+        kill(pid, 9);
         exit(1);
     }
 
@@ -11526,40 +11489,39 @@ static int func_00432940(pid_t arg0) {
         perror("unknown problem\n");
         exit(1);
     }
+#endif
 
     return fd;
 }
 
-// function func_00432BDC # 62
 // test pipe read
-static void func_00432BDC(void) {
+static void my_psema(void) {
     char buf;
     int failure;
 
-    close(B_1000EC98[1]);
-    failure = (read(B_1000EC98[0], &buf, 1) != 1);
+    close(Pipe[1]);
+    failure = (read(Pipe[0], &buf, 1) != 1);
     if (failure) {
         perror("read on pipe failed");
         exit(1);
     }
-    close(B_1000EC98[0]);
+    close(Pipe[0]);
 }
 
-// function func_00432C94 # 63
 // test pipe write
-static void func_00432C94(void) {
+static void my_vsema(void) {
     char buf;
 
-    close(B_1000EC98[0]);
-    if (write(B_1000EC98[1], &buf, 1) != 1) {
+    close(Pipe[0]);
+    if (write(Pipe[1], &buf, 1) != 1) {
         perror("write on pipe failed");
         exit(1);
     }
-    close(B_1000EC98[1]);
+    close(Pipe[1]);
 }
 
-// function func_00432D3C # 64
-static void func_00432D3C(const char* arg0, int count) {
+static void print_mem(const char* arg0, int count) {
+#ifdef __sgi
     int i;
     int identified_segment;
     unsigned int flags;
@@ -11587,20 +11549,20 @@ static void func_00432D3C(const char* arg0, int count) {
 
     for (i = 0; i < count; i++) {
         identified_segment = FALSE;
-        flags = B_1000CAC0[i].pr_mflags & 0xFFFF;
+        flags = mapbuf[i].pr_mflags & 0xFFFF;
         if (flags == (MA_PRIMARY | 0xD)) {
-            text_size += B_1000CAC0[i].pr_vsize * pagesize;
+            text_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
 
         if (flags == (MA_READ | MA_EXEC | MA_SHARED)) {
-            so_text_size += B_1000CAC0[i].pr_vsize * pagesize;
+            so_text_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
 
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
-                so_data_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr < DATA_ADDRESS) {
+                so_data_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
@@ -11611,43 +11573,43 @@ static void func_00432D3C(const char* arg0, int count) {
             || (flags == (MA_READ | MA_WRITE | MA_SHARED)) 
             || (flags == (MA_READ | MA_SHARED))) {
             // clang-format on
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr < 0x10000000) {
-                mmap_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr < DATA_ADDRESS) {
+                mmap_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         flags &= ~MA_PRIMARY;
         if (flags == (MA_READ | MA_WRITE | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
-                data_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr >= DATA_ADDRESS) {
+                data_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         if (flags == (MA_READ | MA_WRITE | MA_BREAK | MA_COW)) {
-            if ((uintptr_t)B_1000CAC0[i].pr_vaddr >= 0x10000000) {
-                brk_size += B_1000CAC0[i].pr_vsize * pagesize;
+            if ((uintptr_t)mapbuf[i].pr_vaddr >= DATA_ADDRESS) {
+                brk_size += mapbuf[i].pr_vsize * pagesize;
                 identified_segment = TRUE;
             }
         }
         if (flags == (MA_READ | MA_WRITE | MA_STACK)) {
-            stack_size += B_1000CAC0[i].pr_vsize * pagesize;
+            stack_size += mapbuf[i].pr_vsize * pagesize;
             identified_segment = TRUE;
         }
         if (!identified_segment) {
             fprintf(stderr, "-showm: Unidentified: segment %d\n", i);
         }
         if (memflag || !identified_segment) {
-            fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, B_1000CAC0[i].pr_vaddr);
-            fprintf(stderr, "pr_size[%d]= %lx\n", i, B_1000CAC0[i].pr_size);
-            fprintf(stderr, "pr_off[%d]= %lx\n", i, B_1000CAC0[i].pr_off);
-            fprintf(stderr, "pr_mflags[%d]= %lx\n", i, B_1000CAC0[i].pr_mflags);
-            fprintf(stderr, "pr_vsize[%d]= %lx\n", i, B_1000CAC0[i].pr_vsize);
-            fprintf(stderr, "pr_psize[%d]= %lx\n", i, B_1000CAC0[i].pr_psize);
-            fprintf(stderr, "pr_wsize[%d]= %lx\n", i, B_1000CAC0[i].pr_wsize);
-            fprintf(stderr, "pr_rsize[%d]= %lx\n", i, B_1000CAC0[i].pr_rsize);
-            fprintf(stderr, "pr_msize[%d]= %lx\n", i, B_1000CAC0[i].pr_msize);
-            fprintf(stderr, "pr_dev[%d]= %lx\n", i, B_1000CAC0[i].pr_dev);
-            fprintf(stderr, "pr_ino[%d]= %lx\n", i, B_1000CAC0[i].pr_ino);
+            fprintf(stderr, "pr_vaddr[%d]= %lx\n", i, mapbuf[i].pr_vaddr);
+            fprintf(stderr, "pr_size[%d]= %lx\n", i, mapbuf[i].pr_size);
+            fprintf(stderr, "pr_off[%d]= %lx\n", i, mapbuf[i].pr_off);
+            fprintf(stderr, "pr_mflags[%d]= %lx\n", i, mapbuf[i].pr_mflags);
+            fprintf(stderr, "pr_vsize[%d]= %lx\n", i, mapbuf[i].pr_vsize);
+            fprintf(stderr, "pr_psize[%d]= %lx\n", i, mapbuf[i].pr_psize);
+            fprintf(stderr, "pr_wsize[%d]= %lx\n", i, mapbuf[i].pr_wsize);
+            fprintf(stderr, "pr_rsize[%d]= %lx\n", i, mapbuf[i].pr_rsize);
+            fprintf(stderr, "pr_msize[%d]= %lx\n", i, mapbuf[i].pr_msize);
+            fprintf(stderr, "pr_dev[%d]= %lx\n", i, mapbuf[i].pr_dev);
+            fprintf(stderr, "pr_ino[%d]= %lx\n", i, mapbuf[i].pr_ino);
             fprintf(stderr, "\n");
         }
     }
@@ -11672,9 +11634,11 @@ static void func_00432D3C(const char* arg0, int count) {
             (text_size + data_size + brk_size + stack_size + so_text_size + so_data_size + so_brk_size + mmap_size) /
                 0x400);
     }
+#else
+    fprintf(stderr, "-showm not implemented for non-SGI machines\n");
+#endif
 }
 
-// function func_00433534 # 65
 // Prepends "--" to a string by copying.
 static char* func_00433534(const char* arg0) {
     char* ret = (char*)malloc(strlen(arg0) + 3);
