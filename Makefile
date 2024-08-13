@@ -50,7 +50,7 @@ ASM_PROCESSOR := python3 tools/asm-processor/build.py
 IINC       := -Iinclude -Iinclude/indy -Isrc
 
 # Check code syntax with host compiler
-CHECK_WARNINGS := -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-variable -Wno-char-subscripts -Wno-unused-label -Wno-parentheses -Wno-unused-parameter
+CHECK_WARNINGS := -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-variable -Wno-char-subscripts -Wno-unused-label -Wno-parentheses -Wno-unused-parameter -Wno-pointer-sign
 # Have CC_CHECK pretend to be a MIPS compiler
 MIPS_BUILTIN_DEFS := -D_MIPS_FPSET=16 -D_MIPS_ISA=2 -D_ABIO32=1 -D_MIPS_SIM=_ABIO32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_MIPS_SZPTR=32
 MIPS_BUILTIN_DEFS += -D__EXTENSIONS__ -DLANGUAGE_C -D_LANGUAGE_C -D__INLINE_INTRINSICS
@@ -60,7 +60,7 @@ MIPS_BUILTIN_DEFS += -D__mips=2 -D_MIPSEB -DMIPSEB -D_CFE
 MIPS_BUILTIN_DEFS += -DPERMUTER=1
 #	The -MMD flags additionaly creates a .d file with the same name as the .o file.
 CC_CHECK          := $(CC_CHECK_COMP)
-CC_CHECK_FLAGS    := -MMD -fno-builtin -fsyntax-only -fsigned-char -std=c11 -m32 -DNON_MATCHING -DCC_CHECK=1
+CC_CHECK_FLAGS    := -MMD -fno-builtin -fsyntax-only -funsigned-char -std=c11 -m32 -DNON_MATCHING -DCC_CHECK=1
 ifneq ($(WERROR), 0)
 	CHECK_WARNINGS += -Werror
 endif
