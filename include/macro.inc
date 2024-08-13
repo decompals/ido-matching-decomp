@@ -1,8 +1,19 @@
 .set noat
 .set noreorder
 .set gp=64
-.macro glabel label
-    .global \label
+
+.macro glabel label, visibility=global
+    .visibility \label
+    \label:
+.endm
+
+.macro dlabel label, visibility=global
+    .visibility \label
+    \label:
+.endm
+
+.macro jlabel label, visibility=global
+    .visibility \label
     \label:
 .endm
 
