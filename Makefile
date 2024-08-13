@@ -12,10 +12,10 @@ WERROR ?= 0
 CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
-#	IDO_TC      := cc acpp as0 as1 cfe ugen ujoin uld umerge uopt usplit
+#	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
 	IDO_TC      := cc cfe
 else ifeq ($(VERSION),5.3)
-#	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt usplit
+#	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
