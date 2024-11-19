@@ -3,6 +3,8 @@
 
 #include "stdlib.h"
 
+#define ALIGN(x, n) (char*)(((int)(x) + n - 1) & ~(n - 1))
+
 typedef struct MemCtx {
     /* 0x00 */ char** list_start;
     /* 0x04 */ char** current_region;
@@ -19,6 +21,9 @@ void* __mem_alloc(MemCtx* s, size_t size);
 int mem_free(MemCtx* s);
 size_t mem_usage(MemCtx* s);
 
-// TODO mem_alloc macro 
+#define mem_alloc(mem, size, align) \
+    (mem->ptr = ALIGN(mem->ptr, align)) + size > mem->region_end ? \
+    __mem_alloc(mem, size) : \
+    (mem->ptr += size, mem->ptr - size)
 
 #endif

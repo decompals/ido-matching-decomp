@@ -1,6 +1,8 @@
 #include "mem.h"
 #include <stdio.h>
 
+#define REGION_SIZE 0x1000
+
 const char header[] = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $"; 
 
 // TODO move to appropriate place
@@ -44,10 +46,10 @@ MemCtx* mem_start(void) {
 
     s = (MemCtx*)Malloc(sizeof(MemCtx));
     s->list_start = Calloc(0x10, 4);
-    *s->list_start = Calloc(1, 0x1000);
+    *s->list_start = Calloc(1, REGION_SIZE);
     s->current_region = s->list_start;
     s->ptr = *s->list_start;
-    s->region_end = s->ptr + 0x1000;
+    s->region_end = s->ptr + REGION_SIZE;
     s->list_end = s->list_start + 0x10;
 
     if (debug_arr[0x6D] > 0) {
@@ -65,8 +67,8 @@ void* __mem_alloc(MemCtx* s, size_t size) {
         s->current_region = s->list_end - 0x10;
     }
 
-    *s->current_region = Calloc(1, size > 0x1000 ? size : 0x1000);
-    s->region_end = *s->current_region + (size > 0x1000 ? size : 0x1000);
+    *s->current_region = Calloc(1, size > REGION_SIZE ? size : REGION_SIZE);
+    s->region_end = *s->current_region + (size > REGION_SIZE ? size : REGION_SIZE);
     s->ptr = *s->current_region + size;
 
     if (debug_arr[0x6D] > 0) {
@@ -92,7 +94,7 @@ int mem_free(MemCtx* s) {
 }
 
 size_t mem_usage(MemCtx* s) {
-    size_t size = (s->current_region - s->list_start) * 0x1000;
+    size_t size = (s->current_region - s->list_start) * REGION_SIZE;
     size += s->ptr - *s->current_region;
     return size;
 }

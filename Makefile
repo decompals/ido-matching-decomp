@@ -86,7 +86,7 @@ IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
 
 
-SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*)
+SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*")
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
