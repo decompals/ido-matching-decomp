@@ -1,5 +1,7 @@
 #include "linklist.h"
 
+const char header[] = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/linklist.c,v 1.1 1992/07/29 18:45:02 wsj Exp $";
+
 LinkedList* link_start(MemCtx* mem, int size) {
     LinkedList* ll = mem_alloc(mem, sizeof(LinkedList), 4);
 
