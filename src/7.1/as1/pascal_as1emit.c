@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/emitnop.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/emitalu3.s")
@@ -37,3 +38,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0043D194.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/loadimmed.s")
+*/

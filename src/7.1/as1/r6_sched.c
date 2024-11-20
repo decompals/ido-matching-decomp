@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/init_set.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/deallocate_set.s")
@@ -27,3 +28,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/r6_start_time.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/r6_start_instruction.s")
+*/

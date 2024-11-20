@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/basereg_error.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0045C134.s")
@@ -48,3 +49,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/parseafri_fp.s")
 
+*/

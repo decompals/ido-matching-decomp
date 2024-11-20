@@ -79,6 +79,7 @@ CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNING
 
 
 # -- Location of original IDO binaries
+
 IRIX_BASE    ?= $(RECOMP)/ido
 IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 

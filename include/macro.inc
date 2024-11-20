@@ -1,21 +1,20 @@
 .set noat
 .set noreorder
-.set gp=64
 
-.macro glabel label, visibility=global
-    .visibility \label
+.macro glabel label
+    .global \label
     \label:
 .endm
 
-.macro dlabel label, visibility=global
-    .visibility \label
+.macro dlabel label
+    .global \label
     \label:
 .endm
 
-.macro jlabel label, visibility=global
-    .visibility \label
+.macro jlabel label
     \label:
 .endm
+
 
 
 # Float register aliases (o32 ABI, odd ones are rarely used)

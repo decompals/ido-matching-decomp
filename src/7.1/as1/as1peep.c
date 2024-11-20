@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_004161F0.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00416294.s")
@@ -81,3 +82,4 @@ int func_0041BB98(int arg0) {
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/do_passI_opt.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/do_passII_opt.s")
+*/

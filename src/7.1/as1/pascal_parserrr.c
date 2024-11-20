@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/smul.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/genmul.s")
@@ -33,3 +34,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/parseafrrr.s")
 
 
+*/
