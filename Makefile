@@ -16,7 +16,7 @@ ifeq ($(VERSION),7.1)
 	IDO_TC      := cc cfe
 else ifeq ($(VERSION),5.3)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
-	IDO_TC      := cc cfe
+	IDO_TC      := cc cfe as0
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
 endif
@@ -34,8 +34,12 @@ ASM     := asm
 SYMBOLS := symbols
 CONTEXT := context
 
-CC       := $(RECOMP)/build/7.1/out/cc
-CC_OLD   := $(RECOMP)/build/5.3/out/cc
+ifeq ($(VERSION),7.1)
+        CC	:= $(RECOMP)/build/7.1/out/cc
+else ifeq ($(VERSION),5.3)
+        CC  	:= $(RECOMP)/build/5.3/out/cc
+endif
+
 
 AS         := $(MIPS_BINUTILS_PREFIX)as
 LD         := $(MIPS_BINUTILS_PREFIX)ld
