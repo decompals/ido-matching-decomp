@@ -3,7 +3,7 @@
 
 #define REGION_SIZE 0x1000
 
-const char header[] = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $"; 
+char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $";
 
 // TODO move to appropriate place
 int error(int, int, int, char*);

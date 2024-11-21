@@ -22,8 +22,8 @@ int mem_free(MemCtx* s);
 size_t mem_usage(MemCtx* s);
 
 #define mem_alloc(mem, size, align) \
-    (mem->ptr = ALIGN(mem->ptr, align)) + size > mem->region_end ? \
+    (mem->ptr = ALIGN(mem->ptr, align)) + (size) > mem->region_end ? \
     __mem_alloc(mem, size) : \
-    (mem->ptr += size, mem->ptr - size)
+    (mem->ptr += (size), mem->ptr - (size))
 
 #endif

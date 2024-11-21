@@ -14,4 +14,8 @@ typedef struct LinkedList {
     /* 0x0C */ unsigned int elem_size;
 } LinkedList; // size = 0x10
 
+LinkedList* link_start(MemCtx* mem, int size);
+void* link_pop(LinkedList* ll);
+void* get_link_elem(LinkedList* ll);
+
 #endif
