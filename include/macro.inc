@@ -12,9 +12,9 @@
 .endm
 
 .macro jlabel label
+    .global \label
     \label:
 .endm
-
 
 
 # Float register aliases (o32 ABI, odd ones are rarely used)
