@@ -15,6 +15,11 @@ extern struct {
     size_t unk4;
 } rep_buffer;
 
+struct unk_struct {
+    int sym;
+    struct unk_struct* next;
+};
+
 // external declarations
 extern char isa;
 extern int atflag;
@@ -37,7 +42,7 @@ extern int verbose;
 extern int CurrentFile;
 extern int CurrentLine;
 extern int in_repeat_block;
-extern int rep_size;
+extern size_t rep_size;
 extern int mednat;
 extern struct _struct_asm_info_0x8 asm_info[0x1AF];
 extern char* sset_value[0x11];
@@ -52,7 +57,7 @@ extern int isStruct;
 //.data
 static char* D_10000004[4] = { "", "operand 1", "operand 2", "operand 3" };
 int gform_extn = 0;
-static int* D_10000014 = NULL;
+static struct unk_struct* D_10000014 = NULL;
 
 //.bss
 /* 029800 1000A800 */ int freg4;
@@ -140,7 +145,7 @@ static void func_0040B340(void);
 int do_dot_end(int arg0);
 static void func_0040B554(int arg0);
 static void func_0040B5F0(int arg0);
-static int func_0040B984(void);
+static void func_0040B984(void);
 static void func_0040BC84(void);
 static int func_0040BEBC(int* arg0, int* arg1, int* arg2);
 static void func_0040C048(void);
@@ -875,7 +880,7 @@ static void func_00407334(void) {
     unsigned int var_s1;
     int var_s5;
     int var_v0;
-    int temp_s6;
+    unsigned int temp_s6;
     char sp50[0x400];
     unsigned* temp = &binasm_rec.unk8;
 
@@ -949,8 +954,8 @@ static void func_004075CC(int arg0) {
 }
 
 static void func_004076A0(int fasm) {
-    int stackPad;
-    sym* sp48;
+    sym* pad;
+    int sp48;
     sym* sp44;
     unsigned int sp40;
     int var_a0;
@@ -961,9 +966,9 @@ static void func_004076A0(int fasm) {
     sp44 = NULL;
     sp30 = NULL;
 
-    sp48 = GetRegister();
-    if (sp48 != 0) {
-        sp48 = sp48->reg;
+    pad = GetRegister();
+    if (pad != NULL) {
+        sp48 = pad->reg;
 
         if ((diag_flag != 0) && (fasm == zlui) && (Tokench == 'i')) {
             if (LookUp(Tstring, &sp30) != 0) {
@@ -2178,7 +2183,7 @@ static void func_0040B340(void) {
 }
 
 int do_dot_end(int arg0) {
-    int* temp_s0;
+    struct unk_struct* temp_s0;
 
     if ((arg0 == 0) && (D_10000014 == NULL)) {
         posterror(".end without .ent", NULL, 2);
@@ -2187,12 +2192,12 @@ int do_dot_end(int arg0) {
             posterror("missing .end at end of assembly", NULL, 2);
         }
         while (D_10000014 != NULL) {
-            if (sym_undefined(D_10000014[0]) != 0) {
+            if (sym_undefined(D_10000014->sym) != 0) {
                 posterror(".ent/.end block never defined the procedure name", NULL, 2);
             } else {
-                binasm_rec.unk0 = st_procend(D_10000014[0]);
+                binasm_rec.unk0 = st_procend(D_10000014->sym);
             }
-            temp_s0 = D_10000014[1];
+            temp_s0 = D_10000014->next;
             free(D_10000014);
             D_10000014 = temp_s0;
             binasm_rec.unk5_003F = 0x18;
@@ -2202,7 +2207,7 @@ int do_dot_end(int arg0) {
 }
 
 static void func_0040B554(int arg0) {
-    int* sp24;
+    struct unk_struct* sp24;
 
     sp24 = D_10000014;
     D_10000014 = malloc(sizeof(long long));
@@ -2210,8 +2215,9 @@ static void func_0040B554(int arg0) {
         new_error();
         return;
     }
-    *D_10000014 = arg0;
-    D_10000014[1] = sp24;
+
+    D_10000014->sym = arg0;
+    D_10000014->next = sp24;
 }
 
 static void func_0040B5F0(int arg0) {
@@ -2270,7 +2276,7 @@ static void func_0040B5F0(int arg0) {
     }
 }
 
-static int func_0040B984(void) {
+static void func_0040B984(void) {
     sym* cur_symbol;
     int sp38;
 
