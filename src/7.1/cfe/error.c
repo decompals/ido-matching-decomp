@@ -5,11 +5,11 @@
 #include "linklist.h"
 
 typedef struct ErrorStruct {
-    /* 0x00 */ struct LinkedListEntry* next;
-    /* 0x04 */ int unk_04;
-    /* 0x08 */ int unk_08;
-    /* 0x0C */ int unk_0C;
-    /* 0x10 */ char* unk_10[4];
+    /* 0x00 */ struct LinkedListEntry link;
+    /* 0x04 */ int message;
+    /* 0x08 */ int level;
+    /* 0x0C */ int location;
+    /* 0x10 */ char* params[4];
 } ErrorStruct; // size = 0x20
 
 typedef struct ErrorFmt {
@@ -36,6 +36,7 @@ extern char* myname;
 extern int imm_flag;
 int real_file_line(int, char**, int*, int);
 int cpp_line_ptr(char*, char**, int);
+int __assert(char*, char*, int);
 
 extern int num_warns;
 extern int num_errs;
@@ -87,6 +88,10 @@ int error_init(char** arg0, FILE* arg1, int arg2) {
     B_10020F2C = mem_start();
     B_10020F30 = link_start(B_10020F2C, sizeof(ErrorStruct));
     return 1;
+}
+
+void set_error_mode(int arg0) {
+    mode = arg0;
 }
 
 static void func_0040F730(char* arg0, int arg1, int arg2) {
@@ -165,7 +170,7 @@ void lint_warning(ErrorStruct* arg0) {
 
     strcpy(B_10020F38, "");
 
-    if (arg0->unk_0C != -1 && real_file_line(arg0->unk_0C, &sp3C, &sp38, 0) == 1) {
+    if (arg0->location != -1 && real_file_line(arg0->location, &sp3C, &sp38, 0) == 1) {
         if (sp3C != 0) {
             error(0x170154, 6, -1, sp3C);
             error(0x170155, 6, -1);
@@ -175,9 +180,9 @@ void lint_warning(ErrorStruct* arg0) {
         }
     }
 
-    switch (arg0->unk_08) {
+    switch (arg0->level) {
         case 1:
-            func_0040FC14(B_10021F38, arg0->unk_04);
+            func_0040FC14(B_10021F38, arg0->message);
             strcat(B_10020F38, B_10021F38);
             break;
         case 3:
@@ -190,8 +195,8 @@ void lint_warning(ErrorStruct* arg0) {
             break;
     }
 
-    func_0040F730(B_10021F38, arg0->unk_04 & 0xFFFF, 0);
-    sprintf(B_10020F38 + strlen(B_10020F38), B_10021F38, arg0->unk_10[0], arg0->unk_10[1], arg0->unk_10[2], arg0->unk_10[3]);
+    func_0040F730(B_10021F38, arg0->message & 0xFFFF, 0);
+    sprintf(B_10020F38 + strlen(B_10020F38), B_10021F38, arg0->params[0], arg0->params[1], arg0->params[2], arg0->params[3]);
     strcat(B_10020F38, "\n");
     fprintf(D_1001BA78, "%s", B_10020F38);
 }
@@ -201,11 +206,11 @@ static void func_0040FECC(ErrorStruct* arg0) {
     int sp38 = 0;
     static char* B_10021B38;
 
-    if ((arg0->unk_04 >> 20) != 0 && B_10022F58[arg0->unk_04 & 0xFFFF]) {
+    if ((arg0->message >> 20) != 0 && B_10022F58[arg0->message & 0xFFFF]) {
         return;
     }
 
-    B_10022F58[arg0->unk_04 & 0xFFFF] = 1;
+    B_10022F58[arg0->message & 0xFFFF] = 1;
     if (options[19] && !(options[3] & 0x20)) {
         lint_warning(arg0);
         return;
@@ -217,9 +222,9 @@ static void func_0040FECC(ErrorStruct* arg0) {
         strcat(B_10020F38, ": ");
     }
 
-    switch (arg0->unk_08) {
+    switch (arg0->level) {
         case 1:
-            func_0040FC14(B_10021F38, arg0->unk_04);
+            func_0040FC14(B_10021F38, arg0->message);
             strcat(B_10020F38, B_10021F38);
             break;
         case 3:
@@ -232,7 +237,7 @@ static void func_0040FECC(ErrorStruct* arg0) {
             break;
     }
 
-    if (arg0->unk_0C != -1 && real_file_line(arg0->unk_0C, &sp3C, &sp38, 0) == 1) {
+    if (arg0->location != -1 && real_file_line(arg0->location, &sp3C, &sp38, 0) == 1) {
         if (sp3C != 0) {
             strcat(B_10020F38, sp3C);
             strcat(B_10020F38, ", ");
@@ -243,10 +248,10 @@ static void func_0040FECC(ErrorStruct* arg0) {
             sprintf(B_10020F38 + strlen(B_10020F38), " %d: ", sp38);
         }
     }
-    func_0040F730(B_10021F38, arg0->unk_04 & 0xFFFF, 0);
-    sprintf(B_10020F38 + strlen(B_10020F38), B_10021F38, arg0->unk_10[0], arg0->unk_10[1], arg0->unk_10[2], arg0->unk_10[3]);
+    func_0040F730(B_10021F38, arg0->message & 0xFFFF, 0);
+    sprintf(B_10020F38 + strlen(B_10020F38), B_10021F38, arg0->params[0], arg0->params[1], arg0->params[2], arg0->params[3]);
     if (((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-        func_0040F730(B_10021F38, arg0->unk_04 & 0xFFFF, 2);
+        func_0040F730(B_10021F38, arg0->message & 0xFFFF, 2);
         if (strlen(B_10021F38) != 0) {
             sprintf(B_10020F38 + strlen(B_10020F38), " (%s)\n", B_10021F38);
         } else {
@@ -257,17 +262,17 @@ static void func_0040FECC(ErrorStruct* arg0) {
     }
 
     if ((options[3] & 2) && sp3C != NULL && sp38 != 0) {
-        cpp_line_ptr(B_10020F38 + strlen(B_10020F38), &B_10021B38, arg0->unk_0C);
+        cpp_line_ptr(B_10020F38 + strlen(B_10020F38), &B_10021B38, arg0->location);
     }
     if (options[3] & 4) {
-        func_0040F730(B_10020F38 + strlen(B_10020F38), arg0->unk_04 & 0xFFFF, 1);
+        func_0040F730(B_10020F38 + strlen(B_10020F38), arg0->message & 0xFFFF, 1);
     }
     fprintf(D_1001BA78, "%s", B_10020F38);
 }
 
 void error_flush(int arg0) {
     while (B_10020F30->used_list != NULL) {
-        if (arg0 < ((ErrorStruct*)B_10020F30->used_list)->unk_0C && arg0 != -1) {
+        if (arg0 < ((ErrorStruct*)B_10020F30->used_list)->location && arg0 != -1) {
             break;
         }
         func_0040FECC(((ErrorStruct*)B_10020F30->used_list));
@@ -275,29 +280,29 @@ void error_flush(int arg0) {
     }
 }
 
-int error(int arg0, int arg1, int arg2, ...) {
-    int sp84;
+int error(int message, int level, int location, ...) {
+    int real_level;
     ErrorStruct* sp80;
     int sp7C = imm_flag;
     int i;
-    int msgid = arg0 & 0xFFFF;
+    int msgid = message & 0xFFFF;
     static int D_1001BA7C;
     va_list args;
     int unused[2];
 
     if (msgid > 356) {
-        sp84 = 3;
-    } else if (arg1 == 0) {
-        sp84 = D_1001BA24[err_options[msgid]][mode];
+        real_level = 3;
+    } else if (level == 0) {
+        real_level = D_1001BA24[err_options[msgid]][mode];
     } else {
-        sp84 = arg1;
+        real_level = level;
     }
 
-    if (sp84 == 4) {
+    if (real_level == 4) {
         return 4;
     }
 
-    if (sp84 == 1) {
+    if (real_level == 1) {
         if (!(options[3] & 1) || B_100234F0[msgid]) {
             return 4;
         }
@@ -305,12 +310,12 @@ int error(int arg0, int arg1, int arg2, ...) {
     }
 
     if (debug_arr[0x65] > 0) {
-        fprintf(dbgout, "err_msg #:%d l:%d loca:%x sec:%d\n", msgid, sp84, arg2, (arg0 >> 16) & 0xF);
+        fprintf(dbgout, "err_msg #:%d l:%d loca:%x sec:%d\n", msgid, real_level, location, (message >> 16) & 0xF);
     }
 
     sp80 = get_link_elem(B_10020F30);
     if (msgid < 0x165) {
-        va_start(args, arg2);
+        va_start(args, location);
         if (err_fmts[msgid].unk_00 != 0) {
             for (i = 0; i < err_fmts[msgid].unk_00; i++) {
                 switch(fmts_arr[err_fmts[msgid].unk_02 + i].unk_04) {
@@ -325,20 +330,20 @@ int error(int arg0, int arg1, int arg2, ...) {
                         break;
                 }
     
-                sp80->unk_10[i] = mem_alloc(B_10020F2C, strlen(B_10020F38) + 1, 1);
-                strcpy(sp80->unk_10[i], B_10020F38);
+                sp80->params[i] = mem_alloc(B_10020F2C, strlen(B_10020F38) + 1, 1);
+                strcpy(sp80->params[i], B_10020F38);
             }
         }
     }
 
-    sp80->unk_04 = arg0;
-    sp80->unk_08 = sp84;
-    sp80->unk_0C = arg2;
+    sp80->message = message;
+    sp80->level = real_level;
+    sp80->location = location;
 
-    if (sp84 == 3 || sp84 == 6) {
+    if (real_level == 3 || real_level == 6) {
         sp7C = 1;
     }
-    if (arg2 == -1) {
+    if (location == -1) {
         sp7C = 1;
     }
 
@@ -347,8 +352,8 @@ int error(int arg0, int arg1, int arg2, ...) {
     } else {
         LinkedListEntry* a0 = B_10020F30;
         while (a0->next != NULL) {
-            if (sp80->unk_0C < ((ErrorStruct*)(a0->next))->unk_0C) {
-                sp80->next = a0->next;
+            if (sp80->location < ((ErrorStruct*)(a0->next))->location) {
+                sp80->link.next = a0->next;
                 break;
             }
             a0 = a0->next;
@@ -356,12 +361,12 @@ int error(int arg0, int arg1, int arg2, ...) {
         a0->next = sp80;
     }
 
-    if (sp84 == 3) {
+    if (real_level == 3) {
         fatal();
     }
 
-    if (sp84 == 2) {
-        int v1 = (arg0 >> 0x10) & 0xF;
+    if (real_level == 2) {
+        int v1 = (message >> 16) & 0xF;
         num_errs++;
 
         if (v1 != 0 && v1 < 8) {
@@ -378,5 +383,5 @@ int error(int arg0, int arg1, int arg2, ...) {
         error(0x40007, 3, -1);
     }
 
-    return sp84;
+    return real_level;
 }
