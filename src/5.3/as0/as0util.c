@@ -1566,8 +1566,11 @@ static unsigned int func_00411ECC(void) {
     return var_s2;
 }
 
-static long long func_0041213C(void) {
-}
+#ifdef _GNU_C
+__attribute__((noreturn)) static long long func_0041213C(void) {}
+#else
+static long long func_0041213C(void) {} // The long long type is required to match
+#endif
 
 static long long func_00412144(void) {
     long long var_s2;
@@ -1576,6 +1579,7 @@ static long long func_00412144(void) {
     char temp_s1;
 
     var_s2 = func_00411B84();
+
     func_0041213C();
 
     while ((Tokench == '*') || (Tokench == '/') || (Tokench == '%') || (Tokench == '<') || (Tokench == '>') ||

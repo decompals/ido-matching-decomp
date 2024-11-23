@@ -4,6 +4,11 @@
 #include <elf.h>
 #include <sys/elf.h>
 #include <cmplrs/msym.h>
+
+#ifdef _GNU_C
+#pragma GCC diagnostic ignored "-Wimplicit-int"
+#endif
+
 extern unsigned long
 foreach_section(
 	struct obj	*obj,
