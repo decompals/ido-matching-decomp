@@ -287,8 +287,7 @@ int error(int message, int level, int location, ...) {
     int i;
     int msgid = message & 0xFFFF;
     static int D_1001BA7C;
-    va_list args;
-    int unused[2];
+    int unused;
 
     if (msgid > 356) {
         real_level = 3;
@@ -315,8 +314,9 @@ int error(int message, int level, int location, ...) {
 
     sp80 = get_link_elem(B_10020F30);
     if (msgid < 0x165) {
-        va_start(args, location);
         if (err_fmts[msgid].unk_00 != 0) {
+            va_list args;
+            va_start(args, location);
             for (i = 0; i < err_fmts[msgid].unk_00; i++) {
                 switch(fmts_arr[err_fmts[msgid].unk_02 + i].unk_04) {
                     case 1:
@@ -351,12 +351,14 @@ int error(int message, int level, int location, ...) {
         func_0040FECC(sp80);
     } else {
         LinkedListEntry* a0 = B_10020F30;
-        while (a0->next != NULL) {
-            if (sp80->location < ((ErrorStruct*)(a0->next))->location) {
-                sp80->link.next = a0->next;
+        LinkedListEntry* v0 = B_10020F30->used_list;
+        while (v0 != NULL) {
+            if (sp80->location < ((ErrorStruct*)v0)->location) {
+                sp80->link.next = v0;
                 break;
             }
-            a0 = a0->next;
+            a0 = v0;
+            v0 = v0->next;
         }
         a0->next = sp80;
     }
