@@ -55,7 +55,7 @@ static int D_1001BA24[7][3] = {
 };
 static FILE* D_1001BA78 = (FILE*)0x0FB4EE64; // what is this pointer ?
 extern int err_options[]; // 1001BAB0
-static char** B_10020F20;
+static char** message_files;
 static int B_10020F24;
 static FILE* B_10020F28;
 static MemCtx* B_10020F2C;
@@ -77,7 +77,7 @@ int set_woff(int arg0) {
 
 int error_init(char** arg0, FILE* arg1, int arg2) {
     if (arg0 != NULL) {
-        B_10020F20 = arg0;
+        message_files = arg0;
     }
     if (arg1 != 0) {
         D_1001BA78 = arg1;
@@ -99,12 +99,12 @@ static void func_0040F730(char* arg0, int arg1, int arg2) {
     int i;
 
     if (B_10020F28 == NULL) {
-        while (*B_10020F20 != NULL && B_10020F28 == NULL) {
-            B_10020F28 = fopen(*B_10020F20, "r");
+        while (*message_files != NULL && B_10020F28 == NULL) {
+            B_10020F28 = fopen(*message_files, "r");
             if (debug_arr[0x65] > 0) {
-                fprintf(dbgout, "attempting to open msg file %s %s\n", *B_10020F20, B_10020F28 != NULL ? "success" : "failed");
+                fprintf(dbgout, "attempting to open msg file %s %s\n", *message_files, B_10020F28 != NULL ? "success" : "failed");
             }
-            B_10020F20++;
+            message_files++;
         }
 
         if (B_10020F28 == NULL) {
