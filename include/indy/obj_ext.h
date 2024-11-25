@@ -5,7 +5,7 @@
 #include <sys/elf.h>
 #include <cmplrs/msym.h>
 
-#ifdef _GNU_C
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wimplicit-int"
 #endif
 

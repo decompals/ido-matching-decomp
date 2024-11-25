@@ -2817,7 +2817,7 @@ static void func_0040D284(char* arg0) {
     binasm_rec.unk0 = cur_symbol->unk18;
 
     // TODO: Maybe introduce a AVOID_UB flag to fix this..
-#ifdef _GNU_C
+#ifdef __GNUC__
     #pragma GCC diagnostic ignored "-Woverflow"
 #endif
     binasm_rec.unk5_003F = ~0x3F;

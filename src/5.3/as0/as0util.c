@@ -1317,12 +1317,12 @@ void readinline(void) {
 sym* alloc_new_sym(void) {
     sym* ptr;
 
-    ptr = malloc(0x1C);
+    ptr = malloc(sizeof(sym));
 
     if (ptr == NULL) {
         new_error();
     } else {
-        memset(ptr, 0, 0x1C);
+        memset(ptr, 0, sizeof(sym));
     }
     return ptr;
 }
@@ -1566,7 +1566,7 @@ static unsigned int func_00411ECC(void) {
     return var_s2;
 }
 
-#ifdef _GNU_C
+#ifdef __GNUC__
 __attribute__((noreturn)) static long long func_0041213C(void) {}
 #else
 static long long func_0041213C(void) {} // The long long type is required to match
