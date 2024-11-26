@@ -678,6 +678,90 @@ out:
     }
 }
 
+int func_00413014(char arg0, char* arg1, int arg2, int* arg3) {
+    char c;
+
+    while (*arg1 = GETCHAR()) {
+        if (*arg1 == '\n') {
+            error(0x20014, 2, curloc);
+            return false;
+        }
+
+        if (*arg1 != '\\') {
+            return *arg1 != arg0;
+        }
+
+        *arg1 = GETCHAR();
+
+        switch(*arg1) {
+            case 'b':
+            case 'f':
+            case 'n':
+            case 'r':
+            case 't':
+            case 'v':
+                *arg1 = func_00410E40(*arg1);
+                return true;
+            case 'a':
+                if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
+                    *arg1 = func_00410E40(*arg1);
+                } else {
+                    *arg1 = 'a';
+                    error(0x20018, 0, curloc, *arg1);
+                }
+                return true;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+                if (!arg2) {
+                    int i;
+                    unsigned int value = *arg1 - '0';
+
+                    for (i = 0; i < 2; i++) {
+                        char c1 = GETCHAR();
+                        if (c1 >= '0' && c1 <= '7') {
+                            value = value * 8 + c1 - '0';
+                        } else {
+                            B_1002BA94--;
+                            if (*B_1002BA94 == '\n') {
+                                yyline--;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (value >= 256) {
+                        error(0x20015, 0, curloc, value);
+                    }
+                    *arg1 = value;
+                } else {
+                    *arg3 = 1;
+                }
+                return 1;
+            case 'x':
+                if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && !arg2) {
+                }
+
+                *arg1 = 'x';
+                if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
+                    error(0x20018, 0, curloc, *arg1);
+                }
+                if (arg2) {
+                    *arg3 = 1;
+                }
+                break;
+        }
+    }
+
+    error(0x20014, 2, curloc);
+    return false;
+}
+
 void useitall(void) {
     func_00410E40(32);
     func_00410EBC(0,0,0);
@@ -685,27 +769,5 @@ void useitall(void) {
     func_00411C00(0, 0, 0);
     func_00411C5C(0, 0, 0);
     func_00411CB8(1);
-}
-
-int func_00413014(char arg0, char* arg1, int arg2, int* arg3) {
-    char c;
-
-    switch(c = GETCHAR()) {
-        case '\n':
-            error(0x20014, 2, curloc);
-            return 0;
-        case '\\':
-            switch (*arg1 = GETCHAR()) {
-                case 'b':
-                case 'f':
-                case 'n':
-                case 'r':
-                case 't':
-                case 'v':
-                    *arg1 = func_00410E40(*arg1);
-                    return 1;
-                case 'a':
-                    
-            }
-    }
+    func_00413014(0, 0, 0, 0);
 }
