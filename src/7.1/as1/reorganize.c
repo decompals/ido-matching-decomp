@@ -7,6 +7,7 @@ struct unk_1 {
     unsigned unk0_C0 : 6;
 };
 
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/reorganize_init.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0042D240.s")
@@ -74,6 +75,7 @@ struct unk_1 {
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/eligible.s")
 
 //#pragma GLOBAL_ASM("asm/7.1/functions/as1/cannot_trap.s")
+*/
 
 int stores_to_memory(struct unk_1 arg0) {
     switch (arg0.unk0_C0) {
@@ -123,6 +125,7 @@ int loads_from_memory(struct unk_1 arg0) {
     }
 }
 
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/do_init_noalias.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/reorg_noalias.s")
@@ -149,4 +152,4 @@ int loads_from_memory(struct unk_1 arg0) {
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/init_reorg_state.s")
 
-
+*/

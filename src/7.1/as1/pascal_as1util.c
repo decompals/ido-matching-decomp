@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/get_byte_at_a_time.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/put_byte_at_a_time.s")
@@ -71,3 +72,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/find_matching_entry.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/number_pdr_entries.s")
+*/

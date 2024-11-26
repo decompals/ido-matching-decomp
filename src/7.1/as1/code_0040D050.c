@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/add_address_pair.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/set_address_pair.s")
@@ -51,4 +52,4 @@ void func_0040E340(void){
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0040F0BC.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0040F1C0.s")
-
+*/

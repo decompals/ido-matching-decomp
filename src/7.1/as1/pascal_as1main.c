@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00440E20.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00440E54.s")
@@ -22,3 +23,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/main.s")
 
+*/

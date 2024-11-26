@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00423100.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/update_live_ranges.s")
@@ -72,3 +73,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/schedule.s")
 
+*/
