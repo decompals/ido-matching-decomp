@@ -57,6 +57,7 @@ typedef struct TokenIdentifier {
 union YYLVAL {
     UnkOmega* node;
     TokenIdentifier identifier;
+    int loc;
 };
 
 extern int yyfile;
@@ -1036,6 +1037,181 @@ int func_004141C4(char arg0) {
         return tp;
     }
     return IDENTIFIER;
+}
+
+int scan(void) {
+    int sp58;
+    int sp54;
+    char c;
+    char c1;
+
+restart:
+    curloc = (int)(B_1002BA94 - B_10023A90) + B_1002BA98 - 1;
+    switch (c = input()) {
+        case 0:
+            B_1002BA94--;
+            return 0;
+        case '\n':
+            c1 = input();
+            while (c1 == ' ' || c1 == '\t') {
+                c1 = input();
+            }
+            if (c1 == '#') {
+                curloc = (int)(B_1002BA94 - B_10023A90) + B_1002BA98 - 1;
+                if (func_00410EBC(&sp58, B_1002BAA4, &sp54) == 1) {
+                    if (sp54) {
+                        register_file(B_1002BAA4, sp54);
+                    } else {
+                        register_file("", 1);
+                    }
+
+                    if (sp54) {                    
+                        while (c = input()) {
+                            if (c == '\n') {
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    c = '\n';
+                }
+            } else {
+                unput();
+            }
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            unput();
+            return func_00411CB8(0);
+        case '"':
+            return func_00413B2C();
+        case '\'':
+            return func_00413D68();
+        case '(':
+        case ')':
+        case ',':
+        case ';':
+        case '?':
+        case '[':
+        case ']':
+        case '{':
+        case '}':
+        case '~':
+            yylval.loc = curloc;
+            return c;
+        case ':':
+            if (options[21]) {
+                if (input() == ':') {
+                    c = input();
+                    if (c == '*') {
+                        yylval.loc = curloc;
+                        return COLCOLSTAR;
+                    }
+                    if (c == ' ' || c == '\t') {
+                        while (c1 = input()) {
+                            if (c1 != ' ' && c1 != '\t') {
+                                break;
+                            }
+                        }
+                        if (c1 == '*') {
+                            yylval.loc = curloc;
+                            return COLCOLSTAR;
+                        }
+                        unput();
+                        yylval.loc = curloc;
+                        return COLONCOLON;
+                    }
+                    unput();
+                    yylval.loc = curloc;
+                    return COLONCOLON;
+                }
+                unput();
+            }
+            yylval.loc = curloc;
+            return ':';
+        case '+':
+            c = input();
+            if (c == '=') {
+                yylval.loc = curloc;
+                return ADD_ASSIGN;
+            }
+            if (c == '+') {
+                yylval.loc = curloc;
+                return INC_OP;
+            }
+            if (c == ' ' || c == '\t') {
+                while (c1 = input()) {
+                    if (c1 != ' ' && c1 != '\t') {
+                        break;
+                    }
+                }
+
+                if (c1 == '=') {
+                    error(0x20111, 0, curloc, "+=");
+                    yylval.loc = curloc;
+                    return ADD_ASSIGN;
+                }
+            }
+            unput();
+            yylval.loc = curloc;
+            return '+';
+        case '-':
+            c = input();
+            if (c == '=') {
+                yylval.loc = curloc;
+                return SUB_ASSIGN;
+            }
+            if (c == '-') {
+                yylval.loc = curloc;
+                return DEC_OP;
+            }
+            if (c == '>') {
+                if (options[13]) {
+                    if (input() == '*') {
+                        yylval.loc = curloc;
+                        return MEMPTR_OP;
+                    }
+                    unput();
+                    yylval.loc = curloc;
+                    return PTR_OP;
+                }
+                yylval.loc = curloc;
+                return PTR_OP;
+            }
+            if (c == ' ' || c == '\t') {
+                while (c1 = input()) {
+                    if (c1 != ' ' && c1 != '\t') {
+                        break;
+                    }
+                }
+
+                if (c1 == '=') {
+                    error(0x20111, 0, curloc, "-=");
+                    yylval.loc = curloc;
+                    return SUB_ASSIGN;
+                }
+            }
+            unput();
+            yylval.loc = curloc;
+            return '-';
+        case '/':
+            c = input();
+            if (c == '=') {
+                yylval.loc = curloc;
+                return DIV_ASSIGN;
+            }
+            if (c == '*') {
+                
+            }
+            
+    }
 }
 
 void useitall(void) {
