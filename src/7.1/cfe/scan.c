@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "mem.h"
+#include "linklist.h"
 #include "y.tab.h"
 
 #define false 0
@@ -79,6 +80,7 @@ extern UnkOmega* int_type;
 extern unsigned short options[];
 extern unsigned long long __ULONGLONG_MAX;
 extern long long __LONGLONG_MAX;
+extern long long __LONGLONG_MIN;
 extern UnkChi* cur_lvl;
 
 static char func_004119A0(void);
@@ -1587,8 +1589,90 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
 
     if (a0 || B_1002BAAC == 1) {
         char* ptr = cpplinearr.loc[a1].unk_00 + B_10023A90 - B_1002BA98 + 1;
-        for ()
     } else {
 
     }
+}
+
+extern MemCtx* pmhandle;
+extern LinkedList* psymb_handle;
+extern LinkedList* isymb_handle;
+
+void init_scan(void) {
+    long long tmp;
+
+    pmhandle = mem_start();
+    B_1002BA9C = 0x1000;
+    B_1002BAA0 = Malloc(B_1002BA9C);
+    B_1002BAA4 = B_1002BAA0;
+    B_1002BAA8 = B_1002BAA0;
+
+    psymb_handle = link_start(pmhandle, 0xC);
+    isymb_handle = link_start(pmhandle, 0x14);
+
+    mk_parse_symb(string_to_symbol("__builtin_alignof", 17), ALIGNOF, 0);
+    mk_parse_symb(string_to_symbol("__builtin_classof", 17), CLASSOF, 0);
+    mk_parse_symb(string_to_symbol("__builtin_try", 13), TRY, 0);
+    mk_parse_symb(string_to_symbol("__builtin_except", 16), EXCEPT, 0);
+    mk_parse_symb(string_to_symbol("__builtin_finally", 17), FINALLY, 0);
+    mk_parse_symb(string_to_symbol("__unaligned", 11), UNALIGN, 0);
+    mk_parse_symb(string_to_symbol("__builtin_leave", 15), LEAVE, 0);
+    mk_parse_symb(string_to_symbol("auto", 4), AUTO, 0);
+    mk_parse_symb(string_to_symbol("break", 5), BREAK, 0);
+    mk_parse_symb(string_to_symbol("char", 4), CHAR, 0);
+    mk_parse_symb(string_to_symbol("case", 4), CASE, 0);
+    mk_parse_symb(string_to_symbol("const", 5), CONST, 0);
+    mk_parse_symb(string_to_symbol("continue", 8), CONTINUE, 0);
+    mk_parse_symb(string_to_symbol("double", 6), DOUBLE, 0);
+    mk_parse_symb(string_to_symbol("default", 7), DEFAULT, 0);
+    mk_parse_symb(string_to_symbol("do", 2), DO, 0);
+    mk_parse_symb(string_to_symbol("extern", 6), EXTERN, 0);
+    mk_parse_symb(string_to_symbol("else", 4), ELSE, 0);
+    mk_parse_symb(string_to_symbol("enum", 4), ENUM, 0);
+    mk_parse_symb(string_to_symbol("for", 3), FOR, 0);
+    mk_parse_symb(string_to_symbol("float", 5), FLOAT, 0);
+    mk_parse_symb(string_to_symbol("goto", 4), GOTO, 0);
+    mk_parse_symb(string_to_symbol("if", 2), IF, 0);
+    mk_parse_symb(string_to_symbol("int", 3), INT, 0);
+    mk_parse_symb(string_to_symbol("long", 4), LONG, 0);
+    mk_parse_symb(string_to_symbol("__long_long", 11), LONGLONG, 0);
+    mk_parse_symb(string_to_symbol("return", 6), RETURN, 0);
+    mk_parse_symb(string_to_symbol("register", 8), REGISTER, 0);
+    mk_parse_symb(string_to_symbol("switch", 6), SWITCH, 0);
+    mk_parse_symb(string_to_symbol("struct", 6), STRUCT, 0);
+    mk_parse_symb(string_to_symbol("signed", 6), SIGNED, 0);
+    mk_parse_symb(string_to_symbol("sizeof", 6), SIZEOF, 0);
+    mk_parse_symb(string_to_symbol("short", 5), SHORT, 0);
+    mk_parse_symb(string_to_symbol("static", 6), STATIC, 0);
+    mk_parse_symb(string_to_symbol("typedef", 7), TYPEDEF, 0);
+    mk_parse_symb(string_to_symbol("unsigned", 8), UNSIGNED, 0);
+    mk_parse_symb(string_to_symbol("union", 5), UNION, 0);
+    mk_parse_symb(string_to_symbol("void", 4), VOID, 0);
+    mk_parse_symb(string_to_symbol("volatile", 8), VOLATILE, 0);
+    mk_parse_symb(string_to_symbol("while", 5), WHILE, 0);
+    mk_parse_symb(string_to_symbol("__builtin_alignof", 17), ALIGNOF, 0);
+    mk_parse_symb(string_to_symbol("__pragma", 8), __PRAGMA, 0);
+    if (!options[13] && !(options[5] & 1) || !options[13] && (options[5] & 3) == 3) {
+        mk_parse_symb(string_to_symbol("__inline", 8), INLINE, 0);
+    }
+    if (options[13]) {
+        mk_parse_symb(string_to_symbol("class", 5), CLASS, 0);
+        mk_parse_symb(string_to_symbol("virtual", 7), VIRTUAL, 0);
+        mk_parse_symb(string_to_symbol("protected", 9), PROTECTED, 0);
+        mk_parse_symb(string_to_symbol("public", 6), PUBLIC, 0);
+        mk_parse_symb(string_to_symbol("private", 7), PRIVATE, 0);
+        mk_parse_symb(string_to_symbol("operator", 8), OPERATOR, 0);
+        mk_parse_symb(string_to_symbol("this", 4), THIS, 0);
+        mk_parse_symb(string_to_symbol("new", 3), NEW, 0);
+        mk_parse_symb(string_to_symbol("delete", 6), DELETE, 0);
+        mk_parse_symb(string_to_symbol("inline", 6), INLINE, 0);
+        mk_parse_symb(string_to_symbol("friend", 6), FRIEND, 0);
+    }
+
+    func_00411554();
+    tmp = 0x7FFFFFFF;
+
+    __LONGLONG_MAX = 1 + tmp * 2 + tmp * 2 * (tmp + 1);
+    __ULONGLONG_MAX = __LONGLONG_MAX * 2 + 1;
+    __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
