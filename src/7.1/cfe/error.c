@@ -204,7 +204,7 @@ void lint_warning(ErrorStruct* arg0) {
 static void func_0040FECC(ErrorStruct* arg0) {
     char* sp3C;
     int sp38 = 0;
-    static char* B_10021B38;
+    static char B_10021B38[1024];
 
     if ((arg0->message >> 20) != 0 && B_10022F58[arg0->message & 0xFFFF]) {
         return;
@@ -262,7 +262,7 @@ static void func_0040FECC(ErrorStruct* arg0) {
     }
 
     if ((options[3] & 2) && sp3C != NULL && sp38 != 0) {
-        cpp_line_ptr(B_10020F38 + strlen(B_10020F38), &B_10021B38, arg0->location);
+        cpp_line_ptr(B_10020F38 + strlen(B_10020F38), B_10021B38, arg0->location);
     }
     if (options[3] & 4) {
         func_0040F730(B_10020F38 + strlen(B_10020F38), arg0->message & 0xFFFF, 1);

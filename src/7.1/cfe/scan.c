@@ -9,6 +9,8 @@
 #define false 0
 #define true 1
 
+#define GET_SYM_CAT(x) (x != 0 ? (x == -1 ? "typedef" : "keyword") : "regular")
+
 typedef struct Location {
     int unk_00;
     int unk_04;
@@ -26,7 +28,6 @@ static int B_1002BAAC;
 static FILE* B_1002BAB0;
 static int B_1002BAB4;
 
-
 typedef struct UnkOmega {
     char unk_00[0x04];
     int unk_04;
@@ -41,13 +42,19 @@ typedef struct UnkChi {
 } UnkChi;
 
 typedef struct UnkQwe {
-    int unk_00;
+    LinkedListEntry link;
     int unk_04;
+    int unk_08;
 } UnkQwe;
 
 typedef struct UnkPsi {
     int unk_00;
     UnkQwe* unk_04;
+    int unk_08;
+    int unk_0C;
+    int unk_10;
+    int unk_14;
+    char unk_18[1];
 } UnkPsi;
 
 typedef struct TokenIdentifier {
@@ -82,6 +89,11 @@ extern unsigned long long __ULONGLONG_MAX;
 extern long long __LONGLONG_MAX;
 extern long long __LONGLONG_MIN;
 extern UnkChi* cur_lvl;
+extern MemCtx* pmhandle;
+extern LinkedList* psymb_handle;
+extern LinkedList* isymb_handle;
+extern char debug_arr[];
+extern FILE* dbgout;
 
 static char func_004119A0(void);
 static char func_00411938(void);
@@ -95,6 +107,7 @@ UnkOmega* make_uiconstant(int, UnkOmega*, unsigned long long);
 UnkOmega* make_iconstant(int, UnkOmega*, long long);
 unsigned int sizeof_type(int);
 char* get_type_name(int);
+UnkQwe* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2);
 int loc_to_cppline(int);
 
 void adjust_vwbuf(void) {
@@ -1558,45 +1571,130 @@ label2:
     }
 }
 
-int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
-    int sp58 = (int)(arg1 - arg0) / 2;
-    int a1;
-    int a0;
-    int t2 = 1;
-    int i;
+int cpp_line_ptr(char* arg0, int arg1, int arg2) {
+    int sp58;
+    int sp50;
+    int sp4C;
+    char* sp20;
+    int temp_a0;
+    int temp_v1;
+    int var_a0;
+    int var_a1;
+    int var_s0;
+    int var_v1;
+    char var_v0_2;
+    char* var_a3;
+    char* var_v0;
 
-    a1 = loc_to_cppline(arg2);
-
-    if (cpplinearr.loc[a1].unk_00 == arg2 && a1 == cppline) {
-        a1--;
+    temp_v1 = arg1 - (int)arg0;
+    sp58 = temp_v1 / 2;
+    var_a1 = loc_to_cppline(arg2);
+    var_s0 = cpplinearr.loc[var_a1].unk_00;
+    sp50 = 0;
+    if (var_s0 == arg2 && var_a1 == cppline) {
+        var_a1--;
         arg2--;
+        var_s0 = cpplinearr.loc[var_a1].unk_00;
     }
-
-    a0 = 1;
-    if (a1 == cppline || cpplinearr.loc[a1].unk_00 < B_1002BA98 || cpplinearr.loc[a1].unk_00 > B_1002BA98 + 0x8000) {
-        a0 = 0;
+    
+    temp_a0 = arg2 - var_s0;
+    if (temp_a0 > temp_v1 / 3) {
+        sp50 = temp_a0 - temp_v1 / 3;
     }
-
-    if (a0 && cpplinearr.loc[a1 + 1].unk_00 < B_1002BA98 && cpplinearr.loc[a1 + 1].unk_00 > B_1002BA98 + 0x8000) {
-        a0 = 0;
+    var_a0 = 1;
+    if (var_a1 == cppline || var_s0 < B_1002BA98 || B_1002BA98 + 0x8000 < var_s0) {
+        var_a0 = 0;
     }
-
+    
+    if ((var_a0 != 0) && (cpplinearr.loc[var_a1 + 1].unk_00 < B_1002BA98 || B_1002BA98 + 0x8000 < cpplinearr.loc[var_a1 + 1].unk_00)) {
+        var_a0 = 0;
+    }
+    
     *arg0++ = ' ';
-    if (t2 != 0) {
-        memcpy(arg0, ".... ", 5);
+    var_a3 = arg0;
+    if (sp50 != 0) {
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = ' ';
         arg0 += 5;
     }
-
-    if (a0 || B_1002BAAC == 1) {
-        char* ptr = cpplinearr.loc[a1].unk_00 + B_10023A90 - B_1002BA98 + 1;
+    
+    sp20 = arg0;
+    
+    if (var_a0 || B_1002BAAC == 1) {
+        var_v0 = ((var_s0 + B_10023A90) - B_1002BA98) + 1;
+        for (var_v1 = 0; var_v1 < sp50; var_v1++) {
+            var_v0++;
+        }
+        while (*var_v0 != 0 && *var_v0 != '\n') {
+            if (var_a3 - arg0 < sp58) {
+                *var_a3++ = *var_v0++;
+            } else {
+                var_a3[-1] = 0x2E;
+                var_a3[-2] = 0x2E;
+                var_a3[-3] = 0x2E;
+                var_a3[-4] = 0x2E;
+                var_a3[-5] = 0x20;
+                break;
+            }
+        }
+        if (var_a3[-1] != '\n') {
+            *var_a3++ = '\n';
+        }
     } else {
-
+        if (fseek(B_1002BAB0, var_s0, 0) != -1) {
+            sp4C = 0;
+            while ((var_v0_2 = fgetc(B_1002BAB0)) != -1) {
+                if (sp4C < sp50) {
+                    sp4C++;
+                } else if (var_a3 - arg0 < sp58) {
+                    *var_a3++ = var_v0_2;
+                    if (var_v0_2 == '\n') {
+                        break;
+                    }
+                } else {
+                    var_a3[-1] = 0xA;
+                    var_a3[-2] = 0x2E;
+                    var_a3[-3] = 0x2E;
+                    var_a3[-4] = 0x2E;
+                    var_a3[-5] = 0x2E;
+                    var_a3[-6] = 0x20;
+                    break;
+                }
+            }
+        }
     }
+    
+    *var_a3++ = ' ';    
+    if (sp50 != 0) {
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = '.';
+        *var_a3++ = ' ';
+    }
+    
+    while (var_s0 < arg2 - sp50) {
+        if (*sp20 == 0xA) {
+            *arg0 = 0;
+            return 0;
+        }
+        if (*sp20 == '\t') {
+            *var_a3++ = '\t';
+        } else {
+            *var_a3++ = '-';
+        }
+        sp20++;
+        var_s0++;
+    }
+    
+    *var_a3++ = '^';
+    *var_a3++ = '\n';
+    *var_a3++ = 0;
+    return 1;
 }
-
-extern MemCtx* pmhandle;
-extern LinkedList* psymb_handle;
-extern LinkedList* isymb_handle;
 
 void init_scan(void) {
     long long tmp;
@@ -1607,7 +1705,7 @@ void init_scan(void) {
     B_1002BAA4 = B_1002BAA0;
     B_1002BAA8 = B_1002BAA0;
 
-    psymb_handle = link_start(pmhandle, 0xC);
+    psymb_handle = link_start(pmhandle, sizeof(UnkQwe));
     isymb_handle = link_start(pmhandle, 0x14);
 
     mk_parse_symb(string_to_symbol("__builtin_alignof", 17), ALIGNOF, 0);
@@ -1675,4 +1773,24 @@ void init_scan(void) {
     __LONGLONG_MAX = 1 + tmp * 2 + tmp * 2 * (tmp + 1);
     __ULONGLONG_MAX = __LONGLONG_MAX * 2 + 1;
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
+}
+
+UnkQwe* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2) {
+    UnkQwe* psymb;
+    UnkQwe* prev;
+    
+    psymb = (UnkQwe*)get_link_elem(psymb_handle);
+    psymb->unk_04 = arg1;
+    psymb->unk_08 = arg2;
+    prev = psymb->link.next = arg0->unk_04;
+    arg0->unk_04 = psymb;
+
+    if (debug_arr[80] > 0) {
+        fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
+            arg0->unk_14, arg0->unk_18,
+            psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),
+            prev, prev != NULL ? prev->unk_08 : -1, prev != NULL ? GET_SYM_CAT(prev->unk_04) : "<nil>");
+    }
+
+    return psymb;
 }
