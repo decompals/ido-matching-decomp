@@ -36,7 +36,7 @@ The following table specify if each binary has been matched or not, and if it ha
 | `uopt`    | :x: | :x: | :x: | :x: |
 | `ugen`    | :x: | :x: | :x: | :x: |
 | `as1`     | :x: | :x: | :x: | :x: |
-| `as0`     | :x: | :x: | :x: | :x: |
+| `as0`     | :heavy_check_mark: | :x: | :x: | :x: |
 | `ld`      | :x: | :x: | :x: | :x: |
 | `uld`     | :x: | :x: | :x: | :x: |
 | `umerge`  | :x: | :x: | :x: | :x: |
