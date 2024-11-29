@@ -1571,47 +1571,45 @@ label2:
     }
 }
 
-int cpp_line_ptr(char* arg0, int arg1, int arg2) {
+int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
+    char* vv;
     int sp58;
+    int var_a0;
     int sp50;
     int sp4C;
-    char* sp20;
-    int temp_a0;
-    int temp_v1;
-    int var_a0;
     int var_a1;
-    int var_s0;
     int var_v1;
-    char var_v0_2;
+    int var_v0_2;
     char* var_a3;
+    int unused1;
+    int unused2;
+    int var_s0;    
     char* var_v0;
-
-    temp_v1 = arg1 - (int)arg0;
-    sp58 = temp_v1 / 2;
+    
+    sp58 = (arg1 - arg0) / 2;
     var_a1 = loc_to_cppline(arg2);
     var_s0 = cpplinearr.loc[var_a1].unk_00;
-    sp50 = 0;
+    
     if (var_s0 == arg2 && var_a1 == cppline) {
         var_a1--;
         arg2--;
         var_s0 = cpplinearr.loc[var_a1].unk_00;
     }
-    
-    temp_a0 = arg2 - var_s0;
-    if (temp_a0 > temp_v1 / 3) {
-        sp50 = temp_a0 - temp_v1 / 3;
+    if (arg2 - var_s0 > (arg1 - arg0) / 3) {
+        sp50 = arg2 - var_s0 - (arg1 - arg0) / 3;
+    } else {
+        sp50 = 0;
     }
     var_a0 = 1;
     if (var_a1 == cppline || var_s0 < B_1002BA98 || B_1002BA98 + 0x8000 < var_s0) {
         var_a0 = 0;
     }
-    
     if ((var_a0 != 0) && (cpplinearr.loc[var_a1 + 1].unk_00 < B_1002BA98 || B_1002BA98 + 0x8000 < cpplinearr.loc[var_a1 + 1].unk_00)) {
         var_a0 = 0;
     }
+    *arg0 = ' ';
+    var_a3 = arg0 + 1;   
     
-    *arg0++ = ' ';
-    var_a3 = arg0;
     if (sp50 != 0) {
         *var_a3++ = '.';
         *var_a3++ = '.';
@@ -1621,22 +1619,21 @@ int cpp_line_ptr(char* arg0, int arg1, int arg2) {
         arg0 += 5;
     }
     
-    sp20 = arg0;
     
     if (var_a0 || B_1002BAAC == 1) {
         var_v0 = ((var_s0 + B_10023A90) - B_1002BA98) + 1;
         for (var_v1 = 0; var_v1 < sp50; var_v1++) {
             var_v0++;
         }
-        while (*var_v0 != 0 && *var_v0 != '\n') {
+        while (*var_v0 != 0 && *var_v0 != '\n' && var_a3 - arg0 <= sp58) {
             if (var_a3 - arg0 < sp58) {
                 *var_a3++ = *var_v0++;
             } else {
-                var_a3[-1] = 0x2E;
-                var_a3[-2] = 0x2E;
-                var_a3[-3] = 0x2E;
-                var_a3[-4] = 0x2E;
-                var_a3[-5] = 0x20;
+                var_a3[-1] = '.';
+                var_a3[-2] = '.';
+                var_a3[-3] = '.';
+                var_a3[-4] = '.';
+                var_a3[-5] = ' ';
                 break;
             }
         }
@@ -1651,16 +1648,18 @@ int cpp_line_ptr(char* arg0, int arg1, int arg2) {
                     sp4C++;
                 } else if (var_a3 - arg0 < sp58) {
                     *var_a3++ = var_v0_2;
-                    if (var_v0_2 == '\n') {
+                    if ((char)var_v0_2 == '\n') {
                         break;
                     }
                 } else {
-                    var_a3[-1] = 0xA;
-                    var_a3[-2] = 0x2E;
-                    var_a3[-3] = 0x2E;
-                    var_a3[-4] = 0x2E;
-                    var_a3[-5] = 0x2E;
-                    var_a3[-6] = 0x20;
+                    var_a3[-1] = '\n';
+                    var_a3[-2] = '.';
+                    var_a3[-3] = '.';
+                    var_a3[-4] = '.';
+                    if (B_1002BA98 && B_1002BA98) {}
+                    var_a3[-5] = '.';
+                    var_a3[-6] = ' ';
+                    
                     break;
                 }
             }
@@ -1676,17 +1675,18 @@ int cpp_line_ptr(char* arg0, int arg1, int arg2) {
         *var_a3++ = ' ';
     }
     
+    vv = arg0 + 1;
     while (var_s0 < arg2 - sp50) {
-        if (*sp20 == 0xA) {
-            *arg0 = 0;
+        if (*vv == '\n') {
+            *arg0 = (*vv) * 0; // fake match
             return 0;
         }
-        if (*sp20 == '\t') {
+        if (*vv == '\t') {
             *var_a3++ = '\t';
         } else {
             *var_a3++ = '-';
         }
-        sp20++;
+        vv++;
         var_s0++;
     }
     
