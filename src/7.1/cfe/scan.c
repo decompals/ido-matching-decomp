@@ -6,27 +6,30 @@
 #include "linklist.h"
 #include "y.tab.h"
 
-#define false 0
-#define true 1
+#define FALSE 0
+#define TRUE 1
+
+#define BUFFER_SIZE 0x8000
 
 #define GET_SYM_CAT(x) (x != 0 ? (x == -1 ? "typedef" : "keyword") : "regular")
 
 typedef struct Location {
-    int unk_00;
-    int unk_04;
-    int unk_08;
+    int offset;
+    int file;
+    int line;
 } Location;
 
-static char B_10023A90[1];
-static char* B_1002BA94;
-static int B_1002BA98;
-static unsigned int B_1002BA9C;
-static void* B_1002BAA0;
-static char* B_1002BAA4;
-static int* B_1002BAA8;
-static int B_1002BAAC;
-static FILE* B_1002BAB0;
-static int B_1002BAB4;
+/* .bss       */
+/* 0x10023A90 */ static char input_buffer[BUFFER_SIZE + 1];
+/* 0x1002BA94 */ static char* inbuf_ptr;
+/* 0x1002BA98 */ static int offset_in_file;
+/* 0x1002BA9C */ static unsigned int tokenbuf_size;
+/* 0x1002BAA0 */ static void* tokenbuf_base;
+/* 0x1002BAA4 */ static char* token;
+/* 0x1002BAA8 */ static int* wstring_base;
+/* 0x1002BAAC */ static int input_file_status;
+/* 0x1002BAB0 */ static FILE* input_file;
+/* 0x1002BAB4 */ static int input_file_eof;
 
 typedef struct UnkOmega {
     char unk_00[0x04];
@@ -69,6 +72,14 @@ union YYLVAL {
     int loc;
 };
 
+typedef struct CppLineArr {
+    unsigned int lines;
+    Location* loc;
+} CppLineArr;
+
+extern CppLineArr cpplinearr;
+extern unsigned int cppline;
+
 extern int yyfile;
 extern int yyline;
 extern char* infile;
@@ -96,7 +107,7 @@ extern char debug_arr[];
 extern FILE* dbgout;
 
 static char func_004119A0(void);
-static char func_00411938(void);
+static char next_char(void);
 void register_file(char*, int);
 int error(int, int, int, ...);
 float str_to_float(char* arg0, int arg1, int arg2);
@@ -110,53 +121,58 @@ char* get_type_name(int);
 UnkQwe* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2);
 int loc_to_cppline(int);
 
+#define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : func_004119A0())
+#define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
+
 void adjust_vwbuf(void) {
-    B_1002BA9C *= 1.333;
-    B_1002BAA0 = Realloc(B_1002BAA0, B_1002BA9C);
-    B_1002BAA4 = B_1002BAA0;
-    B_1002BAA8 = B_1002BAA0;
+    tokenbuf_size *= 1.333;
+    tokenbuf_base = Realloc(tokenbuf_base, tokenbuf_size);
+    token = tokenbuf_base;
+    wstring_base = tokenbuf_base;
 }
 
 Location* yylocation(Location* arg0) {
     Location ret;
     
-    ret.unk_00 = (int)(B_1002BA94 - B_10023A90) + B_1002BA98;
-    ret.unk_04 = yyfile;
-    ret.unk_08 = yyline;
+    ret.offset = (int)(inbuf_ptr - input_buffer) + offset_in_file;
+    ret.file = yyfile;
+    ret.line = yyline;
 
     *arg0 = ret;
     return arg0;
 }
 
-char* get_buffer(int arg0) {
-    if (arg0 != 0x8000) {
+char* get_buffer(int size) {
+    if (size != BUFFER_SIZE) {
         return NULL;
     }
-    B_1002BAAC = 0;
-    return &B_10023A90[1];
+    input_file_status = 0;
+    return &input_buffer[1];
 }
 
-void cpp_write(char* arg0, int arg1) {
-    if (arg1 != 0x8000 && B_1002BAAC == 0) {
-        B_1002BAAC = 1;
-        B_10023A90[arg1 + 1] = 0;
-    } else if (arg1 == 0x8000 && B_1002BAAC == 0) {
+void cpp_write(char* data, int size) {
+    if (size != BUFFER_SIZE && input_file_status == 0) {
+        input_file_status = 1;
+        input_buffer[size + 1] = 0;
+    } else if (size == BUFFER_SIZE && input_file_status == 0) {
         char* name = tempnam("", "");
-        B_1002BAB0 = fopen(name, "w+");
-        if (B_1002BAB0 == NULL) {
+
+        input_file = fopen(name, "w+");
+        if (input_file == NULL) {
             error(0x2001A, 3, -1, infile != NULL ? infile : "");
         } else {
+            // remove this file when it's closed
             unlink(name);
         }
 
-        fwrite(arg0, 1, arg1, B_1002BAB0);
-        if (ferror(B_1002BAB0)) {
+        fwrite(data, 1, size, input_file);
+        if (ferror(input_file)) {
             error(0x10047, 3, -1, name);
         }
-        B_1002BAAC = 2;
+        input_file_status = 2;
     } else {
-        fwrite(arg0, 1, arg1, B_1002BAB0);
-        if (ferror(B_1002BAB0)) {
+        fwrite(data, 1, size, input_file);
+        if (ferror(input_file)) {
             error(0x10047, 3, -1, "temporary for buffering");
         }
     }
@@ -166,33 +182,31 @@ void free_buffer(char* arg0) {
 
 }
 
-static int func_00410E40(char arg0) {
-    switch (arg0) {
+static int unescape(char c) {
+    switch (c) {
         case 'a':
-            return 7;
+            return '\a';
         case 'b':
-            return 8;
+            return '\b';
         case 'f':
-            return 12;
+            return '\f';
         case 'n':
-            return 10;
+            return '\n';
         case 'r':
-            return 13;
+            return '\r';
         case 't':
-            return 9;
+            return '\t';
         case 'v':
-            return 11;
+            return '\v';
     }
 }
 
-#define input() (isprint(*B_1002BA94) ? *B_1002BA94++ : func_004119A0())
-#define unput() B_1002BA94--; if (*B_1002BA94 == '\n') { yyline--; }
-
-static int func_00410EBC(int* arg0, char* arg1, int* arg2) {
+static int scan_line_and_filename(int* line, char* filename, int* hasFilename) {
     char c;
     char* ptr;
 
     while (c = input()) {
+        // skip whitespaces
         if (c == ' ' || c == '\t') {
             continue;
         }
@@ -200,12 +214,13 @@ static int func_00410EBC(int* arg0, char* arg1, int* arg2) {
         if (c == '\n' || c == 0) {
             return 0;
         }
-
+        // digit encountered -> read line number
         if (isdigit(c)) {
             break;
         }
 
         if (c == 'l' && (c = input()) == 'i' && (c = input()) == 'n' && (c = input()) == 'e') {
+            // skip "line" word
             continue;
         } else {
 out:
@@ -221,40 +236,40 @@ out:
                 }
             }
         
-            return 0;
+            return FALSE;
         }
     }
 
-    *arg0 = c - '0';
-    while (c = (func_00411938() == '\n' ? '\n' : input())) {
+    // read line number
+    *line = c - '0';
+    while (c = (next_char() == '\n' ? '\n' : input())) {
         if (isdigit(c)) {
-            *arg0 = *arg0 * 10 + c - '0';
+            *line = *line * 10 + c - '0';
         } else {
             if (c != '\n') {
-                B_1002BA94--;
-                if (*B_1002BA94 == '\n') {
-                    yyline--;
-                }
+                unput();
             }
             break;
         }
     }
 
-    while (c = (func_00411938() == '\n' ? '\n' : input())) {
+    while (c = (next_char() == '\n' ? '\n' : input())) {
         if (c != ' ' && isprint(c)) {
             break;
         }
         if (c == '\n') {
-            *arg2 = 0;
-            return 1;
+            // only line, without filename
+            *hasFilename = FALSE;
+            return TRUE;
         }
     }
 
+    // filename starts with quote
     if (c != '"') {
         goto out;
     }
 
-    ptr = arg1;
+    ptr = filename;
     while ((c = input()) != '"') {
         if (c == '\n' || c == 0) {
             goto out;
@@ -262,50 +277,52 @@ out:
         *ptr++ = c;
     }
     *ptr = 0;
-    *arg2 = 1;
-    return 1;
+    *hasFilename = TRUE;
+    return TRUE;
 }
 
 static int func_00411554(void) {
     int nread;
     int unused[3];
-    int sp34;
+    int line;
     char c;
-    int sp2C;
+    int hasFilename;
 
-    if (B_1002BA94 == NULL) {
-        if (B_1002BAAC == 2) {
-            rewind(B_1002BAB0);
+    if (inbuf_ptr == NULL) {
+        if (input_file_status == 2) {
+            rewind(input_file);
         }
-        B_1002BA98 = 0;
-    } else if (*B_1002BA94 == 0) {
-        if (B_1002BAAC == 2 && B_1002BAB4 != 0) {
-            return 0;
-        }
-
-        if (B_1002BAAC == 1) {
-            return 0;
+        offset_in_file = 0;
+    } else if (*inbuf_ptr == 0) {
+        if (input_file_status == 2 && input_file_eof) {
+            return FALSE;
         }
 
-        if (B_1002BAAC == 0) {
+        if (input_file_status == 1) {
+            return FALSE;
+        }
+
+        if (input_file_status == 0) {
             error(0x20095, 1, 0);
-            return 0;
+            return FALSE;
         }
 
-        B_1002BA94--;
-        B_10023A90[0] = *B_1002BA94;
-        B_1002BA98 += (int)(B_1002BA94 - B_10023A90);
-        B_1002BA94 = B_10023A90 + 1;
+        // copy one char to the new buffer
+        inbuf_ptr--;
+        input_buffer[0] = *inbuf_ptr;
+
+        offset_in_file += (int)(inbuf_ptr - input_buffer);
+        inbuf_ptr = input_buffer + 1;
     }
 
-    if (B_1002BAAC == 2) {        
-        if (fseek(B_1002BAB0, B_1002BA98, SEEK_SET) == -1) {
+    if (input_file_status == 2) {        
+        if (fseek(input_file, offset_in_file, SEEK_SET) == -1) {
             return 0;
         }
 
-        nread = fread(B_10023A90 + 1, 1, 0x8000, B_1002BAB0);
-        B_10023A90[1 + nread] = 0;
-        if (ferror(B_1002BAB0)) {
+        nread = fread(input_buffer + 1, 1, BUFFER_SIZE, input_file);
+        input_buffer[1 + nread] = 0;
+        if (ferror(input_file)) {
             error(0x10046, 3, -1, "temporary for buffering");
             return 0;
         }
@@ -313,77 +330,66 @@ static int func_00411554(void) {
             return 0;
         }
 
-        if (feof(B_1002BAB0)) {
-            B_1002BAB4 = 1;
+        if (feof(input_file)) {
+            input_file_eof = TRUE;
         } else {
-            B_1002BAB4 = 0;
+            input_file_eof = FALSE;
         }
     }
 
-    if (B_1002BA94 == NULL) {
-        B_1002BA94 = B_10023A90 + 1;
-        if (B_10023A90[1] == '#') {
-            B_1002BA94++;
-            if (func_00410EBC(&sp34, B_1002BAA4, &sp2C) == 1) {
-                if (sp2C) {
-                    register_file(B_1002BAA4, sp34);
+    if (inbuf_ptr == NULL) {
+        inbuf_ptr = input_buffer + 1;
+        if (input_buffer[1] == '#') {
+            inbuf_ptr++;
+            if (scan_line_and_filename(&line, token, &hasFilename) == 1) {
+                if (hasFilename) {
+                    register_file(token, line);
                 } else {
                     register_file("", 1);
                 }
 
-                if (sp2C) {                    
+                if (hasFilename) {                    
                     while (c = input()) {
                         if (c == '\n') {
                             break;
                         }
                     }
                 }
-                B_1002BA94--;
-                if (*B_1002BA94 == '\n') {
-                    yyline--;
-                }
+                unput();
             }
         } else {
             register_file(infile != NULL ? infile : "", 1);
         }
     }
 
-    return 1;
+    return TRUE;
 }
 
 static void func_00411930(void) {
 
 }
 
-static char func_00411938(void) {
-    if (B_1002BA94 == NULL || *B_1002BA94 == 0) {
+static char next_char(void) {
+    if (inbuf_ptr == NULL || *inbuf_ptr == 0) {
         func_00411554();
     }
-    return *B_1002BA94;
+    return *inbuf_ptr;
 }
-
-typedef struct CppLineArr {
-    unsigned int lines;
-    Location* loc;
-} CppLineArr;
-
-extern CppLineArr cpplinearr;
-extern unsigned int cppline;
 
 // NONMATCHING
 static char func_004119A0(void) {
-    if (B_1002BA94 == NULL || *B_1002BA94 == 0) {
+    if (inbuf_ptr == NULL || *inbuf_ptr == 0) {
         if (func_00411554()) {
             return input();
         }
 
-        return *B_1002BA94++;
+        return *inbuf_ptr++;
     }
 
-    if (*B_1002BA94 == '\n') {
+    if (*inbuf_ptr == '\n') {
         yyline++;
-        if (cppline == 0 || ((int)(B_1002BA94 - B_10023A90) + B_1002BA98) != cpplinearr.loc[cppline].unk_00) {
-            char* ptr = B_1002BA94 + 1;
+        if (cppline == 0 || ((int)(inbuf_ptr - input_buffer) + offset_in_file) != cpplinearr.loc[cppline].offset) {
+            char* ptr = inbuf_ptr + 1;
             if (*ptr != '#') {
                 
                 while (*ptr == ' ' || *ptr == '\t') {
@@ -393,24 +399,26 @@ static char func_004119A0(void) {
                 if (*ptr != '\n') {
                     cppline++;
                     if (cppline >= cpplinearr.lines) {
-                        cpplinearr.lines = cppline + 0x100;
-                        cpplinearr.loc = Realloc(cpplinearr.loc, cpplinearr.lines * 3 << 2);
-                        yylocation(cpplinearr.loc + cppline);
+                        int newvar = cppline + 0x100;
+
+                        cpplinearr.lines = newvar;
+                        cpplinearr.loc = Realloc(cpplinearr.loc, newvar * 12);
+                        yylocation(&cpplinearr.loc[cppline]);
                     } else {
-                        yylocation(cpplinearr.loc + cppline);
+                        yylocation(&cpplinearr.loc[cppline]);
                     }
                 }
             }
         }
-        B_1002BA94++;
+        inbuf_ptr++;
         return '\n';
     }
 
-    if (*B_1002BA94 == '\t' || *B_1002BA94 == '\f' || *B_1002BA94 == '\v') {
-        return *B_1002BA94++;
+    if (*inbuf_ptr == '\t' || *inbuf_ptr == '\f' || *inbuf_ptr == '\v') {
+        return *inbuf_ptr++;
     }
 
-    return *B_1002BA94++;
+    return *inbuf_ptr++;
 }
 
 static float func_00411C00(char* arg0, char* arg1, int arg2) {
@@ -431,27 +439,27 @@ static double func_00411C5C(char* arg0, char* arg1, int arg2) {
     }
 }
 
-static int func_00411CB8(int arg0) {
-    int spC4 = false;
-    int spC0 = false;
+static int scan_number(int firstCharIsDot) {
+    int spC4 = FALSE;
+    int spC0 = FALSE;
     char* s1;
-    int spB8 = false;
-    int spB4 = false;
-    int spB0 = false;
-    int spAC = false;
-    int s4 = false;
-    int spA4 = false;    
+    int spB8 = FALSE;
+    int spB4 = FALSE;
+    int spB0 = FALSE;
+    int spAC = FALSE;
+    int s4 = FALSE;
+    int spA4 = FALSE;    
     char* s2;
     char c;
     char sp9E = 0;        
     char c1;
 
-    if (arg0) {
-        s4 = true;
-        *B_1002BAA4 = '.';
-        s1 = B_1002BAA4 + 1;
+    if (firstCharIsDot) {
+        s4 = TRUE;
+        *token = '.';
+        s1 = token + 1;
     } else {
-        s1 = B_1002BAA4;
+        s1 = token;
     }
 
     if(s4) {} // required to match
@@ -460,15 +468,15 @@ static int func_00411CB8(int arg0) {
         if (isdigit(c)) {
             *s1++ = c;
 
-            if (s1 == B_1002BAA4 + 1 && c == '0') {
-                spC0 = true;
+            if (s1 == token + 1 && c == '0') {
+                spC0 = TRUE;
             }
             if (spC0 && c > '7' && sp9E == 0) {
                 sp9E = c;
             }
         } else if (c == 'X' || c == 'x') {
-            if (s1 == B_1002BAA4 + 1 && *B_1002BAA4 == '0') {
-                spC4 = true;
+            if (s1 == token + 1 && *token == '0') {
+                spC4 = TRUE;
                 *s1++ = c;
                 while (c = input()) {
                     if (!isxdigit(c)) {
@@ -481,18 +489,18 @@ static int func_00411CB8(int arg0) {
                 break;
             }
         } else if (c == '.') {
-            if (arg0) {
+            if (firstCharIsDot) {
                 break;
             }
 
-            spC0 = false;
-            arg0 = true;
-            s4 = true;
+            spC0 = FALSE;
+            firstCharIsDot = TRUE;
+            s4 = TRUE;
             *s1++ = c;
         } else if (c == 'e' || c == 'E') {
             *s1++ = c;
-            spC0 = false;
-            s4 = true;
+            spC0 = FALSE;
+            s4 = TRUE;
             c1 = input();
             if (c1 == '+' || c1 == '-') {
                 *s1++ = c1;
@@ -512,50 +520,44 @@ static int func_00411CB8(int arg0) {
         }
     }
 out:
-    B_1002BA94--;
-    if (*B_1002BA94 == '\n') {
-        yyline--;
-    }
+    unput();
 
     while (c = input()) {
         if (s4 && (c == 'f' || c == 'F')) {
-            spAC = true;
+            spAC = TRUE;
             *s1++ = c;
             break;
         } else if (!s4 && !spB8 && (c == 'u' || c == 'U')) {
-            spB8 = true;
+            spB8 = TRUE;
             *s1++ = c;
             if (spB0) {
                 break;
             }
         } else if (!s4 && !spB0 && (c == 'l' || c == 'L')) {
             if (spB4) {
-                spB0 = true;
-                spB4 = false;
+                spB0 = TRUE;
+                spB4 = FALSE;
             } else {
-                spB4 = true;
+                spB4 = TRUE;
             }
             *s1++ = c;
         } else if (s4 && (c == 'l' || c == 'L')) {
-            spB4 = true;
+            spB4 = TRUE;
             *s1++ = c;
             break;
         } else {
-            B_1002BA94--;
-            if (*B_1002BA94 == '\n') {
-                yyline--;
-            }
+            unput();
             break;
         }
     }
 
     if (s4) {
         if (spAC) {
-            func_00411C00(B_1002BAA4, s1, curloc);
-            yylval.node = make(0x65, curloc, float_type, string_to_symbol(B_1002BAA4, s1 - B_1002BAA4));
+            func_00411C00(token, s1, curloc);
+            yylval.node = make(0x65, curloc, float_type, string_to_symbol(token, s1 - token));
         } else {
-            func_00411C5C(B_1002BAA4, s1, curloc);
-            yylval.node = make(0x65, curloc, double_type, string_to_symbol(B_1002BAA4, s1 - B_1002BAA4));
+            func_00411C5C(token, s1, curloc);
+            yylval.node = make(0x65, curloc, double_type, string_to_symbol(token, s1 - token));
         }
         return CONSTANT;
     } else {
@@ -565,18 +567,18 @@ out:
         int s52 = spB0;
         int sp80 = 0;
         int sp7C = 0;
-        int s6 = false;
+        int s6 = FALSE;
 
         if (s52 && ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
             error(0x20131, 1, curloc, "long long constants (LL)");
         }
 
         if (spC4) {
-            if (s1 == B_1002BAA4 + 2) {
-                spA4 = true;
+            if (s1 == token + 2) {
+                spA4 = TRUE;
                 error(0x2010B, 0, curloc);
             }
-            for (s2 = B_1002BAA4 + 2; s2 < s1; s2++) {
+            for (s2 = token + 2; s2 < s1; s2++) {
                 if (!isxdigit(*s2)) {
                     break;
                 }
@@ -584,10 +586,10 @@ out:
                 sp80 += 4;
                 if (!spA4 && !s6 && (s52 && sp8C > __ULONGLONG_MAX / 16 || s42 > 0xFFFFFFFF / 16)) {
                     if (s52 || (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 5) == 5) {
-                        s6 = true;
+                        s6 = TRUE;
                     } else {
-                        sp7C = true;
-                        s52 = true;
+                        sp7C = TRUE;
+                        s52 = TRUE;
                         sp8C = s42;                        
                         s42 = 0;
                     }
@@ -600,17 +602,17 @@ out:
                 }
             }
         } else if (spC0 && sp9E == 0) {
-            for (s2 = B_1002BAA4 + 1; s2 < s1; s2++) {
+            for (s2 = token + 1; s2 < s1; s2++) {
                 if (*s2 < '0' || *s2 > '7') {
                     break;
                 }
                 sp80 += 3;
                 if (!s6 && (s52 && sp8C > __ULONGLONG_MAX / 8 || s42 > 0xFFFFFFFF / 8)) {
                     if (s52 || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-                        s6 = true;
+                        s6 = TRUE;
                     } else {
-                        sp7C = true;
-                        s52 = true;
+                        sp7C = TRUE;
+                        s52 = TRUE;
                         sp8C = s42;                        
                         s42 = 0;
                     }
@@ -628,7 +630,7 @@ out:
                 spC0 = 0;
             }
             
-            for (s2 = B_1002BAA4; s2 < s1; s2++) {
+            for (s2 = token; s2 < s1; s2++) {
                 unsigned int s0;
                 if (!isdigit(*s2)) {
                     break;
@@ -636,10 +638,10 @@ out:
                 s0 = *s2 - '0';
                 if (!s6 && (s52 && (sp8C > __ULONGLONG_MAX / 10 || sp8C * 10 > __ULONGLONG_MAX - s0) || (s42 > 0xFFFFFFFF / 10 || s42 * 10 > 0xFFFFFFFF - s0))) {
                     if (s52 || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-                        s6 = true;
+                        s6 = TRUE;
                     } else {
-                        sp7C = true;
-                        s52 = true;
+                        sp7C = TRUE;
+                        s52 = TRUE;
                         sp8C = s42;                        
                         s42 = 0;
                     }
@@ -734,8 +736,8 @@ restart:
             goto eof;
         case '\n':
             error(0x20014, 2, curloc);
-retfalse:
-            return false;
+retFALSE:
+            return FALSE;
         case '\\':    
             switch(*arg1 = input()) {
                 case '\n':
@@ -746,11 +748,11 @@ retfalse:
                 case 'r':
                 case 't':
                 case 'v':
-                    *arg1 = func_00410E40(*arg1);
+                    *arg1 = unescape(*arg1);
                     break;
                 case 'a':
                     if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
-                        *arg1 = func_00410E40(*arg1);
+                        *arg1 = unescape(*arg1);
                     } else {
                         *arg1 = 'a';
                         error(0x20018, 0, curloc, *arg1);
@@ -794,20 +796,14 @@ retfalse:
                                 value = value * 16 + (isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10);
                                 c = input();
                             }
-                            B_1002BA94--;
-                            if (*B_1002BA94 == '\n') {
-                                yyline--;
-                            }
+                            unput();
                             if (value > 255 || (int)value < 0) {
                                 error(0x20016, 0, curloc, value, 255);
                             }
                             *arg1 = value;
                             break;
                         } else {
-                            B_1002BA94--;
-                            if (*B_1002BA94 == '\n') {
-                                yyline--;
-                            }
+                            unput();
                         }
                     }
         
@@ -822,7 +818,7 @@ retfalse:
                 case 0:
 eof:
                     error(0x20017, 2, curloc);
-                    goto retfalse;
+                    goto retFALSE;
                 default:                    
                     if (islower(*arg1)) {
                         error(0x20018, 0, curloc, *arg1);
@@ -832,12 +828,12 @@ eof:
             break;
         default:
             if (*arg1 == arg0) {
-                goto retfalse;
+                goto retFALSE;
             }
             break;
     }
     
-    return true;
+    return TRUE;
 }
 
 static int func_004136C8(char arg0, char* arg1) {
@@ -845,12 +841,12 @@ static int func_004136C8(char arg0, char* arg1) {
     int i;
     unsigned int value;    
     int unused;
-    int sp44 = false;
-    int sp40 = false;
-    int sp3C = false;    
+    int sp44 = FALSE;
+    int sp40 = FALSE;
+    int sp3C = FALSE;    
 
     if (!func_00413014(arg0, arg1, 1, &sp3C)) {
-        return false;
+        return FALSE;
     }
     if (1) {} if (1) {} if (1) {} if (1) {}
     if (sp3C) {
@@ -864,18 +860,15 @@ static int func_004136C8(char arg0, char* arg1) {
                         while (isxdigit(c)) {
                             value = value * 16 + (isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10);
                             if (sp40) {
-                                sp44 = true;
+                                sp44 = TRUE;
                                 break;
                             }
                             if (value >> 28) {
-                                sp40 = true;
+                                sp40 = TRUE;
                             }
                             c = input();
                         }
-                        B_1002BA94--;
-                        if (*B_1002BA94 == '\n') {
-                            yyline--;
-                        }
+                        unput();
                         if (sp44) {
                             error(0x20016, 0, curloc, value, 0xFFFFFFFF);
                         }
@@ -912,82 +905,82 @@ static int func_004136C8(char arg0, char* arg1) {
         *(int*)arg1 = *arg1;
     }
 
-    return true;
+    return TRUE;
 }
 
-static int func_00413B2C(void) {
+static int scan_string(void) {
     char* ptr;    
     int len;
     int unused;
     int sp38 = 0;
 
-    for (ptr = B_1002BAA4, len = 0; func_00413014('"', ptr, 0, &sp38); ptr++, len++) {
-        if (len >= B_1002BA9C - 1) {
+    for (ptr = token, len = 0; func_00413014('"', ptr, 0, &sp38); ptr++, len++) {
+        if (len >= tokenbuf_size - 1) {
             adjust_vwbuf();
-            ptr = &B_1002BAA4[len];
+            ptr = &token[len];
         }
     }
 
     *ptr = 0;
-    yylval.node = make(0x65, curloc, array_type, B_1002BAA4, ptr - B_1002BAA4 + 1);
+    yylval.node = make(0x65, curloc, array_type, token, ptr - token + 1);
     return STRING;
 }
 
-static int func_00413C54(void) {
+static int scan_wstring(void) {
     int* ptr;
     int len;
 
-    for (ptr = B_1002BAA8, len = 0; func_004136C8('"', ptr); ptr++, len++) {
-        if (len >= (B_1002BA9C >> 2) - 1) {
+    for (ptr = wstring_base, len = 0; func_004136C8('"', ptr); ptr++, len++) {
+        if (len >= (tokenbuf_size >> 2) - 1) {
             adjust_vwbuf();
-            ptr = &B_1002BAA8[len];
+            ptr = &wstring_base[len];
         }
     }
 
     *ptr = 0;
-    yylval.node = make(0x68, curloc, array_type, B_1002BAA8, len + 1);
+    yylval.node = make(0x68, curloc, array_type, wstring_base, len + 1);
     return WSTRING;
 }
 
-static int func_00413D68(void) {
+static int scan_char(void) {
     char* ptr;
     int sp30 = 0;
     unsigned int len;
 
-    for (ptr = B_1002BAA4; func_00413014('\'', ptr, 0, &sp30); ptr++) {
+    for (ptr = token; func_00413014('\'', ptr, 0, &sp30); ptr++) {
     }
 
-    len = ptr - B_1002BAA4;
+    len = ptr - token;
     if (len > 4 || len == 0) {
         error(0x20011, 0, curloc);
     }
-    len = ptr - B_1002BAA4;
+    len = ptr - token;
     switch(len) {
         case 0:
             yylval.node = make_iconstant(curloc, int_type, 0);
             break;
         case 1:
-            yylval.node = make_iconstant(curloc, int_type, options[6] ? (signed char)B_1002BAA4[0] : (unsigned char)B_1002BAA4[0]);
+            yylval.node = make_iconstant(curloc, int_type, options[6] ? (signed char)token[0] : (unsigned char)token[0]);
             break;
         case 2:
             if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[0] : (unsigned char)B_1002BAA4[0]) << 8) + B_1002BAA4[1]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 8) + token[1]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[1] : (unsigned char)B_1002BAA4[1]) << 8) + B_1002BAA4[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[1] : (unsigned char)token[1]) << 8) + token[0]));
             }
             break;
         case 3:
             if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[0] : (unsigned char)B_1002BAA4[0]) << 16) + (B_1002BAA4[1] << 8) + B_1002BAA4[2]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 16) + (token[1] << 8) + token[2]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[2] : (unsigned char)B_1002BAA4[2]) << 16) + (B_1002BAA4[1] << 8) + B_1002BAA4[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[2] : (unsigned char)token[2]) << 16) + (token[1] << 8) + token[0]));
             }
             break;
         default:
             if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[0] : (unsigned char)B_1002BAA4[0]) << 24) + (B_1002BAA4[1] << 16) + (B_1002BAA4[2] << 8) + B_1002BAA4[3]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 24) + (token[1] << 16) + (token[2] << 8) + token[3]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)B_1002BAA4[3] : (unsigned char)B_1002BAA4[3]) << 24) + (B_1002BAA4[2] << 16) + (B_1002BAA4[1] << 8) + B_1002BAA4[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[3] : (unsigned char)token[3]) << 24) + (token[2] << 16) + (token[1] << 8) + token[0]));
             }
             break;
     }
@@ -995,13 +988,13 @@ static int func_00413D68(void) {
     return CONSTANT;
 }
 
-static int func_00414114(void) {
+static int scan_wchar(void) {
     int* ptr;
 
-    for (ptr = B_1002BAA8; func_004136C8('\'', ptr); ptr++) {
+    for (ptr = wstring_base; func_004136C8('\'', ptr); ptr++) {
     }
 
-    yylval.node = make_iconstant(curloc, long_type, *B_1002BAA8);
+    yylval.node = make_iconstant(curloc, long_type, *wstring_base);
     return CONSTANT;
 }
 
@@ -1009,13 +1002,13 @@ void func_004141BC(void) {
 
 }
 
-static int func_004141C4(char arg0) {
+static int scan_identifier(char firstChar) {
     char c;
-    char* ptr = B_1002BAA4;
+    char* ptr = token;
     int len;
     int tp;
 
-    *ptr++ = arg0;
+    *ptr++ = firstChar;
 
     while (c = input()) {
         if (!(isalnum(c) || c == '_' || c == '$' && options[7])) {
@@ -1023,15 +1016,15 @@ static int func_004141C4(char arg0) {
             break;
         }
 
-        if (ptr - B_1002BAA4 >= B_1002BA9C) {
-            len = ptr - B_1002BAA4;
+        if (ptr - token >= tokenbuf_size) {
+            len = ptr - token;
             adjust_vwbuf();
-            ptr = &B_1002BAA4[len];
+            ptr = &token[len];
         }
         *ptr++ = c;
     }
 
-    yylval.identifier.unk_04 = string_to_symbol(B_1002BAA4, ptr - B_1002BAA4);
+    yylval.identifier.unk_04 = string_to_symbol(token, ptr - token);
     yylval.identifier.unk_08 = curloc;
     yylval.identifier.unk_00 = 0;
 
@@ -1058,16 +1051,16 @@ static int func_004141C4(char arg0) {
 int scan(void) {
     char c;
     char c1;
-    int sp58;
+    int lineNo;
     int sp54;    
 
 restart:
-    curloc = (int)(B_1002BA94 - B_10023A90) + B_1002BA98 - 1;
+    curloc = (int)(inbuf_ptr - input_buffer) + offset_in_file - 1;
     c = input();
 label2:
     switch (c) {
         case 0:
-            B_1002BA94--;
+            inbuf_ptr--;
             return 0;
         case '\n':
             c = input();
@@ -1075,16 +1068,16 @@ label2:
                 c = input();
             }
             if (c == '#') {
-                curloc = (int)(B_1002BA94 - B_10023A90) + B_1002BA98 - 1;
-                if (func_00410EBC(&sp58, B_1002BAA4, &sp54) != 1) {
+                curloc = (int)(inbuf_ptr - input_buffer) + offset_in_file - 1;
+                if (scan_line_and_filename(&lineNo, token, &sp54) != 1) {
                     c = '\n';
                     goto label2;
                 }
                 
                 if (sp54) {
-                    register_file(B_1002BAA4, sp58);
+                    register_file(token, lineNo);
                 } else {
-                    register_file(NULL, sp58);
+                    register_file(NULL, lineNo);
                 }
 
                 if (sp54) {
@@ -1115,11 +1108,11 @@ label2:
         case '8':
         case '9':
             unput();
-            return func_00411CB8(0);
+            return scan_number(FALSE);
         case '"':
-            return func_00413B2C();
+            return scan_string();
         case '\'':
-            return func_00413D68();
+            return scan_char();
         case '(':
         case ')':
         case ',':
@@ -1236,7 +1229,7 @@ label2:
                 return DIV_ASSIGN;
             }
             if (c == '*') {
-                while (true) {
+                while (TRUE) {
                     c = input();
                     if (c == '*') {
                         c = input();
@@ -1425,7 +1418,7 @@ label2:
             }
             if (isdigit(c)) {
                 unput();
-                return func_00411CB8(1);
+                return scan_number(TRUE);
             }
             unput();
             yylval.loc = curloc;
@@ -1497,13 +1490,13 @@ label2:
         case 'L':
             c = input();
             if (c == '"') {
-                return func_00413C54();
+                return scan_wstring();
             }
             if (c == '\'') {
-                return func_00414114();
+                return scan_wchar();
             }
             unput();
-            return func_004141C4('L');
+            return scan_identifier('L');
         case '$':
         case 'A':
         case 'B':
@@ -1558,7 +1551,7 @@ label2:
         case 'y':
         case 'z':
             if (c == '$' && options[7] || c != '$') {
-                return func_004141C4(c);
+                return scan_identifier(c);
             }
             /* fallthrough */
         default:
@@ -1588,12 +1581,12 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     
     sp58 = (arg1 - arg0) / 2;
     var_a1 = loc_to_cppline(arg2);
-    var_s0 = cpplinearr.loc[var_a1].unk_00;
+    var_s0 = cpplinearr.loc[var_a1].offset;
     
     if (var_s0 == arg2 && var_a1 == cppline) {
         var_a1--;
         arg2--;
-        var_s0 = cpplinearr.loc[var_a1].unk_00;
+        var_s0 = cpplinearr.loc[var_a1].offset;
     }
     if (arg2 - var_s0 > (arg1 - arg0) / 3) {
         sp50 = arg2 - var_s0 - (arg1 - arg0) / 3;
@@ -1601,10 +1594,10 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
         sp50 = 0;
     }
     var_a0 = 1;
-    if (var_a1 == cppline || var_s0 < B_1002BA98 || B_1002BA98 + 0x8000 < var_s0) {
+    if (var_a1 == cppline || var_s0 < offset_in_file || offset_in_file + BUFFER_SIZE < var_s0) {
         var_a0 = 0;
     }
-    if ((var_a0 != 0) && (cpplinearr.loc[var_a1 + 1].unk_00 < B_1002BA98 || B_1002BA98 + 0x8000 < cpplinearr.loc[var_a1 + 1].unk_00)) {
+    if ((var_a0 != 0) && (cpplinearr.loc[var_a1 + 1].offset < offset_in_file || offset_in_file + BUFFER_SIZE < cpplinearr.loc[var_a1 + 1].offset)) {
         var_a0 = 0;
     }
     *arg0 = ' ';
@@ -1620,8 +1613,8 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     }
     
     
-    if (var_a0 || B_1002BAAC == 1) {
-        var_v0 = ((var_s0 + B_10023A90) - B_1002BA98) + 1;
+    if (var_a0 || input_file_status == 1) {
+        var_v0 = ((var_s0 + input_buffer) - offset_in_file) + 1;
         for (var_v1 = 0; var_v1 < sp50; var_v1++) {
             var_v0++;
         }
@@ -1641,9 +1634,9 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
             *var_a3++ = '\n';
         }
     } else {
-        if (fseek(B_1002BAB0, var_s0, 0) != -1) {
+        if (fseek(input_file, var_s0, 0) != -1) {
             sp4C = 0;
-            while ((var_v0_2 = fgetc(B_1002BAB0)) != -1) {
+            while ((var_v0_2 = fgetc(input_file)) != -1) {
                 if (sp4C < sp50) {
                     sp4C++;
                 } else if (var_a3 - arg0 < sp58) {
@@ -1656,7 +1649,7 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
                     var_a3[-2] = '.';
                     var_a3[-3] = '.';
                     var_a3[-4] = '.';
-                    if (B_1002BA98 && B_1002BA98) {}
+                    if (offset_in_file && offset_in_file) {}
                     var_a3[-5] = '.';
                     var_a3[-6] = ' ';
                     
@@ -1698,12 +1691,13 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
 
 void init_scan(void) {
     long long tmp;
+    long long tmp2;
 
     pmhandle = mem_start();
-    B_1002BA9C = 0x1000;
-    B_1002BAA0 = Malloc(B_1002BA9C);
-    B_1002BAA4 = B_1002BAA0;
-    B_1002BAA8 = B_1002BAA0;
+    tokenbuf_size = 0x1000;
+    tokenbuf_base = Malloc(tokenbuf_size);
+    token = tokenbuf_base;
+    wstring_base = tokenbuf_base;
 
     psymb_handle = link_start(pmhandle, sizeof(UnkQwe));
     isymb_handle = link_start(pmhandle, 0x14);
@@ -1768,9 +1762,10 @@ void init_scan(void) {
     }
 
     func_00411554();
+    
     tmp = 0x7FFFFFFF;
-
-    __LONGLONG_MAX = 1 + tmp * 2 + tmp * 2 * (tmp + 1);
+    tmp2 = 1 + tmp * 2;
+    __LONGLONG_MAX = tmp2 + tmp * 2 * (tmp + 1);
     __ULONGLONG_MAX = __LONGLONG_MAX * 2 + 1;
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
