@@ -13,7 +13,7 @@ CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
-	IDO_TC      := cc cfe
+	IDO_TC      := cc cfe ugen
 else ifeq ($(VERSION),5.3)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe as0
@@ -95,9 +95,12 @@ SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*"
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+P_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.p)) # Pascal files
+
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
 
 O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
+            $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
             $(foreach f,$(S_FILES:.s=.o),$(BUILD)/$(f))
 
 # Automatic dependency files
@@ -145,6 +148,11 @@ $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 $(BUILD)/%.o: %.c
 	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+
+$(BUILD)/%.o: %.p
+	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+
+
 
 
 ## Disassembly
