@@ -146,6 +146,7 @@ $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD)/%.o: %.c
+	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
 $(BUILD)/%.o: %.p

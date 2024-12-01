@@ -309,7 +309,7 @@ static char input_any_char(void) {
 
                 if (*ptr != '\n') {
                     cppline++;
-                    if (cppline >= cpplinearr.size) {
+                    if (cppline >= (unsigned int)cpplinearr.size) {
                         cpplinearr.size = cppline + 0x100;
                         cpplinearr.loc = Realloc(cpplinearr.loc, cpplinearr.size * (signed)sizeof(Location));
                         temp = &cpplinearr;
@@ -478,7 +478,7 @@ out:
         int unused;
         unsigned long long longLongValue = 0;
         int isLongLong = hasLongLongSuffix;
-        int bitSize = 0;
+        unsigned int bitSize = 0;
         int hasTypePromotion = 0;
         int hasOverflow = FALSE;
 
@@ -583,7 +583,7 @@ out:
         } else if (hasUnsignedSuffix) {
             yylval.node = make_uiconstant(curloc, uint_type, (unsigned int)longValue);
         } else if (isLongLong) {
-            if (longLongValue <= __LONGLONG_MAX) {
+            if (longLongValue <= (unsigned long long)__LONGLONG_MAX) {
                 yylval.node = make_iconstant(curloc, longlong_type, (long long)longLongValue);
             } else {
                 yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)longLongValue);
@@ -827,7 +827,7 @@ static int read_wstring_character(char stopChar, char* buffer) {
 
 static int scan_string(void) {
     char* ptr;    
-    int len;
+    unsigned int len;
     int unused;
     int hasNumeric = FALSE;
 
@@ -845,7 +845,7 @@ static int scan_string(void) {
 
 static int scan_wstring(void) {
     int* ptr;
-    int len;
+    unsigned int len;
 
     for (ptr = wstring_base, len = 0; read_wstring_character('"', (char*)ptr); ptr++, len++) {
         if (len >= (tokenbuf_size >> 2) - 1) {
@@ -933,7 +933,7 @@ static int scan_identifier(char firstChar) {
             break;
         }
 
-        if (ptr - token >= tokenbuf_size) {
+        if ((unsigned int)(ptr - token) >= tokenbuf_size) {
             len = ptr - token;
             adjust_vwbuf();
             ptr = &token[len];
@@ -1327,7 +1327,7 @@ label2:
                 }
                 unput();
                 yylval.loc = curloc;
-                return '..'; // what?
+                return 0x2E2E; // '..'
             }
             if (c == '*' && options[13]) {
                 yylval.loc = curloc;
@@ -1490,7 +1490,7 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     int var_a0;
     int sp50;
     int sp4C;
-    int var_a1;
+    unsigned int var_a1;
     int var_v1;
     int var_v0_2;
     char* var_a3;

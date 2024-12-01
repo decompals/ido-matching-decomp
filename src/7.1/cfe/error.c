@@ -1,3 +1,10 @@
+#ifdef __GNUC__
+#define __STDARG_H__
+#define va_list int
+#define va_start(x, y)
+#define va_arg(x, y) (0)
+#endif
+
 #include "common.h"
 
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/error.c,v 1.9 1994/06/15 00:22:07 rdahl Exp $";
@@ -10,14 +17,14 @@ typedef struct ErrorStruct {
     /* 0x10 */ char* params[4];
 } ErrorStruct; // size = 0x20
 
-static int D_1001BA24[7][3] = {
-    { 2, 2, 2 },
-    { 1, 1, 1 },
-    { 3, 3, 3 },
-    { 1, 2, 1 },
-    { 4, 4, 4 },
-    { 4, 1, 1 },
-    { 4, 2, 2 },
+static int default_error_levels[7][3] = {
+    { LEVEL_ERROR, LEVEL_ERROR, LEVEL_ERROR },
+    { LEVEL_WARNING, LEVEL_WARNING, LEVEL_WARNING },
+    { LEVEL_FATAL, LEVEL_FATAL, LEVEL_FATAL },
+    { LEVEL_WARNING, LEVEL_ERROR, LEVEL_WARNING },
+    { LEVEL_SUPPRESSED, LEVEL_SUPPRESSED, LEVEL_SUPPRESSED },
+    { LEVEL_SUPPRESSED, LEVEL_WARNING, LEVEL_WARNING },
+    { LEVEL_SUPPRESSED, LEVEL_ERROR, LEVEL_ERROR },
 };
 
 extern int err_options[]; // 1001BAB0
@@ -68,7 +75,8 @@ void set_error_mode(int error_mode) {
 }
 
 static void get_error_message(char* buffer, int msgid, int type) {
-    int offset, length;
+    int offset;
+    size_t length;
     int i;
 
     if (current_mesg_file == NULL) {
@@ -263,20 +271,20 @@ int error(int message, int level, int location, ...) {
     int unused;
 
     if (msgid > 356) {
-        real_level = 3;
-    } else if (level == 0) {
-        real_level = D_1001BA24[err_options[msgid]][mode];
+        real_level = LEVEL_FATAL;
+    } else if (level == LEVEL_DEFAULT) {
+        real_level = default_error_levels[err_options[msgid]][mode];
     } else {
         real_level = level;
     }
 
-    if (real_level == 4) {
-        return 4;
+    if (real_level == LEVEL_SUPPRESSED) {
+        return LEVEL_SUPPRESSED;
     }
 
     if (real_level == 1) {
         if (!(options[3] & 1) || warning_disabled[msgid]) {
-            return 4;
+            return LEVEL_SUPPRESSED;
         }
         num_warns++;
     }
@@ -313,7 +321,7 @@ int error(int message, int level, int location, ...) {
     ers->level = real_level;
     ers->location = location;
 
-    if (real_level == 3 || real_level == 6) {
+    if (real_level == LEVEL_FATAL || real_level == LEVEL_6) {
         print_immediately = TRUE;
     }
     if (location == -1) {
@@ -336,11 +344,11 @@ int error(int message, int level, int location, ...) {
         a0->next = &ers->link;
     }
 
-    if (real_level == 3) {
+    if (real_level == LEVEL_FATAL) {
         fatal();
     }
 
-    if (real_level == 2) {
+    if (real_level == LEVEL_ERROR) {
         int v1 = (message >> 16) & 0xF;
         num_errs++;
 

@@ -6,7 +6,7 @@ enum ErrorLevels {
     LEVEL_WARNING = 1,
     LEVEL_ERROR = 2,
     LEVEL_FATAL = 3,
-    LEVEL_4 = 4,
+    LEVEL_SUPPRESSED = 4,
     LEVEL_6 = 6
 };
 

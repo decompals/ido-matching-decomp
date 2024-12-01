@@ -117,5 +117,6 @@ unsigned int sizeof_type(int);
 char* get_type_name(int);
 ParseSymbol* mk_parse_symb(Symbol* arg0, int arg1, int arg2);
 int loc_to_cppline(int);
+void fatal(void);
 
 #endif
