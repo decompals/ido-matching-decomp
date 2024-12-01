@@ -6,8 +6,8 @@
 #include "unistd.h"
 #include "cmplrs/binasm.h"
 
-static FILE* binasm_file; // binasm_file
-static char binasm_name[2]; // binasm_name
+static FILE* binasm_file;
+static char binasm_name[2];
 
 void cat_files(char* arg0, char* arg1) {
     char buf[0x2000];
