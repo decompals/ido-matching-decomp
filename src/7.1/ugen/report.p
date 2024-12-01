@@ -25,14 +25,12 @@ begin
 end;
 
 (*
-*  @function: report_error
-* 
 *  Reports an exception in ugen internals
 *
-*  @param error_kind    Kind of error to be printed (Fix, info, warn, etc..)
-*  @param line          Line that is causing the exception in ugen
-*  @param internal_file File where is located the exception
-*  @param error         Exception message
+*  @param: error_kind    Kind of error to be printed (Fix, info, warn, etc..)
+*  @param: line          Line that is causing the exception in ugen
+*  @param: internal_file File where is located the exception
+*  @param: error         Exception message
 *)
 procedure report_error(error_kind: u8; line: CARDINAL; internal_file: String; error: String); 
 begin
