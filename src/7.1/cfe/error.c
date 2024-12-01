@@ -28,8 +28,6 @@ static int default_error_levels[7][3] = {
     { LEVEL_SUPPRESSED, LEVEL_ERROR, LEVEL_ERROR },
 };
 
-extern int err_options[]; // 1001BAB0
-
 /* .data      */
 static FILE* D_1001BA78 = stderr; // not sure if it's correct value
 

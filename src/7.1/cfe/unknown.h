@@ -102,6 +102,7 @@ extern LinkedList* psymb_handle;
 extern LinkedList* isymb_handle;
 extern char debug_arr[];
 extern FILE* dbgout;
+extern int err_options[];
 
 int real_file_line(int, char**, int*, int);
 int cpp_line_ptr(char*, char*, int);
