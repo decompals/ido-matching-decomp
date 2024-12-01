@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/wrreloc.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0044BA08.s")
@@ -15,3 +16,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0044C468.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/wrobj.s")
+*/

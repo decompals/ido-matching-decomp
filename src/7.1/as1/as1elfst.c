@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/put_as_table.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/elf_st_openobj.s")
@@ -73,3 +74,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/create_comment_section.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/create_pdr_exception_section.s")
+*/

@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00428920.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_00428980.s")
@@ -29,3 +30,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/do_xbb_opt.s")
 
 
+*/

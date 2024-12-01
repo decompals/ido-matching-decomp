@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/macro_error.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/disp.s")
@@ -96,3 +97,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/parsestmt.s")
 
+*/

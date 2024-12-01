@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/null_terminate.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/eindex.s")
@@ -32,3 +33,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/grow_array_size.s")
 
+*/

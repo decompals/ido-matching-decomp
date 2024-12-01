@@ -2,6 +2,7 @@
 #include "stdlib.h"
 
 
+/*
 //#pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0041CC50.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/func_0041CCE0.s")
@@ -98,3 +99,4 @@
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/ll_load_immed.s")
 
+*/

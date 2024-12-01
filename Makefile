@@ -13,10 +13,10 @@ CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
-	IDO_TC      := cc cfe
+	IDO_TC      := cc cfe ugen
 else ifeq ($(VERSION),5.3)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
-	IDO_TC      := cc cfe
+	IDO_TC      := cc cfe as0
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
 endif
@@ -34,8 +34,12 @@ ASM     := asm
 SYMBOLS := symbols
 CONTEXT := context
 
-CC       := $(RECOMP)/build/7.1/out/cc
-CC_OLD   := $(RECOMP)/build/5.3/out/cc
+ifeq ($(VERSION),7.1)
+        CC	:= $(RECOMP)/build/7.1/out/cc
+else ifeq ($(VERSION),5.3)
+        CC  	:= $(RECOMP)/build/5.3/out/cc
+endif
+
 
 AS         := $(MIPS_BINUTILS_PREFIX)as
 LD         := $(MIPS_BINUTILS_PREFIX)ld
@@ -79,6 +83,7 @@ CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNING
 
 
 # -- Location of original IDO binaries
+
 IRIX_BASE    ?= $(RECOMP)/ido
 IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 
@@ -90,9 +95,12 @@ SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*"
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+P_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.p)) # Pascal files
+
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
 
 O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
+            $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
             $(foreach f,$(S_FILES:.s=.o),$(BUILD)/$(f))
 
 # Automatic dependency files
@@ -139,6 +147,11 @@ $(BUILD)/$(ASM)/%.o: $(ASM)/%.s
 
 $(BUILD)/%.o: %.c
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+
+$(BUILD)/%.o: %.p
+	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+
+
 
 
 ## Disassembly

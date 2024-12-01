@@ -1,3 +1,4 @@
+/*
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/atoe.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/get_fp_string.s")
@@ -27,3 +28,4 @@
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/emit_fp_const.s")
 
 #pragma GLOBAL_ASM("asm/7.1/functions/as1/emit_pool_const.s")
+*/
