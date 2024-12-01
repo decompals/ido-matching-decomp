@@ -1,24 +1,22 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <string.h>
-#include <limits.h>
-#include "mem.h"
-#include "linklist.h"
-#include "y.tab.h"
+#include "common.h"
 
-#define FALSE 0
-#define TRUE 1
+char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/scan.c,v 1.32 1995/02/27 22:12:08 rdahl Exp $";
 
 #define BUFFER_SIZE 0x8000
+#define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : input_any_char())
+#define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
 
-#define GET_SYM_CAT(x) (x != 0 ? (x == -1 ? "typedef" : "keyword") : "regular")
+typedef struct TokenIdentifier {
+    int unk_00;
+    Symbol* unk_04;
+    int unk_08;
+} TokenIdentifier;
 
-typedef struct Location {
-    int offset;
-    int file;
-    int line;
-} Location;
+union YYLVAL {
+    UnkOmega* node;
+    TokenIdentifier identifier;
+    int loc;
+};
 
 /* .bss       */
 /* 0x10023A90 */ static char input_buffer[BUFFER_SIZE + 1];
@@ -32,98 +30,8 @@ typedef struct Location {
 /* 0x1002BAB0 */ static FILE* input_file; // temp file used for buffering
 /* 0x1002BAB4 */ static int input_file_eof;
 
-typedef struct UnkOmega {
-    char unk_00[0x04];
-    int unk_04;
-    struct UnkOmega* unk_08;
-    char unk_0C[0x0C];
-    int unk_18;
-} UnkOmega;
-
-typedef struct UnkChi {
-    int unk_00;
-    int unk_04;
-} UnkChi;
-
-typedef struct ParseSymbol {
-    LinkedListEntry link;
-    int unk_04;
-    int unk_08;
-} ParseSymbol;
-
-typedef struct UnkPsi {
-    int unk_00;
-    ParseSymbol* unk_04;
-    int unk_08;
-    int unk_0C;
-    int unk_10;
-    int namelen;
-    char name[1];
-} UnkPsi;
-
-typedef struct TokenIdentifier {
-    int unk_00;
-    UnkPsi* unk_04;
-    int unk_08;
-} TokenIdentifier;
-
-union YYLVAL {
-    UnkOmega* node;
-    TokenIdentifier identifier;
-    int loc;
-};
-
-typedef struct CppLineArr {
-    int size;
-    Location* loc;
-} CppLineArr;
-
-extern CppLineArr cpplinearr;
-extern unsigned int cppline;
-
-extern int yyfile;
-extern int yyline;
-extern char* infile;
-extern int origfile;
-extern int curloc;
-extern union YYLVAL yylval;
-extern void* float_type;
-extern void* double_type;
-extern void* ulonglong_type;
-extern void* longlong_type;
-extern void* array_type;
-extern void* ulong_type;
-extern UnkOmega* long_type;
-extern void* uint_type;
-extern UnkOmega* int_type;
-extern unsigned short options[];
-extern unsigned long long __ULONGLONG_MAX;
-extern long long __LONGLONG_MAX;
-extern long long __LONGLONG_MIN;
-extern UnkChi* cur_lvl;
-extern MemCtx* pmhandle;
-extern LinkedList* psymb_handle;
-extern LinkedList* isymb_handle;
-extern char debug_arr[];
-extern FILE* dbgout;
-
 static char input_any_char(void);
 static char next_char(void);
-void register_file(char*, int);
-int error(int, int, int, ...);
-float str_to_float(char* arg0, int arg1, int arg2);
-double str_to_double(char* arg0, int arg1, int arg2);
-void* make(int, ...);
-UnkPsi* string_to_symbol(char*, size_t);
-UnkOmega* make_uiconstant(int, UnkOmega*, unsigned long long);
-UnkOmega* make_iconstant(int, UnkOmega*, long long);
-unsigned int sizeof_type(int);
-char* get_type_name(int);
-ParseSymbol* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2);
-int loc_to_cppline(int);
-
-#define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : input_any_char())
-#define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
 
 void adjust_vwbuf(void) {
     tokenbuf_size *= 1.333;
@@ -160,7 +68,7 @@ void cpp_write(char* data, int size) {
 
         input_file = fopen(name, "w+");
         if (input_file == NULL) {
-            error(0x2001A, 3, -1, infile != NULL ? infile : "");
+            error(0x2001A, LEVEL_FATAL, -1, infile != NULL ? infile : "");
         } else {
             // remove this file when it's closed
             unlink(name);
@@ -168,13 +76,13 @@ void cpp_write(char* data, int size) {
 
         fwrite(data, 1, size, input_file);
         if (ferror(input_file)) {
-            error(0x10047, 3, -1, name);
+            error(0x10047, LEVEL_FATAL, -1, name);
         }
         input_file_status = 2;
     } else {
         fwrite(data, 1, size, input_file);
         if (ferror(input_file)) {
-            error(0x10047, 3, -1, "temporary for buffering");
+            error(0x10047, LEVEL_FATAL, -1, "temporary for buffering");
         }
     }
 }
@@ -306,7 +214,7 @@ static int fill_input_buffer(void) {
         }
 
         if (input_file_status == 0) {
-            error(0x20095, 1, 0);
+            error(0x20095, LEVEL_WARNING, 0);
             return FALSE;
         }
 
@@ -326,7 +234,7 @@ static int fill_input_buffer(void) {
         nread = fread(input_buffer + 1, 1, BUFFER_SIZE, input_file);
         input_buffer[1 + nread] = 0;
         if (ferror(input_file)) {
-            error(0x10046, 3, -1, "temporary for buffering");
+            error(0x10046, LEVEL_FATAL, -1, "temporary for buffering");
             return 0;
         }
         if (nread == 0) {
@@ -517,7 +425,7 @@ static int scan_number(int hasDot) {
                     c1 = input();
                 }
             } else {
-                error(0x2000E, 2, curloc, c1);
+                error(0x2000E, LEVEL_ERROR, curloc, c1);
             }
             break;
         } else {
@@ -575,13 +483,13 @@ out:
         int hasOverflow = FALSE;
 
         if (isLongLong && ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-            error(0x20131, 1, curloc, "long long constants (LL)");
+            error(0x20131, LEVEL_WARNING, curloc, "long long constants (LL)");
         }
 
         if (isHex) {
             if (buf_ptr == token + 2) {
                 isEmptyHex = TRUE;
-                error(0x2010B, 0, curloc);
+                error(0x2010B, LEVEL_DEFAULT, curloc);
             }
             for (int_ptr = token + 2; int_ptr < buf_ptr; int_ptr++) {
                 if (!isxdigit(*int_ptr)) {
@@ -631,7 +539,7 @@ out:
             }
         } else {
             if (invalidOctalDigit) {
-                error(0x20019, 2, curloc, invalidOctalDigit);
+                error(0x20019, LEVEL_ERROR, curloc, invalidOctalDigit);
                 isOctal = FALSE;
             }
 
@@ -662,9 +570,9 @@ out:
 
         if (!isEmptyHex) {
             if (hasOverflow) {
-                error(0x2000F, 0, curloc);
+                error(0x2000F, LEVEL_DEFAULT, curloc);
             } else if ((((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5 || options[23]) && hasTypePromotion){
-                error(0x20010, 0, curloc);
+                error(0x20010, LEVEL_DEFAULT, curloc);
             }
         }
 
@@ -723,7 +631,7 @@ out:
         if (1) { }
         
         if (options[19] && !(options[19] & 0x40) && (isHex || isOctal && bitSize != 0) && bitSize < sizeof_type(yylval.node->unk_08->unk_04)) {
-            error(0x7014D, 1, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
+            error(0x7014D, LEVEL_WARNING, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
         }
         return CONSTANT;
     }
@@ -741,7 +649,7 @@ restart:
         case 0:
             goto eof;
         case '\n':
-            error(0x20014, 2, curloc);
+            error(0x20014, LEVEL_ERROR, curloc);
 return_false:
             return FALSE;
         case '\\':    
@@ -761,7 +669,7 @@ return_false:
                         *out_buf = unescape(*out_buf);
                     } else {
                         *out_buf = 'a';
-                        error(0x20018, 0, curloc, *out_buf);
+                        error(0x20018, LEVEL_DEFAULT, curloc, *out_buf);
                     }
                     break;
                 case '0':
@@ -785,7 +693,7 @@ return_false:
                         }
         
                         if (value > 255) {
-                            error(0x20015, 0, curloc, value, 255);
+                            error(0x20015, LEVEL_DEFAULT, curloc, value, 255);
                         }
                         *out_buf = value;
                         break;
@@ -804,7 +712,7 @@ return_false:
                             }
                             unput();
                             if (value > 255 || (int)value < 0) {
-                                error(0x20016, 0, curloc, value, 255);
+                                error(0x20016, LEVEL_DEFAULT, curloc, value, 255);
                             }
                             *out_buf = value;
                             break;
@@ -815,7 +723,7 @@ return_false:
         
                     *out_buf = 'x';
                     if (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) {
-                        error(0x20018, 0, curloc, *out_buf);
+                        error(0x20018, LEVEL_DEFAULT, curloc, *out_buf);
                     }
                     if (forbidNumeric) {
                         *hasNumeric = TRUE;
@@ -823,11 +731,11 @@ return_false:
                     break;
                 case 0:
 eof:
-                    error(0x20017, 2, curloc);
+                    error(0x20017, LEVEL_ERROR, curloc);
                     goto return_false;
                 default:                    
                     if (islower(*out_buf)) {
-                        error(0x20018, 0, curloc, *out_buf);
+                        error(0x20018, LEVEL_DEFAULT, curloc, *out_buf);
                     }
                     break;
             }
@@ -879,7 +787,7 @@ static int read_wstring_character(char stopChar, char* buffer) {
                         }
                         unput();
                         if (hasOverflow) {
-                            error(0x20016, 0, curloc, value, ULONG_MAX);
+                            error(0x20016, LEVEL_DEFAULT, curloc, value, ULONG_MAX);
                         }
                         *(int*)buffer = value;
                         break;
@@ -961,7 +869,7 @@ static int scan_char(void) {
 
     len = ptr - token;
     if (len > 4 || len == 0) {
-        error(0x20011, 0, curloc);
+        error(0x20011, LEVEL_DEFAULT, curloc);
     }
     len = ptr - token;
     switch(len) {
@@ -1183,7 +1091,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "+=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "+=");
                     yylval.loc = curloc;
                     return ADD_ASSIGN;
                 }
@@ -1223,7 +1131,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "-=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "-=");
                     yylval.loc = curloc;
                     return SUB_ASSIGN;
                 }
@@ -1247,7 +1155,7 @@ label2:
                         }
                         unput();
                     } else if (c == 0) {
-                        error(0x20017, 2, curloc, c);
+                        error(0x20017, LEVEL_ERROR, curloc, c);
                         break;
                     }
                 }
@@ -1261,7 +1169,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "/=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "/=");
                     yylval.loc = curloc;
                     return DIV_ASSIGN;
                 }
@@ -1283,7 +1191,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "%=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "%=");
                     yylval.loc = curloc;
                     return REM_ASSIGN;
                 }
@@ -1310,7 +1218,7 @@ label2:
                     }
     
                     if (c1 == '=') {
-                        error(0x20111, 0, curloc, "&=");
+                        error(0x20111, LEVEL_DEFAULT, curloc, "&=");
                         yylval.loc = curloc;
                         return AND_ASSIGN;
                     }
@@ -1337,7 +1245,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "|=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "|=");
                     yylval.loc = curloc;
                     return OR_ASSIGN;
                 }
@@ -1359,7 +1267,7 @@ label2:
                 }
 
                 if (c1 == '=') {
-                    error(0x20111, 0, curloc, "^=");
+                    error(0x20111, LEVEL_DEFAULT, curloc, "^=");
                     yylval.loc = curloc;
                     return XOR_ASSIGN;
                 }
@@ -1400,7 +1308,7 @@ label2:
                     }
     
                     if (c1 == '=') {
-                        error(0x20111, 0, curloc, "*=");
+                        error(0x20111, LEVEL_DEFAULT, curloc, "*=");
                         yylval.loc = curloc;
                         return MUL_ASSIGN;
                     }
@@ -1448,7 +1356,7 @@ label2:
                     }
     
                     if (c1 == '=') {
-                        error(0x20111, 0, curloc, "<<=");
+                        error(0x20111, LEVEL_DEFAULT, curloc, "<<=");
                         yylval.loc = curloc;
                         return LEFT_ASSIGN;
                     }
@@ -1480,7 +1388,7 @@ label2:
                     }
     
                     if (c1 == '=') {
-                        error(0x20111, 0, curloc, ">>=");
+                        error(0x20111, LEVEL_DEFAULT, curloc, ">>=");
                         yylval.loc = curloc;
                         return RIGHT_ASSIGN;
                     }
@@ -1565,14 +1473,17 @@ label2:
             /* fallthrough */
         default:
             if (isprint(c)) {
-                error(0x2000C, 0, curloc, c);
+                error(0x2000C, LEVEL_DEFAULT, curloc, c);
             } else {
-                error(0x2000D, 0, curloc, c);
+                error(0x2000D, LEVEL_DEFAULT, curloc, c);
             }
             goto restart;
     }
 }
 
+#ifdef NON_MATCHING
+// url: https://decomp.me/scratch/9YiHT
+// score: 16(99.95%)
 int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     char* vv;
     int sp58;
@@ -1695,6 +1606,11 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     *var_a3++ = 0;
     return 1;
 }
+#else
+int cpp_line_ptr(char* arg0, char* arg1, int arg2);
+#pragma GLOBAL_ASM("asm/7.1/functions/cfe/scan/cpp_line_ptr.s")
+#endif
+
 
 void init_scan(void) {
     long long longmax;
@@ -1777,7 +1693,7 @@ void init_scan(void) {
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
 
-ParseSymbol* mk_parse_symb(UnkPsi* symb, int id, int arg2) {
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2) {
     ParseSymbol* psymb;
     ParseSymbol* prev;
     
