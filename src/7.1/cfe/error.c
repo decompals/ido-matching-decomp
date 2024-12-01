@@ -1,4 +1,5 @@
 #ifdef __GNUC__
+// workaround to pass gcc check
 #define __STDARG_H__
 #define va_list int
 #define va_start(x, y)
