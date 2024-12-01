@@ -2,6 +2,7 @@
 #include "ugen.h"
 #include "reg_mgr.h"
 #include "report.h"
+#include "cmplrs/binasm.h"
 
 type
     Ptemp = ^Temp_rec;
@@ -118,6 +119,8 @@ begin
     spill.temp^.area_size := area_size;
     gen_store(arg0, spill.temp^.offset, area_size);
 end;
+
+{GLOBAL_ASM("asm/7.1/functions/ugen/tmp_mgr/gen_store.s")}
 
 procedure free_temp(index: u8); {Guess}
 var
