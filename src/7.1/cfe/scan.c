@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 #include "mem.h"
 #include "linklist.h"
 #include "y.tab.h"
@@ -28,7 +29,7 @@ typedef struct Location {
 /* 0x1002BAA4 */ static char* token;
 /* 0x1002BAA8 */ static int* wstring_base;
 /* 0x1002BAAC */ static int input_file_status;
-/* 0x1002BAB0 */ static FILE* input_file;
+/* 0x1002BAB0 */ static FILE* input_file; // temp file used for buffering
 /* 0x1002BAB4 */ static int input_file_eof;
 
 typedef struct UnkOmega {
@@ -44,20 +45,20 @@ typedef struct UnkChi {
     int unk_04;
 } UnkChi;
 
-typedef struct UnkQwe {
+typedef struct ParseSymbol {
     LinkedListEntry link;
     int unk_04;
     int unk_08;
-} UnkQwe;
+} ParseSymbol;
 
 typedef struct UnkPsi {
     int unk_00;
-    UnkQwe* unk_04;
+    ParseSymbol* unk_04;
     int unk_08;
     int unk_0C;
     int unk_10;
-    int unk_14;
-    char unk_18[1];
+    int namelen;
+    char name[1];
 } UnkPsi;
 
 typedef struct TokenIdentifier {
@@ -73,7 +74,7 @@ union YYLVAL {
 };
 
 typedef struct CppLineArr {
-    unsigned int lines;
+    int size;
     Location* loc;
 } CppLineArr;
 
@@ -106,7 +107,7 @@ extern LinkedList* isymb_handle;
 extern char debug_arr[];
 extern FILE* dbgout;
 
-static char func_004119A0(void);
+static char input_any_char(void);
 static char next_char(void);
 void register_file(char*, int);
 int error(int, int, int, ...);
@@ -118,10 +119,10 @@ UnkOmega* make_uiconstant(int, UnkOmega*, unsigned long long);
 UnkOmega* make_iconstant(int, UnkOmega*, long long);
 unsigned int sizeof_type(int);
 char* get_type_name(int);
-UnkQwe* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2);
+ParseSymbol* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2);
 int loc_to_cppline(int);
 
-#define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : func_004119A0())
+#define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : input_any_char())
 #define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
 
 void adjust_vwbuf(void) {
@@ -201,7 +202,7 @@ static int unescape(char c) {
     }
 }
 
-static int scan_line_and_filename(int* line, char* filename, int* hasFilename) {
+static int scan_line_directive(int* line, char* filename, int* hasFilename) {
     char c;
     char* ptr;
 
@@ -220,7 +221,7 @@ static int scan_line_and_filename(int* line, char* filename, int* hasFilename) {
         }
 
         if (c == 'l' && (c = input()) == 'i' && (c = input()) == 'n' && (c = input()) == 'e') {
-            // skip "line" word
+            // "line" word
             continue;
         } else {
 out:
@@ -269,6 +270,7 @@ out:
         goto out;
     }
 
+    // copy filename
     ptr = filename;
     while ((c = input()) != '"') {
         if (c == '\n' || c == 0) {
@@ -277,11 +279,12 @@ out:
         *ptr++ = c;
     }
     *ptr = 0;
+
     *hasFilename = TRUE;
     return TRUE;
 }
 
-static int func_00411554(void) {
+static int fill_input_buffer(void) {
     int nread;
     int unused[3];
     int line;
@@ -341,7 +344,7 @@ static int func_00411554(void) {
         inbuf_ptr = input_buffer + 1;
         if (input_buffer[1] == '#') {
             inbuf_ptr++;
-            if (scan_line_and_filename(&line, token, &hasFilename) == 1) {
+            if (scan_line_directive(&line, token, &hasFilename) == 1) {
                 if (hasFilename) {
                     register_file(token, line);
                 } else {
@@ -365,47 +368,47 @@ static int func_00411554(void) {
     return TRUE;
 }
 
-static void func_00411930(void) {
+static void nullsub(void) {
 
 }
 
 static char next_char(void) {
     if (inbuf_ptr == NULL || *inbuf_ptr == 0) {
-        func_00411554();
+        fill_input_buffer();
     }
     return *inbuf_ptr;
 }
 
-// NONMATCHING
-static char func_004119A0(void) {
+static char input_any_char(void) {
+    CppLineArr* temp;
+    
     if (inbuf_ptr == NULL || *inbuf_ptr == 0) {
-        if (func_00411554()) {
+        if (fill_input_buffer()) {
             return input();
         }
 
         return *inbuf_ptr++;
     }
-
+    
     if (*inbuf_ptr == '\n') {
         yyline++;
         if (cppline == 0 || ((int)(inbuf_ptr - input_buffer) + offset_in_file) != cpplinearr.loc[cppline].offset) {
             char* ptr = inbuf_ptr + 1;
             if (*ptr != '#') {
-                
                 while (*ptr == ' ' || *ptr == '\t') {
                     ptr++;
                 }
 
                 if (*ptr != '\n') {
                     cppline++;
-                    if (cppline >= cpplinearr.lines) {
-                        int newvar = cppline + 0x100;
-
-                        cpplinearr.lines = newvar;
-                        cpplinearr.loc = Realloc(cpplinearr.loc, newvar * 12);
-                        yylocation(&cpplinearr.loc[cppline]);
+                    if (cppline >= cpplinearr.size) {
+                        cpplinearr.size = cppline + 0x100;
+                        cpplinearr.loc = Realloc(cpplinearr.loc, cpplinearr.size * (signed)sizeof(Location));
+                        temp = &cpplinearr;
+                        yylocation(&temp->loc[cppline]);
                     } else {
-                        yylocation(&cpplinearr.loc[cppline]);
+                        temp = &cpplinearr;
+                        yylocation(&temp->loc[cppline]);
                     }
                 }
             }
@@ -421,94 +424,96 @@ static char func_004119A0(void) {
     return *inbuf_ptr++;
 }
 
-static float func_00411C00(char* arg0, char* arg1, int arg2) {
-    if (arg0 < arg1) {
-        if (arg1[-1] != 0) {
-            *arg1 = 0;
+static float scan_float(char* start, char* end, int arg2) {
+    if (start < end) {
+        if (end[-1] != 0) {
+            *end = 0;
         }
-        return str_to_float(arg0, arg2, 1);
+        return str_to_float(start, arg2, 1);
     }
 }
 
-static double func_00411C5C(char* arg0, char* arg1, int arg2) {
-    if (arg0 < arg1) {
-        if (arg1[-1] != 0) {
-            *arg1 = 0;
+static double scan_double(char* start, char* end, int arg2) {
+    if (start < end) {
+        if (end[-1] != 0) {
+            *end = 0;
         }
-        return str_to_double(arg0, arg2, 1);
+        return str_to_double(start, arg2, 1);
     }
 }
 
-static int scan_number(int firstCharIsDot) {
-    int spC4 = FALSE;
-    int spC0 = FALSE;
-    char* s1;
-    int spB8 = FALSE;
-    int spB4 = FALSE;
-    int spB0 = FALSE;
-    int spAC = FALSE;
-    int s4 = FALSE;
-    int spA4 = FALSE;    
-    char* s2;
+static int scan_number(int hasDot) {
+    int isHex = FALSE;
+    int isOctal = FALSE;
+    char* buf_ptr;
+    int hasUnsignedSuffix = FALSE;
+    int hasLongSuffix = FALSE;
+    int hasLongLongSuffix = FALSE;
+    int hasFloatSuffix = FALSE;
+    int isFloat = FALSE;
+    int isEmptyHex = FALSE;    
+    char* int_ptr;
     char c;
-    char sp9E = 0;        
+    char invalidOctalDigit = 0;        
     char c1;
 
-    if (firstCharIsDot) {
-        s4 = TRUE;
+    if (hasDot) {
+        isFloat = TRUE;
         *token = '.';
-        s1 = token + 1;
+        buf_ptr = token + 1;
     } else {
-        s1 = token;
+        buf_ptr = token;
     }
 
-    if(s4) {} // required to match
+    if(isFloat) {} // required to match
 
     while (c = input()) {
         if (isdigit(c)) {
-            *s1++ = c;
+            *buf_ptr++ = c;
 
-            if (s1 == token + 1 && c == '0') {
-                spC0 = TRUE;
+            if (buf_ptr == token + 1 && c == '0') {
+                isOctal = TRUE;
             }
-            if (spC0 && c > '7' && sp9E == 0) {
-                sp9E = c;
+            if (isOctal && c > '7' && invalidOctalDigit == 0) {
+                invalidOctalDigit = c;
             }
         } else if (c == 'X' || c == 'x') {
-            if (s1 == token + 1 && *token == '0') {
-                spC4 = TRUE;
-                *s1++ = c;
+            if (buf_ptr == token + 1 && *token == '0') {
+                isHex = TRUE;
+                *buf_ptr++ = c;
                 while (c = input()) {
                     if (!isxdigit(c)) {
                         goto out;
                     }
-                    *s1++ = c;
+                    *buf_ptr++ = c;
                 }
                 // continue
             } else {
                 break;
             }
         } else if (c == '.') {
-            if (firstCharIsDot) {
+            if (hasDot) {
                 break;
             }
 
-            spC0 = FALSE;
-            firstCharIsDot = TRUE;
-            s4 = TRUE;
-            *s1++ = c;
+            isOctal = FALSE;
+            hasDot = TRUE;
+            isFloat = TRUE;
+            *buf_ptr++ = c;
         } else if (c == 'e' || c == 'E') {
-            *s1++ = c;
-            spC0 = FALSE;
-            s4 = TRUE;
+            *buf_ptr++ = c;
+            isOctal = FALSE;
+            isFloat = TRUE;
+
             c1 = input();
             if (c1 == '+' || c1 == '-') {
-                *s1++ = c1;
+                *buf_ptr++ = c1;
                 c1 = input();
             }
+
             if (isdigit(c1)) {
                 while (isdigit(c1)) {
-                    *s1++ = c1;
+                    *buf_ptr++ = c1;
                     c1 = input();
                 }
             } else {
@@ -523,27 +528,27 @@ out:
     unput();
 
     while (c = input()) {
-        if (s4 && (c == 'f' || c == 'F')) {
-            spAC = TRUE;
-            *s1++ = c;
+        if (isFloat && (c == 'f' || c == 'F')) {
+            hasFloatSuffix = TRUE;
+            *buf_ptr++ = c;
             break;
-        } else if (!s4 && !spB8 && (c == 'u' || c == 'U')) {
-            spB8 = TRUE;
-            *s1++ = c;
-            if (spB0) {
+        } else if (!isFloat && !hasUnsignedSuffix && (c == 'u' || c == 'U')) {
+            hasUnsignedSuffix = TRUE;
+            *buf_ptr++ = c;
+            if (hasLongLongSuffix) {
                 break;
             }
-        } else if (!s4 && !spB0 && (c == 'l' || c == 'L')) {
-            if (spB4) {
-                spB0 = TRUE;
-                spB4 = FALSE;
+        } else if (!isFloat && !hasLongLongSuffix && (c == 'l' || c == 'L')) {
+            if (hasLongSuffix) {
+                hasLongLongSuffix = TRUE;
+                hasLongSuffix = FALSE;
             } else {
-                spB4 = TRUE;
+                hasLongSuffix = TRUE;
             }
-            *s1++ = c;
-        } else if (s4 && (c == 'l' || c == 'L')) {
-            spB4 = TRUE;
-            *s1++ = c;
+            *buf_ptr++ = c;
+        } else if (isFloat && (c == 'l' || c == 'L')) {
+            hasLongSuffix = TRUE;
+            *buf_ptr++ = c;
             break;
         } else {
             unput();
@@ -551,156 +556,156 @@ out:
         }
     }
 
-    if (s4) {
-        if (spAC) {
-            func_00411C00(token, s1, curloc);
-            yylval.node = make(0x65, curloc, float_type, string_to_symbol(token, s1 - token));
+    if (isFloat) {
+        if (hasFloatSuffix) {
+            scan_float(token, buf_ptr, curloc);
+            yylval.node = make(0x65, curloc, float_type, string_to_symbol(token, buf_ptr - token));
         } else {
-            func_00411C5C(token, s1, curloc);
-            yylval.node = make(0x65, curloc, double_type, string_to_symbol(token, s1 - token));
+            scan_double(token, buf_ptr, curloc);
+            yylval.node = make(0x65, curloc, double_type, string_to_symbol(token, buf_ptr - token));
         }
         return CONSTANT;
     } else {
-        unsigned long s42 = 0;
+        unsigned long longValue = 0;
         int unused;
-        unsigned long long sp8C = 0;
-        int s52 = spB0;
-        int sp80 = 0;
-        int sp7C = 0;
-        int s6 = FALSE;
+        unsigned long long longLongValue = 0;
+        int isLongLong = hasLongLongSuffix;
+        int bitSize = 0;
+        int hasTypePromotion = 0;
+        int hasOverflow = FALSE;
 
-        if (s52 && ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+        if (isLongLong && ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
             error(0x20131, 1, curloc, "long long constants (LL)");
         }
 
-        if (spC4) {
-            if (s1 == token + 2) {
-                spA4 = TRUE;
+        if (isHex) {
+            if (buf_ptr == token + 2) {
+                isEmptyHex = TRUE;
                 error(0x2010B, 0, curloc);
             }
-            for (s2 = token + 2; s2 < s1; s2++) {
-                if (!isxdigit(*s2)) {
+            for (int_ptr = token + 2; int_ptr < buf_ptr; int_ptr++) {
+                if (!isxdigit(*int_ptr)) {
                     break;
                 }
 
-                sp80 += 4;
-                if (!spA4 && !s6 && (s52 && sp8C > __ULONGLONG_MAX / 16 || s42 > 0xFFFFFFFF / 16)) {
-                    if (s52 || (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 5) == 5) {
-                        s6 = TRUE;
+                bitSize += 4;
+                if (!isEmptyHex && !hasOverflow && (isLongLong && longLongValue > __ULONGLONG_MAX / 16 || longValue > ULONG_MAX / 16)) {
+                    if (isLongLong || (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 5) == 5) {
+                        hasOverflow = TRUE;
                     } else {
-                        sp7C = TRUE;
-                        s52 = TRUE;
-                        sp8C = s42;                        
-                        s42 = 0;
+                        hasTypePromotion = TRUE;
+                        isLongLong = TRUE;
+                        longLongValue = longValue;                        
+                        longValue = 0;
                     }
                 }
 
-                if (s52) {
-                    sp8C = (sp8C << 4) + (isdigit(*s2) ? *s2 - '0' : islower(*s2) ? *s2 - 'a' + 10 : *s2 - 'A' + 10);
+                if (isLongLong) {
+                    longLongValue = (longLongValue << 4) + (isdigit(*int_ptr) ? *int_ptr - '0' : islower(*int_ptr) ? *int_ptr - 'a' + 10 : *int_ptr - 'A' + 10);
                 } else {
-                    s42 = (s42 << 4) + (isdigit(*s2) ? *s2 - '0' : islower(*s2) ? *s2 - 'a' + 10 : *s2 - 'A' + 10);
+                    longValue = (longValue << 4) + (isdigit(*int_ptr) ? *int_ptr - '0' : islower(*int_ptr) ? *int_ptr - 'a' + 10 : *int_ptr - 'A' + 10);
                 }
             }
-        } else if (spC0 && sp9E == 0) {
-            for (s2 = token + 1; s2 < s1; s2++) {
-                if (*s2 < '0' || *s2 > '7') {
+        } else if (isOctal && invalidOctalDigit == 0) {
+            for (int_ptr = token + 1; int_ptr < buf_ptr; int_ptr++) {
+                if (*int_ptr < '0' || *int_ptr > '7') {
                     break;
                 }
-                sp80 += 3;
-                if (!s6 && (s52 && sp8C > __ULONGLONG_MAX / 8 || s42 > 0xFFFFFFFF / 8)) {
-                    if (s52 || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-                        s6 = TRUE;
+                bitSize += 3;
+                if (!hasOverflow && (isLongLong && longLongValue > __ULONGLONG_MAX / 8 || longValue > ULONG_MAX / 8)) {
+                    if (isLongLong || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+                        hasOverflow = TRUE;
                     } else {
-                        sp7C = TRUE;
-                        s52 = TRUE;
-                        sp8C = s42;                        
-                        s42 = 0;
+                        hasTypePromotion = TRUE;
+                        isLongLong = TRUE;
+                        longLongValue = longValue;                        
+                        longValue = 0;
                     }
                 }
 
-                if (s52) {
-                    sp8C = (sp8C << 3) + *s2 - '0';
+                if (isLongLong) {
+                    longLongValue = (longLongValue << 3) + *int_ptr - '0';
                 } else {
-                    s42 = (s42 << 3) + *s2 - '0';
+                    longValue = (longValue << 3) + *int_ptr - '0';
                 }
             }
         } else {
-            if (sp9E) {
-                error(0x20019, 2, curloc, sp9E);
-                spC0 = 0;
+            if (invalidOctalDigit) {
+                error(0x20019, 2, curloc, invalidOctalDigit);
+                isOctal = FALSE;
             }
-            
-            for (s2 = token; s2 < s1; s2++) {
-                unsigned int s0;
-                if (!isdigit(*s2)) {
+
+            for (int_ptr = token; int_ptr < buf_ptr; int_ptr++) {
+                unsigned int digit;
+                if (!isdigit(*int_ptr)) {
                     break;
                 }
-                s0 = *s2 - '0';
-                if (!s6 && (s52 && (sp8C > __ULONGLONG_MAX / 10 || sp8C * 10 > __ULONGLONG_MAX - s0) || (s42 > 0xFFFFFFFF / 10 || s42 * 10 > 0xFFFFFFFF - s0))) {
-                    if (s52 || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
-                        s6 = TRUE;
+                digit = *int_ptr - '0';
+                if (!hasOverflow && (isLongLong && (longLongValue > __ULONGLONG_MAX / 10 || longLongValue * 10 > __ULONGLONG_MAX - digit) || (longValue > 0xFFFFFFFF / 10 || longValue * 10 > 0xFFFFFFFF - digit))) {
+                    if (isLongLong || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+                        hasOverflow = TRUE;
                     } else {
-                        sp7C = TRUE;
-                        s52 = TRUE;
-                        sp8C = s42;                        
-                        s42 = 0;
+                        hasTypePromotion = TRUE;
+                        isLongLong = TRUE;
+                        longLongValue = longValue;                        
+                        longValue = 0;
                     }
                 }
 
-                if (s52) {
-                    sp8C = sp8C * 10 + s0;
+                if (isLongLong) {
+                    longLongValue = longLongValue * 10 + digit;
                 } else {
-                    s42 = s42 * 10 + s0;
+                    longValue = longValue * 10 + digit;
                 }
             }
         }
 
-        if (!spA4) {
-            if (s6) {
+        if (!isEmptyHex) {
+            if (hasOverflow) {
                 error(0x2000F, 0, curloc);
-            } else if ((((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5 || options[23]) && sp7C){
+            } else if ((((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5 || options[23]) && hasTypePromotion){
                 error(0x20010, 0, curloc);
             }
         }
 
-        if (spB8 && s52) {
-            yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)sp8C);
-        } else if (spB8 && spB4) {
-            yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)s42);
-        } else if (spB8) {
-            yylval.node = make_uiconstant(curloc, uint_type, (unsigned int)s42);
-        } else if (s52) {
-            if (sp8C <= __LONGLONG_MAX) {
-                yylval.node = make_iconstant(curloc, longlong_type, (long long)sp8C);
+        if (hasUnsignedSuffix && isLongLong) {
+            yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)longLongValue);
+        } else if (hasUnsignedSuffix && hasLongSuffix) {
+            yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
+        } else if (hasUnsignedSuffix) {
+            yylval.node = make_uiconstant(curloc, uint_type, (unsigned int)longValue);
+        } else if (isLongLong) {
+            if (longLongValue <= __LONGLONG_MAX) {
+                yylval.node = make_iconstant(curloc, longlong_type, (long long)longLongValue);
             } else {
-                yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)sp8C);
+                yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)longLongValue);
             }
-        } else if (spB4) {
-            if (s42 < 0x80000000U || !options[13] && !(options[5] & 1)) {
-                yylval.node = make_iconstant(curloc, long_type, (long)s42);
+        } else if (hasLongSuffix) {
+            if (longValue <= LONG_MAX || !options[13] && !(options[5] & 1)) {
+                yylval.node = make_iconstant(curloc, long_type, (long)longValue);
             } else {
-                yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)s42);
+                yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
             }
-        } else if (spC4 || spC0) {
+        } else if (isHex || isOctal) {
             if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
-                if (s42 < 0x80000000U) {
-                    yylval.node = make_iconstant(curloc, int_type, (int)s42);
+                if (longValue <= LONG_MAX) {
+                    yylval.node = make_iconstant(curloc, int_type, (int)longValue);
                 } else {
-                    yylval.node = make_uiconstant(curloc, uint_type, (unsigned int)s42);
+                    yylval.node = make_uiconstant(curloc, uint_type, (unsigned int)longValue);
                 }
             } else {
-                if (s42 < 0x80000000U) {
-                    yylval.node = make_iconstant(curloc, int_type, (int)s42);
+                if (longValue <= LONG_MAX) {
+                    yylval.node = make_iconstant(curloc, int_type, (int)longValue);
                 } else {
-                    yylval.node = make_iconstant(curloc, long_type, (long)s42);
+                    yylval.node = make_iconstant(curloc, long_type, (long)longValue);
                 }
             }
-        } else if (s42 < 0x80000000U) {
-            yylval.node = make_iconstant(curloc, int_type, (int)s42);
-        } else if (s42 < 0x80000000U || !options[13] && !(options[5] & 1)) {
-            yylval.node = make_iconstant(curloc, long_type, (long)s42);
+        } else if (longValue <= LONG_MAX) {
+            yylval.node = make_iconstant(curloc, int_type, (int)longValue);
+        } else if (longValue <= LONG_MAX || !options[13] && !(options[5] & 1)) {
+            yylval.node = make_iconstant(curloc, long_type, (long)longValue);
         } else {
-            yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)s42);
+            yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
         }
 
         if (!options[13] && !(options[5] & 1) && long_type->unk_18 == int_type->unk_18) {
@@ -717,29 +722,30 @@ out:
         if (1) { }
         if (1) { }
         
-        if (options[19] && !(options[19] & 0x40) && (spC4 || spC0 && sp80 != 0) && sp80 < sizeof_type(yylval.node->unk_08->unk_04)) {
-            error(0x7014D, 1, curloc, sp80, spC4 ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
+        if (options[19] && !(options[19] & 0x40) && (isHex || isOctal && bitSize != 0) && bitSize < sizeof_type(yylval.node->unk_08->unk_04)) {
+            error(0x7014D, 1, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
         }
         return CONSTANT;
     }
 }
 
-static int func_00413014(char arg0, char* arg1, int arg2, int* arg3) {
+static int read_string_character(char stopChar, char* out_buf, int forbidNumeric, int* hasNumeric) {
     int i;
     
 restart:
-    *arg1 = input();
-    switch (*arg1) {
+    *out_buf = input();
+    switch (*out_buf) {
         unsigned int value;
         char c;
+
         case 0:
             goto eof;
         case '\n':
             error(0x20014, 2, curloc);
-retFALSE:
+return_false:
             return FALSE;
         case '\\':    
-            switch(*arg1 = input()) {
+            switch(*out_buf = input()) {
                 case '\n':
                     goto restart;
                 case 'b':
@@ -748,14 +754,14 @@ retFALSE:
                 case 'r':
                 case 't':
                 case 'v':
-                    *arg1 = unescape(*arg1);
+                    *out_buf = unescape(*out_buf);
                     break;
                 case 'a':
                     if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
-                        *arg1 = unescape(*arg1);
+                        *out_buf = unescape(*out_buf);
                     } else {
-                        *arg1 = 'a';
-                        error(0x20018, 0, curloc, *arg1);
+                        *out_buf = 'a';
+                        error(0x20018, 0, curloc, *out_buf);
                     }
                     break;
                 case '0':
@@ -766,8 +772,8 @@ retFALSE:
                 case '5':
                 case '6':
                 case '7':
-                    if (!arg2) {        
-                        value = *arg1 - '0';
+                    if (!forbidNumeric) {        
+                        value = *out_buf - '0';
                         for (i = 0; i < 2; i++) {
                             c = input();
                             if (c >= '0' && c <= '7') {
@@ -781,13 +787,13 @@ retFALSE:
                         if (value > 255) {
                             error(0x20015, 0, curloc, value, 255);
                         }
-                        *arg1 = value;
+                        *out_buf = value;
                         break;
                     }
-                    *arg3 = 1;
+                    *hasNumeric = TRUE;
                     break;
                 case 'x':
-                    if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && !arg2) {
+                    if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && !forbidNumeric) {
                         c = input();
                         if (isxdigit(c)) {        
                             value = isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10;                        
@@ -800,35 +806,35 @@ retFALSE:
                             if (value > 255 || (int)value < 0) {
                                 error(0x20016, 0, curloc, value, 255);
                             }
-                            *arg1 = value;
+                            *out_buf = value;
                             break;
                         } else {
                             unput();
                         }
                     }
         
-                    *arg1 = 'x';
+                    *out_buf = 'x';
                     if (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) {
-                        error(0x20018, 0, curloc, *arg1);
+                        error(0x20018, 0, curloc, *out_buf);
                     }
-                    if (arg2) {
-                        *arg3 = 1;
+                    if (forbidNumeric) {
+                        *hasNumeric = TRUE;
                     }
                     break;
                 case 0:
 eof:
                     error(0x20017, 2, curloc);
-                    goto retFALSE;
+                    goto return_false;
                 default:                    
-                    if (islower(*arg1)) {
-                        error(0x20018, 0, curloc, *arg1);
+                    if (islower(*out_buf)) {
+                        error(0x20018, 0, curloc, *out_buf);
                     }
                     break;
             }
             break;
         default:
-            if (*arg1 == arg0) {
-                goto retFALSE;
+            if (*out_buf == stopChar) {
+                goto return_false;
             }
             break;
     }
@@ -836,21 +842,24 @@ eof:
     return TRUE;
 }
 
-static int func_004136C8(char arg0, char* arg1) {
+static int read_wstring_character(char stopChar, char* buffer) {
     char c;
     int i;
     unsigned int value;    
     int unused;
-    int sp44 = FALSE;
-    int sp40 = FALSE;
-    int sp3C = FALSE;    
+    int hasOverflow = FALSE;
+    int nearlyOverflow = FALSE;
+    int hasNumeric = FALSE;    
 
-    if (!func_00413014(arg0, arg1, 1, &sp3C)) {
+    if (!read_string_character(stopChar, buffer, TRUE, &hasNumeric)) {
         return FALSE;
     }
+
     if (1) {} if (1) {} if (1) {} if (1) {}
-    if (sp3C) {
-        switch(*arg1) {
+
+    if (hasNumeric) {
+        // large numeric values are allowed in wide strings
+        switch(*buffer) {
             case 'x':
                 if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
                     c = input();
@@ -859,26 +868,26 @@ static int func_004136C8(char arg0, char* arg1) {
                         c = input();
                         while (isxdigit(c)) {
                             value = value * 16 + (isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10);
-                            if (sp40) {
-                                sp44 = TRUE;
+                            if (nearlyOverflow) {
+                                hasOverflow = TRUE;
                                 break;
                             }
                             if (value >> 28) {
-                                sp40 = TRUE;
+                                nearlyOverflow = TRUE;
                             }
                             c = input();
                         }
                         unput();
-                        if (sp44) {
-                            error(0x20016, 0, curloc, value, 0xFFFFFFFF);
+                        if (hasOverflow) {
+                            error(0x20016, 0, curloc, value, ULONG_MAX);
                         }
-                        *(int*)arg1 = value;
+                        *(int*)buffer = value;
                         break;
                     } else {
                         unput();
                     }
                 }
-                *(int*)arg1 = *arg1;
+                *(int*)buffer = *buffer;
                 break;
             case '0':
             case '1':
@@ -888,7 +897,7 @@ static int func_004136C8(char arg0, char* arg1) {
             case '5':
             case '6':
             case '7':
-                value = *arg1 - '0';
+                value = *buffer - '0';
                 for (i = 0; i < 2; i++) {
                     c = input();
                     if (c >= '0' && c <= '7') {
@@ -898,11 +907,11 @@ static int func_004136C8(char arg0, char* arg1) {
                         break;
                     }
                 }
-                *(int*)arg1 = value;
+                *(int*)buffer = value;
                 break;
         }
     } else {
-        *(int*)arg1 = *arg1;
+        *(int*)buffer = *buffer;
     }
 
     return TRUE;
@@ -912,9 +921,9 @@ static int scan_string(void) {
     char* ptr;    
     int len;
     int unused;
-    int sp38 = 0;
+    int hasNumeric = FALSE;
 
-    for (ptr = token, len = 0; func_00413014('"', ptr, 0, &sp38); ptr++, len++) {
+    for (ptr = token, len = 0; read_string_character('"', ptr, FALSE, &hasNumeric); ptr++, len++) {
         if (len >= tokenbuf_size - 1) {
             adjust_vwbuf();
             ptr = &token[len];
@@ -930,7 +939,7 @@ static int scan_wstring(void) {
     int* ptr;
     int len;
 
-    for (ptr = wstring_base, len = 0; func_004136C8('"', ptr); ptr++, len++) {
+    for (ptr = wstring_base, len = 0; read_wstring_character('"', (char*)ptr); ptr++, len++) {
         if (len >= (tokenbuf_size >> 2) - 1) {
             adjust_vwbuf();
             ptr = &wstring_base[len];
@@ -947,7 +956,7 @@ static int scan_char(void) {
     int sp30 = 0;
     unsigned int len;
 
-    for (ptr = token; func_00413014('\'', ptr, 0, &sp30); ptr++) {
+    for (ptr = token; read_string_character('\'', ptr, 0, &sp30); ptr++) {
     }
 
     len = ptr - token;
@@ -991,7 +1000,7 @@ static int scan_char(void) {
 static int scan_wchar(void) {
     int* ptr;
 
-    for (ptr = wstring_base; func_004136C8('\'', ptr); ptr++) {
+    for (ptr = wstring_base; read_wstring_character('\'', (char*)ptr); ptr++) {
     }
 
     yylval.node = make_iconstant(curloc, long_type, *wstring_base);
@@ -1052,7 +1061,7 @@ int scan(void) {
     char c;
     char c1;
     int lineNo;
-    int sp54;    
+    int hasFilename;    
 
 restart:
     curloc = (int)(inbuf_ptr - input_buffer) + offset_in_file - 1;
@@ -1069,18 +1078,18 @@ label2:
             }
             if (c == '#') {
                 curloc = (int)(inbuf_ptr - input_buffer) + offset_in_file - 1;
-                if (scan_line_and_filename(&lineNo, token, &sp54) != 1) {
+                if (scan_line_directive(&lineNo, token, &hasFilename) != 1) {
                     c = '\n';
                     goto label2;
                 }
                 
-                if (sp54) {
+                if (hasFilename) {
                     register_file(token, lineNo);
                 } else {
                     register_file(NULL, lineNo);
                 }
 
-                if (sp54) {
+                if (hasFilename) {
                     while (c = input()) {
                         if (c == '\n') {
                             goto label2;
@@ -1597,7 +1606,7 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     if (var_a1 == cppline || var_s0 < offset_in_file || offset_in_file + BUFFER_SIZE < var_s0) {
         var_a0 = 0;
     }
-    if ((var_a0 != 0) && (cpplinearr.loc[var_a1 + 1].offset < offset_in_file || offset_in_file + BUFFER_SIZE < cpplinearr.loc[var_a1 + 1].offset)) {
+    if (var_a0 != 0 && (cpplinearr.loc[var_a1 + 1].offset < offset_in_file || offset_in_file + BUFFER_SIZE < cpplinearr.loc[var_a1 + 1].offset)) {
         var_a0 = 0;
     }
     *arg0 = ' ';
@@ -1614,7 +1623,7 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     
     
     if (var_a0 || input_file_status == 1) {
-        var_v0 = ((var_s0 + input_buffer) - offset_in_file) + 1;
+        var_v0 = input_buffer + var_s0 - offset_in_file + 1;
         for (var_v1 = 0; var_v1 < sp50; var_v1++) {
             var_v0++;
         }
@@ -1649,10 +1658,8 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
                     var_a3[-2] = '.';
                     var_a3[-3] = '.';
                     var_a3[-4] = '.';
-                    if (offset_in_file && offset_in_file) {}
                     var_a3[-5] = '.';
-                    var_a3[-6] = ' ';
-                    
+                    var_a3[-6] = ' ';                    
                     break;
                 }
             }
@@ -1690,8 +1697,8 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
 }
 
 void init_scan(void) {
-    long long tmp;
-    long long tmp2;
+    long long longmax;
+    long long ulongmax;
 
     pmhandle = mem_start();
     tokenbuf_size = 0x1000;
@@ -1699,7 +1706,7 @@ void init_scan(void) {
     token = tokenbuf_base;
     wstring_base = tokenbuf_base;
 
-    psymb_handle = link_start(pmhandle, sizeof(UnkQwe));
+    psymb_handle = link_start(pmhandle, sizeof(ParseSymbol));
     isymb_handle = link_start(pmhandle, 0x14);
 
     mk_parse_symb(string_to_symbol("__builtin_alignof", 17), ALIGNOF, 0);
@@ -1761,28 +1768,28 @@ void init_scan(void) {
         mk_parse_symb(string_to_symbol("friend", 6), FRIEND, 0);
     }
 
-    func_00411554();
+    fill_input_buffer();
     
-    tmp = 0x7FFFFFFF;
-    tmp2 = 1 + tmp * 2;
-    __LONGLONG_MAX = tmp2 + tmp * 2 * (tmp + 1);
+    longmax = LONG_MAX;
+    ulongmax = 1 + longmax * 2;
+    __LONGLONG_MAX = ulongmax + longmax * 2 * (longmax + 1);
     __ULONGLONG_MAX = __LONGLONG_MAX * 2 + 1;
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
 
-UnkQwe* mk_parse_symb(UnkPsi* arg0, int arg1, int arg2) {
-    UnkQwe* psymb;
-    UnkQwe* prev;
+ParseSymbol* mk_parse_symb(UnkPsi* symb, int id, int arg2) {
+    ParseSymbol* psymb;
+    ParseSymbol* prev;
     
-    psymb = (UnkQwe*)get_link_elem(psymb_handle);
-    psymb->unk_04 = arg1;
+    psymb = (ParseSymbol*)get_link_elem(psymb_handle);
+    psymb->unk_04 = id;
     psymb->unk_08 = arg2;
-    prev = psymb->link.next = arg0->unk_04;
-    arg0->unk_04 = psymb;
+    prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->unk_04);
+    symb->unk_04 = psymb;
 
     if (debug_arr[80] > 0) {
         fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
-            arg0->unk_14, arg0->unk_18,
+            symb->namelen, symb->name,
             psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),
             prev, prev != NULL ? prev->unk_08 : -1, prev != NULL ? GET_SYM_CAT(prev->unk_04) : "<nil>");
     }
