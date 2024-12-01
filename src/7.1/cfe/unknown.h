@@ -67,7 +67,6 @@ extern FILE* dbgout;
 extern int* short_offset;
 extern int* long_offset;
 extern int* ansi_offset;
-extern unsigned short options[];
 extern char* myname;
 extern int imm_flag;
 extern int num_warns;
@@ -105,7 +104,6 @@ extern FILE* dbgout;
 extern int err_options[];
 
 int real_file_line(int, char**, int*, int);
-int cpp_line_ptr(char*, char*, int);
 int __assert(char*, char*, int);
 void register_file(char*, int);
 float str_to_float(char* arg0, int arg1, int arg2);
@@ -116,7 +114,6 @@ UnkOmega* make_uiconstant(int, UnkOmega*, unsigned long long);
 UnkOmega* make_iconstant(int, UnkOmega*, long long);
 unsigned int sizeof_type(int);
 char* get_type_name(int);
-ParseSymbol* mk_parse_symb(Symbol* arg0, int arg1, int arg2);
 int loc_to_cppline(int);
 void fatal(void);
 

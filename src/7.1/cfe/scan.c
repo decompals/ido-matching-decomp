@@ -32,6 +32,7 @@ union YYLVAL {
 
 static char input_any_char(void);
 static char next_char(void);
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2);
 
 void adjust_vwbuf(void) {
     tokenbuf_size *= 1.333;

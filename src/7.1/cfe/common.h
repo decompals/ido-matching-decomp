@@ -14,6 +14,7 @@
 #include "mem.h"
 #include "linklist.h"
 #include "error.h"
+#include "scan.h"
 #include "y.tab.h"
 #include "unknown.h"
 
