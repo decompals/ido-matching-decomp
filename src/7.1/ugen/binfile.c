@@ -60,7 +60,7 @@ void close_bin_file(void) {
 }
 
 void open_bin_file(char* arg0) {
-    strcpy(binasm_name, arg0);
+    strcpy(binasm_name, arg0); // ! @bug: this can overflow binasm_name!
     binasm_file = fopen(arg0, "w");
     if (binasm_file == NULL) {
         fprintf(stderr, "ugen: internal error opening %s:  %s\n", 
@@ -72,8 +72,7 @@ void open_bin_file(char* arg0) {
 void output_inst_bin(binasm* arg0, size_t arg1, binasm* arg2, size_t arg3) {
     for (; arg3 != 0; arg3--, arg2--) {
         if (fwrite(arg2, sizeof(binasm), 1, binasm_file) != 1) {
-
-            fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", &binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
+            fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
             fprintf(stderr, "suggestion:  you may want to use TMPDIR to change where temporary files are written\n");
             fflush(stderr);
             exit(EXIT_FAILURE);
@@ -81,8 +80,7 @@ void output_inst_bin(binasm* arg0, size_t arg1, binasm* arg2, size_t arg3) {
     }
 
     if (fwrite(arg0, sizeof(binasm), arg1, binasm_file) != arg1) {
-
-        fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", &binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
+        fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
         fflush(stderr);
         exit(EXIT_FAILURE);
     }
