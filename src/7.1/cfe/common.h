@@ -17,6 +17,7 @@
 #include "error.h"
 #include "scan.h"
 #include "main.h"
+#include "modes.h"
 #include "y.tab.h"
 #include "unknown.h"
 

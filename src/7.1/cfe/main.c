@@ -3,27 +3,27 @@
 /* .data      */
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/main.c,v 1.36 1995/12/13 22:32:10 zaineb Exp $";
 char* outfile = "";
-static char* D_1001D44C[] = {
+static char* default_path_dirs[] = {
     "/usr/lib/",
     "/lib/"
 };
 
 /* .bss       */
 /* 0x1002BAD0 */ static int exit_code;
-/* 0x1002BAD8 */ static char B_1002BAD8[1024];
-/* 0x1002BED8 */ static char B_1002BED8[1024];
-/* 0x1002C2D8 */ static char* B_1002C2D8[6];
+/* 0x1002BAD8 */ static char curr_lang_error_file[1024];
+/* 0x1002BED8 */ static char err_file_buffer[1024];
+/* 0x1002C2D8 */ static char* message_files[6];
 
-static char* func_0041CAA0(char* arg0);
-static void func_0041BB98(int argc, char** argv);
-static int func_0041B7FC(char* path);
+static char* get_directory(char* arg0);
+static void parse_cmdline(int argc, char** argv);
+static int get_program_id(char* path);
 
 int main(int argc, char** argv) {
     char* error_file;
     char* lang;    
-    char* sp34;
+    char* dir;
     int error_mode;
-    char* sp2C;
+    char* dir_end;
 
     catchall();
     init_options();
@@ -37,27 +37,26 @@ int main(int argc, char** argv) {
 
     error_file = getenv("__ERROR_FILE");
     if (error_file != NULL) {
-        error_mode = 1;
-        B_1002C2D8[0] = error_file;
+        message_files[error_mode++] = error_file;
     }
 
-    sprintf(B_1002BAD8, "err.%s.cc", lang);
+    sprintf(curr_lang_error_file, "err.%s.cc", lang);
 
-    sp2C = strrchr(argv[0], '/');
-    if (sp2C != NULL) {
-        strncpy(B_1002BED8, argv[0], sp2C - argv[0] + 1);
-        strcpy(&B_1002BED8[sp2C - argv[0] + 1], B_1002BAD8);
-        B_1002C2D8[error_mode++] = B_1002BED8;
+    dir_end = strrchr(argv[0], '/');
+    if (dir_end != NULL) {
+        strncpy(err_file_buffer, argv[0], dir_end - argv[0] + 1);
+        strcpy(&err_file_buffer[dir_end - argv[0] + 1], curr_lang_error_file);
+        message_files[error_mode++] = err_file_buffer;
     } else {
-        sp34 = func_0041CAA0(argv[0]);
-        strcpy(B_1002BED8, sp34);
-        strcat(B_1002BED8, B_1002BAD8);
-        B_1002C2D8[error_mode++] = B_1002BED8;
-        free(sp34);
+        dir = get_directory(argv[0]);
+        strcpy(err_file_buffer, dir);
+        strcat(err_file_buffer, curr_lang_error_file);
+        message_files[error_mode++] = err_file_buffer;
+        free(dir);
     }
 
-    B_1002C2D8[error_mode++] = B_1002BAD8;
-    B_1002C2D8[error_mode++] = "/usr/lib/cmplrs/err.cc";
+    message_files[error_mode++] = curr_lang_error_file;
+    message_files[error_mode++] = "/usr/lib/cmplrs/err.cc";
 
     if (IS_RELAXED_ANSI) {
         error_mode = 2;
@@ -67,11 +66,11 @@ int main(int argc, char** argv) {
         error_mode = 0;
     }
 
-    if (!error_init(B_1002C2D8, NULL, error_mode)) {
+    if (!error_init(message_files, NULL, error_mode)) {
         return 5;
     }
 
-    func_0041BB98(argc, argv);
+    parse_cmdline(argc, argv);
 
     if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && !options[OPTION_XCOMMON]) {
         options[OPTION_XCOMMON] = TRUE;
@@ -87,7 +86,7 @@ int main(int argc, char** argv) {
 
     set_error_mode(error_mode);
 
-    switch(func_0041B7FC(argv[0])) {
+    switch(get_program_id(argv[0])) {
         case 0:
             exit_code = 3;
             if (options[OPTION_LINT_FLAGS] & 1) {
@@ -124,10 +123,10 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-static int func_0041B7FC(char* path) {
-    char* v0 = strrchr(path, '/');
-    if (v0 != NULL) {
-        path = v0 + 1;
+static int get_program_id(char* path) {
+    char* ptr = strrchr(path, '/');
+    if (ptr != NULL) {
+        path = ptr + 1;
     }
     myname = path;
 
@@ -147,55 +146,55 @@ void fatal(void) {
     exit(exit_code);
 }
 
-static void func_0041B978(char* arg0, int* arg1, int* arg2, int* arg3) {
+static void parse_woff(char* input, int* has_error, int* wrong_warn_number, int* invalid_input) {
     int i = 6;
-    int len = strlen(arg0);    
-    int s0, s3;
+    int len = strlen(input);    
+    int num1, num2;
 
     while (i < len) {
-        if (isdigit(arg0[i])) {
-            s0 = atoi(&arg0[i]);
+        if (isdigit(input[i])) {
+            num1 = atoi(&input[i]);
             i++;
-            while (isdigit(arg0[i])) {
+            while (isdigit(input[i])) {
                 i++;
             }
             
-            if (arg0[i] == '-' && isdigit(arg0[++i])) {
-                s3 = atoi(&arg0[i]);
+            if (input[i] == '-' && isdigit(input[++i])) {
+                num2 = atoi(&input[i]);
             } else {
-                s3 = s0;
+                num2 = num1;
             }
             
-            while (s0 <= s3) {
-                if (!set_woff(s0)) {
-                    *arg1 = 1;
-                    *arg2 = s0;
+            while (num1 <= num2) {
+                if (!set_woff(num1)) {
+                    *has_error = TRUE;
+                    *wrong_warn_number = num1;
                 }
-                s0++;
+                num1++;
             }
         } else {
-            *arg3 = 1;
+            *invalid_input = TRUE;
         }
 
-        while (i < len && arg0[i] != ',') {
-            if (!isdigit(arg0[i])) {
-                *arg3 = 1;
+        while (i < len && input[i] != ',') {
+            if (!isdigit(input[i])) {
+                *invalid_input = TRUE;
             }
             i++;
         }
-        if (i < len && arg0[i] == ',') {
+        if (i < len && input[i] == ',') {
             i++;
         }
     }
 }
 
-static void func_0041BB98(int argc, char** argv) {
+static void parse_cmdline(int argc, char** argv) {
     int i;
     int u1;
-    int sp8C = 0;
-    int sp88 = 0;
+    int has_woff_error = 0;
+    int woff_warn_num = 0;
     int sp84;
-    int sp80 = 0;
+    int invalid_woff = 0;
     int constModeChanged = 0;
     int sp78 = 0;
     
@@ -235,16 +234,16 @@ static void func_0041BB98(int argc, char** argv) {
                             if (strncmp(argv[i], "-Xdollar", 8) == 0) {
                                 options[OPTION_DOLLAR] = TRUE;
                             } else {
-                                int v1;
+                                int dbgval;
 
                                 if (argv[i][4] == 0) {
-                                    v1 = 1;
+                                    dbgval = 1;
                                 } else {
-                                    v1 = atoi(argv[i] + 4);
+                                    dbgval = atoi(argv[i] + 4);
                                 }
-                                debug_arr[argv[i][3]] = v1;
+                                debug_arr[argv[i][3]] = dbgval;
                                 if (argv[i][3] == 'y') {
-                                    yydebug = v1;
+                                    yydebug = dbgval;
                                 }
                             }
                             break;
@@ -358,7 +357,7 @@ static void func_0041BB98(int argc, char** argv) {
                             break;
                         case 'w':
                             if (strncmp(argv[i], "-Xwoff", 6) == 0) {
-                                func_0041B978(argv[i], &sp8C, &sp88, &sp80);
+                                parse_woff(argv[i], &has_woff_error, &woff_warn_num, &invalid_woff);
                             }
                             break;
                     }
@@ -511,7 +510,7 @@ static void func_0041BB98(int argc, char** argv) {
         } else {
             if (infile == NULL) {
                 infile = argv[i];
-            } else if (func_0041B7FC(argv[0]) != 2) {
+            } else if (get_program_id(argv[0]) != 2) {
                 error(0x40040, 2, -1, argv[i]);
             }
         }
@@ -523,65 +522,65 @@ static void func_0041BB98(int argc, char** argv) {
     if (!sp78) {
         options[OPTION_LITERAL_CONST] = IS_ANSI && !IS_RELAXED_ANSI;
     }
-    if (options[OPTION_FULLWARN] && sp8C) {
-        error(0x40135, 1, -1, "such as ", sp88, 0x1F4, 0x358);
+    if (options[OPTION_FULLWARN] && has_woff_error) {
+        error(0x40135, 1, -1, "such as ", woff_warn_num, 500, 856);
     }
-    if (options[OPTION_FULLWARN] && sp80) {
-        error(0x40135, 1, -1, "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 0x25f, 0x1F4, 0x358);
+    if (options[OPTION_FULLWARN] && invalid_woff) {
+        error(0x40135, 1, -1, "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 607, 500, 856);
     }
 }
 
-static char* func_0041CAA0(char* arg0) {
-    char* ptr = getenv("PATH");
+static char* get_directory(char* name) {
+    char* path_ptr = getenv("PATH");
     int i;
-    char sp4C[100];
+    char buffer[100];
     int fd;    
     char* path;
 
-    while (*ptr != 0) {
-        char* ptr2 = sp4C;
+    while (*path_ptr != 0) {
+        char* bufptr = buffer;
 
-        while (*ptr != ':' && *ptr != 0) {
-            *ptr2++ = *ptr++;
+        while (*path_ptr != ':' && *path_ptr != 0) {
+            *bufptr++ = *path_ptr++;
         }
 
-        if (*ptr == ':') {
-            ptr++;
+        if (*path_ptr == ':') {
+            path_ptr++;
         }
 
-        if (ptr2[-1] != '/') {
-            *ptr2 = '/';
-            ptr2++;
+        if (bufptr[-1] != '/') {
+            *bufptr = '/';
+            bufptr++;
         }
 
-        *ptr2 = 0;
+        *bufptr = 0;
 
-        strcat(sp4C, arg0);
-        fd = open(sp4C, O_RDONLY);
+        strcat(buffer, name);
+        fd = open(buffer, O_RDONLY);
         if (fd >= 0) {
             close(fd);
-            *ptr2 = 0;
-            path = Malloc(strlen(sp4C) + 1);
-            strcpy(path, sp4C);
+            *bufptr = 0;
+            path = Malloc(strlen(buffer) + 1);
+            strcpy(path, buffer);
             return path;
         }
     }
 
-    for (i = 0; D_1001D44C[i] != NULL; i++) {
-        sp4C[0] = 0;
-        strcat(sp4C, D_1001D44C[i]);
-        strcat(sp4C, arg0);
-        fd = open(sp4C, O_RDONLY);
+    for (i = 0; default_path_dirs[i] != NULL; i++) {
+        buffer[0] = 0;
+        strcat(buffer, default_path_dirs[i]);
+        strcat(buffer, name);
+        fd = open(buffer, O_RDONLY);
         if (fd >= 0) {
             close(fd);
-            path = Malloc(strlen(D_1001D44C[i]) + 1);
-            strcpy(path, D_1001D44C[i]);
+            path = Malloc(strlen(default_path_dirs[i]) + 1);
+            strcpy(path, default_path_dirs[i]);
             return path;
         }
     }
 
-    sp4C[0] = 0;
-    path = Malloc(strlen(sp4C) + 1);
-    strcpy(path, sp4C);
+    buffer[0] = 0;
+    path = Malloc(strlen(buffer) + 1);
+    strcpy(path, buffer);
     return path;
 }

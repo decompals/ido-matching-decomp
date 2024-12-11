@@ -281,7 +281,7 @@ int error(int message, int level, int location, ...) {
         return LEVEL_SUPPRESSED;
     }
 
-    if (real_level == 1) {
+    if (real_level == LEVEL_WARNING) {
         if (!(options[OPTION_VERBOSITY] & VERBOSE_FLAG_1) || warning_disabled[msgid]) {
             return LEVEL_SUPPRESSED;
         }
