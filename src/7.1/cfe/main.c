@@ -9,7 +9,7 @@ static char* D_1001D44C[] = {
 };
 
 /* .bss       */
-/* 0x1002BAD0 */ static int B_1002BAD0;
+/* 0x1002BAD0 */ static int exit_code;
 /* 0x1002BAD8 */ static char B_1002BAD8[1024];
 /* 0x1002BED8 */ static char B_1002BED8[1024];
 /* 0x1002C2D8 */ static char* B_1002C2D8[6];
@@ -22,13 +22,13 @@ int main(int argc, char** argv) {
     char* error_file;
     char* lang;    
     char* sp34;
-    int sp30;
+    int error_mode;
     char* sp2C;
 
     catchall();
     init_options();
     general_handle = mem_start();
-    sp30 = 0;
+    error_mode = 0;
 
     lang = getenv("__LANG");
     if (lang == NULL) {
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
     error_file = getenv("__ERROR_FILE");
     if (error_file != NULL) {
-        sp30 = 1;
+        error_mode = 1;
         B_1002C2D8[0] = error_file;
     }
 
@@ -47,69 +47,69 @@ int main(int argc, char** argv) {
     if (sp2C != NULL) {
         strncpy(B_1002BED8, argv[0], sp2C - argv[0] + 1);
         strcpy(&B_1002BED8[sp2C - argv[0] + 1], B_1002BAD8);
-        B_1002C2D8[sp30++] = B_1002BED8;
+        B_1002C2D8[error_mode++] = B_1002BED8;
     } else {
         sp34 = func_0041CAA0(argv[0]);
         strcpy(B_1002BED8, sp34);
         strcat(B_1002BED8, B_1002BAD8);
-        B_1002C2D8[sp30++] = B_1002BED8;
+        B_1002C2D8[error_mode++] = B_1002BED8;
         free(sp34);
     }
 
-    B_1002C2D8[sp30++] = B_1002BAD8;
-    B_1002C2D8[sp30++] = "/usr/lib/cmplrs/err.cc";
+    B_1002C2D8[error_mode++] = B_1002BAD8;
+    B_1002C2D8[error_mode++] = "/usr/lib/cmplrs/err.cc";
 
-    if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 3) == 3) {
-        sp30 = 2;
-    } else if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
-        sp30 = 1;
+    if (IS_RELAXED_ANSI) {
+        error_mode = 2;
+    } else if (IS_ANSI) {
+        error_mode = 1;
     } else {
-        sp30 = 0;
+        error_mode = 0;
     }
 
-    if (!error_init(B_1002C2D8, NULL, sp30)) {
+    if (!error_init(B_1002C2D8, NULL, error_mode)) {
         return 5;
     }
 
     func_0041BB98(argc, argv);
 
-    if (!options[13] && !(options[5] & 1) && !options[24]) {
-        options[24] = TRUE;
+    if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && !options[OPTION_XCOMMON]) {
+        options[OPTION_XCOMMON] = TRUE;
     }
 
-    if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 3) == 3) {
-        sp30 = 2;
-    } else if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
-        sp30 = 1;
+    if (IS_RELAXED_ANSI) {
+        error_mode = 2;
+    } else if (IS_ANSI) {
+        error_mode = 1;
     } else {
-        sp30 = 0;
+        error_mode = 0;
     }
 
-    set_error_mode(sp30);
+    set_error_mode(error_mode);
 
     switch(func_0041B7FC(argv[0])) {
         case 0:
-            B_1002BAD0 = 3;
-            if (options[19] & 1) {
-                options[23] = 1;
-                B_1002BAD0 = lint(argc, argv);
+            exit_code = 3;
+            if (options[OPTION_LINT_FLAGS] & 1) {
+                options[OPTION_FULLWARN] = TRUE;
+                exit_code = lint(argc, argv);
             } else {
-                B_1002BAD0 = cfe(argc, argv);
+                exit_code = cfe(argc, argv);
             }
             break;
         case 2:
-            B_1002BAD0 = 1;
-            B_1002BAD0 = cpp(argc, argv);
-            if (B_1002BAD0 == 0x1007A) {
-                B_1002BAD0 = 0;
+            exit_code = 1;
+            exit_code = cpp(argc, argv);
+            if (exit_code == 0x1007A) {
+                exit_code = 0;
             }
             break;
         case 1:
-            B_1002BAD0 = 2;
-            options[19] |= 1;
-            options[19] |= 2;
-            options[23] = 1;
-            B_1002BAD0 = lint(argc, argv);
+            exit_code = 2;
+            options[OPTION_LINT_FLAGS] |= 1;
+            options[OPTION_LINT_FLAGS] |= 2;
+            options[OPTION_FULLWARN] = TRUE;
+            exit_code = lint(argc, argv);
             break;
         default:
             ((void)((FALSE)||__assert("FALSE", "main.c", 0x9D)));
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
         hash_table_statistics();
     }
 
-    exit(B_1002BAD0);
+    exit(exit_code);
     return 0;
 }
 
@@ -144,7 +144,7 @@ static int func_0041B7FC(char* path) {
 }
 
 void fatal(void) {
-    exit(B_1002BAD0);
+    exit(exit_code);
 }
 
 static void func_0041B978(char* arg0, int* arg1, int* arg2, int* arg3) {
@@ -196,7 +196,7 @@ static void func_0041BB98(int argc, char** argv) {
     int sp88 = 0;
     int sp84;
     int sp80 = 0;
-    int sp7C = 0;
+    int constModeChanged = 0;
     int sp78 = 0;
     
     if (getenv("_XPG") != NULL) {
@@ -224,16 +224,16 @@ static void func_0041BB98(int argc, char** argv) {
                     switch(argv[i][2]) {
                         case 'c':
                             if (strcmp(argv[i], "-Xcommon") == 0) {
-                                options[24] = TRUE;
+                                options[OPTION_XCOMMON] = TRUE;
                             } else if (strcmp(argv[i], "-Xcpluscomm") == 0) {
-                                options[26] = TRUE;
+                                options[OPTION_CPLUSCOMM] = TRUE;
                             } else if (strncmp(argv[i], "-Xcmd:", 6) == 0) {
                                 command_line_file_name = argv[i] + 6;
                             }
                             break;
                         case 'd':
                             if (strncmp(argv[i], "-Xdollar", 8) == 0) {
-                                options[7] = TRUE;
+                                options[OPTION_DOLLAR] = TRUE;
                             } else {
                                 int v1;
 
@@ -250,22 +250,22 @@ static void func_0041BB98(int argc, char** argv) {
                             break;
                         case 'f':
                             if (strncmp(argv[i], "-Xfloat", 7) == 0) {
-                                options[4] = TRUE;
+                                options[OPTION_FLOAT] = TRUE;
                             } else if (strncmp(argv[i], "-Xfullwarn", 10) == 0) {
-                                options[23] = TRUE;
+                                options[OPTION_FULLWARN] = TRUE;
                             }
                             break;
                         case 'g':
-                            options[1] = atoi(argv[i] + 3);
+                            options[OPTION_G_LEVEL] = atoi(argv[i] + 3);
                             break;
                         case 'p':
                             if (strncmp(argv[i], "-Xprototypes", 12) == 0) {
-                                options[22] = TRUE;
+                                options[OPTION_PROTOTYPES] = TRUE;
                             }
                             break;
                         case 's':
                             if (strcmp(argv[i], "-Xsigned") == 0) {
-                                options[6] = TRUE;
+                                options[OPTION_SIGNED] = TRUE;
                             }
                             break;
                         case 'N':
@@ -275,7 +275,7 @@ static void func_0041BB98(int argc, char** argv) {
                             break;
                         case 't':
                             if (argv[i][3] == 0) {
-                                options[16] = TRUE;
+                                options[OPTION_T] = TRUE;
                             } else if (strncmp(argv[i], "-Xtypebind:", 11) == 0) {
                                 char* ptr = argv[i] + 11;
                                 int c;
@@ -342,18 +342,18 @@ static void func_0041BB98(int argc, char** argv) {
                             break;
                         case 'u':
                             if (strcmp(argv[i], "-Xunsigned") == 0) {
-                                options[6] = FALSE;
+                                options[OPTION_SIGNED] = FALSE;
                             } else {
                                 outfile = NULL;
                             }
                             break;
                         case 'v':
                             if (strcmp(argv[i], "-Xvolatile") == 0) {
-                                options[25] = TRUE;
+                                options[OPTION_VOLATILE] = TRUE;
                                 error(0x4015F, 1, -1, "-volatile");
                                 break;
                             } if (strcmp(argv[i], "-Xv") == 0) {
-                                options[3] |= 8;
+                                options[OPTION_VERBOSITY] |= VERBOSE_FLAG_8;
                             }
                             break;
                         case 'w':
@@ -366,26 +366,26 @@ static void func_0041BB98(int argc, char** argv) {
                 case 's':
                     if (strncmp(argv[i], "-std", 4) == 0) {
                         if (argv[i][4] == '0' && argv[i][5] == 0) {
-                            options[5] = 0;
+                            options[OPTION_ANSI_MODE] = 0;
                         } else if (argv[i][4] == 0) {
-                            options[5] = 3;
+                            options[OPTION_ANSI_MODE] = 3;
                         } else if (argv[i][4] == '1' && argv[i][5] == 0) {
-                            options[5] = 5;
+                            options[OPTION_ANSI_MODE] = 5;
                         }
                     } else if (strncmp(argv[i], "-saveargs", 9) == 0) {
-                        options[18] = TRUE;
+                        options[OPTION_SAVEARGS] = TRUE;
                     }
                     break;
                 case 'c':
                     if (strncmp(argv[i], "-call_shared", 12) == 0) {
                         // ignored
                     } else if (strncmp(argv[i], "-cplus", 6) == 0) {
-                        options[13]++;
+                        options[OPTION_CPLUSPLUS]++;
                     } else if (strncmp(argv[i], "-checkstack", 11) == 0) {
-                        options[15]++;
+                        options[OPTION_CHECKSTACK]++;
                         i++; // skip next argument
                     } else if (strncmp(argv[i], "-check_bounds", 13) == 0) {
-                        options[17]++;
+                        options[OPTION_CHECK_BOUNDS]++;
                     }
                     break;
                 case 'n':
@@ -395,7 +395,7 @@ static void func_0041BB98(int argc, char** argv) {
                     break;
                 case 't':
                     if (strncmp(argv[i], "-trapuv", 7) == 0) {
-                        options[10] = TRUE;
+                        options[OPTION_TRAPUV] = TRUE;
                     }
                     break;
                 case 'A':
@@ -410,16 +410,16 @@ static void func_0041BB98(int argc, char** argv) {
                     break;
                 case 'E':
                     if (argv[i][2] == 'B' && argv[i][3] == 0) {
-                        options[2] = options[2];
+                        options[OPTION_ENDIANNESS] = options[OPTION_ENDIANNESS];
                     } else if (argv[i][2] == 'L' && argv[i][3] == 0) {
-                        options[2] = !options[2];
+                        options[OPTION_ENDIANNESS] = !options[OPTION_ENDIANNESS];
                     }
                     break;
                 case 'O':
-                    options[0] = atoi(argv[i] + 2);
+                    options[OPTION_O_LEVEL] = atoi(argv[i] + 2);
                     break;
                 case 'T':
-                    options[8] = atoi(argv[i] + 2);
+                    options[OPTION_T_LEVEL] = atoi(argv[i] + 2);
                     break;
                 case 'o':
                     if (argv[i][2] == 0) {
@@ -431,32 +431,32 @@ static void func_0041BB98(int argc, char** argv) {
                     break;
                 case 'w':
                     if (strcmp(argv[i], "-wimplicit") == 0) {
-                        options[20] = TRUE;
+                        options[OPTION_WIMPLICIT] = TRUE;
                     } else if (strncmp(argv[i], "-wlint", 6) == 0) {
-                        options[19] |= 1;
+                        options[OPTION_LINT_FLAGS] |= 1;
                     } else {
                         switch (argv[i][2]) {
                             case 0:
                             case '1':
-                                options[3] &= ~1;
+                                options[OPTION_VERBOSITY] &= ~VERBOSE_FLAG_1;
                                 break;
                             case '3':
-                                options[3] &= ~1;
+                                options[OPTION_VERBOSITY] &= ~VERBOSE_FLAG_1;
                                 // fallthrough */
                             case '2':
-                                options[3] |= 0x10;
+                                options[OPTION_VERBOSITY] |= VERBOSE_FLAG_10;
                                 break;
                         }
                     }
                     break;
                 case 'v':
                     if (strcmp(argv[i], "-verbose") == 0) {
-                        options[3] |= 4;
+                        options[OPTION_VERBOSITY] |= VERBOSE_FLAG_4;
                     }
                     break;
                 case 'f':
                     if (strcmp(argv[i], "-framepointer") == 0) {
-                        options[9] = TRUE;
+                        options[OPTION_FRAMEPOINTER] = TRUE;
                     }
                     break;
                 case 'Z':
@@ -466,12 +466,12 @@ static void func_0041BB98(int argc, char** argv) {
                     break;
                 case 'm':
                     if (strncmp(argv[i], "-mips", 5) == 0) {
-                        options[12] = atoi(argv[i] + 5);
-                        if (options[12] > 2) {
-                            options[14] = TRUE;
+                        options[OPTION_MIPS_GEN] = atoi(argv[i] + 5);
+                        if (options[OPTION_MIPS_GEN] > 2) {
+                            options[OPTION_14] = TRUE;
                         }
                     } else if (strncmp(argv[i], "-msft", 5) == 0) {
-                        options[21] = TRUE;
+                        options[OPTION_MSFT] = TRUE;
                     } else if (strncmp(argv[i], "-min_st_indirection", 19) == 0) {
                         minimize_indirection_entries = TRUE;
                     } else if (strncmp(argv[i], "-max_st_indirection", 19) == 0) {
@@ -482,21 +482,21 @@ static void func_0041BB98(int argc, char** argv) {
                     break;
                 case 'd':
                     if (strcmp(argv[i], "-dwopcode") == 0) {
-                        options[14] = TRUE;
+                        options[OPTION_14] = TRUE;
                     }
                     break;
                 case 'u':
                     if (strncmp(argv[i], "-use_readonly_const", 19) == 0) {
-                        options[27] = TRUE;
-                        sp7C = TRUE;
+                        options[OPTION_READONLY_CONST] = TRUE;
+                        constModeChanged = TRUE;
                     } else if (strncmp(argv[i], "-use_readwrite_const", 20) == 0) {
-                        options[27] = FALSE;
-                        sp7C = TRUE;
+                        options[OPTION_READONLY_CONST] = FALSE;
+                        constModeChanged = TRUE;
                     } else if (strncmp(argv[i], "-use_literal_const", 18) == 0) {
-                        options[28] = TRUE;
+                        options[OPTION_LITERAL_CONST] = TRUE;
                         sp78 = TRUE;
                     } else if (strncmp(argv[i], "-use_variable_const", 19) == 0) {
-                        options[28] = FALSE;
+                        options[OPTION_LITERAL_CONST] = FALSE;
                         sp78 = TRUE;
                     }
                     break;
@@ -504,7 +504,7 @@ static void func_0041BB98(int argc, char** argv) {
                     if (strcmp(argv[i], "-64data") == 0) {
                         bit_size[9] = 64;
                         bit_size[4] = 64;
-                        options[14] = TRUE;
+                        options[OPTION_14] = TRUE;
                     }
                     break;
             }
@@ -517,18 +517,16 @@ static void func_0041BB98(int argc, char** argv) {
         }
     }
 
-    if (!sp7C) {
-        options[27] = TRUE;
+    if (!constModeChanged) {
+        options[OPTION_READONLY_CONST] = TRUE;
     }
     if (!sp78) {
-        options[28] = (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) &&
-            (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) ||
-            !((options[5] & 3) == 3));
+        options[OPTION_LITERAL_CONST] = IS_ANSI && !IS_RELAXED_ANSI;
     }
-    if (options[23] && sp8C) {
+    if (options[OPTION_FULLWARN] && sp8C) {
         error(0x40135, 1, -1, "such as ", sp88, 0x1F4, 0x358);
     }
-    if (options[23] && sp80) {
+    if (options[OPTION_FULLWARN] && sp80) {
         error(0x40135, 1, -1, "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 0x25f, 0x1F4, 0x358);
     }
 }
