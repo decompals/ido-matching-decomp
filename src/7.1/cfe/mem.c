@@ -1,22 +1,15 @@
-#include "mem.h"
-#include <stdio.h>
+#include "common.h"
 
 #define REGION_SIZE 0x1000
 
-const char header[] = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $"; 
-
-// TODO move to appropriate place
-int error(int, int, int, char*);
-extern char* infile;
-extern char debug_arr[];
-extern FILE* dbgout;
+char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $";
 
 void* Malloc(size_t size) {
     void* ret;
     
     ret = malloc(size);
     if (ret == NULL && size != 0) {
-        error(0x40000, 3, -1, infile != NULL ? infile : "");
+        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
@@ -26,7 +19,7 @@ void* Calloc(size_t nmemb, size_t size) {
     
     ret = calloc(nmemb, size);
     if (ret == NULL && nmemb * size != 0) {
-        error(0x40000, 3, -1, infile != NULL ? infile : "");
+        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
@@ -36,7 +29,7 @@ void* Realloc(void* ptr, size_t size) {
     
     ret = realloc(ptr, size);
     if (ret == NULL && size != 0) {
-        error(0x40000, 3, -1, infile != NULL ? infile : "");
+        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
