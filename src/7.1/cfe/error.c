@@ -81,7 +81,7 @@ static void get_error_message(char* buffer, int msgid, int type) {
     if (current_mesg_file == NULL) {
         while (*message_files != NULL && current_mesg_file == NULL) {
             current_mesg_file = fopen(*message_files, "r");
-            if (debug_arr[101] > 0) {
+            if (debug_arr['e'] > 0) {
                 fprintf(dbgout, "attempting to open msg file %s %s\n", *message_files, current_mesg_file != NULL ? "success" : "failed");
             }
             message_files++;
@@ -288,7 +288,7 @@ int error(int message, int level, int location, ...) {
         num_warns++;
     }
 
-    if (debug_arr[0x65] > 0) {
+    if (debug_arr['e'] > 0) {
         fprintf(dbgout, "err_msg #:%d l:%d loca:%x sec:%d\n", msgid, real_level, location, (message >> 16) & 0xF);
     }
 

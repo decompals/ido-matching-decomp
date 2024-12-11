@@ -1704,7 +1704,7 @@ ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2) {
     prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->unk_04);
     symb->unk_04 = psymb;
 
-    if (debug_arr[80] > 0) {
+    if (debug_arr['P'] > 0) {
         fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
             symb->namelen, symb->name,
             psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),

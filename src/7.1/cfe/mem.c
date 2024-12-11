@@ -45,7 +45,7 @@ MemCtx* mem_start(void) {
     s->region_end = s->ptr + REGION_SIZE;
     s->list_end = s->list_start + 0x10;
 
-    if (debug_arr[0x6D] > 0) {
+    if (debug_arr['m'] > 0) {
         fprintf(dbgout, "mem_start returns s=%x r=%x c=%x\n", s, s->list_start, s->ptr);
     }
 
@@ -64,14 +64,14 @@ void* __mem_alloc(MemCtx* s, size_t size) {
     s->region_end = *s->current_region + (size > REGION_SIZE ? size : REGION_SIZE);
     s->ptr = *s->current_region + size;
 
-    if (debug_arr[0x6D] > 0) {
+    if (debug_arr['m'] > 0) {
         fprintf(dbgout, "__mem_alloc returns s=%x r=%x cr=%x d=%x\n", s, s->list_start, s->current_region, *s->current_region);
     }
     return *s->current_region;
 }
 
 int mem_free(MemCtx* s) {
-    if (debug_arr[0x6D] > 0) {
+    if (debug_arr['m'] > 0) {
         fprintf(dbgout, "mem_free s=%x\n", s);
     }
 
