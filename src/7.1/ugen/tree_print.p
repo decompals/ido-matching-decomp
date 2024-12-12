@@ -152,16 +152,16 @@ end;
 
 procedure print_tree(pFile: ^Text; arg1: ^tree; arg2: cardinal; arg3: cardinal);
 var
-    sp24: integer;
+    mark: integer;
     sp20: cardinal; /* sp - 8*/
 
     /* inner function */
     procedure func_00449D24(sub_arg0: ^Tree; sub_arg1: Cardinal);
     begin
         while (sub_arg0 <> nil) do begin
-            if (sub_arg0^.unk17 = sp24) then break;
+            if (sub_arg0^.unk17 = mark) then break;
 
-            sub_arg0^.unk17 := sp24;
+            sub_arg0^.unk17 := mark;
             print_node_1(pFile, sub_arg0, sub_arg1);
 
             if (sub_arg1 < arg2) then begin
@@ -187,7 +187,7 @@ var
     end;
 
 begin
-    sp24 := next_mark();
+    mark := next_mark();
     sp20 := 0;
     func_00449D24(arg1, 0);
 end;

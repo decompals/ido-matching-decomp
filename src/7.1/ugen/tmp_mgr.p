@@ -28,7 +28,7 @@ spill_rec = Record
 end;
 
 
-procedure gen_store(arg0: registers; temp_id: integer; arg2: integer); external; {No decompiled yet}
+procedure gen_store(arg0: registers; temp_id: integer; arg2: integer); forward;
 
 
 procedure init_temps();
@@ -119,44 +119,36 @@ begin
     gen_store(reg, spill.temp^.offset, area_size);
 end;
 
-#ifdef NON_MATCHING
-
-(*
- url: https://decomp.me/scratch/0r65L
- score: 96.50% (988)
-*)
-procedure gen_store(reg: registers; offset: integer; area_size: integer);
+procedure gen_store();
 var
-    op: first(asmcodes)..last(asmcodes); (* sp + C6 *)
-    frame_calc: integer; (* sp + BC *)
+    op: first(asmcodes)..last(asmcodes); /* sp + C6 */
 begin
-        if ((xr0 in [reg])) then begin {Unknown pascal set operation}
+    if (reg in [xr0..xr31]) then begin
 
-        if (area_size < 5) then begin
+        if (area_size <= 4) then begin
             op := zsw;
-        end else if (area_size < 9) then begin
+        end else if (area_size <= 8) then begin
             op := zsd;
         end else begin
-            report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
+            report_error(4, 124, "temp_mgr.p", "illegal size temporary");
             return;
         end;
 
-    end else if (area_size < 5) then begin
+    end else if (area_size <= 4) then begin
         op := fs_s;
-    end else if (area_size < 9) then begin
+    end else if (area_size <= 8) then begin
         op := fs_d;
     end else begin
-        report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
+        report_error(4, 133, "temp_mgr.p", "illegal size temporary");
         return;
     end;
         if (reversed_stack) then begin
             if ((op = zsd) and not (opcode_arch)) then begin
-                frame_calc :=  offset + (((area_size + 3) div 4) * 4);
-                emit_rob(zsw, reg, frame_offset1(frame_calc), frame_pointer, 0);
-                emit_rob(zsw, reg , frame_offset1(frame_calc) + 4, frame_pointer, 0);
+                emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+                emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
                 return;
             end;
-            emit_rob(op, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+            emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
             return;
         end;
 
@@ -167,9 +159,6 @@ begin
             emit_rob(op, reg, frame_offset1(offset), frame_pointer, 0);
         end;
 end;
-#else 
-{GLOBAL_ASM("asm/7.1/functions/ugen/tmp_mgr/gen_store.s")}
-#endif
 
 procedure free_temp(index: u8); {Guess}
 var
