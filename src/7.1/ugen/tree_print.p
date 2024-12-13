@@ -102,7 +102,7 @@ begin
     write(pFile^, " ival=", u.Initval.ival:1);
 end;
 #else
-{GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/print_ucode.s")}
+GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/print_ucode.s")
 #endif
 
 #ifdef NON_MATCHING
@@ -147,7 +147,7 @@ begin
     writeln(pFile^);        
 end;
 #else
-{GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/print_node_1.s")}
+GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/print_node_1.s")
 #endif
 
 procedure print_tree(pFile: ^Text; arg1: ^tree; arg2: cardinal; arg3: cardinal);

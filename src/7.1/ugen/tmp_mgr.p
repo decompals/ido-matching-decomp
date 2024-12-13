@@ -2,6 +2,7 @@
 #include "ugen.h"
 #include "reg_mgr.h"
 #include "report.h"
+#include "frame_offset.h"
 
 type
     Ptemp = ^Temp_rec;
@@ -19,6 +20,8 @@ var
     temps: ^Temp_rec;
     current_temp_index: u8;
     temps_offset: integer;
+    frame_pointer: extern integer; {From frame_offset maybe?}
+    reversed_stack: extern boolean;
 
 
 type
@@ -28,8 +31,9 @@ spill_rec = Record
 end;
 
 
-procedure gen_store(arg0: registers; temp_id: integer; arg2: integer); forward;
+procedure gen_store(reg: registers; offset: integer; area_size: integer); forward;
 
+procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: integer; arg4: integer); external;
 
 procedure init_temps();
 begin
@@ -124,40 +128,40 @@ var
     op: first(asmcodes)..last(asmcodes); /* sp + C6 */
 begin
     if (reg in [xr0..xr31]) then begin
-
         if (area_size <= 4) then begin
             op := zsw;
         end else if (area_size <= 8) then begin
             op := zsd;
         end else begin
-            report_error(4, 124, "temp_mgr.p", "illegal size temporary");
+            report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
             return;
         end;
-
-    end else if (area_size <= 4) then begin
-        op := fs_s;
-    end else if (area_size <= 8) then begin
-        op := fs_d;
     end else begin
-        report_error(4, 133, "temp_mgr.p", "illegal size temporary");
-        return;
-    end;
-        if (reversed_stack) then begin
-            if ((op = zsd) and not (opcode_arch)) then begin
-                emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
-                emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
-                return;
-            end;
-            emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+        if (area_size <= 4) then begin
+            op := fs_s;
+        end else if (area_size <= 8) then begin
+            op := fs_d;
+        end else begin
+            report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
             return;
         end;
+    end;
 
+    if (reversed_stack) then begin
+        if ((op = zsd) and not (opcode_arch)) then begin
+            emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+            emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
+        end else begin
+            emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+        end;
+    end else begin
         if ((op = zsd) and not (opcode_arch)) then begin
             emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
             emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
         end else begin
             emit_rob(op, reg, frame_offset1(offset), frame_pointer, 0);
         end;
+    end;
 end;
 
 procedure free_temp(index: u8); {Guess}
