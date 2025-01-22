@@ -2,7 +2,7 @@
 #include "ugen.h"
 #include "reg_mgr.h"
 #include "report.h"
-#include "cmplrs/binasm.h"
+#include "frame_offset.h"
 
 type
     Ptemp = ^Temp_rec;
@@ -20,6 +20,8 @@ var
     temps: ^Temp_rec;
     current_temp_index: u8;
     temps_offset: integer;
+    frame_pointer: extern integer; {From frame_offset maybe?}
+    reversed_stack: extern boolean;
 
 
 type
@@ -29,9 +31,9 @@ spill_rec = Record
 end;
 
 
-procedure gen_store(arg0: u8; temp_id: integer; arg2: integer); external; {No decompiled yet}
-function usage_count(index: u8): u16; external; {Forward doesn't seem to be working?}
+procedure gen_store(reg: registers; offset: integer; area_size: integer); forward;
 
+procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: integer; arg4: integer); external;
 
 procedure init_temps();
 begin
@@ -59,9 +61,10 @@ var
     temp: Ptemp;
 begin
 
-    temp := new(16#14, 1);
+    new(temp);
+
     if (temp = nil) then begin
-        report_error(4, 76, "Insufficiant memory", "temp_mgr.p");
+        report_error(Internal, 76, "Insufficiant memory", "temp_mgr.p");
         return temp;
     end;
     if (arg0 >= 5) then begin
@@ -100,11 +103,11 @@ begin
     return nil;
 end;
 
-procedure spill_to_temp(arg0: u8; area_size: integer);
+procedure spill_to_temp(reg: registers; area_size: integer);
 var
     spill: spill_rec;
 begin
-    if (not (opcode_arch) and (kind_of_register(arg0) = 6)) then begin
+    if (not (opcode_arch) and (kind_of_register(reg) = 6)) then begin
         area_size := 8;
     end;
     spill.temp :=  find_free_temp(area_size);
@@ -112,15 +115,54 @@ begin
         spill.temp := make_new_temp(area_size);
     end;
 
-    spill.unk := content_of(arg0);
+    spill.unk := content_of(reg);
     spill.unk^.temp_index := spill.temp^.index;
 
-    spill.temp^.usage_count := usage_count(arg0);
+    spill.temp^.usage_count := usage_count(reg);
     spill.temp^.area_size := area_size;
-    gen_store(arg0, spill.temp^.offset, area_size);
+    gen_store(reg, spill.temp^.offset, area_size);
 end;
 
-{GLOBAL_ASM("asm/7.1/functions/ugen/tmp_mgr/gen_store.s")}
+procedure gen_store();
+var
+    op: first(asmcodes)..last(asmcodes); /* sp + C6 */
+begin
+    if (reg in [xr0..xr31]) then begin
+        if (area_size <= 4) then begin
+            op := zsw;
+        end else if (area_size <= 8) then begin
+            op := zsd;
+        end else begin
+            report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
+            return;
+        end;
+    end else begin
+        if (area_size <= 4) then begin
+            op := fs_s;
+        end else if (area_size <= 8) then begin
+            op := fs_d;
+        end else begin
+            report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
+            return;
+        end;
+    end;
+
+    if (reversed_stack) then begin
+        if ((op = zsd) and not (opcode_arch)) then begin
+            emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+            emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
+        end else begin
+            emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+        end;
+    end else begin
+        if ((op = zsd) and not (opcode_arch)) then begin
+            emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
+            emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
+        end else begin
+            emit_rob(op, reg, frame_offset1(offset), frame_pointer, 0);
+        end;
+    end;
+end;
 
 procedure free_temp(index: u8); {Guess}
 var
@@ -128,7 +170,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(4, 192, "temporary not found", "tmp_mgr.p");
+        report_error(Internal, 192, "temporary not found", "tmp_mgr.p");
         return;
     end;
     temp^.free := true;
@@ -140,7 +182,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(4, 204, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 204, "temporary not found", "temp_mgr.p");
     end else begin
         return temp^.offset;
     end;
@@ -152,7 +194,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(4, 216, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 216, "temporary not found", "temp_mgr.p");
     end else begin
         return temp^.usage_count;
     end;

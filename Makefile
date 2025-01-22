@@ -116,6 +116,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
 build/src/7.1/cfe/%.o: OPTFLAGS := -O2
+build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 
 # Targets
 
