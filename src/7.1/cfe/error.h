@@ -11,5 +11,8 @@ enum ErrorLevels {
 };
 
 int error(int mesg, int level, int location, ...);
+int error_init(char** msg_files, FILE* file, int error_mode);
+void set_error_mode(int error_mode);
+int set_woff(int warning_number);
 
 #endif

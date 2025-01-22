@@ -99,9 +99,15 @@ extern UnkChi* cur_lvl;
 extern MemCtx* pmhandle;
 extern LinkedList* psymb_handle;
 extern LinkedList* isymb_handle;
-extern char debug_arr[];
 extern FILE* dbgout;
 extern int err_options[];
+extern MemCtx* general_handle;
+extern int xpg_flag;
+extern char* command_line_file_name;
+extern int yydebug;
+extern char* st_filename;
+extern int bit_size[];
+extern int minimize_indirection_entries;
 
 int real_file_line(int, char**, int*, int);
 int __assert(char*, char*, int);
@@ -115,6 +121,13 @@ UnkOmega* make_iconstant(int, UnkOmega*, long long);
 unsigned int sizeof_type(int);
 char* get_type_name(int);
 int loc_to_cppline(int);
-void fatal(void);
+void catchall(void);
+int lint(int argc, char** argv);
+int cfe(int argc, char** argv);
+int cpp(int argc, char** argv);
+void hash_table_statistics(void);
+void Set_Small_Data_Upper_Limit(int);
+void set_def_member_pack(int);
+void cpp_symentry_setMaxMacroRecursionDepth(int);
 
 #endif

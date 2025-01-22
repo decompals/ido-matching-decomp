@@ -483,7 +483,7 @@ out:
         int hasTypePromotion = 0;
         int hasOverflow = FALSE;
 
-        if (isLongLong && ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+        if (isLongLong && IS_STRICT_ANSI) {
             error(0x20131, LEVEL_WARNING, curloc, "long long constants (LL)");
         }
 
@@ -499,7 +499,7 @@ out:
 
                 bitSize += 4;
                 if (!isEmptyHex && !hasOverflow && (isLongLong && longLongValue > __ULONGLONG_MAX / 16 || longValue > ULONG_MAX / 16)) {
-                    if (isLongLong || (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && (options[5] & 5) == 5) {
+                    if (isLongLong || IS_STRICT_ANSI) {
                         hasOverflow = TRUE;
                     } else {
                         hasTypePromotion = TRUE;
@@ -522,7 +522,7 @@ out:
                 }
                 bitSize += 3;
                 if (!hasOverflow && (isLongLong && longLongValue > __ULONGLONG_MAX / 8 || longValue > ULONG_MAX / 8)) {
-                    if (isLongLong || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+                    if (isLongLong || IS_STRICT_ANSI) {
                         hasOverflow = TRUE;
                     } else {
                         hasTypePromotion = TRUE;
@@ -551,7 +551,7 @@ out:
                 }
                 digit = *int_ptr - '0';
                 if (!hasOverflow && (isLongLong && (longLongValue > __ULONGLONG_MAX / 10 || longLongValue * 10 > __ULONGLONG_MAX - digit) || (longValue > 0xFFFFFFFF / 10 || longValue * 10 > 0xFFFFFFFF - digit))) {
-                    if (isLongLong || ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+                    if (isLongLong || IS_STRICT_ANSI) {
                         hasOverflow = TRUE;
                     } else {
                         hasTypePromotion = TRUE;
@@ -572,7 +572,7 @@ out:
         if (!isEmptyHex) {
             if (hasOverflow) {
                 error(0x2000F, LEVEL_DEFAULT, curloc);
-            } else if ((((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5 || options[23]) && hasTypePromotion){
+            } else if ((IS_STRICT_ANSI || options[OPTION_FULLWARN]) && hasTypePromotion){
                 error(0x20010, LEVEL_DEFAULT, curloc);
             }
         }
@@ -590,13 +590,13 @@ out:
                 yylval.node = make_uiconstant(curloc, ulonglong_type, (unsigned long long)longLongValue);
             }
         } else if (hasLongSuffix) {
-            if (longValue <= LONG_MAX || !options[13] && !(options[5] & 1)) {
+            if (longValue <= LONG_MAX || !options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1)) {
                 yylval.node = make_iconstant(curloc, long_type, (long)longValue);
             } else {
                 yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
             }
         } else if (isHex || isOctal) {
-            if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
+            if (IS_ANSI) {
                 if (longValue <= LONG_MAX) {
                     yylval.node = make_iconstant(curloc, int_type, (int)longValue);
                 } else {
@@ -611,13 +611,13 @@ out:
             }
         } else if (longValue <= LONG_MAX) {
             yylval.node = make_iconstant(curloc, int_type, (int)longValue);
-        } else if (longValue <= LONG_MAX || !options[13] && !(options[5] & 1)) {
+        } else if (longValue <= LONG_MAX || !options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1)) {
             yylval.node = make_iconstant(curloc, long_type, (long)longValue);
         } else {
             yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
         }
 
-        if (!options[13] && !(options[5] & 1) && long_type->unk_18 == int_type->unk_18) {
+        if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && long_type->unk_18 == int_type->unk_18) {
             if (yylval.node->unk_08 == long_type) {
                 yylval.node->unk_08 = int_type;
             } else if (yylval.node->unk_08 == ulong_type) {
@@ -631,7 +631,7 @@ out:
         if (1) { }
         if (1) { }
         
-        if (options[19] && !(options[19] & 0x40) && (isHex || isOctal && bitSize != 0) && bitSize < sizeof_type(yylval.node->unk_08->unk_04)) {
+        if (options[OPTION_LINT_FLAGS] && !(options[OPTION_LINT_FLAGS] & 0x40) && (isHex || isOctal && bitSize != 0) && bitSize < sizeof_type(yylval.node->unk_08->unk_04)) {
             error(0x7014D, LEVEL_WARNING, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
         }
         return CONSTANT;
@@ -666,7 +666,7 @@ return_false:
                     *out_buf = unescape(*out_buf);
                     break;
                 case 'a':
-                    if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
+                    if (IS_ANSI) {
                         *out_buf = unescape(*out_buf);
                     } else {
                         *out_buf = 'a';
@@ -702,7 +702,7 @@ return_false:
                     *hasNumeric = TRUE;
                     break;
                 case 'x':
-                    if ((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) && !forbidNumeric) {
+                    if (IS_ANSI && !forbidNumeric) {
                         c = input();
                         if (isxdigit(c)) {        
                             value = isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10;                        
@@ -723,7 +723,7 @@ return_false:
                     }
         
                     *out_buf = 'x';
-                    if (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) {
+                    if (!IS_ANSI) {
                         error(0x20018, LEVEL_DEFAULT, curloc, *out_buf);
                     }
                     if (forbidNumeric) {
@@ -770,7 +770,7 @@ static int read_wstring_character(char stopChar, char* buffer) {
         // large numeric values are allowed in wide strings
         switch(*buffer) {
             case 'x':
-                if (options[13] && (options[5] & 1) || !options[13] && (options[5] & 1)) {
+                if (IS_ANSI) {
                     c = input();
                     if (isxdigit(c)) {        
                         value = isdigit(c) ? c - '0' : islower(c) ? c - 'a' + 10 : c - 'A' + 10;                        
@@ -878,27 +878,27 @@ static int scan_char(void) {
             yylval.node = make_iconstant(curloc, int_type, 0);
             break;
         case 1:
-            yylval.node = make_iconstant(curloc, int_type, options[6] ? (signed char)token[0] : (unsigned char)token[0]);
+            yylval.node = make_iconstant(curloc, int_type, options[OPTION_SIGNED] ? (signed char)token[0] : (unsigned char)token[0]);
             break;
         case 2:
-            if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 8) + token[1]));
+            if (options[OPTION_ENDIANNESS]) {
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[0] : (unsigned char)token[0]) << 8) + token[1]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[1] : (unsigned char)token[1]) << 8) + token[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[1] : (unsigned char)token[1]) << 8) + token[0]));
             }
             break;
         case 3:
-            if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 16) + (token[1] << 8) + token[2]));
+            if (options[OPTION_ENDIANNESS]) {
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[0] : (unsigned char)token[0]) << 16) + (token[1] << 8) + token[2]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[2] : (unsigned char)token[2]) << 16) + (token[1] << 8) + token[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[2] : (unsigned char)token[2]) << 16) + (token[1] << 8) + token[0]));
             }
             break;
         default:
-            if (options[2]) {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[0] : (unsigned char)token[0]) << 24) + (token[1] << 16) + (token[2] << 8) + token[3]));
+            if (options[OPTION_ENDIANNESS]) {
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[0] : (unsigned char)token[0]) << 24) + (token[1] << 16) + (token[2] << 8) + token[3]));
             } else {
-                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[6] ? (signed char)token[3] : (unsigned char)token[3]) << 24) + (token[2] << 16) + (token[1] << 8) + token[0]));
+                yylval.node = make_iconstant(curloc, int_type, (unsigned int)(((options[OPTION_SIGNED] ? (signed char)token[3] : (unsigned char)token[3]) << 24) + (token[2] << 16) + (token[1] << 8) + token[0]));
             }
             break;
     }
@@ -929,7 +929,7 @@ static int scan_identifier(char firstChar) {
     *ptr++ = firstChar;
 
     while (c = input()) {
-        if (!(isalnum(c) || c == '_' || c == '$' && options[7])) {
+        if (!(isalnum(c) || c == '_' || c == '$' && options[OPTION_DOLLAR])) {
             unput();
             break;
         }
@@ -1044,7 +1044,7 @@ label2:
             yylval.loc = curloc;
             return c;
         case ':':
-            if (options[13]) {
+            if (options[OPTION_CPLUSPLUS]) {
                 c = input();
                 if (c == ':') {
                     c = input();
@@ -1111,7 +1111,7 @@ label2:
                 return DEC_OP;
             }
             if (c == '>') {
-                if (options[13]) {
+                if (options[OPTION_CPLUSPLUS]) {
                     c = input();
                     if (c == '*') {
                         yylval.loc = curloc;
@@ -1210,7 +1210,7 @@ label2:
                 yylval.loc = curloc;
                 return AND_OP;
             }
-            if (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) {
+            if (!IS_ANSI) {
                 if (c == ' ' || c == '\t') {
                     while (c1 = input()) {
                         if (c1 != ' ' && c1 != '\t') {
@@ -1300,7 +1300,7 @@ label2:
                 yylval.loc = curloc;
                 return MUL_ASSIGN;
             }
-            if (!(options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) {
+            if (!IS_ANSI) {
                 if (c == ' ' || c == '\t') {
                     while (c1 = input()) {
                         if (c1 != ' ' && c1 != '\t') {
@@ -1330,7 +1330,7 @@ label2:
                 yylval.loc = curloc;
                 return 0x2E2E; // '..'
             }
-            if (c == '*' && options[13]) {
+            if (c == '*' && options[OPTION_CPLUSPLUS]) {
                 yylval.loc = curloc;
                 return MEMDOT_OP;
             }
@@ -1468,7 +1468,7 @@ label2:
         case 'x':
         case 'y':
         case 'z':
-            if (c == '$' && options[7] || c != '$') {
+            if (c == '$' && options[OPTION_DOLLAR] || c != '$') {
                 return scan_identifier(c);
             }
             /* fallthrough */
@@ -1668,10 +1668,10 @@ void init_scan(void) {
     mk_parse_symb(string_to_symbol("while", 5), WHILE, 0);
     mk_parse_symb(string_to_symbol("__builtin_alignof", 17), ALIGNOF, 0);
     mk_parse_symb(string_to_symbol("__pragma", 8), __PRAGMA, 0);
-    if (!options[13] && !(options[5] & 1) || !options[13] && (options[5] & 3) == 3) {
+    if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) || !options[OPTION_CPLUSPLUS] && (options[OPTION_ANSI_MODE] & 3) == 3) {
         mk_parse_symb(string_to_symbol("__inline", 8), INLINE, 0);
     }
-    if (options[13]) {
+    if (options[OPTION_CPLUSPLUS]) {
         mk_parse_symb(string_to_symbol("class", 5), CLASS, 0);
         mk_parse_symb(string_to_symbol("virtual", 7), VIRTUAL, 0);
         mk_parse_symb(string_to_symbol("protected", 9), PROTECTED, 0);
@@ -1704,7 +1704,7 @@ ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2) {
     prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->unk_04);
     symb->unk_04 = psymb;
 
-    if (debug_arr[80] > 0) {
+    if (debug_arr['P'] > 0) {
         fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
             symb->namelen, symb->name,
             psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),

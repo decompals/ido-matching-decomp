@@ -81,7 +81,7 @@ static void get_error_message(char* buffer, int msgid, int type) {
     if (current_mesg_file == NULL) {
         while (*message_files != NULL && current_mesg_file == NULL) {
             current_mesg_file = fopen(*message_files, "r");
-            if (debug_arr[101] > 0) {
+            if (debug_arr['e'] > 0) {
                 fprintf(dbgout, "attempting to open msg file %s %s\n", *message_files, current_mesg_file != NULL ? "success" : "failed");
             }
             message_files++;
@@ -191,7 +191,7 @@ static void print_error(ErrorStruct* arg0) {
     }
     error_already_reported[arg0->message & 0xFFFF] = TRUE;
 
-    if (options[19] && !(options[3] & 0x20)) {
+    if (options[OPTION_LINT_FLAGS] && !(options[OPTION_VERBOSITY] & VERBOSE_FLAG_20)) {
         lint_warning(arg0);
         return;
     }
@@ -230,7 +230,7 @@ static void print_error(ErrorStruct* arg0) {
     }
     get_error_message(message_text_buf, arg0->message & 0xFFFF, 0);
     sprintf(error_buffer + strlen(error_buffer), message_text_buf, arg0->params[0], arg0->params[1], arg0->params[2], arg0->params[3]);
-    if (((options[13] && (options[5] & 1) || !options[13] && (options[5] & 1))) && (options[5] & 5) == 5) {
+    if (IS_STRICT_ANSI) {
         get_error_message(message_text_buf, arg0->message & 0xFFFF, 2);
         if (strlen(message_text_buf) != 0) {
             sprintf(error_buffer + strlen(error_buffer), " (%s)\n", message_text_buf);
@@ -241,10 +241,10 @@ static void print_error(ErrorStruct* arg0) {
         strcat(error_buffer, "\n");
     }
 
-    if ((options[3] & 2) && file != NULL && line != 0) {
+    if ((options[OPTION_VERBOSITY] & VERBOSE_FLAG_2) && file != NULL && line != 0) {
         cpp_line_ptr(error_buffer + strlen(error_buffer), B_10021B38, arg0->location);
     }
-    if (options[3] & 4) {
+    if (options[OPTION_VERBOSITY] & VERBOSE_FLAG_4) {
         get_error_message(error_buffer + strlen(error_buffer), arg0->message & 0xFFFF, 1);
     }
     fprintf(D_1001BA78, "%s", error_buffer);
@@ -281,14 +281,14 @@ int error(int message, int level, int location, ...) {
         return LEVEL_SUPPRESSED;
     }
 
-    if (real_level == 1) {
-        if (!(options[3] & 1) || warning_disabled[msgid]) {
+    if (real_level == LEVEL_WARNING) {
+        if (!(options[OPTION_VERBOSITY] & VERBOSE_FLAG_1) || warning_disabled[msgid]) {
             return LEVEL_SUPPRESSED;
         }
         num_warns++;
     }
 
-    if (debug_arr[0x65] > 0) {
+    if (debug_arr['e'] > 0) {
         fprintf(dbgout, "err_msg #:%d l:%d loca:%x sec:%d\n", msgid, real_level, location, (message >> 16) & 0xF);
     }
 

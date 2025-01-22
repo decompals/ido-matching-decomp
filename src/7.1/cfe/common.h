@@ -10,11 +10,14 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <limits.h>
+#include <fcntl.h>
 
 #include "mem.h"
 #include "linklist.h"
 #include "error.h"
 #include "scan.h"
+#include "main.h"
+#include "modes.h"
 #include "y.tab.h"
 #include "unknown.h"
 
