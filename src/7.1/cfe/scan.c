@@ -13,7 +13,7 @@ typedef struct TokenIdentifier {
 } TokenIdentifier;
 
 union YYLVAL {
-    UnkOmega* node;
+    TreeNode* node;
     TokenIdentifier identifier;
     int loc;
 };
@@ -468,10 +468,10 @@ out:
     if (isFloat) {
         if (hasFloatSuffix) {
             scan_float(token, buf_ptr, curloc);
-            yylval.node = make(0x65, curloc, float_type, string_to_symbol(token, buf_ptr - token));
+            yylval.node = make(Constant, curloc, float_type, string_to_symbol(token, buf_ptr - token));
         } else {
             scan_double(token, buf_ptr, curloc);
-            yylval.node = make(0x65, curloc, double_type, string_to_symbol(token, buf_ptr - token));
+            yylval.node = make(Constant, curloc, double_type, string_to_symbol(token, buf_ptr - token));
         }
         return CONSTANT;
     } else {
@@ -617,11 +617,11 @@ out:
             yylval.node = make_uiconstant(curloc, ulong_type, (unsigned long)longValue);
         }
 
-        if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && long_type->unk_18 == int_type->unk_18) {
-            if (yylval.node->unk_08 == long_type) {
-                yylval.node->unk_08 = int_type;
-            } else if (yylval.node->unk_08 == ulong_type) {
-                yylval.node->unk_08 = uint_type;
+        if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && BASIC_TYPE(long_type).size == BASIC_TYPE(int_type).size) {
+            if (TREE_TYPE(yylval.node) == long_type) {
+                TREE_TYPE(yylval.node) = int_type;
+            } else if (TREE_TYPE(yylval.node) == ulong_type) {
+                TREE_TYPE(yylval.node) = uint_type;
             }
         }
 
@@ -631,8 +631,11 @@ out:
         if (1) { }
         if (1) { }
         
-        if (options[OPTION_LINT_FLAGS] && !(options[OPTION_LINT_FLAGS] & 0x40) && (isHex || isOctal && bitSize != 0) && bitSize < sizeof_type(yylval.node->unk_08->unk_04)) {
-            error(0x7014D, LEVEL_WARNING, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(yylval.node->unk_08->unk_04));
+        if (options[OPTION_LINT_FLAGS]
+            && !(options[OPTION_LINT_FLAGS] & 0x40)
+            && (isHex || isOctal && bitSize != 0)
+            && bitSize < sizeof_type(TREE_CODE(TREE_TYPE(yylval.node)))) {
+            error(0x7014D, LEVEL_WARNING, curloc, bitSize, isHex ? "hex" : "octal", get_type_name(TREE_CODE(TREE_TYPE(yylval.node))));
         }
         return CONSTANT;
     }
@@ -840,7 +843,7 @@ static int scan_string(void) {
     }
 
     *ptr = 0;
-    yylval.node = make(0x65, curloc, array_type, token, ptr - token + 1);
+    yylval.node = make(Constant, curloc, array_type, token, ptr - token + 1);
     return STRING;
 }
 
@@ -856,7 +859,7 @@ static int scan_wstring(void) {
     }
 
     *ptr = 0;
-    yylval.node = make(0x68, curloc, array_type, wstring_base, len + 1);
+    yylval.node = make(Constant_special, curloc, array_type, wstring_base, len + 1);
     return WSTRING;
 }
 

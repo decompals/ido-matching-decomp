@@ -18,6 +18,8 @@
 #include "scan.h"
 #include "main.h"
 #include "modes.h"
+#include "symtab.h"
+#include "tree.h"
 #include "y.tab.h"
 #include "unknown.h"
 
