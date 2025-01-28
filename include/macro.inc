@@ -1,3 +1,6 @@
+.ifndef MACRO_INC
+.set MACRO_INC, 1
+
 .set noat
 .set noreorder
 
@@ -12,10 +15,12 @@
 .endm
 
 .macro jlabel label
-    .global \label
     \label:
 .endm
 
+.macro llabel label
+    \label:
+.endm
 
 # Float register aliases (o32 ABI, odd ones are rarely used)
 
@@ -51,3 +56,5 @@
 .set $fs4f,         $f29
 .set $fs5,          $f30
 .set $fs5f,         $f31
+
+.endif

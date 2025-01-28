@@ -2,11 +2,8 @@
 
 /* .data      */
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/main.c,v 1.36 1995/12/13 22:32:10 zaineb Exp $";
+static int unused = 0;
 char* outfile = "";
-static char* default_path_dirs[] = {
-    "/usr/lib/",
-    "/lib/"
-};
 
 /* .bss       */
 /* 0x1002BAD0 */ static int exit_code;
@@ -529,6 +526,11 @@ static void parse_cmdline(int argc, char** argv) {
         error(0x40135, 1, -1, "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 607, 500, 856);
     }
 }
+
+static char* default_path_dirs[] = {
+    "/usr/lib/",
+    "/lib/"
+};
 
 static char* get_directory(char* name) {
     char* path_ptr = getenv("PATH");
