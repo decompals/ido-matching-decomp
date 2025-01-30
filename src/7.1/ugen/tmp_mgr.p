@@ -61,10 +61,10 @@ var
     temp: Ptemp;
 begin
 
-    new(temp);
+    new(temp); { NON_MATCHING!! }
 
     if (temp = nil) then begin
-        report_error(Internal, 76, "Insufficiant memory", "temp_mgr.p");
+        report_error(Internal, 76, "temp_mgr.p", "Insufficiant memory");
         return temp;
     end;
     if (arg0 >= 5) then begin
@@ -101,26 +101,6 @@ begin
         temp := temp^.next;
     end;
     return nil;
-end;
-
-procedure spill_to_temp(reg: registers; area_size: integer);
-var
-    spill: spill_rec;
-begin
-    if (not (opcode_arch) and (kind_of_register(reg) = 6)) then begin
-        area_size := 8;
-    end;
-    spill.temp :=  find_free_temp(area_size);
-    if (spill.temp = nil) then begin
-        spill.temp := make_new_temp(area_size);
-    end;
-
-    spill.unk := content_of(reg);
-    spill.unk^.temp_index := spill.temp^.index;
-
-    spill.temp^.usage_count := usage_count(reg);
-    spill.temp^.area_size := area_size;
-    gen_store(reg, spill.temp^.offset, area_size);
 end;
 
 procedure gen_store();
@@ -164,13 +144,33 @@ begin
     end;
 end;
 
+procedure spill_to_temp(reg: registers; area_size: integer);
+var
+    spill: spill_rec;
+begin
+    if (not (opcode_arch) and (kind_of_register(reg) = 6)) then begin
+        area_size := 8;
+    end;
+    spill.temp :=  find_free_temp(area_size);
+    if (spill.temp = nil) then begin
+        spill.temp := make_new_temp(area_size);
+    end;
+
+    spill.unk := content_of(reg);
+    spill.unk^.temp_index := spill.temp^.index;
+
+    spill.temp^.usage_count := usage_count(reg);
+    spill.temp^.area_size := area_size;
+    gen_store(reg, spill.temp^.offset, area_size);
+end;
+
 procedure free_temp(index: u8); {Guess}
 var
     temp: Ptemp;
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 192, "temporary not found", "tmp_mgr.p");
+        report_error(Internal, 192, "temp_mgr.p", "temporary not found");
         return;
     end;
     temp^.free := true;
@@ -182,7 +182,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 204, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 204, "temp_mgr.p", "temporary not found");
     end else begin
         return temp^.offset;
     end;
@@ -194,7 +194,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 216, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 216, "temp_mgr.p", "temporary not found");
     end else begin
         return temp^.usage_count;
     end;
