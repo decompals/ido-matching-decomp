@@ -936,9 +936,12 @@ def parse_source(f, opts, out_dependencies, print_source=None):
     global_asm = None
     asm_functions = []
     base_fname = f.name
-    output_lines = [
-        '#line 1 "' + base_fname + '"'
-    ]
+    if state.pascal:
+        output_lines = []
+    else:    
+        output_lines = [
+            '#line 1 "' + base_fname + '"'
+        ]
 
     is_cutscene_data = False
     is_early_include = False

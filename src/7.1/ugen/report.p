@@ -10,7 +10,11 @@ ugen_err_string =  packed array [1..10] of char;
 (* File variables *)
 var
 err_tab : array [first(ugen_report)..last(ugen_report)] of ugen_err_string := (
-      "fix\0", "info\0", "warning\0", "error\0", "internal\0"
+      "fix",
+      "info",
+      "warning",
+      "error",
+      "internal"
       );
 
 errors: array [first(ugen_report)..ugen_report(20)] of integer; 
@@ -65,5 +69,5 @@ end;
 
 procedure assertion_error();
 begin
-    report_error(Internal, 79, 'Assertion failed', 'report.p');
+    report_error(Internal, 79, 'report.p', 'Assertion failed');
 end;
