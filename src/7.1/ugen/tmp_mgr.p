@@ -58,7 +58,7 @@ var
     temp: Ptemp;
 begin
 
-    new(temp); { NON_MATCHING!! }
+    new(temp);
 
     if (temp = nil) then begin
         report_error(Internal, 76, "temp_mgr.p", "Insufficiant memory");
