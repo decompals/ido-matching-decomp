@@ -7,8 +7,10 @@ typedef struct ParseSymbol {
     int unk_08;
 } ParseSymbol;
 
+struct TreeNode;
+
 typedef struct Symbol {
-    int unk_00;
+    struct TreeNode* unk_00;
     ParseSymbol* unk_04;
     int unk_08;
     int unk_0C;

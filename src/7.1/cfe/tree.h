@@ -40,12 +40,16 @@
 #define BINARY_EXPR(t) (*((TreeNode_Binary_expr*)t))
 #define TERNARY_EXPR(t) (*((TreeNode_Ternary_expr*)t))
 #define AGGREGATE_EXPR(t) (*((TreeNode_Aggregate_expr*)t))
-#define GET_CONSTANT(t) (*((TreeNode_Constant*)t))
+#define ICONSTANT(t) (*((TreeNode_IConstant*)t))
+#define UICONSTANT(t) (*((TreeNode_UIConstant*)t))
+#define FLTCONSTANT(t) (*((TreeNode_FltConstant*)t))
+#define DBLCONSTANT(t) (*((TreeNode_DblConstant*)t))
+#define REALCONSTANT(t) (*((TreeNode_RealConstant*)t))
+#define STRINGCONSTANT(t) (*((TreeNode_StringConstant*)t))
+#define WSTRINGCONSTANT(t) (*((TreeNode_WStringConstant*)t))
 #define GET_IDENTIFIER(t) (*((TreeNode_Identifier*)t))
 #define GET_PRAGMA(t) (*((TreeNode_Pragma*)t))
 #define ACCESS_SPEC(t) (*((TreeNode_Access_spec*)t))
-
-#define GET_UNKNOWN1(t) (*((TreeNode_Unknown1*)t))
 
 #define IS_STD_TREE(t) (t == char_type || t == double_type || t == int_type || \
         t == int_type || t == float_type || t == long_type || t == longlong_type || \
@@ -238,6 +242,13 @@ typedef struct TreeNode_Pointer_type {
     int size;
     int align;
     TreeNode* base_type;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
 } TreeNode_Pointer_type;
 
 typedef struct TreeNode_Field_decl {
@@ -381,21 +392,44 @@ typedef struct TreeNode_Ternary_expr {
 
 typedef struct TreeNode_Aggregate_expr {
     TreeNode t;
-    TreeNode* operand[1]; // variable size
+    TreeNode* operand[2]; // variable size
 } TreeNode_Aggregate_expr;
 
-typedef struct TreeNode_Constant {
+typedef struct TreeNode_IConstant {
     TreeNode t;
-    union {
-        long long ll;
-        unsigned long long ull;
-        Symbol* real;
-        float flt;
-        double dbl;
-        char str[1];
-        int array[1];
-    } value;
-} TreeNode_Constant;
+    long long value;
+} TreeNode_IConstant;
+
+typedef struct TreeNode_UIConstant {
+    TreeNode t;
+    unsigned long long value;
+} TreeNode_UIConstant;
+
+typedef struct TreeNode_FltConstant {
+    TreeNode t;
+    float value;
+} TreeNode_FltConstant;
+
+typedef struct TreeNode_DblConstant {
+    TreeNode t;
+    double value;
+} TreeNode_DblConstant;
+
+typedef struct TreeNode_RealConstant {
+    TreeNode t;
+    Symbol* value; // not sure
+    int unk_1C;
+} TreeNode_RealConstant;
+
+typedef struct TreeNode_StringConstant {
+    TreeNode t;
+    char value[1]; // variable size
+} TreeNode_StringConstant;
+
+typedef struct TreeNode_WStringConstant {
+    TreeNode t;
+    long value[1]; // variable size
+} TreeNode_WStringConstant;
 
 typedef struct TreeNode_Identifier {
     TreeNode t;
@@ -413,13 +447,11 @@ typedef struct TreeNode_Access_spec {
     TreeNode* access;
 } TreeNode_Access_spec;
 
-typedef struct TreeNode_Unknown1 {
-    TreeNode t;
-    long long size;
-} TreeNode_Unknown1;
-
 TreeNode* make(int code, int location, ...);
 TreeNode* make_uiconstant(int, TreeNode*, unsigned long long);
 TreeNode* make_iconstant(int, TreeNode*, long long);
+TreeNode* make_pointer(TreeNode* arg0);
+float str_to_float(char* arg0, int arg1, int arg2);
+double str_to_double(char* arg0, int arg1, int arg2);
 
 #endif

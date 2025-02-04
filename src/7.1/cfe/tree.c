@@ -10,7 +10,7 @@
 
 // .data
 static int D_1001D470 = 0;
-static int D_1001D474 = 0;
+static int D_1001D474 = FALSE;
 
 char* type_name[] = {
     "ident",
@@ -531,7 +531,7 @@ void display_node(TreeNode* t) {
                 case Longlong_type:
                 case Short_type:
                 case Signed_type:
-                    fprintf(stderr, "i64=(%d,%u)\n", GET_CONSTANT(t).value.ll);
+                    fprintf(stderr, "i64=(%d,%u)\n", ICONSTANT(t).value);
                     break;
                 case Unsigned_type:
                 case Uchar_type:
@@ -540,35 +540,33 @@ void display_node(TreeNode* t) {
                 case Ulonglong_type:
                 case Ushort_type:
                 case Pointer_type:
-                    fprintf(stderr, "ui64=(%d,%u)\n", GET_CONSTANT(t).value.ull);
+                    fprintf(stderr, "ui64=(%d,%u)\n", UICONSTANT(t).value);
                     break;
                 case Double_type:
                 case Longdouble_type:
                 case Float_type:
                     if (!(TREE_ATTRIBUTE(t) & 0x40000)) { // TODO name attribute
-                        int a0;
-                        fprintf(stderr, "real=%s\n", GET_CONSTANT(t).value.real->name);
-                        a0 = GET_CONSTANT(t).value.real->unk_00; 
-                        if (a0) {
-                            display_node((TreeNode*)a0); // TODO type!
+                        fprintf(stderr, "real=%s\n", REALCONSTANT(t).value->name);
+                        if (REALCONSTANT(t).value->unk_00 != NULL) {
+                            display_node(REALCONSTANT(t).value->unk_00);
                         }
                     } else if (TREE_CODE(TREE_TYPE(t)) == Float_type) {
-                        fprintf(stderr, "fp=%g\n", GET_CONSTANT(t).value.flt);
+                        fprintf(stderr, "fp=%g\n", FLTCONSTANT(t).value);
                     } else {
-                        fprintf(stderr, "fp=%g\n", GET_CONSTANT(t).value.dbl);
+                        fprintf(stderr, "fp=%g\n", DBLCONSTANT(t).value);
                     }
                     break;
                 case Array_type:
                     if (TREE_CODE(t) == Constant && TREE_CODE(TREE_TYPE(t)) == Array_type &&
                         (TREE_CODE(TREE_TYPE(TREE_TYPE(t))) == Uchar_type || TREE_CODE(TREE_TYPE(TREE_TYPE(t))) == Char_type)) {
-                        fprintf(stderr, "s=%s\n", GET_CONSTANT(t).value.str);
+                        fprintf(stderr, "s=%s\n", STRINGCONSTANT(t).value);
                     } else {
-                        for (k = 0, l = 3; k < GET_UNKNOWN1(ARRAY_TYPE(TREE_TYPE(t)).index_type).size && k != 80; k++, l++) {
+                        for (k = 0, l = 3; k < ICONSTANT(ARRAY_TYPE(TREE_TYPE(t)).index_type).value && k != 80; k++, l++) {
                             if (l == 7) {
                                 fprintf(stderr, "\n");
                                 l = 0;
                             }
-                            fprintf(stderr, "w[%d]=%ld (%c) ", k, GET_CONSTANT(t).value.array[k], GET_CONSTANT(t).value.array[k]);
+                            fprintf(stderr, "w[%d]=%ld (%c) ", k, WSTRINGCONSTANT(t).value[k], WSTRINGCONSTANT(t).value[k]);
                         }
                         fprintf(stderr, "\n");
                     }
@@ -864,7 +862,7 @@ void preorder_walk(TreeNode* t, void (*disp)(TreeNode*)) {
                 preorder_walk(child, disp);
             }
             if (TREE_CODE(t) != Qualified_ref && TREE_CODE(BINARY_EXPR(t).operand[1]) == Constant) {
-                fprintf(stderr, "\t>value of offset is %d\n", GET_CONSTANT(BINARY_EXPR(t).operand[1]).value.ll);
+                fprintf(stderr, "\t>value of offset is %d\n", ICONSTANT(BINARY_EXPR(t).operand[1]).value);
             }
             preorder_walk(BINARY_EXPR(t).operand[0], disp);
             preorder_walk(BINARY_EXPR(t).operand[1], disp);
@@ -944,7 +942,7 @@ void display_tree(TreeNode* t) {
     walk(t, 't', display_node);
 }
 
-TreeNode* func_0041F630(TreeNode* t, char* c) {
+static TreeNode* func_0041F630(TreeNode* t, char* c) {
     switch (TREE_CODE(t)) {
         case Array_type:
             return ARRAY_TYPE(t).index_type;
@@ -1344,7 +1342,7 @@ TreeNode* duplicate_node(TreeNode* t) {
                 case Longlong_type:
                 case Short_type:
                 case Signed_type:
-                    copy = make_iconstant(TREE_LOCATION(t), TREE_TYPE(t), GET_CONSTANT(t).value.ll);
+                    copy = make_iconstant(TREE_LOCATION(t), TREE_TYPE(t), ICONSTANT(t).value);
                     break;
                 case Unsigned_type:
                 case Uchar_type:
@@ -1354,7 +1352,7 @@ TreeNode* duplicate_node(TreeNode* t) {
                 case Ushort_type:
                 case Pointer_type:
                     // why not make_uiconstant ??
-                    copy = make_iconstant(TREE_LOCATION(t), TREE_TYPE(t), GET_CONSTANT(t).value.ull);
+                    copy = make_iconstant(TREE_LOCATION(t), TREE_TYPE(t), UICONSTANT(t).value);
                     break;
                 default:
                     __assert("FALSE", "tree.c", 0x5BB);
@@ -1523,6 +1521,11 @@ TreeNode* make(int code, int location, ...) {
     int num_args;
     TreeNode* arg;
     TreeNode* t3;
+    TreeNode* tt;
+    int i;
+    char* sp4C;
+    int* sp48;
+    int sp40;
 
     va_start(args, location);
     
@@ -1559,6 +1562,10 @@ TreeNode* make(int code, int location, ...) {
             break;
         case Enum_type:
             t = mem_alloc(tree_handle, sizeof(TreeNode_Enum_type), 4);
+            break;
+        case Func_type:
+            t = mem_alloc(tree_handle, sizeof(TreeNode_Func_type), 4);
+            FUNC_TYPE(t).params = va_arg(args, TreeNode*);
             break;
         case Pointer_type:
         case Reference_type:
@@ -1630,7 +1637,12 @@ TreeNode* make(int code, int location, ...) {
             t = mem_alloc(tree_handle, sizeof(TreeNode_While_stmt), 4);
             WHILE_STMT(t).expr = va_arg(args, TreeNode*);
             WHILE_STMT(t).stmt = va_arg(args, TreeNode*);
-            WHILE_STMT(t).breaklab = va_arg(args, int);
+            break;
+        case Try_stmt:
+            t = mem_alloc(tree_handle, sizeof(TreeNode_Try_stmt), 4);
+            TRY_STMT(t).expr = va_arg(args, TreeNode*);
+            TRY_STMT(t).guard = va_arg(args, TreeNode*);
+            TRY_STMT(t).handler = va_arg(args, TreeNode*);
             break;
         case Dowhile_stmt:
             t = mem_alloc(tree_handle, sizeof(TreeNode_Dowhile_stmt), 4);
@@ -1726,13 +1738,15 @@ TreeNode* make(int code, int location, ...) {
             break;
         case Aggregate_expr:
             num_args = 0;
-            t = va_arg(args, TreeNode*);
-            for (arg = t; arg != NULL; arg = TREE_LINK(arg)) {
+            tt = va_arg(args, TreeNode*);
+            for (arg = tt; arg != NULL; arg = TREE_LINK(arg)) {
                 num_args++;
             }
-
             t = mem_alloc(tree_handle, sizeof(TreeNode_Aggregate_expr) + 4 * num_args, 4);
-            // TODOOOOOO
+            for (i = 0, arg = tt; arg != NULL; i++, arg = TREE_LINK(arg)) {
+                AGGREGATE_EXPR(t).operand[i] = arg;
+            }
+            AGGREGATE_EXPR(t).operand[i] = NULL;
             break;
         case Constant:
             t3 = va_arg(args, TreeNode*);
@@ -1743,13 +1757,13 @@ TreeNode* make(int code, int location, ...) {
                 case Longlong_type:
                 case Short_type:
                 case Signed_type:
-                    if (D_1001D474 == 0) {
+                    if (!D_1001D474) {
                         __assert("FALSE", "tree.c", 0x75A);
                     }
-                    D_1001D474 = 0;
+                    D_1001D474 = FALSE;
 
-                    t = mem_alloc(tree_handle, sizeof(TreeNode_Constant), 4);
-                    GET_CONSTANT(t).value.ll = va_arg(args, long long);
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_IConstant), 8);
+                    ICONSTANT(t).value = va_arg(args, long long);
                     break;
                 case Enum_type:
                     t3 = uint_type;
@@ -1761,19 +1775,19 @@ TreeNode* make(int code, int location, ...) {
                 case Ulonglong_type:
                 case Ushort_type:
                 case Pointer_type:
-                    if (D_1001D474 == 0) {
+                    if (!D_1001D474) {
                         __assert("FALSE", "tree.c", 0x76C);
                     }
-                    D_1001D474 = 0;
+                    D_1001D474 = FALSE;
 
-                    t = mem_alloc(tree_handle, sizeof(TreeNode_Constant), 4);
-                    GET_CONSTANT(t).value.ull = va_arg(args, unsigned long long);
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_UIConstant), 8);
+                    UICONSTANT(t).value = va_arg(args, unsigned long long);
                     break;
                 case Double_type:
                 case Longdouble_type:
                 case Float_type:
-                    t = mem_alloc(tree_handle, sizeof(TreeNode_Constant), 4);
-                    GET_CONSTANT(t).value.flt = va_arg(args, float);
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_RealConstant), 4);
+                    REALCONSTANT(t).value = va_arg(args, Symbol*);
                     break;
                 case Label_type:
                 case Void_type:
@@ -1781,20 +1795,196 @@ TreeNode* make(int code, int location, ...) {
                     __assert("FALSE", "tree.c", 0x785);
                     break;
                 case Array_type:
-                    // TODODODOOOO
+                    t3 = mem_alloc(tree_handle, sizeof(TreeNode_Array_type), 4);
+                    sp4C = va_arg(args, char*);
+                    sp40 = va_arg(args, int);
+                    ARRAY_TYPE(t3).size = bit_size[1] * sp40;
+                    ARRAY_TYPE(t3).align = bit_size[1];
+                    t = mem_alloc(tree_handle, sp40 + 0x18, 4); // sizeof(TreeNode_StringConstant) ?
+                    TREE_CODE(t3) = Array_type;
+                    if (options[3]) {
+                        TREE_TYPE(t3) = char_type;
+                    } else {
+                        TREE_TYPE(t3) = uchar_type;
+                    }
+                    t3->id = ++D_1001D470;
+                    ARRAY_TYPE(t3).index_type = make_iconstant(location, long_type, sp40);
+                    memcpy(STRINGCONSTANT(t).value, sp4C, sp40);
                     break;
                 default:
                     __assert("FALSE", "tree.c", 0x796);
                     break;
             }
+            TREE_TYPE(t) = t3;
+            break;
+        case Constant_special:
+            t3 = va_arg(args, TreeNode*);
+            switch (TREE_CODE(t3)) {
+                case Double_type:
+                case Longdouble_type:
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_DblConstant), 4);
+                    DBLCONSTANT(t).value = va_arg(args, double);
+                    TREE_ATTRIBUTE(t) = 0x40000;
+                    break;
+                case Float_type:
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_FltConstant), 4);
+                    FLTCONSTANT(t).value = va_arg(args, double);
+                    TREE_ATTRIBUTE(t) = 0x40000;
+                    break;
+                case Array_type:
+                    t3 = mem_alloc(tree_handle, sizeof(TreeNode_Array_type), 4);
+                    sp48 = va_arg(args, int*);
+                    sp40 = va_arg(args, int);
+                    ARRAY_TYPE(t3).size = bit_size[1] * sp40;
+                    ARRAY_TYPE(t3).align = bit_size[1];
+                    t = mem_alloc(tree_handle, sp40 * 4 + 0x18, 4); // sizeof(TreeNode_StringConstant) ?
+                    TREE_CODE(t3) = Array_type;
+                    TREE_TYPE(t3) = long_type;
+                    t3->id = ++D_1001D470;
+                    ARRAY_TYPE(t3).index_type = make_iconstant(location, long_type, sp40);
+                    memcpy(WSTRINGCONSTANT(t).value, sp48, sp40 * 4);
+                    break;
+            }
+            TREE_TYPE(t) = t3;
+            code = Constant;
+            break;
+        case Identifier:
+            t = mem_alloc(tree_handle, sizeof(Identifier), 4);
+            GET_IDENTIFIER(t).id = va_arg(args, Symbol*);
+            break;
+        case End_of_file:
+        case Nop:
+        case Error_mark:
+        case Reserved:
+            t = mem_alloc(tree_handle, sizeof(TreeNode), 4);
+            break;
+        default:
+            __assert("FALSE", "tree.c", 0x7C7);
             break;
     }
 
     t->id = ++D_1001D470;
     TREE_CODE(t) = code;
     TREE_LOCATION(t) = location;
+
+    return t;
 }
 
 void init_trees(void) {
     tree_handle = general_handle;
+}
+
+void make_std_trees(void) {
+    char_type = make(Char_type, -1, bit_size[1], bit_size[1]);
+    double_type = make(Double_type, -1, bit_size[7], bit_size[7]);
+    int_type = make(Int_type, -1, bit_size[3], bit_size[3]);
+    float_type = make(Float_type, -1, bit_size[6], bit_size[6]);
+    long_type = make(Long_type, -1, bit_size[4], bit_size[4]);
+    longlong_type = make(Longlong_type, -1, bit_size[5], bit_size[5]);
+    longdouble_type = make(Longdouble_type, -1, bit_size[8], bit_size[8]);
+    short_type = make(Short_type, -1, bit_size[2], bit_size[2]);
+    signed_type = make(Signed_type, -1, bit_size[3], bit_size[3]);
+    unsigned_type = make(Unsigned_type, -1, 1, bit_size[3], bit_size[3]);
+    uchar_type = make(Uchar_type, -1, bit_size[1], bit_size[1]);
+    uint_type = make(Uint_type, -1, bit_size[3], bit_size[3]);
+    ulong_type = make(Ulong_type, -1, bit_size[4], bit_size[4]);
+    ulonglong_type = make(Ulonglong_type, -1, bit_size[5], bit_size[5]);
+    ushort_type = make(Ushort_type, -1, bit_size[2], bit_size[2]);
+    label_type = make(Label_type, -1, bit_size[9], bit_size[9]);
+    void_type = make(Void_type, -1, 0, 0);
+    any_type = make(Any_type, -1, bit_size[3], bit_size[3], 0);
+    array_type = make(Array_type, -1, NULL);
+
+    voidstar_type = make_pointer(void_type);
+    TREE_TYPE(voidstar_type) = void_type;
+
+    int32_type = make(Int_type, -1, 32, 32);
+    uint32_type = make(Uint_type, -1, 32, 32);
+    int64_type = make(Longlong_type, -1, 64, 64);
+    uint64_type = make(Ulonglong_type, -1, 64, 64);
+    one_constant = make_iconstant(-1, int_type, 1);
+    zero_constant = make_iconstant(-1, int_type, 0);
+    ellipsis = any_type;
+    last_stdtree_id = zero_constant->id;
+}
+
+float cvt_float_const(TreeNode* arg0) {
+    int unused;
+    float value;
+    MemCtx* savedCtx;
+    
+    savedCtx = tree_handle;
+    tree_handle = general_handle;
+    REALCONSTANT(arg0).value->unk_00 = make(Constant_special, TREE_LOCATION(arg0), float_type, value = str_to_float(REALCONSTANT(arg0).value->name, TREE_LOCATION(arg0), 4));
+    tree_handle = savedCtx;
+    return value;
+}
+
+double cvt_double_const(TreeNode* arg0) {
+    int unused;
+    double value;
+    MemCtx* savedCtx;
+
+    savedCtx = tree_handle;
+    tree_handle = general_handle;
+    REALCONSTANT(arg0).value->unk_00 = make(Constant_special, TREE_LOCATION(arg0), double_type, value = str_to_double(REALCONSTANT(arg0).value->name, TREE_LOCATION(arg0), 4));
+    tree_handle = savedCtx;
+    return value;
+}
+
+TreeNode* standard_tree(TreeNode* t) {
+    switch (TREE_CODE(t)) {
+        case Char_type:
+            return char_type;
+        case Int_type:
+            return int_type;
+        case Long_type:
+            return long_type;
+        case Longlong_type:
+            return longlong_type;
+        case Short_type:
+            return short_type;
+        case Uchar_type:
+            return uchar_type;
+        case Uint_type:
+            return uint_type;
+        case Ulong_type:
+            return ulong_type;
+        case Ulonglong_type:
+            return ulonglong_type;
+        case Ushort_type:
+            return ushort_type;
+        case Float_type:
+            return float_type;
+        case Double_type:
+            return double_type;
+        case Longdouble_type:
+            return longdouble_type;
+        case Void_type:
+            return void_type;
+        case Label_type:
+            return label_type;
+        case Enum_type:
+            return int_type;
+        default:
+            return t;
+    }
+}
+
+TreeNode* make_pointer(TreeNode* t) {
+    TreeNode* p;
+    p = make(Pointer_type, TREE_LOCATION(t));
+    POINTER_TYPE(p).base_type = t;
+    POINTER_TYPE(p).size = bit_size[9];
+    POINTER_TYPE(p).align = bit_size[9];
+}
+
+TreeNode* make_iconstant(int location, TreeNode* type, long long value) {
+    D_1001D474 = TRUE;
+    return make(Constant, location, type, value);
+}
+
+TreeNode* make_uiconstant(int location, TreeNode* type, unsigned long long value) {
+    D_1001D474 = TRUE;
+    return make(Constant, location, type, value);
 }
