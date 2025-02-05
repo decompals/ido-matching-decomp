@@ -17,6 +17,7 @@ Type tree  = Packed Record
   case integer of
     0 : (
         reg: first(registers)..last(registers);
+        visited: boolean;
         ref_count2: u8;
       );
     1 : /* 0x20 */ ( u: BCrec);
