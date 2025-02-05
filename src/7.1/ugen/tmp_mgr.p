@@ -18,9 +18,9 @@ end;
 
 var
     temps: ^Temp_rec;
-    current_temp_index: u8;
     temps_offset: integer;
-    frame_pointer: extern integer; {From frame_offset maybe?}
+    current_temp_index: u8;
+    frame_pointer: extern u8; {From frame_offset maybe?}
     reversed_stack: extern boolean;
 
 
@@ -29,9 +29,6 @@ spill_rec = Record
     unk: ^unk_rgmr_rec;
     temp: Ptemp;
 end;
-
-
-procedure gen_store(reg: registers; offset: integer; area_size: integer); forward;
 
 procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: integer; arg4: integer); external;
 
@@ -64,7 +61,7 @@ begin
     new(temp);
 
     if (temp = nil) then begin
-        report_error(Internal, 76, "Insufficiant memory", "temp_mgr.p");
+        report_error(Internal, 76, "temp_mgr.p", "Insufficiant memory");
         return temp;
     end;
     if (arg0 >= 5) then begin
@@ -103,6 +100,48 @@ begin
     return nil;
 end;
 
+procedure gen_store(reg: registers; offset: integer; area_size: integer);
+var
+    op: first(asmcodes)..last(asmcodes); /* sp + C6 */
+begin
+    if (reg in [xr0..xr31]) then begin
+
+        if (area_size <= 4) then begin
+            op := zsw;
+        end else if (area_size <= 8) then begin
+            op := zsd;
+        end else begin
+            report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
+            return;
+        end;
+
+    end else if (area_size <= 4) then begin
+        op := fs_s;
+    end else if (area_size <= 8) then begin
+        op := fs_d;
+    end else begin
+        report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
+        return;
+    end;
+
+    if (reversed_stack) then begin
+        if ((op = zsd) and not (opcode_arch)) then begin
+            emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+            emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
+            return;
+        end;
+        emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+        return;
+    end;
+
+    if ((op = zsd) and not (opcode_arch)) then begin
+        emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
+        emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
+    end else begin
+        emit_rob(op, reg, frame_offset1(offset), frame_pointer, 0);
+    end;
+end;
+
 procedure spill_to_temp(reg: registers; area_size: integer);
 var
     spill: spill_rec;
@@ -123,54 +162,13 @@ begin
     gen_store(reg, spill.temp^.offset, area_size);
 end;
 
-procedure gen_store();
-var
-    op: first(asmcodes)..last(asmcodes); /* sp + C6 */
-begin
-    if (reg in [xr0..xr31]) then begin
-        if (area_size <= 4) then begin
-            op := zsw;
-        end else if (area_size <= 8) then begin
-            op := zsd;
-        end else begin
-            report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
-            return;
-        end;
-    end else begin
-        if (area_size <= 4) then begin
-            op := fs_s;
-        end else if (area_size <= 8) then begin
-            op := fs_d;
-        end else begin
-            report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
-            return;
-        end;
-    end;
-
-    if (reversed_stack) then begin
-        if ((op = zsd) and not (opcode_arch)) then begin
-            emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
-            emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
-        end else begin
-            emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
-        end;
-    end else begin
-        if ((op = zsd) and not (opcode_arch)) then begin
-            emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
-            emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
-        end else begin
-            emit_rob(op, reg, frame_offset1(offset), frame_pointer, 0);
-        end;
-    end;
-end;
-
 procedure free_temp(index: u8); {Guess}
 var
     temp: Ptemp;
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 192, "temporary not found", "tmp_mgr.p");
+        report_error(Internal, 192, "temp_mgr.p", "temporary not found");
         return;
     end;
     temp^.free := true;
@@ -182,7 +180,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 204, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 204, "temp_mgr.p", "temporary not found");
     end else begin
         return temp^.offset;
     end;
@@ -194,7 +192,7 @@ var
 begin
     temp := lookup_temp(index);
     if (temp = nil) then begin
-        report_error(Internal, 216, "temporary not found", "temp_mgr.p");
+        report_error(Internal, 216, "temp_mgr.p", "temporary not found");
     end else begin
         return temp^.usage_count;
     end;

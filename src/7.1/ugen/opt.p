@@ -1,7 +1,6 @@
 #include "common.h"
 #include "ugen.h"
-
-#line 22 (* This is required to match the function *)
+#line 22 "opt.p"
 procedure set_opts(arg0: u8; arg1: u8);
 begin
     glevel := arg1;
@@ -42,7 +41,8 @@ begin
         end;
   
         opt_labels := (arg1 = 0) or (arg1 = 3);
-            ignore_vreg := 1;
+        opt_parms := 0;
+        ignore_vreg := 1;
         if (arg0 >= 3) and (tail_call_opt <> 0) then begin
             tail_call_opt := 1;
         end else

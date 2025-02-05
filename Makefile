@@ -98,10 +98,11 @@ C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 P_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.p)) # Pascal files
 
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
+COMBINED_S_FILES := $(sort $(foreach file, $(S_FILES:.s=), $(basename $(file))))
 
 O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
             $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
-            $(foreach f,$(S_FILES:.s=.o),$(BUILD)/$(f))
+            $(foreach f,$(COMBINED_S_FILES),$(BUILD)/$(f).o)
 
 # Automatic dependency files
 DEP_FILES := $(O_FILES:.o=.d) \
@@ -124,6 +125,7 @@ build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 .DEFAULT_GOAL:= all
 
 all: $(ELFS) $(O_FILES)
+	./tools/diff_objfiles.py
 
 clean:
 	$(RM) -r $(BUILD)
@@ -138,13 +140,14 @@ setup:
 	$(MAKE) -C $(RECOMP) DEBUG=0 VERSION=5.3
 
 disasm: $(DISASM_TARGETS)
+	find asm -type f -name "*.s" | grep -v "/functions/" | xargs sed -i -e "s/glabel func_/llabel func_/; s/dlabel RO_/llabel RO_/; s/dlabel B_/llabel B_/; s/dlabel D_/llabel D_/; s/dlabel jtbl_/llabel jtbl_/;"
 
 
 $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
 
-$(BUILD)/$(ASM)/%.o: $(ASM)/%.s
-	$(AS) $(ASFLAGS) $< -o $@
+$(BUILD)/$(ASM)/%.o: $(ASM)/%.*.s
+	$(AS) $(ASFLAGS) $^ -o $@
 
 $(BUILD)/%.o: %.c
 	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<

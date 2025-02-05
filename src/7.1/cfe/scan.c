@@ -641,6 +641,9 @@ out:
     }
 }
 
+const char unreferenced_string_1[] = "sizeof(wchar_t) <= sizeof(uint_t)";
+const char unreferenced_string_2[] = "scan.c";
+
 static int read_string_character(char stopChar, char* out_buf, int forbidNumeric, int* hasNumeric) {
     int i;
     
