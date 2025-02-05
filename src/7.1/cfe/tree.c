@@ -340,9 +340,9 @@ void display_node(TreeNode* t) {
             fprintf(stderr, "handlers=%u\n", TREE_ID(FUNC_TYPE(t).handlers));
             break;
         case Reference_type:
-            fprintf(stderr, "size=%u ", REFERENCE_TYPE(t).size);
-            fprintf(stderr, "align=%u ", REFERENCE_TYPE(t).align);
-            fprintf(stderr, "base_type=%u\n", TREE_ID(REFERENCE_TYPE(t).base_type));
+            fprintf(stderr, "size=%u ", POINTER_TYPE(t).size);
+            fprintf(stderr, "align=%u ", POINTER_TYPE(t).align);
+            fprintf(stderr, "base_type=%u\n", TREE_ID(POINTER_TYPE(t).base_type));
             break;
         case Pointer_type:
             fprintf(stderr, "size=%u ", POINTER_TYPE(t).size);
@@ -525,13 +525,14 @@ void display_node(TreeNode* t) {
             break;
         case Constant:
             switch (TREE_CODE(TREE_TYPE(t))) {
+                
                 case Char_type:
                 case Int_type:
                 case Long_type:
                 case Longlong_type:
                 case Short_type:
                 case Signed_type:
-                    fprintf(stderr, "i64=(%d,%u)\n", ICONSTANT(t).value);
+                    fprintf(stderr, "i64=(%d,%u)\n", *(long*)&ICONSTANT(t).value, (unsigned long)ICONSTANT(t).value);
                     break;
                 case Unsigned_type:
                 case Uchar_type:
@@ -540,12 +541,12 @@ void display_node(TreeNode* t) {
                 case Ulonglong_type:
                 case Ushort_type:
                 case Pointer_type:
-                    fprintf(stderr, "ui64=(%d,%u)\n", UICONSTANT(t).value);
+                    fprintf(stderr, "ui64=(%u,%u)\n", *(unsigned long*)&UICONSTANT(t).value, (unsigned long)UICONSTANT(t).value);
                     break;
                 case Double_type:
                 case Longdouble_type:
                 case Float_type:
-                    if (!(TREE_ATTRIBUTE(t) & 0x40000)) { // TODO name attribute
+                    if (!(TREE_ATTRIBUTE(t) & 0x40000)) {
                         fprintf(stderr, "real=%s\n", REALCONSTANT(t).value->name);
                         if (REALCONSTANT(t).value->unk_00 != NULL) {
                             display_node(REALCONSTANT(t).value->unk_00);
@@ -557,7 +558,8 @@ void display_node(TreeNode* t) {
                     }
                     break;
                 case Array_type:
-                    if (TREE_CODE(t) == Constant && TREE_CODE(TREE_TYPE(t)) == Array_type &&
+                    if (TREE_CODE(t) == Constant &&
+                        TREE_CODE(TREE_TYPE(t)) == Array_type &&
                         (TREE_CODE(TREE_TYPE(TREE_TYPE(t))) == Uchar_type || TREE_CODE(TREE_TYPE(TREE_TYPE(t))) == Char_type)) {
                         fprintf(stderr, "s=%s\n", STRINGCONSTANT(t).value);
                     } else {
@@ -595,6 +597,7 @@ void display_node(TreeNode* t) {
             break;
     }
 }
+
 
 void preorder_walk(TreeNode* t, void (*disp)(TreeNode*)) {
     TreeNode* child;
@@ -669,7 +672,7 @@ void preorder_walk(TreeNode* t, void (*disp)(TreeNode*)) {
             break;
         case Reference_type:
             disp(t);
-            preorder_walk(REFERENCE_TYPE(t).base_type, disp);
+            preorder_walk(POINTER_TYPE(t).base_type, disp);
             break;
         case Field_decl:
             disp(t);
@@ -967,7 +970,7 @@ static TreeNode* func_0041F630(TreeNode* t, char* c) {
         case Pointer_type:
             return POINTER_TYPE(t).base_type;
         case Reference_type:
-            return REFERENCE_TYPE(t).base_type;
+            return POINTER_TYPE(t).base_type;
         case Func_type:
             switch (*c) {
                 case 'p':
@@ -1330,9 +1333,9 @@ TreeNode* duplicate_node(TreeNode* t) {
             break;
         case Reference_type:
             copy = make(Reference_type, TREE_LOCATION(t));
-            REFERENCE_TYPE(copy).size = REFERENCE_TYPE(t).size;
-            REFERENCE_TYPE(copy).align = REFERENCE_TYPE(t).align;
-            REFERENCE_TYPE(copy).base_type = REFERENCE_TYPE(t).base_type;
+            POINTER_TYPE(copy).size = POINTER_TYPE(t).size;
+            POINTER_TYPE(copy).align = POINTER_TYPE(t).align;
+            POINTER_TYPE(copy).base_type = POINTER_TYPE(t).base_type;
             break;
         case Constant:
             switch (TREE_CODE(TREE_TYPE(t))) {
@@ -1516,16 +1519,16 @@ TreeNode* unqual_type(TreeNode* t) {
 }
 
 TreeNode* make(int code, int location, ...) {
-    TreeNode* t;
     va_list args;
-    int num_args;
-    TreeNode* arg;
     TreeNode* t3;
-    TreeNode* tt;
-    int i;
     char* sp4C;
     int* sp48;
+    TreeNode* t;
     int sp40;
+    TreeNode* arg;
+    int unused;
+    TreeNode* tt;
+    int i;
 
     va_start(args, location);
     
@@ -1622,7 +1625,7 @@ TreeNode* make(int code, int location, ...) {
             t = mem_alloc(tree_handle, sizeof(TreeNode_Compound_stmt), 4);
             COMPOUND_STMT(t).decls = va_arg(args, TreeNode*);
             COMPOUND_STMT(t).stmts = va_arg(args, TreeNode*);
-            COMPOUND_STMT(t).context = va_arg(args, TreeNode*);
+            COMPOUND_STMT(t).end_location = va_arg(args, int);
             break;
         case Expr_stmt:
             t = mem_alloc(tree_handle, sizeof(TreeNode_Expr_stmt), 4);
@@ -1646,8 +1649,8 @@ TreeNode* make(int code, int location, ...) {
             break;
         case Dowhile_stmt:
             t = mem_alloc(tree_handle, sizeof(TreeNode_Dowhile_stmt), 4);
-            DOWHILE_STMT(t).expr = va_arg(args, TreeNode*);
             DOWHILE_STMT(t).stmt = va_arg(args, TreeNode*);
+            DOWHILE_STMT(t).expr = va_arg(args, TreeNode*);            
             break;
         case For_stmt:
             t = mem_alloc(tree_handle, sizeof(TreeNode_For_stmt), 4);
@@ -1737,16 +1740,27 @@ TreeNode* make(int code, int location, ...) {
             TERNARY_EXPR(t).operand[2] = va_arg(args, TreeNode*);
             break;
         case Aggregate_expr:
-            num_args = 0;
-            tt = va_arg(args, TreeNode*);
-            for (arg = tt; arg != NULL; arg = TREE_LINK(arg)) {
-                num_args++;
+            i = 0;
+            t = arg = va_arg(args, TreeNode*);
+            while (arg != NULL) {
+                i++;
+                arg = TREE_LINK(arg);
             }
-            t = mem_alloc(tree_handle, sizeof(TreeNode_Aggregate_expr) + 4 * num_args, 4);
-            for (i = 0, arg = tt; arg != NULL; i++, arg = TREE_LINK(arg)) {
+            tt = t;
+            t = mem_alloc(tree_handle, sizeof(TreeNode_Aggregate_expr) + 4 * i, 4);
+            i = 0;
+            while (TRUE) {
+                arg = tt;
+                tt = TREE_LINK(tt);
                 AGGREGATE_EXPR(t).operand[i] = arg;
+                TREE_LINK(arg) = NULL;
+                i++;
+                if (tt == NULL) {
+                    AGGREGATE_EXPR(t).operand[i] = NULL;
+                    break;
+                }
             }
-            AGGREGATE_EXPR(t).operand[i] = NULL;
+            
             break;
         case Constant:
             t3 = va_arg(args, TreeNode*);
@@ -1786,7 +1800,7 @@ TreeNode* make(int code, int location, ...) {
                 case Double_type:
                 case Longdouble_type:
                 case Float_type:
-                    t = mem_alloc(tree_handle, sizeof(TreeNode_RealConstant), 4);
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_RealConstant), 8);
                     REALCONSTANT(t).value = va_arg(args, Symbol*);
                     break;
                 case Label_type:
@@ -1800,13 +1814,9 @@ TreeNode* make(int code, int location, ...) {
                     sp40 = va_arg(args, int);
                     ARRAY_TYPE(t3).size = bit_size[1] * sp40;
                     ARRAY_TYPE(t3).align = bit_size[1];
-                    t = mem_alloc(tree_handle, sp40 + 0x18, 4); // sizeof(TreeNode_StringConstant) ?
+                    t = mem_alloc(tree_handle, 0x18 + sp40 * 1, 4); // sizeof(TreeNode_StringConstant) ?
                     TREE_CODE(t3) = Array_type;
-                    if (options[3]) {
-                        TREE_TYPE(t3) = char_type;
-                    } else {
-                        TREE_TYPE(t3) = uchar_type;
-                    }
+                    TREE_TYPE(t3) = options[6] ? char_type : uchar_type;
                     t3->id = ++D_1001D470;
                     ARRAY_TYPE(t3).index_type = make_iconstant(location, long_type, sp40);
                     memcpy(STRINGCONSTANT(t).value, sp4C, sp40);
@@ -1822,7 +1832,7 @@ TreeNode* make(int code, int location, ...) {
             switch (TREE_CODE(t3)) {
                 case Double_type:
                 case Longdouble_type:
-                    t = mem_alloc(tree_handle, sizeof(TreeNode_DblConstant), 4);
+                    t = mem_alloc(tree_handle, sizeof(TreeNode_DblConstant), 8);
                     DBLCONSTANT(t).value = va_arg(args, double);
                     TREE_ATTRIBUTE(t) = 0x40000;
                     break;
@@ -1835,21 +1845,22 @@ TreeNode* make(int code, int location, ...) {
                     t3 = mem_alloc(tree_handle, sizeof(TreeNode_Array_type), 4);
                     sp48 = va_arg(args, int*);
                     sp40 = va_arg(args, int);
-                    ARRAY_TYPE(t3).size = bit_size[1] * sp40;
-                    ARRAY_TYPE(t3).align = bit_size[1];
-                    t = mem_alloc(tree_handle, sp40 * 4 + 0x18, 4); // sizeof(TreeNode_StringConstant) ?
+                    unused = sp40 * 4;
+                    ARRAY_TYPE(t3).size = bit_size[4] * sp40;
+                    ARRAY_TYPE(t3).align = bit_size[4];
+                    t = mem_alloc(tree_handle, 0x18 + unused, 4); // sizeof(TreeNode_WStringConstant) ?
                     TREE_CODE(t3) = Array_type;
                     TREE_TYPE(t3) = long_type;
                     t3->id = ++D_1001D470;
                     ARRAY_TYPE(t3).index_type = make_iconstant(location, long_type, sp40);
-                    memcpy(WSTRINGCONSTANT(t).value, sp48, sp40 * 4);
+                    memcpy(WSTRINGCONSTANT(t).value, sp48, unused);
                     break;
             }
             TREE_TYPE(t) = t3;
             code = Constant;
             break;
         case Identifier:
-            t = mem_alloc(tree_handle, sizeof(Identifier), 4);
+            t = mem_alloc(tree_handle, sizeof(TreeNode_Identifier), 4);
             GET_IDENTIFIER(t).id = va_arg(args, Symbol*);
             break;
         case End_of_file:

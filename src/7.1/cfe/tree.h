@@ -19,7 +19,6 @@
 #define STRUCT_TYPE(t) (*((TreeNode_Struct_type*)t))
 #define ENUM_TYPE(t) (*((TreeNode_Enum_type*)t))
 #define FUNC_TYPE(t) (*((TreeNode_Func_type*)t))
-#define REFERENCE_TYPE(t) (*((TreeNode_Reference_type*)t))
 #define POINTER_TYPE(t) (*((TreeNode_Pointer_type*)t))
 #define FIELD_DECL(t) (*((TreeNode_Field_decl*)t))
 #define ID_DECL(t) (*((TreeNode_Id_decl*)t))
@@ -196,6 +195,13 @@ typedef struct TreeNode_Array_type {
     int size;
     int align;
     TreeNode* index_type;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
 } TreeNode_Array_type;
 
 typedef struct TreeNode_Struct_type {
@@ -206,6 +212,14 @@ typedef struct TreeNode_Struct_type {
     TreeNode* members;
     int info;
     TreeNode* baselist;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
+    int unk_4C;
 } TreeNode_Struct_type;
 
 typedef struct TreeNode_Enum_type {
@@ -216,6 +230,13 @@ typedef struct TreeNode_Enum_type {
     TreeNode* literals;
     int lb;
     int ub;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
 } TreeNode_Enum_type;
 
 typedef struct TreeNode_Func_type {
@@ -228,14 +249,15 @@ typedef struct TreeNode_Func_type {
     int psize;
     int end_blkno;
     TreeNode* handlers;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
+    int unk_4C;
+    int unk_50;
+    int unk_54;
 } TreeNode_Func_type;
-
-typedef struct TreeNode_Reference_type {
-    TreeNode t;
-    int size;
-    int align;
-    TreeNode* base_type;
-} TreeNode_Reference_type;
 
 typedef struct TreeNode_Pointer_type {
     TreeNode t;
@@ -255,6 +277,20 @@ typedef struct TreeNode_Field_decl {
     TreeNode t;
     TreeNode* field;
     int width;
+    int unk_20;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
+    int unk_4C;
+    int unk_50;
+    int unk_54;
 } TreeNode_Field_decl;
 
 typedef struct TreeNode_Id_decl {
@@ -274,11 +310,39 @@ typedef struct TreeNode_Id_decl {
     TreeNode* overloads;
     int oclass;
     int lastused;
+    int unk_50;
+    int unk_54;
+    int unk_58;
+    int unk_5C;
+    int unk_60;
+    int unk_64;
+    int unk_68;
+    int unk_6C;
+    int unk_70;
+    int unk_74;
+    int unk_78;
+    int unk_7C;
+    int unk_80;
+    int unk_84;
 } TreeNode_Id_decl;
 
 typedef struct TreeNode_Declare_decl {
     TreeNode t;
     TreeNode* ids;
+    int unk_1C;
+    int unk_20;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
+    int unk_4C;
+    int unk_50;
 } TreeNode_Declare_decl;
 
 typedef struct TreeNode_If_stmt {
@@ -286,6 +350,13 @@ typedef struct TreeNode_If_stmt {
     TreeNode* expr;
     TreeNode* then_part;
     TreeNode* else_part;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
 } TreeNode_If_stmt;
 
 typedef struct TreeNode_Init {
@@ -302,6 +373,13 @@ typedef struct TreeNode_Labeled_stmt {
     TreeNode* expr;
     TreeNode* stmt;
     int label;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
 } TreeNode_Labeled_stmt;
 
 typedef struct TreeNode_Compound_stmt {
@@ -311,11 +389,25 @@ typedef struct TreeNode_Compound_stmt {
     TreeNode* context;
     int end_location;
     int cg_info;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
 } TreeNode_Compound_stmt;
 
 typedef struct TreeNode_Expr_stmt {
     TreeNode t;
     TreeNode* expr;
+    int unk_1C;
+    int unk_20;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
 } TreeNode_Expr_stmt;
 
 typedef struct TreeNode_While_stmt {
@@ -325,6 +417,12 @@ typedef struct TreeNode_While_stmt {
     int breaklab;
     int contlab;
     int cases;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
 } TreeNode_While_stmt;
 
 typedef struct TreeNode_Switch_stmt {
@@ -334,6 +432,13 @@ typedef struct TreeNode_Switch_stmt {
     int breaklab;
     int contlab;
     int cases;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
 } TreeNode_Switch_stmt;
 
 typedef struct TreeNode_Dowhile_stmt {
@@ -342,6 +447,13 @@ typedef struct TreeNode_Dowhile_stmt {
     TreeNode* expr;
     int breaklab;
     int contlab;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
 } TreeNode_Dowhile_stmt;
 
 typedef struct TreeNode_Try_stmt {
@@ -353,6 +465,13 @@ typedef struct TreeNode_Try_stmt {
     TreeNode* end_addr;
     int label;
     int jmp_target;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
+    int unk_4C;
 } TreeNode_Try_stmt;
 
 typedef struct TreeNode_For_stmt {
@@ -363,16 +482,37 @@ typedef struct TreeNode_For_stmt {
     TreeNode* stmt;
     int breaklab;
     int contlab;
+    int unk_30;
+    int unk_34;
+    int unk_38;
+    int unk_3C;
+    int unk_40;
+    int unk_44;
+    int unk_48;
 } TreeNode_For_stmt;
 
 typedef struct TreeNode_Goto_stmt {
     TreeNode t;
     TreeNode* id;
+    int unk_1C;
+    int unk_20;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
 } TreeNode_Goto_stmt;
 
 typedef struct TreeNode_Return_stmt {
     TreeNode t;
     TreeNode* expr;
+    int unk_1C;
+    int unk_20;
+    int unk_24;
+    int unk_28;
+    int unk_2C;
+    int unk_30;
+    int unk_34;
 } TreeNode_Return_stmt;
 
 typedef struct TreeNode_Unary_expr {
@@ -399,6 +539,18 @@ typedef struct TreeNode_IConstant {
     TreeNode t;
     long long value;
 } TreeNode_IConstant;
+
+typedef struct TreeNode_IConstant2 {
+    TreeNode t;
+    long high;
+    long low;
+} TreeNode_IConstant2;
+
+typedef struct TreeNode_UIConstant2 {
+    TreeNode t;
+    unsigned long high;
+    unsigned long low;
+} TreeNode_UIConstant2;
 
 typedef struct TreeNode_UIConstant {
     TreeNode t;
