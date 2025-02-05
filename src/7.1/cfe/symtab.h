@@ -10,7 +10,7 @@ typedef struct ParseSymbol {
 struct TreeNode;
 
 typedef struct Symbol {
-    struct TreeNode* unk_00;
+    struct TreeNode* constVal;
     ParseSymbol* unk_04;
     int unk_08;
     int unk_0C;

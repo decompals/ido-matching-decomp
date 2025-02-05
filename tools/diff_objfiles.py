@@ -54,7 +54,7 @@ def main():
             if same_section(content_c, content_asm, section):
                 print(f"[OK] {name} {section}")
             else:
-                print(f"[--] {name} {section}")
+                print(f"[--] {name} {section} : compare build/src/{name}{section}.c.bin and build/src/{name}{section}.asm.bin")
                 if section in content_c:
                     Path(f"build/src/{name}{section}.c.bin").write_bytes(content_c[section])
                 if section in content_asm:
