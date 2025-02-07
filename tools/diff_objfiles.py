@@ -30,8 +30,8 @@ def main():
         objfile_asm_text = f"build/asm/{name}"
 
         # object file sections
-        readelf_c = shell_exec(f"readelf -S {objfile_c}")
-        readelf_asm = shell_exec(f"readelf -S {objfile_asm_text}")
+        readelf_c = shell_exec(f"mips-linux-gnu-readelf -S {objfile_c}")
+        readelf_asm = shell_exec(f"mips-linux-gnu-readelf -S {objfile_asm_text}")
 
         #get sections content
         content_c = {}
