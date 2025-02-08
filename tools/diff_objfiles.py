@@ -27,8 +27,11 @@ def main():
 
     if sys.argv[1] == "5.3":
         programs = ("5.3/cfe", "5.3/cc", "5.3/ugen")
-    else:
+    elif sys.argv[1] == "7.1":
         programs = ("7.1/cfe", "7.1/cc", "7.1/ugen")
+    else:
+        print("Version unrecognized")
+        sys.exit(1)
 
     objfiles = [f.relative_to('build/src') for p in programs for f in (Path('build/src').glob(f'{p}/*.o'))]
     sections = (".text", ".data", ".rodata")
