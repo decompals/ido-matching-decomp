@@ -3,8 +3,7 @@
 #include "common.h"
 #include "cmplrs/ucode.h"
 #include "cmplrs/binasm.h"
-
-Type tree  = Packed Record
+type tree  = packed record
   /* 0x0 */  op1: ^tree;
   /* 0x4 */  op2: ^tree;
   /* 0x8 */  next: ^tree;
@@ -16,17 +15,19 @@ Type tree  = Packed Record
   /* 0x18 */ unk18: u8;
   case integer of
     0 : (
-        reg: first(registers)..last(registers);
+        reg: first(integer)..last(integer);
         visited: boolean;
         ref_count2: u8;
       );
     1 : /* 0x20 */ ( u: BCrec);
     2:             (
+                    unk1C: integer;
+                    unk20: u16;
                     unk22: u16;
                     unk24: integer;
                     unk28: integer;
                     unk2C: integer;
                     unk30: integer;
                     unk34: integer;);
-End;
+end;
 #endif /* TREE_H */
