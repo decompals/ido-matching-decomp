@@ -1,12 +1,5 @@
 #include "cmplrs/ucode.h"
 
-type
-    thing = packed record 
-    fill: packed array[0..2] of char;
-    op: Uopcode;
-    pos: integer;
-end;
-
 var 
 Utab: array[first(Uopcode)..last(Uopcode)] of Utabrec;
 

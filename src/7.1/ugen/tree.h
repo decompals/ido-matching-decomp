@@ -15,7 +15,7 @@ type tree  = packed record
   /* 0x18 */ unk18: u8;
   case integer of
     0 : (
-        reg: first(integer)..last(integer);
+        reg: first(registers)..last(registers);
         visited: boolean;
         ref_count2: u8;
       );
