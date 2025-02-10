@@ -4,7 +4,7 @@
 #define VOLATILE_ATTRIBUTE          0x80000000
 #define CONST_ATTRIBUTE             0x40000000
 #define PACKED_ATTRIBUTE            0x20000000
-#define TYPE_ATTRIBUTE              0x10000000
+#define TYPEDEF_ATTRIBUTE           0x10000000
 #define EXTERN_ATTRIBUTE            0x08000000
 #define STATIC_ATTRIBUTE            0x04000000
 #define AUTO_ATTRIBUTE              0x02000000

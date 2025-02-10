@@ -156,7 +156,7 @@ struct AttrDesc attr_list[] = {
     { VOLATILE_ATTRIBUTE,           "VOL" },
     { CONST_ATTRIBUTE,              "CONST" },
     { PACKED_ATTRIBUTE,             "PACK" },
-    { TYPE_ATTRIBUTE,               "TYPE" },
+    { TYPEDEF_ATTRIBUTE,               "TYPE" },
     { EXTERN_ATTRIBUTE,             "EXT" },
     { STATIC_ATTRIBUTE,             "STAT" },
     { AUTO_ATTRIBUTE,               "AUTO" },
@@ -1443,7 +1443,7 @@ TreeNode* unqual_type(TreeNode* t) {
         isPlain = FALSE;
     }
 
-    if (TREE_ATTRIBUTE(t) & (VOLATILE_ATTRIBUTE | CONST_ATTRIBUTE | TYPE_ATTRIBUTE | UNALIGNED_ATTRIBUTE)) {
+    if (TREE_ATTRIBUTE(t) & (VOLATILE_ATTRIBUTE | CONST_ATTRIBUTE | TYPEDEF_ATTRIBUTE | UNALIGNED_ATTRIBUTE)) {
         if (TREE_CODE(t) == Struct_type || TREE_CODE(t) == Enum_type) {
             t = TREE_TYPE(t);
         } else if (TREE_CODE(t) == Array_type || TREE_CODE(t) == Pointer_type || TREE_CODE(t) == Func_type) {

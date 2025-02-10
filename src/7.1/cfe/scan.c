@@ -6,18 +6,6 @@ char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe
 #define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : input_any_char())
 #define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
 
-typedef struct TokenIdentifier {
-    int unk_00;
-    Symbol* unk_04;
-    int unk_08;
-} TokenIdentifier;
-
-union YYLVAL {
-    TreeNode* node;
-    TokenIdentifier identifier;
-    int loc;
-};
-
 /* .bss       */
 /* 0x10023A90 */ static char input_buffer[BUFFER_SIZE + 1];
 /* 0x1002BA94 */ static char* inbuf_ptr;
