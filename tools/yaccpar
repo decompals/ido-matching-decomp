@@ -164,6 +164,8 @@ int yyparse()
 				printf( "end-of-file\n" );
 			else if ( yychar < 0 )
 				printf( "-none-\n" );
+			else if ( yychar < 0x100 )
+				printf( "%c\n", yychar );
 			else
 			{
 				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
@@ -217,9 +219,9 @@ int yyparse()
 			if (yynewmax <= yymaxdepth)	/* tables not expanded */
 			{
 #ifdef __cplusplus
-				yyerror( gettxt("uxlibc:80", "yacc stack overflow") );
+				error(0x2007D, LEVEL_ERROR, curloc);
 #else
-				yyerror( gettxt("uxlibc:80", "Yacc stack overflow") );
+				error(0x2007D, LEVEL_ERROR, curloc);
 #endif
 				YYABORT;
 			}
@@ -262,6 +264,8 @@ int yyparse()
 				printf( "end-of-file\n" );
 			else if ( yychar < 0 )
 				printf( "-none-\n" );
+			else if ( yychar < 0x100 )
+				printf( "%c\n", yychar );
 			else
 			{
 				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
@@ -304,6 +308,8 @@ int yyparse()
 					printf( "end-of-file\n" );
 				else if ( yychar < 0 )
 					printf( "-none-\n" );
+				else if ( yychar < 0x100 )
+					printf( "%c\n", yychar );
 				else
 				{
 					for ( yy_i = 0;
@@ -349,9 +355,9 @@ int yyparse()
 			{
 			case 0:		/* new error */
 #ifdef __cplusplus
-				yyerror( gettxt("uxlibc:81", "syntax error") );
+				error(0x2007B, LEVEL_ERROR, curloc);
 #else
-				yyerror( gettxt("uxlibc:81", "Syntax error") );
+				error(0x2007B, LEVEL_ERROR, curloc);
 #endif
 				goto skip_init;
 			yyerrlab:

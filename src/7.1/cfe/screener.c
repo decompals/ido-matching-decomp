@@ -1,4 +1,5 @@
 #include "common.h"
+#include "y.tab.h"
 
 #define GET_TOKEN() B_1002F1B8 != 0 ? func_0042713C() : scan()
 
@@ -9,7 +10,7 @@ struct LegalTypeSpecifier {
 
 struct StringArray {
     unsigned int size;
-    union YYLVAL* ptr;
+    YYSTYPE* ptr;
 };
 
 struct CharArray {
@@ -66,7 +67,7 @@ static struct CharArray B_1002F1A0;
 static struct WCharArray B_1002F1A8;
 static struct StringArray B_1002F1B0;
 static int B_1002F1B8;
-static union YYLVAL B_1002F1C0;
+static YYSTYPE B_1002F1C0;
 
 void init_screener(void) {
     legal_ts[0].unk_04 = options[OPTION_SIGNED] ? char_type : uchar_type;
@@ -134,6 +135,10 @@ static int func_0042713C(void) {
     return tokenId;
 }
 
+// NON_MATCHING
+// url: https://decomp.me/scratch/9dUWy
+// score: 18(99.96%)
+// only stack diff
 int yylex(void) {
     int tokenId;
     int nextTokenId;
@@ -153,7 +158,7 @@ int yylex(void) {
             // concatenate strings
             if (B_1002F1B0.size == 0) {
                 B_1002F1B0.size = 256;
-                B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(union YYLVAL));
+                B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(YYSTYPE));
                 B_1002F1B0.ptr[0] = yylval;
             } else {
                 B_1002F1B0.ptr[0] = yylval;
@@ -163,7 +168,7 @@ int yylex(void) {
             while ((nextTokenId = GET_TOKEN()) == tokenId) {
                 if (numStrings >= B_1002F1B0.size) {
                     B_1002F1B0.size = numStrings + 256;
-                    B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, (B_1002F1B0.size) * sizeof(union YYLVAL));
+                    B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, (B_1002F1B0.size) * sizeof(YYSTYPE));
                     B_1002F1B0.ptr[numStrings] = yylval;
                 } else {
                     B_1002F1B0.ptr[numStrings] = yylval;
@@ -211,7 +216,7 @@ int yylex(void) {
             // concatenate wide strings
             if (B_1002F1B0.size == 0) {
                 B_1002F1B0.size = 256;
-                B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(union YYLVAL));
+                B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(YYSTYPE));
                 B_1002F1B0.ptr[0] = yylval;
             } else {
                 B_1002F1B0.ptr[0] = yylval;
@@ -221,7 +226,7 @@ int yylex(void) {
             while ((nextTokenId = GET_TOKEN()) == tokenId) {
                 if (numStrings >= B_1002F1B0.size) {
                     B_1002F1B0.size = numStrings + 256;
-                    B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(union YYLVAL));
+                    B_1002F1B0.ptr = Realloc(B_1002F1B0.ptr, B_1002F1B0.size * sizeof(YYSTYPE));
                     B_1002F1B0.ptr[numStrings] = yylval;
                 } else {
                     B_1002F1B0.ptr[numStrings] = yylval;

@@ -1,3 +1,15 @@
+
+typedef union
+#ifdef __cplusplus
+	YYSTYPE
+#endif
+ {
+	 TreeNode* node;
+	 int location;
+	 struct TokenIdentifier identifier;
+	 int force_alignment[4];
+} YYSTYPE;
+extern YYSTYPE yylval;
 # define IDENTIFIER 257
 # define SIZEOF 258
 # define ALIGNOF 259

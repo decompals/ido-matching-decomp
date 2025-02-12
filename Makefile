@@ -50,8 +50,10 @@ MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
 DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
+YACC := tools/yacc
+YFLAGS := -p tools/yaccpar -t
 
-IINC       := -Iinclude -Iinclude/indy -Isrc
+IINC       := -Iinclude -Iinclude/indy -Isrc -Ibuild
 
 # Check code syntax with host compiler
 CHECK_WARNINGS := -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-variable -Wno-char-subscripts -Wno-unused-label -Wno-parentheses -Wno-unused-parameter -Wno-pointer-sign
@@ -90,7 +92,6 @@ IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 # We use a sentinel file for disassembling each binary
 DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
 
-
 SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*")
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
@@ -100,7 +101,10 @@ P_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.p)) # Pascal files
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
 COMBINED_S_FILES := $(sort $(foreach file, $(S_FILES:.s=), $(basename $(file))))
 
-O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
+Y_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.y))
+
+O_FILES  := $(foreach f,$(Y_FILES:.y=.o),$(BUILD)/$(f)) \
+			$(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
             $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
             $(foreach f,$(COMBINED_S_FILES),$(BUILD)/$(f).o)
 
@@ -110,7 +114,6 @@ DEP_FILES := $(O_FILES:.o=.d) \
 
 # create build directories
 $(shell mkdir -p $(foreach dir,$(SRC_DIRS) $(ASM_DIRS),$(BUILD)/$(dir)))
-
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
@@ -142,7 +145,6 @@ setup:
 disasm: $(DISASM_TARGETS)
 	find asm -type f -name "*.s" | grep -v "/functions/" | xargs sed -i -e "s/glabel func_/llabel func_/; s/dlabel RO_/llabel RO_/; s/dlabel B_/llabel B_/; s/dlabel D_/llabel D_/; s/dlabel jtbl_/llabel jtbl_/;"
 
-
 $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
 
@@ -156,9 +158,6 @@ $(BUILD)/%.o: %.c
 $(BUILD)/%.o: %.p
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
-
-
-
 ## Disassembly
 
 # cc is special and is stored in a different folder
@@ -167,8 +166,6 @@ $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
 
 $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/$*.splits.csv --split-functions $(ASM)/$(VERSION)/functions/$* --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
-
-
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
 

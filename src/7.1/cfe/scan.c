@@ -1,4 +1,5 @@
 #include "common.h"
+#include "y.tab.h"
 
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/scan.c,v 1.32 1995/02/27 22:12:08 rdahl Exp $";
 
@@ -1035,7 +1036,7 @@ label2:
         case '{':
         case '}':
         case '~':
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return c;
         case ':':
             if (options[OPTION_CPLUSPLUS]) {
@@ -1043,7 +1044,7 @@ label2:
                 if (c == ':') {
                     c = input();
                     if (c == '*') {
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return COLCOLSTAR;
                     }
                     if (c == ' ' || c == '\t') {
@@ -1053,29 +1054,29 @@ label2:
                             }
                         }
                         if (c1 == '*') {
-                            yylval.loc = curloc;
+                            yylval.location = curloc;
                             return COLCOLSTAR;
                         }
                         unput();
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return COLONCOLON;
                     }
                     unput();
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return COLONCOLON;
                 }
                 unput();
             }
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return ':';
         case '+':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return ADD_ASSIGN;
             }
             if (c == '+') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return INC_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1087,35 +1088,35 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "+=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return ADD_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '+';
         case '-':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return SUB_ASSIGN;
             }
             if (c == '-') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return DEC_OP;
             }
             if (c == '>') {
                 if (options[OPTION_CPLUSPLUS]) {
                     c = input();
                     if (c == '*') {
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return MEMPTR_OP;
                     }
                     unput();
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return PTR_OP;
                 }
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return PTR_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1127,17 +1128,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "-=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return SUB_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '-';
         case '/':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return DIV_ASSIGN;
             }
             if (c == '*') {
@@ -1165,17 +1166,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "/=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return DIV_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '/';
         case '%':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return REM_ASSIGN;
             }
             if (c == ' ' || c == '\t') {
@@ -1187,21 +1188,21 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "%=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return REM_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '%';
         case '&':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return AND_ASSIGN;
             }
             if (c == '&') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return AND_OP;
             }
             if (!IS_ANSI) {
@@ -1214,22 +1215,22 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "&=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return AND_ASSIGN;
                     }
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '&';
         case '|':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return OR_ASSIGN;
             }
             if (c == '|') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return OR_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1241,17 +1242,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "|=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return OR_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '|';
         case '^':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return XOR_ASSIGN;
             }
             if (c == ' ' || c == '\t') {
@@ -1263,35 +1264,35 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "^=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return XOR_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '^';
         case '!':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return NE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '!';
         case '=':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return EQ_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '=';
         case '*':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return MUL_ASSIGN;
             }
             if (!IS_ANSI) {
@@ -1304,28 +1305,28 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "*=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return MUL_ASSIGN;
                     }
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '*';
         case '.':
             c = input();
             if (c == '.') {
                 c = input();
                 if (c == '.') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return ELLIPSIS;
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return 0x2E2E; // '..'
             }
             if (c == '*' && options[OPTION_CPLUSPLUS]) {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return MEMDOT_OP;
             }
             if (isdigit(c)) {
@@ -1333,14 +1334,14 @@ label2:
                 return scan_number(TRUE);
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '.';
         case '<':
             c = input();
             if (c == '<') {
                 c = input();
                 if (c == '=') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return LEFT_ASSIGN;
                 }
                 if (c == ' ' || c == '\t') {
@@ -1352,27 +1353,27 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "<<=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return LEFT_ASSIGN;
                     }
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return LEFT_OP;
             }
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return LE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '<';
         case '>':
             c = input();
             if (c == '>') {
                 c = input();
                 if (c == '=') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return RIGHT_ASSIGN;
                 }
                 if (c == ' ' || c == '\t') {
@@ -1384,20 +1385,20 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, ">>=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return RIGHT_ASSIGN;
                     }
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return RIGHT_OP;
             }
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return GE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '>';
         case 'L':
             c = input();

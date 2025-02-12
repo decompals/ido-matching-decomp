@@ -22,8 +22,12 @@ typedef struct CppLineArr {
 } CppLineArr;
 
 typedef struct UnkChi {
-    int unk_00;
+    LinkedListEntry link;
     int unk_04;
+    int unk_08;
+    int unk_0C;
+    int unk_10;
+    MemCtx* unk_14;
 } UnkChi;
 
 typedef struct ErrorFmt {
@@ -58,7 +62,6 @@ extern int yyline;
 extern char* infile;
 extern int origfile;
 extern int curloc;
-extern union YYLVAL yylval;
 extern TreeNode* char_type;
 extern TreeNode* uchar_type;
 extern TreeNode* float_type;
@@ -106,6 +109,9 @@ extern int bit_size[];
 extern int minimize_indirection_entries;
 extern char* sc_names[];
 extern MemCtx* tree_handle;
+extern MemCtx* temp_handle;
+extern int builtins[];
+extern Symbol* anonymous;
 
 int real_file_line(int, char**, int*, int);
 int __assert(char*, char*, int);
