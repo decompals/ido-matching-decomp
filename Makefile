@@ -129,6 +129,7 @@ build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 
 all: $(ELFS) $(O_FILES)
 	./tools/diff_objfiles.py
+	rm -f src/7.1/cfe/c.c
 
 clean:
 	$(RM) -r $(BUILD)
