@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "common.h"
 
 #define INVALID_ADDR -1
 
