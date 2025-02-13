@@ -13,7 +13,7 @@ CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
-	IDO_TC      := cc cfe ugen
+	IDO_TC      := cc cfe ugen as1
 else ifeq ($(VERSION),5.3)
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe as0
@@ -91,7 +91,7 @@ IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
 
 
-SRC_DIRS := $(shell find src/$(VERSION) -type d -not -path "src/$(VERSION)/as1*")
+SRC_DIRS := $(shell find src/$(VERSION) -type d)
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
@@ -116,6 +116,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
+build/src/7.1/as1/%.o: OPTFLAGS := -O2
 build/src/7.1/cfe/%.o: OPTFLAGS := -O2
 build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 

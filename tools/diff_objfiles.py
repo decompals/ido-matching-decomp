@@ -20,7 +20,7 @@ def same_section(content1, content2, secname):
     return False
 
 def main():
-    programs = ("7.1/cfe", "7.1/cc", "7.1/ugen")
+    programs = ("7.1/as1", "7.1/cfe", "7.1/cc", "7.1/ugen")
     objfiles = [f.relative_to('build/src') for p in programs for f in (Path('build/src').glob(f'{p}/*.o'))]
     sections = (".text", ".data", ".rodata")
 
