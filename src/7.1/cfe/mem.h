@@ -3,7 +3,7 @@
 
 #include "stdlib.h"
 
-#define ALIGN(x, n) (char*)(((int)(x) + n - 1) & ~(n - 1))
+#define ALIGN(x, n) (char*)(((unsigned int)(x) + n - 1) & ~(n - 1))
 
 typedef struct MemCtx {
     /* 0x00 */ char** list_start;
