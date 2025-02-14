@@ -74,7 +74,7 @@ void gen_br_patches(void) {
         // make jump 
         sp4C.j_format.opcode = j_op;
         sp4C.j_format.target = (s3->unk_04 + 8) >> 2;        
-        if (nextrld >= rld_list.size) {
+        if ((unsigned int)nextrld >= rld_list.size) {
             rld_list.array = grow_array(&rld_list.size, nextrld, sizeof(*rld_list.array), rld_list.array, FALSE);
         }
         rld_list.array[nextrld].unk_00 = 0;
@@ -88,7 +88,7 @@ void gen_br_patches(void) {
 
         // make another jump
         sp4C.j_format.target = s3->unk_08->unk_10 >> 2;
-        if (nextrld >= rld_list.size) {
+        if ((unsigned int)nextrld >= rld_list.size) {
             rld_list.array = grow_array(&rld_list.size, nextrld, sizeof(*rld_list.array), rld_list.array, FALSE);
         }
         rld_list.array[nextrld].unk_00 = 0;
@@ -174,7 +174,7 @@ void do_forward_branches(UnkGamma* arg0, int arg1) {
             memory[arg1].unk_00[s3->unk_00 >> 2].word = sp58.word;
 
             if (s5 != 0) {
-                if (nextrld >= rld_list.size) {
+                if ((unsigned int)nextrld >= rld_list.size) {
                     rld_list.array = grow_array(&rld_list.size, nextrld, sizeof(*rld_list.array), rld_list.array, FALSE);
                 }
                 rld_list.array[nextrld].unk_00 = 0;
@@ -212,7 +212,7 @@ void do_handle_branchop(UnkGamma* arg0, union mips_instruction* arg1, int* arg2)
 
         if (t1 != 0) {
             *arg2 = nextrld;
-            if (nextrld >= rld_list.size) {
+            if ((unsigned int)nextrld >= rld_list.size) {
                 rld_list.array = grow_array(&rld_list.size, nextrld, sizeof(*rld_list.array), rld_list.array, FALSE);
             }
             rld_list.array[nextrld].unk_00 = 0;

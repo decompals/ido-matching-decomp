@@ -36,7 +36,7 @@ typedef struct UnkBeta {
 
 typedef struct UnkBetaArray {
     /* 0x00 */ UnkBeta* array;
-    /* 0x04 */ size_t size;    
+    /* 0x04 */ size_t size;
 } UnkBetaArray; // size = 0x08
 
 typedef struct UnkDelta {
