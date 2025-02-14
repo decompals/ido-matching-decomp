@@ -53,7 +53,7 @@ begin
     return nil;
 end;
 
-function make_new_temp(arg0: integer): pointer;
+function make_new_temp(areaSize: integer): pointer;
 var
     temp: Ptemp;
 begin
@@ -64,20 +64,20 @@ begin
         report_error(Internal, 76, "temp_mgr.p", "Insufficiant memory");
         return temp;
     end;
-    if (arg0 >= 5) then begin
-        if ( temps_offset & 7 <> 0) then begin
+    if (areaSize >= 5) then begin
+        if (temps_offset & 7 <> 0) then begin
             temps_offset := temps_offset + temps_offset &7;
         end;
     end;
 
-    temp^.free := FALSE;
+    temp^.free := false;
     temp^.offset := temps_offset;
-    temp^.area_size := arg0;
+    temp^.area_size := areaSize;
 
     temp^.index := current_temp_index;
     current_temp_index := current_temp_index + 1;
 
-    temps_offset := temps_offset + arg0;
+    temps_offset := temps_offset + areaSize;
     temp^.next := temps;
 
     temps := temp;
@@ -85,13 +85,13 @@ begin
     return temp;
 end;
 
-function find_free_temp(area_size: integer): Ptemp;
+function find_free_temp(areaSize: integer): Ptemp;
 var
     temp: Ptemp;
 begin
     temp := temps;
     while (temp <> nil) do begin
-        if ((temp^.free) and (area_size = temp^.area_size)) then begin
+        if ((temp^.free) and (areaSize = temp^.area_size)) then begin
             temp^.free := false;
             return temp;
         end;
@@ -100,24 +100,23 @@ begin
     return nil;
 end;
 
-procedure gen_store(reg: registers; offset: integer; area_size: integer);
+procedure gen_store(reg: registers; offset: integer; areaSize: integer);
 var
-    op: first(asmcodes)..last(asmcodes); /* sp + C6 */
+    op: first(asmcodes)..last(asmcodes);
 begin
     if (reg in [xr0..xr31]) then begin
-
-        if (area_size <= 4) then begin
+        if (areaSize <= 4) then begin
             op := zsw;
-        end else if (area_size <= 8) then begin
+        end else if (areaSize <= 8) then begin
             op := zsd;
         end else begin
             report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
             return;
         end;
 
-    end else if (area_size <= 4) then begin
+    end else if (areaSize <= 4) then begin
         op := fs_s;
-    end else if (area_size <= 8) then begin
+    end else if (areaSize <= 8) then begin
         op := fs_d;
     end else begin
         report_error(Internal, 133, "temp_mgr.p", "illegal size temporary");
@@ -126,11 +125,11 @@ begin
 
     if (reversed_stack) then begin
         if ((op = zsd) and not (opcode_arch)) then begin
-            emit_rob(zsw, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
-            emit_rob(zsw, succ(reg), frame_offset1(offset + (((area_size + 3) div 4) * 4)) + 4, frame_pointer, 0);
+            emit_rob(zsw, reg, frame_offset1(offset + (((areaSize + 3) div 4) * 4)), frame_pointer, 0);
+            emit_rob(zsw, succ(reg), frame_offset1(offset + (((areaSize + 3) div 4) * 4)) + 4, frame_pointer, 0);
             return;
         end;
-        emit_rob(op, reg, frame_offset1(offset + (((area_size + 3) div 4) * 4)), frame_pointer, 0);
+        emit_rob(op, reg, frame_offset1(offset + (((areaSize + 3) div 4) * 4)), frame_pointer, 0);
         return;
     end;
 
@@ -142,24 +141,24 @@ begin
     end;
 end;
 
-procedure spill_to_temp(reg: registers; area_size: integer);
+procedure spill_to_temp(reg: registers; areaSize: integer);
 var
     spill: spill_rec;
 begin
     if (not (opcode_arch) and (kind_of_register(reg) = 6)) then begin
-        area_size := 8;
+        areaSize := 8;
     end;
-    spill.temp :=  find_free_temp(area_size);
+    spill.temp :=  find_free_temp(areaSize);
     if (spill.temp = nil) then begin
-        spill.temp := make_new_temp(area_size);
+        spill.temp := make_new_temp(areaSize);
     end;
 
     spill.unk := content_of(reg);
     spill.unk^.temp_index := spill.temp^.index;
 
     spill.temp^.usage_count := usage_count(reg);
-    spill.temp^.area_size := area_size;
-    gen_store(reg, spill.temp^.offset, area_size);
+    spill.temp^.area_size := areaSize;
+    gen_store(reg, spill.temp^.offset, areaSize);
 end;
 
 procedure free_temp(index: u8); {Guess}

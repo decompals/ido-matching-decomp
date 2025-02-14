@@ -7,6 +7,7 @@
 #include "mem.h"
 #include "linklist.h"
 #include "tree.h"
+#include "tree.h"
 
 #define GET_SYM_CAT(x) (x != 0 ? (x == -1 ? "typedef" : "keyword") : "regular")
 
