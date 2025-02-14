@@ -6,6 +6,7 @@
 #define INST_NOP 0U
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "sys/inst.h"
 #include "sex.h"
 

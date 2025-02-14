@@ -71,7 +71,7 @@ offset,vram,.dummy
 09A480,0049A480,init
 
 offset,vram,.rodata
-09B000,1000B000,as1_09B000
+09B000,1000B000,branch
 09B0B0,1000B0B0,as1_09B0B0
 09B250,1000B250,as1_09B250
 09BED0,1000BED0,as1_09BED0
@@ -128,7 +128,8 @@ offset,vram,.dummy
 0B2DC0,10022DC0,got
 
 offset,vram,.bss
-0B3B90,10023B90,as1_10023B90
+0B3B90,10023B90,branch
+0B3BA0,10023BA0,as1_10023BA0
 
 0C22E4,100322E4,.end
 # offset,vram,.dummy
