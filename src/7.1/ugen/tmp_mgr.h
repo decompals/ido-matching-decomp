@@ -1,7 +1,7 @@
 #ifndef TMP_MGR_H
 #define TMP_MGR_H
 function lookup_temp(index: u8): pointer; external;
-function make_new_temp(arg0: integer): pointer; external;
+function make_new_temp(area_size: integer): pointer; external;
 function find_free_temp(area_size: integer): pointer; external;
 function temp_offset(index: u8): integer; external;
 function temp_usage_count(index: u8): u16; external;

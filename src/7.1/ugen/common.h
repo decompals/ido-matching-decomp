@@ -13,5 +13,11 @@ ugen_report  = (
       Internal
 );
 
+mips_isa = (
+    ISA_MIPS1,
+    ISA_MIPS2,
+    ISA_MIPS3
+);
+
 
 #endif /* COMMON_H */

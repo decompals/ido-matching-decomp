@@ -125,7 +125,7 @@ build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 .DEFAULT_GOAL:= all
 
 all: $(ELFS) $(O_FILES)
-	./tools/diff_objfiles.py
+	./tools/diff_objfiles.py $(VERSION)
 
 clean:
 	$(RM) -r $(BUILD)
