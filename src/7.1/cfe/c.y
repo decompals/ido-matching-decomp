@@ -67,7 +67,7 @@ void parse_init(void) {
     cur_lvl->unk_04 = 1;
     cur_lvl->unk_08 = 1;
     cur_lvl->unk_0C = 0;
-    cur_lvl->unk_10 = 0;
+    cur_lvl->in_struct_def = FALSE;
     cur_lvl->link.next = B_10020F00->used_list;
     B_10020F00->used_list = &cur_lvl->link;
 
@@ -787,7 +787,7 @@ struct_or_union_specifier
 			}
 			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_10 = 1;
+			cur_lvl->in_struct_def = TRUE;
 			cur_lvl->link.next = B_10020F00->used_list;
     		B_10020F00->used_list = &cur_lvl->link;
 		}
@@ -804,7 +804,7 @@ struct_or_union_specifier
 		{
 			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_10 = 1;
+			cur_lvl->in_struct_def = TRUE;
 			cur_lvl->link.next = B_10020F00->used_list;
     		B_10020F00->used_list = &cur_lvl->link;
 		}
@@ -1081,7 +1081,7 @@ direct_declarator
 			}
 			$$.unk_00 = 0;
 			cur_lvl->unk_04 = 1;
-			if ($1.unk_00 != 0 && cur_lvl->unk_10 == 0 && cur_lvl->unk_08 == 1) {
+			if ($1.unk_00 != 0 && !cur_lvl->in_struct_def && cur_lvl->unk_08 == 1) {
 				UnkBeta* spD8;
 				mk_parse_symb($1.unk_04, 0, B_10020F04);
 				spD8 = (UnkBeta*)get_link_elem(B_10020F08);
@@ -1089,7 +1089,7 @@ direct_declarator
 				spD8->link.next = B_10020F08->used_list;
 				B_10020F08->used_list = &spD8->link;
 			}
-			if (cur_lvl->unk_10 == 0 && cur_lvl->unk_08 == 0 && $1.unk_00 == 0) {
+			if (!cur_lvl->in_struct_def && cur_lvl->unk_08 == 0 && $1.unk_00 == 0) {
 				UnkBeta* spD4;
 				mk_parse_symb($1.unk_04, -1, B_10020F04);
 				spD4 = (UnkBeta*)get_link_elem(B_10020F08);
@@ -1166,7 +1166,7 @@ fdecl_start
 			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 			cur_lvl->unk_04 = 1;
 			cur_lvl->unk_0C = 0;
-			cur_lvl->unk_10 = 0;
+			cur_lvl->in_struct_def = FALSE;
 			cur_lvl->unk_08 = 1;
 			cur_lvl->link.next = B_10020F00->used_list;
 			B_10020F00->used_list = &cur_lvl->link;
@@ -1516,7 +1516,7 @@ comp_start
 			if (cur_lvl->unk_0C) {
 				cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 				cur_lvl->unk_04 = 1;
-				cur_lvl->unk_10 = 0;				
+				cur_lvl->in_struct_def = FALSE;				
 				cur_lvl->unk_08 = 1;
 				cur_lvl->link.next = B_10020F00->used_list;
 				B_10020F00->used_list = &cur_lvl->link;

@@ -27,7 +27,7 @@ typedef struct UnkChi {
     int unk_04;
     int unk_08;
     int unk_0C;
-    int unk_10;
+    int in_struct_def;
     MemCtx* unk_14;
 } UnkChi;
 
