@@ -2,6 +2,7 @@
 #include "report.h"
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
+#include "cmplrs/uoptions.h"
 
 { TODO: find a home for these }
 procedure demit_dir0(arg0: integer; arg1: integer); external;
@@ -55,7 +56,7 @@ var
     sdata_max: integer;
     apc: u8;
     excpt: u8;
-    source_language: integer; { 2=Fortran }
+    source_language: integer; { see cmplrs/uoptions.h for values }
 
 function sym_hash(arg0: integer): integer;
 begin
@@ -300,7 +301,7 @@ begin
     var_a1 := sym^.unk20;
     if (u.Offset >= sym^.unk20^.u.Offset2 + sym^.unk20^.u.Length) then begin
         var_v1 := var_a1;
-    end else if ((source_language = 2) and (last_inits_handled <> nil) and
+    end else if ((source_language = FORTRAN_SOURCE) and (last_inits_handled <> nil) and
             (last_inits_handled^.next <> nil) and (u.I1 = last_inits_handled_blkno) and
             (u.Offset >= last_inits_handled^.u.Offset2 + last_inits_handled^.u.Length)) then begin
         var_v1 := last_inits_handled;
@@ -312,7 +313,7 @@ begin
     var_v0 := false;
     while (not var_v0) do begin
         if ((u.Offset >= var_v1^.u.Offset2 + var_v1^.u.Length) or (var_v1^.u.Offset >= u.Offset2 + u.Length)) then begin
-            if ((source_language = 2) and (var_v1^.u.Offset >= u.Offset2 + u.Length)) then begin
+            if ((source_language = FORTRAN_SOURCE) and (var_v1^.u.Offset >= u.Offset2 + u.Length)) then begin
                 var_v0 := true;
             end;
         end else begin
@@ -342,7 +343,7 @@ begin
     if (init = sym^.unk20) then begin
         sym^.unk20 := new_init;
     end;
-    if (source_language = 2) then begin
+    if (source_language = FORTRAN_SOURCE) then begin
         last_inits_handled := new_init;
         last_inits_handled_blkno := new_init^.u.I1;
     end;
@@ -515,7 +516,7 @@ begin
     var_v0^.u := u^;
     var_v0^.next := nil;
 
-    if (source_language = 2) then begin
+    if (source_language = FORTRAN_SOURCE) then begin
         temp_t3 := sym^.unk1C;
         if (temp_t3 <> nil) then begin
             var_s0 := temp_t3;
@@ -551,7 +552,7 @@ begin
         return;
     end;
 
-    if (source_language <> 2) then begin
+    if (source_language <> FORTRAN_SOURCE) then begin
         var_s0 := temp_t3;
     end;
 
@@ -562,7 +563,7 @@ begin
                 var_v0^.next := temp_a0;
                 var_s0^.next := var_v0;
                 return;
-            end else if ((temp_a1 = temp_a0^.u.Offset) and (((source_language = 1) and (apc <> 0)) or (source_language = 2))) then begin
+            end else if ((temp_a1 = temp_a0^.u.Offset) and (((source_language = PASCAL_SOURCE) and (apc <> 0)) or (source_language = FORTRAN_SOURCE))) then begin
                 if (temp_t1 = temp_a0) then begin
                     var_s0^.next := var_v0;
                     sym^.unk20 := var_v0;
@@ -576,7 +577,7 @@ begin
         end;
     end;
 
-    if (((source_language = 1) or (source_language = 2)) and (temp_t4 = temp_a1)) then begin
+    if (((source_language = PASCAL_SOURCE) or (source_language = FORTRAN_SOURCE)) and (temp_t4 = temp_a1)) then begin
         var_v0^.next := temp_t3^.next;
         sym^.unk1C := var_v0;
     end else begin
@@ -643,7 +644,7 @@ begin
         var_a2 := var_s3^.u.Offset - var_s0_2;
         if (var_a2 <> 0) then begin
             if (var_a2 < 0) then begin
-                if (source_language = 2) then begin
+                if (source_language = FORTRAN_SOURCE) then begin
                     report_error(Warn, 805, "symbol.p", "Fortran error - Duplicate initialization (ovelapping DATA statements)");
                 end else begin
                     report_error(Internal, 810, "symbol.p", "illegal value in .space - illegal initialization bounds");
@@ -684,7 +685,7 @@ begin
     var_a2 := sym^.size - var_s0_2;
     if (var_a2 <> 0) then begin
         if (var_a2 < 0) then begin
-            if (source_language = 2) then begin
+            if (source_language = FORTRAN_SOURCE) then begin
                 report_error(Warn, 868, "symbol.p", "Fortran error - Duplicate initialization -- illegal DATA statements");
             end else begin
                 report_error(Warn, 873, "symbol.p", "illegal value in .space - illegal initialization bounds");
