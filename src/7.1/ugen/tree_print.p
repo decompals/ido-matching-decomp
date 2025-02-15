@@ -148,7 +148,7 @@ end;
 
 procedure print_node_1(pFile: ^Text; arg1: ^Tree; arg2: cardinal);
 begin
-    write(pFile^, rshift(arg1^.unk10, 8):6, chr(9));
+    write(pFile^, arg1^.unk10:6, chr(9));
     indent_tree(pFile, arg2 * 2);
     print_ucode(pFile, arg1^.u);
 
@@ -156,7 +156,7 @@ begin
         write(pFile^, " ref_count=", arg1^.ref_count:1);
     end;
 
-   if (1 <= arg1^.ref_count2) then begin
+   if (arg1^.ref_count2 <> 0) then begin
         write(pFile^, " ref_count2=", arg1^.ref_count2:1);
     end;
 
@@ -169,19 +169,19 @@ begin
     end;
 
     if (arg1^.op1 <> nil) then begin
-        write(pFile^, " op1=", rshift(arg1^.op1^.unk10, 8):1);
+        write(pFile^, " op1=", arg1^.op1^.unk10:1);
     end;
 
     if (arg1^.op2 <> nil) then begin
-        write(pFile^, " op2=", rshift(arg1^.op2^.unk10, 8):1);
+        write(pFile^, " op2=", arg1^.op2^.unk10:1);
     end;
 
     if (arg1^.next <> nil) then begin
-        write(pFile^, " next=", rshift(arg1^.next^.unk10, 8):1);
+        write(pFile^, " next=", arg1^.next^.unk10:1);
     end;
 
     if (arg1^.prior <> nil) then begin
-        write(pFile^, " prior=", rshift(arg1^.prior^.unk10, 8):1);
+        write(pFile^, " prior=", arg1^.prior^.unk10:1);
     end;
 
     writeln(pFile^);        

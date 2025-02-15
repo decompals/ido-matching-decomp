@@ -1,5 +1,4 @@
 #include "tree.h"
-#include "cmplrs/usys.h"
 #include "cmplrs/uwri.h"
 
 procedure u_tree(arg0: ^Tree);

@@ -203,13 +203,13 @@ type
   Valuptr = ^Valu;
   Stringtext = record
 		case integer of
-		0: (ss: packed array[1..288] of char);
+		0: (ss: packed array[1..Strglgth] of char);
 		1:  (ssarray: array[1..
-			(288+4-1) div 4] of
+			(Strglgth+HostCharsPerWord-1) div HostCharsPerWord] of
 			integer);
 #ifdef _LONGLONG
 		2:  (ssdwarray: array[1..
-			(288+8-1) div 8] of
+			(Strglgth+HostCharsPerDWord-1) div HostCharsPerDWord] of
 			integer64);
 #endif
 		end;
@@ -329,7 +329,7 @@ type
   (***************************************************************************)
   (* source line buffer 						     *)
   (***************************************************************************)
-  Sourceline = packed array[1..288] of char;
+  Sourceline = packed array[1..Strglgth] of char;
 
   Opcstring = packed array[1..4] of char; (* string representation of an     *)
 					(* Uopcode			     *)
@@ -486,7 +486,7 @@ Memtype
   /***************************************************************************/
   /* constants								     */
   /***************************************************************************/
-typedef char Stringtext[288];
+typedef char Stringtext[Strglgth];
 
 union Valu {
 #ifdef _LONGLONG

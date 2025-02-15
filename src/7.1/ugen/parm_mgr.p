@@ -10,22 +10,22 @@ var
 function pass_in_reg(arg0: ^Tree): boolean;
 begin
     Assert(arg0^.u.Opc in [Upar, Updef]);
-    return (arg0^.unk30 + 1) <> 0;
+    return (arg0^.u.Constval.dwval_h + 1) <> 0;
 end;
 
 function parm_reg(arg0: ^Tree): integer;
 begin
     Assert(arg0^.u.Opc in [Upar, Updef, Ushl, Uvreg]);
 
-    if (arg0^.unk30 = -1) then begin
+    if (arg0^.u.Constval.dwval_h= -1) then begin
         return ord(xnoreg);
     end;
 
     if (basicint = 0) then begin
-        return arg0^.unk30 div 4;
+        return arg0^.u.Constval.dwval_h div 4;
     end;
  
-    return arg0^.unk30 div 8;
+    return arg0^.u.Constval.dwval_h div 8;
 end;
 
 GLOBAL_ASM("asm/7.1/functions/ugen/parm_mgr/map_pdefs_to_regs.s")
@@ -37,19 +37,19 @@ var
     temp: integer;
 begin
   
-    Assert(arg0^.unk2C >= 0);
+    Assert(arg0^.u.Offset >= 0);
     temp := 4;
     if (basicint = 0) then begin
-        if ((arg0^.unk2C >= (n_parm_regs * 4)) or (arg0^.unk2C >= (n_fp_parm_regs * 2 * temp))) then begin
+        if ((arg0^.u.Offset >= (n_parm_regs * 4)) or (arg0^.u.Offset >= (n_fp_parm_regs * 2 * temp))) then begin
             return -1;
         end;
-        return pars[arg0^.unk2C div 4];
+        return pars[arg0^.u.Offset div 4];
     end;
 
-    if ((arg0^.unk2C >= (n_parm_regs * 8)) or ((arg0^.unk2C >= (n_fp_parm_regs * 2 * temp))) then begin
+    if (arg0^.u.Offset >= (n_parm_regs * 8)) or ((arg0^.u.Offset >= (n_fp_parm_regs * 2 * temp))) then begin
         return -1;
     end;
-    return pars[arg0^.unk2C div 8];
+    return pars[arg0^.u.Offset div 8];
 end;
 
 GLOBAL_ASM("asm/7.1/functions/ugen/parm_mgr/check_amt_ref.s")
