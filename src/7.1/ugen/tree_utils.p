@@ -18,7 +18,7 @@ procedure initialize_tree();
 begin
     tree_mark := 0;
     tree_counter := 0;
-    label_id_counter := 16#1F;
+    label_id_counter := 31;
 end;
 
 function gen_label_id(): integer;
@@ -237,7 +237,7 @@ begin
     end else begin
     {Sanity check}
         if (arg0^.ref_count = 16#FFFF) then begin
-            report_error(Internal, 16#12C, 'tree_utils.p', 'ref_count overflow');
+            report_error(Internal, 300, 'tree_utils.p', 'ref_count overflow');
         end else begin 
             arg0^.ref_count := arg0^.ref_count + 1;
         end;
@@ -265,7 +265,7 @@ begin
         p_tree^.u.Constval.dwval_h:= dwval_l;
         p_tree^.u.Length := 8;
     end else begin
-        p_tree^.u.Constval.dwval_h := dwval_h;
+        p_tree^.u.Constval.Ival := dwval_h;
         p_tree^.u.Length := 4;
     end;
 

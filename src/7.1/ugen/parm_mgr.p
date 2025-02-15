@@ -10,22 +10,22 @@ var
 function pass_in_reg(arg0: ^Tree): boolean;
 begin
     Assert(arg0^.u.Opc in [Upar, Updef]);
-    return (arg0^.u.Constval.dwval_h + 1) <> 0;
+    return (arg0^.u.Constval.Ival + 1) <> 0;
 end;
 
 function parm_reg(arg0: ^Tree): integer;
 begin
     Assert(arg0^.u.Opc in [Upar, Updef, Ushl, Uvreg]);
 
-    if (arg0^.u.Constval.dwval_h= -1) then begin
+    if (arg0^.u.Constval.Ival = -1) then begin
         return ord(xnoreg);
     end;
 
     if (basicint = 0) then begin
-        return arg0^.u.Constval.dwval_h div 4;
+        return arg0^.u.Constval.Ival div 4;
     end;
  
-    return arg0^.u.Constval.dwval_h div 8;
+    return arg0^.u.Constval.Ival div 8;
 end;
 
 GLOBAL_ASM("asm/7.1/functions/ugen/parm_mgr/map_pdefs_to_regs.s")
