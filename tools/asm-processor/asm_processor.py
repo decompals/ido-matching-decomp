@@ -842,9 +842,11 @@ class GlobalAsmBlock:
         rodata_name = None
         if self.fn_section_sizes['.rodata'] > 0:
             if state.pascal:
-                self.fail(".rodata isn't supported with Pascal for now")
-            rodata_name = state.make_name('rodata')
-            src[self.num_lines] += ' const char {}[{}] = {{1}};'.format(rodata_name, self.fn_section_sizes['.rodata'])
+                # self.fail(".rodata isn't supported with Pascal for now")
+                pass
+            else:
+                rodata_name = state.make_name('rodata')
+                src[self.num_lines] += ' const char {}[{}] = {{1}};'.format(rodata_name, self.fn_section_sizes['.rodata'])
 
         data_name = None
         if self.fn_section_sizes['.data'] > 0:
