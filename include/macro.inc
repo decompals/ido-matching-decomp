@@ -4,9 +4,10 @@
 .set noat
 .set noreorder
 
-.macro glabel label
-    .global \label
-    \label:
+.macro glabel name, visibility=global
+.\visibility \name
+.type \name, @function
+\name:
 .endm
 
 .macro dlabel label
