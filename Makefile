@@ -28,16 +28,27 @@ ifneq ($(shell type $(MIPS_BINUTILS_PREFIX)ld >/dev/null 2>/dev/null; echo $$?),
 $(error Please install or build mips-linux-gnu)
 endif
 
-RECOMP  := tools/recomp
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  DETECTED_OS=linux
+else ifeq ($(UNAME_S),Darwin)
+  DETECTED_OS=macos
+else
+  $(error Unsupported OS: $(UNAME_S))
+endif
+
+RECOMP_VERSION := v1.2
+RECOMP         := tools/ido_recomp
+
 BUILD   := build
 ASM     := asm
 SYMBOLS := symbols
 CONTEXT := context
 
 ifeq ($(VERSION),7.1)
-        CC	:= $(RECOMP)/build/7.1/out/cc
+        CC	:= $(RECOMP)/7.1/cc
 else ifeq ($(VERSION),5.3)
-        CC  	:= $(RECOMP)/build/5.3/out/cc
+        CC  := $(RECOMP)/5.3/cc
 endif
 
 
@@ -48,7 +59,7 @@ OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
-DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
+DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --rodata-string-guesser 4 --pascal-rodata-string-guesser 4 --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
@@ -84,7 +95,7 @@ CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNING
 
 # -- Location of original IDO binaries
 
-IRIX_BASE    ?= $(RECOMP)/ido
+IRIX_BASE    ?= ido
 IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 
 # We use a sentinel file for disassembling each binary
@@ -132,17 +143,18 @@ clean:
 	$(RM) -r $(BUILD)
 
 distclean: clean
-	$(MAKE) -C $(RECOMP) clean
-	$(RM) -r $(ASM)
+	$(RM) -r $(RECOMP) $(ASM)
 
-setup:
-	$(MAKE) -C $(RECOMP) setup
-	$(MAKE) -C $(RECOMP) DEBUG=0 VERSION=7.1
-	$(MAKE) -C $(RECOMP) DEBUG=0 VERSION=5.3
+setup: $(RECOMP)
 
 disasm: $(DISASM_TARGETS)
 	find asm -type f -name "*.s" | grep -v "/functions/" | xargs sed -i -e "s/glabel func_/llabel func_/; s/dlabel RO_/llabel RO_/; s/dlabel B_/llabel B_/; s/dlabel D_/llabel D_/; s/dlabel jtbl_/llabel jtbl_/;"
 
+
+$(RECOMP):
+	mkdir -p $@/5.3 $@/7.1
+	curl -sL https://github.com/decompals/ido-static-recomp/releases/download/$(RECOMP_VERSION)/ido-5.3-recomp-$(DETECTED_OS).tar.gz | tar xz -C $@/5.3
+	curl -sL https://github.com/decompals/ido-static-recomp/releases/download/$(RECOMP_VERSION)/ido-7.1-recomp-$(DETECTED_OS).tar.gz | tar xz -C $@/7.1
 
 $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
