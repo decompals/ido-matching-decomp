@@ -13,9 +13,9 @@
 #include <fcntl.h>
 
 typedef struct TokenIdentifier {
-    int unk_00;
-    struct Symbol* unk_04;
-    int unk_08;
+    int was_typedef;
+    struct Symbol* symbol;
+    int location;
 } TokenIdentifier;
 
 typedef struct DeclSpec {

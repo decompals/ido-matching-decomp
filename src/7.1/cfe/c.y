@@ -66,7 +66,7 @@ void parse_init(void) {
     cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
     cur_lvl->unk_04 = 1;
     cur_lvl->unk_08 = 1;
-    cur_lvl->unk_0C = 0;
+    cur_lvl->unk_0C = FALSE;
     cur_lvl->in_struct_def = FALSE;
     cur_lvl->link.next = B_10020F00->used_list;
     B_10020F00->used_list = &cur_lvl->link;
@@ -87,7 +87,7 @@ TreeNode* parse(void) {
     }
 }
 
-void delete_local_decls(int arg0) {
+void delete_local_decls(int level) {
     UnkBeta* s2 = (UnkBeta*)B_10020F08->used_list;
     ParseSymbol* s1;
 
@@ -95,29 +95,29 @@ void delete_local_decls(int arg0) {
         if (s2 == NULL) {
             return;
         }
-        s1 = s2->unk_04->unk_04;
+        s1 = s2->unk_04->psymb;
         
         if (s1 == NULL) {
             link_pop(B_10020F08);
             return;
         }
-        if (s1->unk_08 < arg0) {
+        if (s1->level < level) {
             return;
         }
 
-        while (s1 != NULL && s1->unk_08 >= arg0) {
+        while (s1 != NULL && s1->level >= level) {
             ParseSymbol* s0 = (ParseSymbol*)s1->link.next;
             if (debug_arr[80] > 0) {
                 fprintf(dbgout, "deleting %.*s (0x%x:%d:%s) unhides (0x%x:%d:%s)\n",
                         s2->unk_04->namelen, s2->unk_04->name,
-                        s1, s1->unk_08, GET_SYM_CAT(s1->unk_04),
-                        s0, s0 != NULL ? s0->unk_08 : -1, s0 != NULL ? GET_SYM_CAT(s0->unk_04) : "<nil>");
+                        s1, s1->level, GET_SYM_CAT(s1->id),
+                        s0, s0 != NULL ? s0->level : -1, s0 != NULL ? GET_SYM_CAT(s0->id) : "<nil>");
             }
 
             s1->link.next = psymb_handle->free_list;
             psymb_handle->free_list = &s1->link;
             s1 = s0;
-            s2->unk_04->unk_04 = s0;
+            s2->unk_04->psymb = s0;
         }
         s2 = link_pop(B_10020F08);
     }
@@ -188,25 +188,26 @@ static void* func_00409D18(int code, int location, TreeNode* arg2) {
 	struct TreeNodeList list;
 }
 
-%token	<identifier>	IDENTIFIER SIZEOF ALIGNOF CLASSOF UNALIGN
+%token	<identifier>	IDENTIFIER
+%token	<location>		SIZEOF ALIGNOF CLASSOF UNALIGN
 %token	<node>			STRING WSTRING CONSTANT
 %token	<location>		PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP AND_OP OR_OP GE_OP NE_OP EQ_OP
 						MUL_ASSIGN DIV_ASSIGN REM_ASSIGN ADD_ASSIGN SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
-%token	<identifier>	TYPEDEF EXTERN STATIC AUTO REGISTER
+						TYPEDEF EXTERN STATIC AUTO REGISTER
 						CHAR SHORT INT LONG LONGLONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 						STRUCT UNION ENUM
-%token	<location>		ELLIPSIS
+						ELLIPSIS
 %token	<identifier>	TYPE_IDENT
-CASE DEFAULT IF ELSE SWITCH WHILE DO FOR
-GOTO LEAVE CONTINUE BREAK RETURN
-TRY EXCEPT FINALLY
-__PRAGMA
+%token	<location>		CASE DEFAULT IF ELSE SWITCH WHILE DO FOR
+						GOTO LEAVE CONTINUE BREAK RETURN
+						TRY EXCEPT FINALLY
+						__PRAGMA
 %token	<location>		'(' ')' '{' '}' '[' ']' '?' ':' '~' ',' ';'
 %left	<location>		'+' '-'
 %left	<location>		'/' '%'
 %left  	<location>		'&' '|'
 %token	<location>		'^' '!' '=' '*' '.' '<' '>'
-%token	<identifier>	CLASS VIRTUAL PROTECTED PUBLIC PRIVATE COLONCOLON COLCOLSTAR OPERATOR THIS MEMDOT_OP MEMPTR_OP NEW DELETE INLINE FRIEND
+						CLASS VIRTUAL PROTECTED PUBLIC PRIVATE COLONCOLON COLCOLSTAR OPERATOR THIS MEMDOT_OP MEMPTR_OP NEW DELETE INLINE FRIEND
 
 %type <node> identifier
 %type <node> constant
@@ -293,9 +294,9 @@ __PRAGMA
 identifier
 	: IDENTIFIER {
 		if (debug_arr['y'] > 0) {
-			fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+			fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 		}
-		$$ = make(Identifier, $1.unk_08, $1.unk_04);
+		$$ = make(Identifier, $1.location, $1.symbol);
 	}
 	;
 
@@ -358,12 +359,12 @@ unary_expression
 				error(0x2012D, LEVEL_WARNING, $2);
 			}
 		}
-	| SIZEOF unary_expression { $$ = make(Sizeof_expr, $1.unk_00, $2); }
-	| SIZEOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Sizeof_expr, $1.unk_00, $3); }
-	| ALIGNOF unary_expression { $$ = make(Alignof_expr, $1.unk_00, $2); }
-	| ALIGNOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Alignof_expr, $1.unk_00, $3); }
-	| CLASSOF unary_expression { $$ = make(Classof_expr, $1.unk_00, $2); }
-	| CLASSOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Classof_expr, $1.unk_00, $3); }
+	| SIZEOF unary_expression { $$ = make(Sizeof_expr, $1, $2); }
+	| SIZEOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Sizeof_expr, $1, $3); }
+	| ALIGNOF unary_expression { $$ = make(Alignof_expr, $1, $2); }
+	| ALIGNOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Alignof_expr, $1, $3); }
+	| CLASSOF unary_expression { $$ = make(Classof_expr, $1, $2); }
+	| CLASSOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Classof_expr, $1, $3); }
 	;
 
 unary_operator
@@ -594,7 +595,7 @@ fct_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x80000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 
 init_declarator_list
@@ -640,7 +641,7 @@ storage_class_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x10000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_08 = 0;
 		}
 	| EXTERN 
@@ -648,28 +649,28 @@ storage_class_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x08000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	| STATIC
 		{
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x04000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	| AUTO
 		{
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x02000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	| REGISTER
 		{
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x01000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	;
 
@@ -679,7 +680,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x04000000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| SHORT
@@ -687,7 +688,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x400000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| INT
@@ -695,7 +696,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x02000000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| LONG
@@ -703,7 +704,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x01000000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| LONGLONG
@@ -711,7 +712,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x800000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| SIGNED
@@ -719,7 +720,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x200000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| UNSIGNED
@@ -727,7 +728,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x100000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| FLOAT
@@ -735,7 +736,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x10000000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| DOUBLE
@@ -743,7 +744,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x40000000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| VOID
@@ -751,7 +752,7 @@ type_specifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0;
 			$$.unk_08 = 0x4000;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 			cur_lvl->unk_04 = 0;
 		}
 	| struct_or_union_specifier
@@ -772,10 +773,10 @@ type_specifier
 		}
 	| typedef_name
 		{
-			$$.unk_00 = make(Identifier, $1.unk_08, $1.unk_04);
+			$$.unk_00 = make(Identifier, $1.location, $1.symbol);
 			$$.unk_04 = 0;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_08;
+			$$.unk_0C = $1.location;
 		}
 	;
 
@@ -783,7 +784,7 @@ struct_or_union_specifier
 	: struct_or_union IDENTIFIER '{'
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.unk_04->name, $2.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
 			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 			cur_lvl->unk_04 = 1;
@@ -793,7 +794,7 @@ struct_or_union_specifier
 		}
 	  struct_declaration_list_semi '}'
 	  	{
-			STRUCT_TYPE($$).sname = make(Id_decl, $2.unk_08, $2.unk_04);
+			STRUCT_TYPE($$).sname = make(Id_decl, $2.location, $2.symbol);
 			STRUCT_TYPE($$).members = $5;
 			cur_lvl = link_pop(B_10020F00);
             if (B_10020F04 == 0) {
@@ -819,9 +820,9 @@ struct_or_union_specifier
 	| struct_or_union IDENTIFIER
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.unk_04->name, $2.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
-			STRUCT_TYPE($$).sname = make(Id_decl, $2.unk_08, $2.unk_04);
+			STRUCT_TYPE($$).sname = make(Id_decl, $2.location, $2.symbol);
 			cur_lvl->unk_04 = 1;
 			if (B_10020F04 == 0) {
                 tree_handle = cur_lvl->unk_14;
@@ -836,7 +837,7 @@ struct_or_union
                 cur_lvl->unk_14 = tree_handle;
                 tree_handle = general_handle;
             }
-            $$ = make(Struct_type, $1.unk_00, STRUCT_INFO_STRUCT);
+            $$ = make(Struct_type, $1, STRUCT_INFO_STRUCT);
             cur_lvl->unk_04 = 0;
 		}
 	| UNION
@@ -845,7 +846,7 @@ struct_or_union
                 cur_lvl->unk_14 = tree_handle;
                 tree_handle = general_handle;
             }
-            $$ = make(Struct_type, $1.unk_00, STRUCT_INFO_UNION);
+            $$ = make(Struct_type, $1, STRUCT_INFO_UNION);
             cur_lvl->unk_04 = 0;
 		}
 	;
@@ -965,13 +966,13 @@ enum_specifier
 	| enum IDENTIFIER
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.unk_04->name, $2.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
 			cur_lvl->unk_04 = 1;
 		}
 	  '{' enumerator_list optcomma '}'
 	  	{
-			ENUM_TYPE($$).ename = make(Id_decl, $2.unk_08, $2.unk_04);
+			ENUM_TYPE($$).ename = make(Id_decl, $2.location, $2.symbol);
 			ENUM_TYPE($$).literals = $5.first;
 			if ($6 != -1) {
 				error(0x2007E, LEVEL_DEFAULT, $6);
@@ -983,9 +984,9 @@ enum_specifier
 	| enum IDENTIFIER
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.unk_04->name, $2.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
-			ENUM_TYPE($$).ename = make(Id_decl, $2.unk_08, $2.unk_04);
+			ENUM_TYPE($$).ename = make(Id_decl, $2.location, $2.symbol);
 			cur_lvl->unk_04 = 1;
 			if (B_10020F04 == 0) {
                 tree_handle = cur_lvl->unk_14;
@@ -1006,7 +1007,7 @@ enum
                 tree_handle = general_handle;
             }
             cur_lvl->unk_04 = 0;
-            $$ = make(Enum_type, $1.unk_00);
+            $$ = make(Enum_type, $1);
 		}
 	;
 
@@ -1026,16 +1027,16 @@ enumerator
 	: IDENTIFIER
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
-			$$ = make(Id_decl, $1.unk_08, $1.unk_04);
+			$$ = make(Id_decl, $1.location, $1.symbol);
 		}
 	| IDENTIFIER '=' constant_expression
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
-			$$ = make(Id_decl, $1.unk_08, $1.unk_04);
+			$$ = make(Id_decl, $1.location, $1.symbol);
 			ID_DECL($$).init_value = $3;
 		}
 	;
@@ -1046,21 +1047,21 @@ type_qualifier
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x40000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	| VOLATILE
 		{
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x80000000;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	| UNALIGN
 		{
 			$$.unk_00 = NULL;
 			$$.unk_04 = 0x80;
 			$$.unk_08 = 0;
-			$$.unk_0C = $1.unk_00;
+			$$.unk_0C = $1;
 		}
 	;
 
@@ -1077,28 +1078,28 @@ direct_declarator
 	: IDENTIFIER
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
 			$$.unk_00 = 0;
 			cur_lvl->unk_04 = 1;
-			if ($1.unk_00 != 0 && !cur_lvl->in_struct_def && cur_lvl->unk_08 == 1) {
+			if ($1.was_typedef && !cur_lvl->in_struct_def && cur_lvl->unk_08 == 1) {
 				UnkBeta* spD8;
-				mk_parse_symb($1.unk_04, 0, B_10020F04);
+				mk_parse_symb($1.symbol, 0, B_10020F04);
 				spD8 = (UnkBeta*)get_link_elem(B_10020F08);
-				spD8->unk_04 = $1.unk_04;
+				spD8->unk_04 = $1.symbol;
 				spD8->link.next = B_10020F08->used_list;
 				B_10020F08->used_list = &spD8->link;
 			}
-			if (!cur_lvl->in_struct_def && cur_lvl->unk_08 == 0 && $1.unk_00 == 0) {
+			if (!cur_lvl->in_struct_def && cur_lvl->unk_08 == 0 && !$1.was_typedef) {
 				UnkBeta* spD4;
-				mk_parse_symb($1.unk_04, -1, B_10020F04);
+				mk_parse_symb($1.symbol, -1, B_10020F04);
 				spD4 = (UnkBeta*)get_link_elem(B_10020F08);
-				spD4->unk_04 = $1.unk_04;
+				spD4->unk_04 = $1.symbol;
 				spD4->link.next = B_10020F08->used_list;
 				B_10020F08->used_list = &spD4->link;
-				$$.unk_04 = make(Id_decl, $1.unk_08, $1.unk_04);
+				$$.unk_04 = make(Id_decl, $1.location, $1.symbol);
 			} else {
-				$$.unk_04 = make(Id_decl, $1.unk_08, $1.unk_04);
+				$$.unk_04 = make(Id_decl, $1.location, $1.symbol);
 			}
 		}
 	| '(' declarator ')'
@@ -1165,7 +1166,7 @@ fdecl_start
 		{
 			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
 			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_0C = 0;
+			cur_lvl->unk_0C = FALSE;
 			cur_lvl->in_struct_def = FALSE;
 			cur_lvl->unk_08 = 1;
 			cur_lvl->link.next = B_10020F00->used_list;
@@ -1417,7 +1418,7 @@ typedef_name
 		{
 			cur_lvl->unk_04 = 0;
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "T_IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+				fprintf(dbgout, "T_IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
 		}
 	;
@@ -1459,23 +1460,23 @@ labeled_statement
 	: IDENTIFIER ':' statement
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.unk_04->name, $1.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
-			$$ = make(Id_decl, $1.unk_08, $1.unk_04);
-			$$ = make(Idlabeled_stmt, $1.unk_08, $$, $3);
+			$$ = make(Id_decl, $1.location, $1.symbol);
+			$$ = make(Idlabeled_stmt, $1.location, $$, $3);
 		}
 	| typedef_name ':' { cur_lvl->unk_04 = 1; } statement
 		{
-			$$ = make(Id_decl, $1.unk_08, $1.unk_04);
-			$$ = make(Idlabeled_stmt, $1.unk_08, $$, $4);
+			$$ = make(Id_decl, $1.location, $1.symbol);
+			$$ = make(Idlabeled_stmt, $1.location, $$, $4);
 		}
 	| CASE constant_expression ':' statement
 		{
-			$$ = make(Caselabeled_stmt, $1.unk_00, $2, $4);
+			$$ = make(Caselabeled_stmt, $1, $2, $4);
 		}
 	| DEFAULT ':' statement
 		{
-			$$ = make(Defaultlabeled_stmt, $1.unk_00, $3);
+			$$ = make(Defaultlabeled_stmt, $1, $3);
 		}
 	;
 
@@ -1523,7 +1524,7 @@ comp_start
 				B_10020F04++;
 			}
 			cur_lvl->unk_08 = 1;
-			cur_lvl->unk_0C = 1;
+			cur_lvl->unk_0C = TRUE;
 			tree_handle = temp_handle;
 		}
 	;
@@ -1568,58 +1569,58 @@ expression_statement
 selection_statement
 	: IF '(' expression ')' statement
 		{
-			$$ = make(If_stmt, $1.unk_00, $3, $5, NULL);
+			$$ = make(If_stmt, $1, $3, $5, NULL);
 		}
 	| IF '(' expression ')' statement ELSE statement
 		{
-			$$ = make(If_stmt, $1.unk_00, $3, $5, $7);
+			$$ = make(If_stmt, $1, $3, $5, $7);
 		}
 	| SWITCH '(' expression ')' statement
 		{
-			$$ = make(Switch_stmt, $1.unk_00, $3, $5);
+			$$ = make(Switch_stmt, $1, $3, $5);
 		}
 	;
 
 iteration_statement
 	: WHILE '(' expression ')' statement
 		{
-			$$ = make(While_stmt, $1.unk_00, $3, $5);
+			$$ = make(While_stmt, $1, $3, $5);
 		}
 	| DO statement WHILE '(' expression ')' ';'
 		{
-			$$ = make(Dowhile_stmt, $1.unk_00, $2, $5);
+			$$ = make(Dowhile_stmt, $1, $2, $5);
 		}
 	| FOR '(' ';' ';' ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, NULL, NULL, NULL, $6);
+			$$ = make(For_stmt, $1, NULL, NULL, NULL, $6);
 		}
 	| FOR '(' ';' ';' expression ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, NULL, NULL, $5, $7);
+			$$ = make(For_stmt, $1, NULL, NULL, $5, $7);
 		}
 	| FOR '(' ';' expression ';' ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, NULL, $4, NULL, $7);
+			$$ = make(For_stmt, $1, NULL, $4, NULL, $7);
 		}
 	| FOR '(' ';' expression ';' expression ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, NULL, $4, $6, $8);
+			$$ = make(For_stmt, $1, NULL, $4, $6, $8);
 		}
 	| FOR '(' expression ';' ';' ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, $3, NULL, NULL, $7);
+			$$ = make(For_stmt, $1, $3, NULL, NULL, $7);
 		}
 	| FOR '(' expression ';' ';' expression ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, $3, NULL, $6, $8);
+			$$ = make(For_stmt, $1, $3, NULL, $6, $8);
 		}
 	| FOR '(' expression ';' expression ';' ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, $3, $5, NULL, $8);
+			$$ = make(For_stmt, $1, $3, $5, NULL, $8);
 		}
 	| FOR '(' expression ';' expression ';' expression ')' statement
 		{
-			$$ = make(For_stmt, $1.unk_00, $3, $5, $7, $9);
+			$$ = make(For_stmt, $1, $3, $5, $7, $9);
 		}
 	;
 
@@ -1627,41 +1628,41 @@ jump_statement
 	: GOTO IDENTIFIER ';'
 		{
 			if (debug_arr['y'] > 0) {
-				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.unk_04->name, $2.unk_00);
+				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
-			$$ = make(Id_decl, $2.unk_08, $2.unk_04);
-			$$ = make(Goto_stmt, $1.unk_00, $$);
+			$$ = make(Id_decl, $2.location, $2.symbol);
+			$$ = make(Goto_stmt, $1, $$);
 		}
 	| CONTINUE ';'
 		{
-			$$ = make(Continue_stmt, $1.unk_00);
+			$$ = make(Continue_stmt, $1);
 		}
 	| BREAK ';'
 		{
-			$$ = make(Break_stmt, $1.unk_00);
+			$$ = make(Break_stmt, $1);
 		}
 	| RETURN ';'
 		{
-			$$ = make(Return_stmt, $1.unk_00, NULL);
+			$$ = make(Return_stmt, $1, NULL);
 		}
 	| RETURN expression ';'
 		{
-			$$ = make(Return_stmt, $1.unk_00, $2);
+			$$ = make(Return_stmt, $1, $2);
 		}
 	| LEAVE ';'
 		{
-			$$ = make(Leave_stmt, $1.unk_00);
+			$$ = make(Leave_stmt, $1);
 		}
 	;
 
 try_statement
 	: TRY compound_statement EXCEPT '(' expression ')' compound_statement
 		{
-			$$ = make(Try_stmt, $1.unk_00, $5, $2, $7);
+			$$ = make(Try_stmt, $1, $5, $2, $7);
 		}
 	| TRY compound_statement FINALLY compound_statement
 		{
-			$$ = make(Try_stmt, $1.unk_00, NULL, $2, $4);
+			$$ = make(Try_stmt, $1, NULL, $2, $4);
 		}
 
 translation_unit
@@ -1706,11 +1707,11 @@ external_definition
 		}
 	| __PRAGMA '(' CONSTANT ',' identifier_or_constant_list ')' ';'
 		{
-			$$ = make(Pragma, $1.unk_00, (int)ICONSTANT($3).value, $5);
+			$$ = make(Pragma, $1, (int)ICONSTANT($3).value, $5);
 		}
 	| __PRAGMA '(' CONSTANT ')' ';'
 		{
-			$$ = make(Pragma, $1.unk_00, (int)ICONSTANT($3).value, NULL);
+			$$ = make(Pragma, $1, (int)ICONSTANT($3).value, NULL);
 		}
 	;
 

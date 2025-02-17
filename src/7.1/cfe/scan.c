@@ -21,7 +21,7 @@ char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe
 
 static char input_any_char(void);
 static char next_char(void);
-ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2);
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int level);
 
 void adjust_vwbuf(void) {
     tokenbuf_size *= 1.333;
@@ -937,25 +937,28 @@ static int scan_identifier(char firstChar) {
         *ptr++ = c;
     }
 
-    yylval.identifier.unk_04 = string_to_symbol(token, ptr - token);
-    yylval.identifier.unk_08 = curloc;
-    yylval.identifier.unk_00 = 0;
+    yylval.identifier.symbol = string_to_symbol(token, ptr - token);
+    yylval.identifier.location = curloc;
+    yylval.identifier.was_typedef = FALSE;
 
-    if (yylval.identifier.unk_04->unk_04 != NULL) {
-        tp = yylval.identifier.unk_04->unk_04->unk_04; 
+    if (yylval.identifier.symbol->psymb != NULL) {
+        tp = yylval.identifier.symbol->psymb->id; 
         if (tp == -1) {
+            // typedef
             if (cur_lvl->unk_04) {
                 return TYPE_IDENT;
             } 
-            yylval.identifier.unk_00 = 1;
+            yylval.identifier.was_typedef = TRUE;
             return IDENTIFIER;
         }
     
         if (tp == 0) {
+            // identifier
             return IDENTIFIER;
         }
-    
-        yylval.identifier.unk_00 = curloc;
+
+        // keyword
+        yylval.location = curloc;
         return tp;
     }
     return IDENTIFIER;
@@ -1689,21 +1692,21 @@ void init_scan(void) {
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
 
-ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2) {
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int level) {
     ParseSymbol* psymb;
     ParseSymbol* prev;
     
     psymb = (ParseSymbol*)get_link_elem(psymb_handle);
-    psymb->unk_04 = id;
-    psymb->unk_08 = arg2;
-    prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->unk_04);
-    symb->unk_04 = psymb;
+    psymb->id = id;
+    psymb->level = level;
+    prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->psymb);
+    symb->psymb = psymb;
 
     if (debug_arr['P'] > 0) {
         fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
             symb->namelen, symb->name,
-            psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),
-            prev, prev != NULL ? prev->unk_08 : -1, prev != NULL ? GET_SYM_CAT(prev->unk_04) : "<nil>");
+            psymb, psymb->level, GET_SYM_CAT(psymb->id),
+            prev, prev != NULL ? prev->level : -1, prev != NULL ? GET_SYM_CAT(prev->id) : "<nil>");
     }
 
     return psymb;

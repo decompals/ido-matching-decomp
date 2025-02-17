@@ -3,15 +3,15 @@
 
 typedef struct ParseSymbol {
     LinkedListEntry link;
-    int unk_04;
-    int unk_08;
+    int id;
+    int level;
 } ParseSymbol;
 
 struct TreeNode;
 
 typedef struct Symbol {
     struct TreeNode* constVal;
-    ParseSymbol* unk_04;
+    ParseSymbol* psymb;
     int unk_08;
     int unk_0C;
     int unk_10;

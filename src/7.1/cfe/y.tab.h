@@ -4,10 +4,12 @@ typedef union
 	YYSTYPE
 #endif
  {
-	 TreeNode* node;
-	 int location;
-	 struct TokenIdentifier identifier;
-	 int force_alignment[4];
+	int location;
+	TreeNode* node; 
+	struct TokenIdentifier identifier;
+	struct DeclSpec declspec;
+	struct Declarator declarator;
+	struct TreeNodeList list;
 } YYSTYPE;
 extern YYSTYPE yylval;
 # define IDENTIFIER 257
