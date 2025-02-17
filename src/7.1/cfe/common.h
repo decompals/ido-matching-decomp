@@ -19,10 +19,10 @@ typedef struct TokenIdentifier {
 } TokenIdentifier;
 
 typedef struct DeclSpec {
-    struct TreeNode* unk_00;
-    unsigned int unk_04;
-    unsigned int unk_08;
-    int unk_0C;
+    struct TreeNode* type;
+    unsigned int type_attr;
+    unsigned int type_spec;
+    int location;
 } DeclSpec;
 
 typedef struct Declarator {

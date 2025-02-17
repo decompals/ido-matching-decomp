@@ -22,14 +22,14 @@ typedef struct CppLineArr {
     Location* loc;
 } CppLineArr;
 
-typedef struct UnkChi {
+typedef struct ParseLevel {
     LinkedListEntry link;
-    int unk_04;
-    int unk_08;
-    int unk_0C;
+    int type_ident_expected;
+    int normal_ident;
+    int in_comp_expr;
     int in_struct_def;
-    MemCtx* unk_14;
-} UnkChi;
+    MemCtx* saved_ctx;
+} ParseLevel;
 
 typedef struct ErrorFmt {
     short unk_00;
@@ -95,7 +95,7 @@ extern unsigned short options[];
 extern unsigned long long __ULONGLONG_MAX;
 extern long long __LONGLONG_MAX;
 extern long long __LONGLONG_MIN;
-extern UnkChi* cur_lvl;
+extern ParseLevel* cur_lvl;
 extern MemCtx* pmhandle;
 extern LinkedList* psymb_handle;
 extern LinkedList* isymb_handle;

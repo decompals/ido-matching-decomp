@@ -4,15 +4,16 @@ char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe
 
 #define YYMAXDEPTH 800
 
-typedef struct UnkBeta {
+typedef struct LocalDeclaration {
     LinkedListEntry link;
-    Symbol* unk_04;
-} UnkBeta;
+    Symbol* symbol;
+} LocalDeclaration;
 
-static LinkedList* B_10020F00;
-static int B_10020F04;
-static LinkedList* B_10020F08;
-static TreeNodeList B_10020F10;
+// .bss
+/* 0x10020F00 */ static LinkedList* level_list;
+/* 0x10020F04 */ static int depth;
+/* 0x10020F08 */ static LinkedList* local_decls;
+/* 0x10020F10 */ static TreeNodeList B_10020F10;
 
 int yyparse(void);
 
@@ -50,35 +51,44 @@ int yyparse(void);
 	} \
 }
 
+#define LIST_APPEND(list, item) \
+if (list.first == NULL) { \
+	list.first = list.last = item; \
+} else if (item != NULL) { \
+	list.last = TREE_LINK(list.last) = item; \
+}
+
+#define LIST_INIT(list, item) \
+	list.first = list.last = item;
+
 // TODO remove error() from yaccpar and probably replace ti with macro
 
 void parse_init(void) {
-    if (B_10020F00 == NULL) {
-        B_10020F00 = link_start(general_handle, sizeof(UnkChi));
+    if (level_list == NULL) {
+        level_list = link_start(general_handle, sizeof(ParseLevel));
     } else {
-        free_link_list(B_10020F00);
+        free_link_list(level_list);
     }
 
-    if (B_10020F08 == NULL) {
-        B_10020F08 = link_start(general_handle, sizeof(UnkBeta));
+    if (local_decls == NULL) {
+        local_decls = link_start(general_handle, sizeof(LocalDeclaration));
     }
 
-    cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
-    cur_lvl->unk_04 = 1;
-    cur_lvl->unk_08 = 1;
-    cur_lvl->unk_0C = FALSE;
+    cur_lvl = (ParseLevel*)get_link_elem(level_list);
+    cur_lvl->type_ident_expected = TRUE;
+    cur_lvl->normal_ident = TRUE;
+    cur_lvl->in_comp_expr = FALSE;
     cur_lvl->in_struct_def = FALSE;
-    cur_lvl->link.next = B_10020F00->used_list;
-    B_10020F00->used_list = &cur_lvl->link;
+    cur_lvl->link.next = level_list->used_list;
+    level_list->used_list = &cur_lvl->link;
 
-    B_10020F04 = 0;
+    depth = 0;
     tree_handle = general_handle;    
 }
 
 TreeNode* parse(void) {
     temp_handle = mem_start();
-    B_10020F10.first = NULL;
-    B_10020F10.last = NULL;
+	LIST_INIT(B_10020F10, NULL);
     parse_init();
     if (yyparse() != 0) {
         return NULL;
@@ -88,93 +98,92 @@ TreeNode* parse(void) {
 }
 
 void delete_local_decls(int level) {
-    UnkBeta* s2 = (UnkBeta*)B_10020F08->used_list;
-    ParseSymbol* s1;
+    LocalDeclaration* local_decl = (LocalDeclaration*)local_decls->used_list;
+    ParseSymbol* psymb;
 
-    while (s2 != NULL) {
-        if (s2 == NULL) {
+    while (local_decl != NULL) {
+        if (local_decl == NULL) {
             return;
         }
-        s1 = s2->unk_04->psymb;
+        psymb = local_decl->symbol->psymb;
         
-        if (s1 == NULL) {
-            link_pop(B_10020F08);
+        if (psymb == NULL) {
+            link_pop(local_decls);
             return;
         }
-        if (s1->level < level) {
+        if (psymb->level < level) {
             return;
         }
 
-        while (s1 != NULL && s1->level >= level) {
-            ParseSymbol* s0 = (ParseSymbol*)s1->link.next;
-            if (debug_arr[80] > 0) {
+        while (psymb != NULL && psymb->level >= level) {
+            ParseSymbol* unhidden = (ParseSymbol*)psymb->link.next;
+            if (debug_arr['P'] > 0) {
                 fprintf(dbgout, "deleting %.*s (0x%x:%d:%s) unhides (0x%x:%d:%s)\n",
-                        s2->unk_04->namelen, s2->unk_04->name,
-                        s1, s1->level, GET_SYM_CAT(s1->id),
-                        s0, s0 != NULL ? s0->level : -1, s0 != NULL ? GET_SYM_CAT(s0->id) : "<nil>");
+                        local_decl->symbol->namelen, local_decl->symbol->name,
+                        psymb, psymb->level, GET_SYM_CAT(psymb->id),
+                        unhidden, unhidden != NULL ? unhidden->level : -1, unhidden != NULL ? GET_SYM_CAT(unhidden->id) : "<nil>");
             }
 
-            s1->link.next = psymb_handle->free_list;
-            psymb_handle->free_list = &s1->link;
-            s1 = s0;
-            s2->unk_04->psymb = s0;
+            psymb->link.next = psymb_handle->free_list;
+            psymb_handle->free_list = &psymb->link;
+            psymb = unhidden;
+            local_decl->symbol->psymb = unhidden;
         }
-        s2 = link_pop(B_10020F08);
+        local_decl = link_pop(local_decls);
     }
 }
 
 TreeNode* make_topdecl(TreeNode* type, int attr, int typespec, TreeNode* ids, int location) {
-    TreeNode* v1;
+    TreeNode* decl;
     
-    v1 = make(Declare_decl, location, NULL, ids);
-	TREE_ATTRIBUTE(v1) = attr;
+    decl = make(Declare_decl, location, NULL, ids);
+	TREE_ATTRIBUTE(decl) = attr;
     if (type != NULL) {
-		TREE_TYPE(v1) = type;
+		TREE_TYPE(decl) = type;
         if (typespec != 0) {
             error(0x2010F, LEVEL_WARNING, location);
         }
-        return v1;
+        return decl;
     } else {
-        TREE_TYPE(v1) = normalize_type(typespec, location);
+        TREE_TYPE(decl) = normalize_type(typespec, location);
         if (was_plain_char(typespec)) {
-            TREE_ATTRIBUTE(v1) |= PLAIN_ATTRIBUTE;
+            TREE_ATTRIBUTE(decl) |= PLAIN_ATTRIBUTE;
         }
-        return v1;
+        return decl;
     }
 }
 
-static void* func_00409D18(int code, int location, TreeNode* arg2) {
-	// TODO type of arg2
-    TreeNode* zeta;
-    TreeNode* v0;    
+static TreeNode* make_pre_update_cast(int pre_update_code, int location, TreeNode* cast_expr) {
+    TreeNode* cast_type;
+    TreeNode* pointer;    
     
     if (!options[OPTION_MSFT]) {
         error(0x3015A, LEVEL_WARNING, location);
     }
     
-    if (arg2 == NULL || BINARY_EXPR(arg2).operand[0] == NULL) {
+    if (cast_expr == NULL || BINARY_EXPR(cast_expr).operand[0] == NULL) {
         return NULL;
     }
 
-    zeta = BINARY_EXPR(BINARY_EXPR(arg2).operand[0]).operand[0];
-    v0 = make(Pointer_type, location, zeta, arg2);
-    POINTER_TYPE(v0).size = bit_size[9];
-    POINTER_TYPE(v0).align = bit_size[9];
+    cast_type = DECLARE_DECL(BINARY_EXPR(cast_expr).operand[0]).ids;
+    pointer = make(Pointer_type, location, cast_type, cast_expr);
+    POINTER_TYPE(pointer).size = bit_size[9];
+    POINTER_TYPE(pointer).align = bit_size[9];
 
 
-    if (zeta == NULL) {
-		BINARY_EXPR(BINARY_EXPR(arg2).operand[0]).operand[0] = v0;
+    if (cast_type == NULL) {
+		DECLARE_DECL(BINARY_EXPR(cast_expr).operand[0]).ids = pointer;
     } else {
-        TreeNode* ptr = zeta;
-        TreeNode* a0 = ptr;
+        TreeNode* ptr = cast_type;
+        TreeNode* prev = ptr;
         
         while (ptr != NULL) {
-            a0 = ptr;
+            prev = ptr;
             ptr = TREE_TYPE(ptr);
         }
-        TREE_TYPE(a0) = v0;
+        TREE_TYPE(prev) = pointer;
     }
-    return make(code, location, make(Indirect_expr, location, arg2));
+    return make(pre_update_code, location, make(Indirect_expr, location, cast_expr));
 }
 
 %}
@@ -320,19 +329,19 @@ postfix_expression
 	| postfix_expression '[' expression ']' { $$ = make(Index_expr, $2, $1, $3); }
 	| postfix_expression '(' argument_expression_list ')'
 		{ 
-			TreeNode* sp108 = make(Aggregate_expr, TREE_LOCATION($3), $3);
-			$$ = make(Call_expr, $2, $1, sp108);
+			TreeNode* arglist = make(Aggregate_expr, TREE_LOCATION($3), $3);
+			$$ = make(Call_expr, $2, $1, arglist);
 		}
 	| postfix_expression '(' ')' { $$ = make(Call_expr, $2, $1, NULL); }
-	| postfix_expression '.' { cur_lvl->unk_04 = 0; } identifier
+	| postfix_expression '.' { cur_lvl->type_ident_expected = FALSE; } identifier
 		{ 
 			$$ = make(Component_ref, $2, $1, $4);
-			cur_lvl->unk_04 = 1;
+			cur_lvl->type_ident_expected = TRUE;
 		}
-	| postfix_expression PTR_OP { cur_lvl->unk_04 = 0; } identifier
+	| postfix_expression PTR_OP { cur_lvl->type_ident_expected = FALSE; } identifier
 		{
 			$$ = make(Indirect_component_ref, $2, $1, $4);
-			cur_lvl->unk_04 = 1;
+			cur_lvl->type_ident_expected = TRUE;
 		}
 	| postfix_expression INC_OP { $$ = make(Postincrement_expr, $2, $1); }
 	| postfix_expression DEC_OP { $$ = make(Postdecrement_expr, $2, $1); }
@@ -353,18 +362,18 @@ unary_expression
 	| unary_operator cast_expression { UNARY_EXPR($$).operand[0] = $2; }
 	| '&' ELLIPSIS
 		{
-			TreeNode* spFC = make(Identifier, $2, builtins[6]);
-			$$ = make(Addr_expr, $1, spFC);
+			TreeNode* ident_ellipsis = make(Identifier, $2, builtins[6]);
+			$$ = make(Addr_expr, $1, ident_ellipsis);
 			if (IS_STRICT_ANSI) {
 				error(0x2012D, LEVEL_WARNING, $2);
 			}
 		}
 	| SIZEOF unary_expression { $$ = make(Sizeof_expr, $1, $2); }
-	| SIZEOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Sizeof_expr, $1, $3); }
+	| SIZEOF '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' { $$ = make(Sizeof_expr, $1, $3); }
 	| ALIGNOF unary_expression { $$ = make(Alignof_expr, $1, $2); }
-	| ALIGNOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Alignof_expr, $1, $3); }
+	| ALIGNOF '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' { $$ = make(Alignof_expr, $1, $3); }
 	| CLASSOF unary_expression { $$ = make(Classof_expr, $1, $2); }
-	| CLASSOF '(' type_name { cur_lvl->unk_04 = 1; } ')' { $$ = make(Classof_expr, $1, $3); }
+	| CLASSOF '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' { $$ = make(Classof_expr, $1, $3); }
 	;
 
 unary_operator
@@ -378,16 +387,16 @@ unary_operator
 
 cast_expression
 	: unary_expression
-	| '(' type_name { cur_lvl->unk_04 = 1; } ')' cast_expression { $$ = make(Cast_expr, $1, $2, $5); }
-	| DEC_OP '(' type_name { cur_lvl->unk_04 = 1; } ')' cast_expression
+	| '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' cast_expression { $$ = make(Cast_expr, $1, $2, $5); }
+	| DEC_OP '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' cast_expression
 		{
-			TreeNode* spF8 = make(Cast_expr, $2, $3, $6);
-			$$ = func_00409D18(Predecrement_expr, $1, spF8);
+			TreeNode* cast_expr = make(Cast_expr, $2, $3, $6);
+			$$ = make_pre_update_cast(Predecrement_expr, $1, cast_expr);
 		}
-	| INC_OP '(' type_name { cur_lvl->unk_04 = 1; } ')' cast_expression
+	| INC_OP '(' type_name { cur_lvl->type_ident_expected = TRUE; } ')' cast_expression
 		{
-			TreeNode* spF4 = make(Cast_expr, $2, $3, $6);
-			$$ = func_00409D18(Preincrement_expr, $1, spF4);
+			TreeNode* cast_expr = make(Cast_expr, $2, $3, $6);
+			$$ = make_pre_update_cast(Preincrement_expr, $1, cast_expr);
 		}
 	;
 
@@ -490,36 +499,36 @@ constant_expression
 declaration
 	: declaration_specifiers init_declarator_list ';'
 		{
-			if (B_10020F04 == 0) {
+			if (depth == 0) {
                 error(0x2007B, LEVEL_ERROR, curloc);
             }
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2.first, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2.first, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	| declaration_specifiers ';'
 		{
-			if (B_10020F04 == 0) {
+			if (depth == 0) {
                 error(0x2007B, LEVEL_ERROR, curloc);
             }
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, NULL, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, NULL, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	;
 
 top_declaration
 	: declaration_specifiers init_declarator_list ';' 
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2.first, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2.first, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	| declaration_specifiers ';' 
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, NULL, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, NULL, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	| init_declarator_list ';'
 		{
@@ -534,57 +543,57 @@ declaration_specifiers
 	| type_qualifier
 	| declaration_specifiers storage_class_specifier
 		{
-			if (($$.unk_04 & 0x1F000000) && ($2.unk_04 & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
-			} else if ($$.unk_04 & $2.unk_04) {
-				error(0x20094, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
+			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
+				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+			} else if ($$.type_attr & $2.type_attr) {
+				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
-				$$.unk_04 |= $2.unk_04;
-				$$.unk_0C = $2.unk_0C;
+				$$.type_attr |= $2.type_attr;
+				$$.location = $2.location;
 			}
 		}
 	| declaration_specifiers type_specifier
 		{
-			if ($$.unk_00 != NULL) {
-				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.unk_00));
+			if ($$.type != NULL) {
+				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.type));
 			}
-			if ($2.unk_00 != NULL) {
-				$$.unk_00 = $2.unk_00;
-			} else if ($$.unk_08 & $2.unk_08) {
-				if ($2.unk_08 == 0x01000000) {
+			if ($2.type != NULL) {
+				$$.type = $2.type;
+			} else if ($$.type_spec & $2.type_spec) {
+				if ($2.type_spec == TYPESPEC_LONG) {
 					if (IS_STRICT_ANSI) {
-						error(0x20131, LEVEL_WARNING, $2.unk_0C, "long long");
+						error(0x20131, LEVEL_WARNING, $2.location, "long long");
 					}
-					$$.unk_08 = $$.unk_08 ^ $2.unk_08;
-					$$.unk_08 |= 0x800000;
+					$$.type_spec = $$.type_spec ^ $2.type_spec;
+					$$.type_spec |= TYPESPEC_LONGLONG;
 				} else {
-					error(0x20094, LEVEL_WARNING, $2.unk_0C, type_to_string($2.unk_08));
+					error(0x20094, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
 				}
 			} else {
-				$$.unk_08 |= $2.unk_08;
+				$$.type_spec |= $2.type_spec;
 			}
 		}
 	| declaration_specifiers type_qualifier
 		{
-			if (($$.unk_04 & 0x1F000000) && ($2.unk_04 & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
-			} else if ($$.unk_04 & $2.unk_04) {
-				error(0x20094, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
+			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
+				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+			} else if ($$.type_attr & $2.type_attr) {
+				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
-				$$.unk_04 |= $2.unk_04;
-				$$.unk_0C = $2.unk_0C;
+				$$.type_attr |= $2.type_attr;
+				$$.location = $2.location;
 			}
 		}
 	| fct_specifier
 	| declaration_specifiers fct_specifier
 		{
-			if (($$.unk_04 & 0x1F000000) && ($2.unk_04 & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
-			} else if ($$.unk_04 & $2.unk_04) {
-				error(0x20094, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
+			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
+				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+			} else if ($$.type_attr & $2.type_attr) {
+				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
-				$$.unk_04 |= $2.unk_04;
-				$$.unk_0C = $2.unk_0C;
+				$$.type_attr |= $2.type_attr;
+				$$.location = $2.location;
 			}
 		}
 	;
@@ -592,24 +601,20 @@ declaration_specifiers
 fct_specifier
 	: INLINE
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x80000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = INLINE_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 
 init_declarator_list
 	: init_declarator
 		{
-			$$.first = $$.last = $1;
+			LIST_INIT($$, $1);
 		}
-	| init_declarator_list ',' { cur_lvl->unk_04 = 0; } init_declarator
+	| init_declarator_list ',' { cur_lvl->type_ident_expected = FALSE; } init_declarator
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $4;
-			} else if ($4 != NULL) {
-				$$.last = TREE_LINK($$.last) = $4;
-			}
+			LIST_APPEND($$, $4);
 		}
 	;
 
@@ -617,18 +622,18 @@ init_declarator
 	: declarator
 		{
 			if ($1.unk_00) {
-				delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+				delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
 			}
 			$$ = $1.unk_04;
 		} 
 	| declarator '=' initializer
 		{
 			if ($1.unk_00) {
-				delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+				delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
 			}
 			ID_DECL($1.unk_04).init_value = $3;
 			$$ = $1.unk_04;
@@ -638,145 +643,145 @@ init_declarator
 storage_class_specifier
 	: TYPEDEF
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x10000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
-			cur_lvl->unk_08 = 0;
+			$$.type = NULL;
+			$$.type_attr = TYPEDEF_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
+			cur_lvl->normal_ident = FALSE;
 		}
 	| EXTERN 
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x08000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = EXTERN_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	| STATIC
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x04000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = STATIC_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	| AUTO
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x02000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = AUTO_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	| REGISTER
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x01000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = REGISTER_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	;
 
 type_specifier
 	: CHAR
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x04000000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_CHAR;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| SHORT
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x400000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_SHORT;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| INT
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x02000000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_INT;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| LONG
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x01000000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_LONG;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| LONGLONG
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x800000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_LONGLONG;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| SIGNED
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x200000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_SIGNED;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| UNSIGNED
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x100000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_UNSIGNED;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| FLOAT
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x10000000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_FLOAT;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| DOUBLE
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x40000000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_DOUBLE;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| VOID
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0x4000;
-			$$.unk_0C = $1;
-			cur_lvl->unk_04 = 0;
+			$$.type = NULL;
+			$$.type_attr = 0;
+			$$.type_spec = TYPESPEC_VOID;
+			$$.location = $1;
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| struct_or_union_specifier
 		{
-			$$.unk_00 = $1;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0;
-			$$.unk_0C = TREE_LOCATION($1);
-			cur_lvl->unk_04 = 0;
+			$$.type = $1;
+			$$.type_attr = 0;
+			$$.type_spec = 0;
+			$$.location = TREE_LOCATION($1);
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| enum_specifier
 		{
-			$$.unk_00 = $1;
-			$$.unk_04 = 0;
-			$$.unk_08 = 0;
-			$$.unk_0C = TREE_LOCATION($1);
-			cur_lvl->unk_04 = 0;
+			$$.type = $1;
+			$$.type_attr = 0;
+			$$.type_spec = 0;
+			$$.location = TREE_LOCATION($1);
+			cur_lvl->type_ident_expected = FALSE;
 		}
 	| typedef_name
 		{
-			$$.unk_00 = make(Identifier, $1.location, $1.symbol);
-			$$.unk_04 = 0;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1.location;
+			$$.type = make(Identifier, $1.location, $1.symbol);
+			$$.type_attr = 0;
+			$$.type_spec = 0;
+			$$.location = $1.location;
 		}
 	;
 
@@ -786,35 +791,35 @@ struct_or_union_specifier
 			if (debug_arr['y'] > 0) {
 				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
-			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
-			cur_lvl->unk_04 = 1;
+			cur_lvl = (ParseLevel*)get_link_elem(level_list);
+			cur_lvl->type_ident_expected = TRUE;
 			cur_lvl->in_struct_def = TRUE;
-			cur_lvl->link.next = B_10020F00->used_list;
-    		B_10020F00->used_list = &cur_lvl->link;
+			cur_lvl->link.next = level_list->used_list;
+    		level_list->used_list = &cur_lvl->link;
 		}
 	  struct_declaration_list_semi '}'
 	  	{
 			STRUCT_TYPE($$).sname = make(Id_decl, $2.location, $2.symbol);
 			STRUCT_TYPE($$).members = $5;
-			cur_lvl = link_pop(B_10020F00);
-            if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			cur_lvl = link_pop(level_list);
+            if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	| struct_or_union '{'
 		{
-			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
-			cur_lvl->unk_04 = 1;
+			cur_lvl = (ParseLevel*)get_link_elem(level_list);
+			cur_lvl->type_ident_expected = TRUE;
 			cur_lvl->in_struct_def = TRUE;
-			cur_lvl->link.next = B_10020F00->used_list;
-    		B_10020F00->used_list = &cur_lvl->link;
+			cur_lvl->link.next = level_list->used_list;
+    		level_list->used_list = &cur_lvl->link;
 		}
 	  struct_declaration_list_semi '}'
 	  	{
 			STRUCT_TYPE($$).members = $4;
-			cur_lvl = link_pop(B_10020F00);
-            if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			cur_lvl = link_pop(level_list);
+            if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	| struct_or_union IDENTIFIER
@@ -823,9 +828,9 @@ struct_or_union_specifier
 				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
 			STRUCT_TYPE($$).sname = make(Id_decl, $2.location, $2.symbol);
-			cur_lvl->unk_04 = 1;
-			if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			cur_lvl->type_ident_expected = TRUE;
+			if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	;
@@ -833,21 +838,21 @@ struct_or_union_specifier
 struct_or_union
 	: STRUCT
 		{
-			if (B_10020F04 == 0) {
-                cur_lvl->unk_14 = tree_handle;
+			if (depth == 0) {
+                cur_lvl->saved_ctx = tree_handle;
                 tree_handle = general_handle;
             }
             $$ = make(Struct_type, $1, STRUCT_INFO_STRUCT);
-            cur_lvl->unk_04 = 0;
+            cur_lvl->type_ident_expected = FALSE;
 		}
 	| UNION
 		{
-			if (B_10020F04 == 0) {
-                cur_lvl->unk_14 = tree_handle;
+			if (depth == 0) {
+                cur_lvl->saved_ctx = tree_handle;
                 tree_handle = general_handle;
             }
             $$ = make(Struct_type, $1, STRUCT_INFO_UNION);
-            cur_lvl->unk_04 = 0;
+            cur_lvl->type_ident_expected = FALSE;
 		}
 	;
 
@@ -865,10 +870,10 @@ struct_declaration_list
 	;
 
 struct_declaration
-	: specifier_qualifier_list { cur_lvl->unk_04 = 0; } struct_declarator_list
+	: specifier_qualifier_list { cur_lvl->type_ident_expected = FALSE; } struct_declarator_list
 		{
-			cur_lvl->unk_04 = 1;
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $3, $1.unk_0C);
+			cur_lvl->type_ident_expected = TRUE;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $3, $1.location);
 		}
 	;
 
@@ -877,41 +882,41 @@ specifier_qualifier_list
 	| type_qualifier
 	| specifier_qualifier_list type_specifier
 		{
-			if ($$.unk_00 != NULL) {
-				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.unk_00));
+			if ($$.type != NULL) {
+				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.type));
 			}
-			if ($2.unk_00 != NULL) {
-				$$.unk_00 = $2.unk_00;
-			} else if ($$.unk_08 & $2.unk_08) {
-				if ($2.unk_08 == 0x01000000) {
+			if ($2.type != NULL) {
+				$$.type = $2.type;
+			} else if ($$.type_spec & $2.type_spec) {
+				if ($2.type_spec == TYPESPEC_LONG) {
 					if (IS_STRICT_ANSI) {
-						error(0x20131, LEVEL_WARNING, $2.unk_0C, "long long");
+						error(0x20131, LEVEL_WARNING, $2.location, "long long");
 					}
-					$$.unk_08 = $$.unk_08 ^ $2.unk_08;
-					$$.unk_08 |= 0x800000;
+					$$.type_spec = $$.type_spec ^ $2.type_spec;
+					$$.type_spec |= TYPESPEC_LONGLONG;
 				} else {
-					error(0x20094, LEVEL_WARNING, $2.unk_0C, type_to_string($2.unk_08));
+					error(0x20094, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
 				}
 			} else {
-				$$.unk_08 |= $2.unk_08;
+				$$.type_spec |= $2.type_spec;
 			}
 		}
 	| specifier_qualifier_list type_qualifier
 		{
-			if (($$.unk_04 & 0x1F000000) && ($2.unk_04 & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
-			} else if ($$.unk_04 & $2.unk_04) {
-				error(0x20094, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
+			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
+				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+			} else if ($$.type_attr & $2.type_attr) {
+				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
-				$$.unk_04 |= $2.unk_04;
-				$$.unk_0C = $2.unk_0C;
+				$$.type_attr |= $2.type_attr;
+				$$.location = $2.location;
 			}
 		}
 	;
 
 struct_declarator_list
 	: struct_declarator
-	| struct_declarator_list ',' { cur_lvl->unk_04 = 0; } struct_declarator
+	| struct_declarator_list ',' { cur_lvl->type_ident_expected = FALSE; } struct_declarator
 		{
 			LINK_PUSH_BACK($$, $4);
 		}
@@ -921,14 +926,14 @@ struct_declarator
 	: declarator
 		{
 			if ($1.unk_00) {
-				delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+				delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
 			}
 			$$ = make(Field_decl, TREE_LOCATION($1.unk_04));
 			FIELD_DECL($$).field = $1.unk_04;
 		}
-	| ':' { cur_lvl->unk_04 = 1; } constant_expression
+	| ':' { cur_lvl->type_ident_expected = TRUE; } constant_expression
 		{
 			$$ = make(Field_decl, TREE_LOCATION($3));
 			FIELD_DECL($$).field = make(Id_decl, TREE_LOCATION($3), anonymous);
@@ -937,9 +942,9 @@ struct_declarator
 	| declarator ':' constant_expression
 		{
 			if ($1.unk_00 != NULL) {
-				delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+				delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
 			}
 			$$ = make(Field_decl, TREE_LOCATION($1.unk_04));
 			FIELD_DECL($$).field = $1.unk_04;
@@ -953,14 +958,14 @@ struct_declarator
 	;
 
 enum_specifier
-	: enum { cur_lvl->unk_04 = 1; } '{' enumerator_list optcomma '}'
+	: enum { cur_lvl->type_ident_expected = TRUE; } '{' enumerator_list optcomma '}'
 		{
 			ENUM_TYPE($$).literals = $4.first;
 			if ($5 != -1) {
 				error(0x2007E, LEVEL_DEFAULT, $5);
 			}
-			if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	| enum IDENTIFIER
@@ -968,7 +973,7 @@ enum_specifier
 			if (debug_arr['y'] > 0) {
 				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
-			cur_lvl->unk_04 = 1;
+			cur_lvl->type_ident_expected = TRUE;
 		}
 	  '{' enumerator_list optcomma '}'
 	  	{
@@ -977,8 +982,8 @@ enum_specifier
 			if ($6 != -1) {
 				error(0x2007E, LEVEL_DEFAULT, $6);
 			}
-			if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	| enum IDENTIFIER
@@ -987,9 +992,9 @@ enum_specifier
 				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $2.symbol->name, $2.was_typedef);
 			}
 			ENUM_TYPE($$).ename = make(Id_decl, $2.location, $2.symbol);
-			cur_lvl->unk_04 = 1;
-			if (B_10020F04 == 0) {
-                tree_handle = cur_lvl->unk_14;
+			cur_lvl->type_ident_expected = TRUE;
+			if (depth == 0) {
+                tree_handle = cur_lvl->saved_ctx;
             }
 		}
 	;
@@ -1002,24 +1007,20 @@ optcomma
 enum
 	: ENUM
 		{
-			if (B_10020F04 == 0) {
-                cur_lvl->unk_14 = tree_handle;
+			if (depth == 0) {
+                cur_lvl->saved_ctx = tree_handle;
                 tree_handle = general_handle;
             }
-            cur_lvl->unk_04 = 0;
+            cur_lvl->type_ident_expected = FALSE;
             $$ = make(Enum_type, $1);
 		}
 	;
 
 enumerator_list
-	: enumerator { $$.first = $$.last = $1; }
+	: enumerator { LIST_INIT($$, $1); }
 	| enumerator_list ',' enumerator
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;
-			}
+			LIST_APPEND($$, $3);
 		}
 	;
 
@@ -1044,24 +1045,24 @@ enumerator
 type_qualifier
 	: CONST
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x40000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = CONST_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	| VOLATILE
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x80000000;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = VOLATILE_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	| UNALIGN
 		{
-			$$.unk_00 = NULL;
-			$$.unk_04 = 0x80;
-			$$.unk_08 = 0;
-			$$.unk_0C = $1;
+			$$.type = NULL;
+			$$.type_attr = UNALIGNED_ATTRIBUTE;
+			$$.type_spec = 0;
+			$$.location = $1;
 		}
 	;
 
@@ -1081,22 +1082,22 @@ direct_declarator
 				fprintf(dbgout, "IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
 			$$.unk_00 = 0;
-			cur_lvl->unk_04 = 1;
-			if ($1.was_typedef && !cur_lvl->in_struct_def && cur_lvl->unk_08 == 1) {
-				UnkBeta* spD8;
-				mk_parse_symb($1.symbol, 0, B_10020F04);
-				spD8 = (UnkBeta*)get_link_elem(B_10020F08);
-				spD8->unk_04 = $1.symbol;
-				spD8->link.next = B_10020F08->used_list;
-				B_10020F08->used_list = &spD8->link;
+			cur_lvl->type_ident_expected = TRUE;
+			if ($1.was_typedef && !cur_lvl->in_struct_def && cur_lvl->normal_ident == TRUE) {
+				LocalDeclaration* spD8;
+				mk_parse_symb($1.symbol, 0, depth);
+				spD8 = (LocalDeclaration*)get_link_elem(local_decls);
+				spD8->symbol = $1.symbol;
+				spD8->link.next = local_decls->used_list;
+				local_decls->used_list = &spD8->link;
 			}
-			if (!cur_lvl->in_struct_def && cur_lvl->unk_08 == 0 && !$1.was_typedef) {
-				UnkBeta* spD4;
-				mk_parse_symb($1.symbol, -1, B_10020F04);
-				spD4 = (UnkBeta*)get_link_elem(B_10020F08);
-				spD4->unk_04 = $1.symbol;
-				spD4->link.next = B_10020F08->used_list;
-				B_10020F08->used_list = &spD4->link;
+			if (!cur_lvl->in_struct_def && cur_lvl->normal_ident == FALSE && !$1.was_typedef) {
+				LocalDeclaration* spD4;
+				mk_parse_symb($1.symbol, -1, depth);
+				spD4 = (LocalDeclaration*)get_link_elem(local_decls);
+				spD4->symbol = $1.symbol;
+				spD4->link.next = local_decls->used_list;
+				local_decls->used_list = &spD4->link;
 				$$.unk_04 = make(Id_decl, $1.location, $1.symbol);
 			} else {
 				$$.unk_04 = make(Id_decl, $1.location, $1.symbol);
@@ -1105,7 +1106,7 @@ direct_declarator
 	| '(' declarator ')'
 		{
 			$$ = $2;
-			cur_lvl->unk_04 = 1;
+			cur_lvl->type_ident_expected = TRUE;
 		}
 	| direct_declarator '[' ']'
 		{
@@ -1124,10 +1125,10 @@ direct_declarator
 			$$.unk_04 = make(Func_type, $2, NULL);
 			QUALIFIERS_PUSH_BACK($1.unk_04, $$.unk_04);
 			$$ = $1;
-			if (B_10020F04 >= 2) {
-                delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+			if (depth >= 2) {
+                delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
             } else {
                 $$.unk_00 = 1;
             }
@@ -1137,10 +1138,10 @@ direct_declarator
 			$$.unk_04 = make(Func_type, $2, $3.first);
 			QUALIFIERS_PUSH_BACK($1.unk_04, $$.unk_04);
 			$$ = $1;
-			if (B_10020F04 >= 2) {
-                delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+			if (depth >= 2) {
+                delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
             } else {
                 $$.unk_00 = 1;
             }
@@ -1150,28 +1151,28 @@ direct_declarator
 			$$.unk_04 = make(Func_type, $2, $3.first);
 			QUALIFIERS_PUSH_BACK($1.unk_04, $$.unk_04);
 			$$ = $1;
-			if (B_10020F04 >= 2) {
-                delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+			if (depth >= 2) {
+                delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
             } else {
                 $$.unk_00 = 1;
             }
-			cur_lvl->unk_04 = 1;
+			cur_lvl->type_ident_expected = TRUE;
 		}
 	;
 
 fdecl_start
 	: '('
 		{
-			cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_0C = FALSE;
+			cur_lvl = (ParseLevel*)get_link_elem(level_list);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->in_comp_expr = FALSE;
 			cur_lvl->in_struct_def = FALSE;
-			cur_lvl->unk_08 = 1;
-			cur_lvl->link.next = B_10020F00->used_list;
-			B_10020F00->used_list = &cur_lvl->link;
-			B_10020F04++;
+			cur_lvl->normal_ident = TRUE;
+			cur_lvl->link.next = level_list->used_list;
+			level_list->used_list = &cur_lvl->link;
+			depth++;
 		}
 	;
 
@@ -1184,10 +1185,10 @@ pointer
 		}
 	| '*' type_qualifier_list
 		{
-			$$ = make(Pointer_type, $2.unk_0C);
+			$$ = make(Pointer_type, $2.location);
 			POINTER_TYPE($$).size = bit_size[9];
 			POINTER_TYPE($$).align = bit_size[9];
-			TREE_ATTRIBUTE($$) = $2.unk_04;
+			TREE_ATTRIBUTE($$) = $2.type_attr;
 		}
 	| '*' pointer
 		{
@@ -1199,10 +1200,10 @@ pointer
 		}
 	| '*' type_qualifier_list pointer
 		{
-			$$ = make(Pointer_type, $2.unk_0C);
+			$$ = make(Pointer_type, $2.location);
 			POINTER_TYPE($$).size = bit_size[9];
 			POINTER_TYPE($$).align = bit_size[9];
-			TREE_ATTRIBUTE($$) = $2.unk_04;
+			TREE_ATTRIBUTE($$) = $2.type_attr;
 			TYPE_PUSH_BACK($3, $$);
 			$$ = $3;
 		}
@@ -1212,13 +1213,13 @@ type_qualifier_list
 	: type_qualifier
 	| type_qualifier_list type_qualifier
 		{
-			if (($$.unk_04 & 0x1F000000) && ($2.unk_04 & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
-			} else if ($$.unk_04 & $2.unk_04) {
-				error(0x20094, LEVEL_WARNING, $2.unk_0C, attribute_to_string($2.unk_04));
+			if (($$.type_attr & 0x1F000000) && ($2.type_attr & 0x1F000000)) {
+				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+			} else if ($$.type_attr & $2.type_attr) {
+				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
-				$$.unk_04 |= $2.unk_04;
-				$$.unk_0C = $2.unk_0C;
+				$$.type_attr |= $2.type_attr;
+				$$.location = $2.location;
 			}
 		}
 	;
@@ -1226,45 +1227,33 @@ type_qualifier_list
 identifier_list
 	: identifier
 		{
-			cur_lvl->unk_04 = 0;
-			$$.first = $$.last = $1;
+			cur_lvl->type_ident_expected = FALSE;
+			LIST_INIT($$, $1);
 		}
 	| identifier_list ',' identifier
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;
-			}
+			LIST_APPEND($$, $3);
 		}
 	;
 
 identifier_or_constant_list
 	: identifier
 		{
-			cur_lvl->unk_04 = 0;
-			$$.first = $$.last = $1;
+			cur_lvl->type_ident_expected = FALSE;
+			LIST_INIT($$, $1);
 		}
 	| CONSTANT
 		{
-			cur_lvl->unk_04 = 0;
-			$$.first = $$.last = $1;
+			cur_lvl->type_ident_expected = FALSE;
+			LIST_INIT($$, $1);
 		}
 	| identifier_list ',' identifier
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;
-			}
+			LIST_APPEND($$, $3);
 		}
 	| identifier_list ',' CONSTANT
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;	
-			}
+			LIST_APPEND($$, $3);
 		}
 	;
 
@@ -1275,7 +1264,7 @@ parameter_type_list
 			TreeNode* sp98;
 			sp98 = make(Id_decl, $1, builtins[6]);
 			sp98 = make(Declare_decl, $1, ellipsis, sp98);
-			$$.first = $$.last = sp98;
+			LIST_INIT($$, sp98);
 			if (IS_STRICT_ANSI) {
 				error(0x2012C, LEVEL_WARNING, $1);
 			}
@@ -1285,26 +1274,18 @@ parameter_type_list
 			TreeNode* sp94;
 			sp94 = make(Id_decl, $3, builtins[6]);
 			sp94 = make(Declare_decl, $3, ellipsis, sp94);
-			if ($$.first == NULL) {
-				$$.first = $$.last = sp94;
-			} else if (sp94 != NULL) {
-				$$.last = TREE_LINK($$.last) = sp94;
-			}
+			LIST_APPEND($$, sp94);
 		}
 	;
 
 parameter_list
 	: parameter_declaration
 		{
-			$$.first = $$.last = $1;
+			LIST_INIT($$, $1);
 		}
 	| parameter_list ',' parameter_declaration
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;
-			}
+			LIST_APPEND($$, $3);
 		}
 	;
 
@@ -1312,35 +1293,35 @@ parameter_declaration
 	: declaration_specifiers declarator
 		{
 			if ($2.unk_00 != NULL)	{
-				delete_local_decls(B_10020F04);
-                cur_lvl = link_pop(B_10020F00);
-                B_10020F04--;
+				delete_local_decls(depth);
+                cur_lvl = link_pop(level_list);
+                depth--;
 			}
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2.unk_04, $1.unk_0C);
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2.unk_04, $1.location);
+			cur_lvl->normal_ident = TRUE;
 		}
 	| declaration_specifiers
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, NULL, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, NULL, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	| declaration_specifiers abstract_declarator
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2, $1.unk_0C);
-			cur_lvl->unk_04 = 1;
-			cur_lvl->unk_08 = 1;
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2, $1.location);
+			cur_lvl->type_ident_expected = TRUE;
+			cur_lvl->normal_ident = TRUE;
 		}
 	;
 
 type_name
 	: specifier_qualifier_list
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, NULL, $1.unk_0C);
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, NULL, $1.location);
 		}
 	| specifier_qualifier_list abstract_declarator
 		{
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2, $1.unk_0C);
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2, $1.location);
 		}
 	;
 
@@ -1382,41 +1363,41 @@ direct_abstract_declarator
 	| fdecl_start ')'
 		{
 			$$ = make(Func_type, $1, NULL);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| fdecl_start parameter_type_list ')'
 		{
 			$$ = make(Func_type, $1, $2.first);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| direct_abstract_declarator fdecl_start ')'
 		{
 			$$ = make(Func_type, $2, NULL);
 			TYPE_PUSH_BACK($1, $$);
 			$$ = $1;
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| direct_abstract_declarator fdecl_start parameter_type_list ')'
 		{
 			$$ = make(Func_type, $2, $3.first);
 			TYPE_PUSH_BACK($1, $$);
 			$$ = $1;
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	;
 
 typedef_name
 	: TYPE_IDENT
 		{
-			cur_lvl->unk_04 = 0;
+			cur_lvl->type_ident_expected = FALSE;
 			if (debug_arr['y'] > 0) {
 				fprintf(dbgout, "T_IDENT=%s, was_typedef=%d\n", $1.symbol->name, $1.was_typedef);
 			}
@@ -1428,21 +1409,17 @@ initializer
 	| '{' { tree_handle = temp_handle; } initializer_list optcomma '}'
 		{
 			$$ = make(Aggregate_expr, TREE_LOCATION($3.first), $3.first);
-			if (B_10020F04 == 0) {
+			if (depth == 0) {
 				tree_handle = general_handle;
 			}
 		}
 	;
 
 initializer_list
-	: initializer { $$.first = $$.last = $1; }
+	: initializer { LIST_INIT($$, $1); }
 	| initializer_list ',' initializer
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $3;
-			} else if ($3 != NULL) {
-				$$.last = TREE_LINK($$.last) = $3;
-			}
+			LIST_APPEND($$, $3);
 		}
 	;
 
@@ -1465,7 +1442,7 @@ labeled_statement
 			$$ = make(Id_decl, $1.location, $1.symbol);
 			$$ = make(Idlabeled_stmt, $1.location, $$, $3);
 		}
-	| typedef_name ':' { cur_lvl->unk_04 = 1; } statement
+	| typedef_name ':' { cur_lvl->type_ident_expected = TRUE; } statement
 		{
 			$$ = make(Id_decl, $1.location, $1.symbol);
 			$$ = make(Idlabeled_stmt, $1.location, $$, $4);
@@ -1484,74 +1461,66 @@ compound_statement
 	: comp_start '}'
 		{
 			$$ = make(Compound_stmt, $1, NULL, NULL, $2);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| comp_start statement_list '}'
 		{
 			$$ = make(Compound_stmt, $1, NULL, $2.first, $3);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| comp_start declaration_list '}'
 		{
 			$$ = make(Compound_stmt, $1, $2.first, NULL, $3);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	| comp_start declaration_list statement_list '}'
 		{
 			$$ = make(Compound_stmt, $1, $2.first, $3.first, $4);
-			delete_local_decls(B_10020F04);
-            cur_lvl = link_pop(B_10020F00);
-            B_10020F04--;
+			delete_local_decls(depth);
+            cur_lvl = link_pop(level_list);
+            depth--;
 		}
 	;
 
 comp_start
 	: '{'
 		{
-			if (cur_lvl->unk_0C) {
-				cur_lvl = (UnkChi*)get_link_elem(B_10020F00);
-				cur_lvl->unk_04 = 1;
+			if (cur_lvl->in_comp_expr) {
+				cur_lvl = (ParseLevel*)get_link_elem(level_list);
+				cur_lvl->type_ident_expected = TRUE;
 				cur_lvl->in_struct_def = FALSE;				
-				cur_lvl->unk_08 = 1;
-				cur_lvl->link.next = B_10020F00->used_list;
-				B_10020F00->used_list = &cur_lvl->link;
-				B_10020F04++;
+				cur_lvl->normal_ident = TRUE;
+				cur_lvl->link.next = level_list->used_list;
+				level_list->used_list = &cur_lvl->link;
+				depth++;
 			}
-			cur_lvl->unk_08 = 1;
-			cur_lvl->unk_0C = TRUE;
+			cur_lvl->normal_ident = TRUE;
+			cur_lvl->in_comp_expr = TRUE;
 			tree_handle = temp_handle;
 		}
 	;
 
 declaration_list
-	: declaration { $$.first = $$.last = $1; }
+	: declaration { LIST_INIT($$, $1); }
 	| declaration_list declaration
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $2;
-			} else if ($2 != NULL) {
-				$$.last = TREE_LINK($$.last) = $2;
-			}
+			LIST_APPEND($$, $2);
 		}
 	;
 
 statement_list
-	: statement { $$.first = $$.last = $1; }
+	: statement { LIST_INIT($$, $1); }
 	| statement_list statement
 		{
-			if ($$.first == NULL) {
-				$$.first = $$.last = $2;
-			} else if ($2 != NULL) {
-				$$.last = TREE_LINK($$.last) = $2;
-			}
+			LIST_APPEND($$, $2);
 		}
-	| error { $$.first = $$.last = NULL; } 
+	| error { LIST_INIT($$, NULL);} 
 	| statement_list error
 	;
 
@@ -1668,11 +1637,7 @@ try_statement
 translation_unit
 	: external_definition
 		{
-			if (B_10020F10.first == NULL) {
-				B_10020F10.first = B_10020F10.last = $1;
-			} else if ($1 != NULL) {
-				B_10020F10.last = TREE_LINK(B_10020F10.last) = $1;
-			}
+			LIST_APPEND(B_10020F10, $1);
 			if (temp_handle->current_region - temp_handle->list_start > options[OPTION_T_LEVEL]) {
 				YYACCEPT;
 			}
@@ -1680,11 +1645,7 @@ translation_unit
 		}
 	| translation_unit external_definition
 		{
-			if (B_10020F10.first == NULL) {
-				B_10020F10.first = B_10020F10.last = $2;
-			} else if ($2 != NULL) {
-				B_10020F10.last = TREE_LINK(B_10020F10.last) = $2;
-			}
+			LIST_APPEND(B_10020F10, $2);
 			if (temp_handle->current_region - temp_handle->list_start > options[OPTION_T_LEVEL]) {
 				YYACCEPT;
 			}
@@ -1740,7 +1701,7 @@ function_definition
 			tree_handle = general_handle;
 			$$ = make_topdecl(int_type, NULL, NULL, $1.unk_04, TREE_LOCATION($1.unk_04));
 		}
-	| declaration_specifiers declarator { cur_lvl->unk_08 = 1; } function_body
+	| declaration_specifiers declarator { cur_lvl->normal_ident = TRUE; } function_body
 		{
 			if (TREE_CODE($2.unk_04) == Id_decl) {
 				char* sp5C = NULL;
@@ -1762,7 +1723,7 @@ function_definition
 				ID_DECL($2.unk_04).init_value = $4;
 			}
 			tree_handle = general_handle;
-			$$ = make_topdecl($1.unk_00, $1.unk_04, $1.unk_08, $2.unk_04, $1.unk_0C);
+			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2.unk_04, $1.location);
 		}
 	;
 
@@ -1775,7 +1736,7 @@ function_body
 		}
 
 build_program_tree
-	: translation_unit {  }
+	: translation_unit { /* do nothing */ }
 	| { B_10020F10.first = make(End_of_file, -1); }
 	;
 

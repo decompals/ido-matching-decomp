@@ -25,17 +25,17 @@ typedef struct UnkAlpha {
     /* 0x28 */ UNK_TYPE unk_28;
 } UnkAlpha; // size = 0x2C
 
-typedef struct UnkBeta {
+typedef struct LocalDeclaration {
     /* 0x00 */ UNK_TYPE unk_00;
     /* 0x04 */ UNK_TYPE unk_04;
     /* 0x08 */ struct UnkGamma* unk_08;
     /* 0x0C */ int unk_0C;
     /* 0x10 */ char unk_10;
     /* 0x14 */ UNK_TYPE unk_14;
-} UnkBeta; // size = 0x18
+} LocalDeclaration; // size = 0x18
 
 typedef struct UnkBetaArray {
-    /* 0x00 */ UnkBeta* array;
+    /* 0x00 */ LocalDeclaration* array;
     /* 0x04 */ size_t size;
 } UnkBetaArray; // size = 0x08
 

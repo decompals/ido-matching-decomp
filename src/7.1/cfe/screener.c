@@ -26,40 +26,40 @@ struct WCharArray {
 // .data
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/screener.c,v 1.4 1993/01/21 15:14:40 hanny Exp $";
 struct LegalTypeSpecifier legal_ts[] = {
-    { 0x04000000, NULL },
-    { 0x02000000, NULL },
-    { 0x00100000, NULL },
-    { 0x00400000, NULL },
-    { 0x01000000, NULL },
-    { 0x10000000, NULL },
-    { 0x40000000, NULL },
-    { 0x00000080, NULL },
-    { 0x00000800, NULL },
-    { 0x00004000, NULL },
-    { 0x02100000, NULL },
-    { 0x00500000, NULL },
-    { 0x01100000, NULL },
-    { 0x80000000, NULL },
-    { 0x02400000, NULL },
-    { 0x03000000, NULL },
-    { 0x04200000, NULL },
-    { 0x04100000, NULL },
-    { 0x00600000, NULL },
-    { 0x02600000, NULL },
-    { 0x02500000, NULL },
-    { 0x00200000, NULL },
-    { 0x02200000, NULL },
-    { 0x01200000, NULL },
-    { 0x03200000, NULL },
-    { 0x03100000, NULL },
-    { 0x41000000, NULL },
-    { 0x11000000, NULL },
-    { 0x00800000, NULL },
-    { 0x00A00000, NULL },
-    { 0x00900000, NULL },
-    { 0x02800000, NULL },
-    { 0x02A00000, NULL },
-    { 0x02900000, NULL },
+    { TYPESPEC_CHAR, NULL },
+    { TYPESPEC_INT, NULL },
+    { TYPESPEC_UNSIGNED, NULL },
+    { TYPESPEC_SHORT, NULL },
+    { TYPESPEC_LONG, NULL },
+    { TYPESPEC_FLOAT, NULL },
+    { TYPESPEC_DOUBLE, NULL },
+    { TYPESPEC_UNK80, NULL },
+    { TYPESPEC_ENUM, NULL },
+    { TYPESPEC_VOID, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_INT, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_SHORT, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_LONG, NULL },
+    { TYPESPEC_UNK8000000, NULL },
+    { TYPESPEC_SHORT | TYPESPEC_INT, NULL },
+    { TYPESPEC_LONG | TYPESPEC_INT, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_CHAR, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_CHAR, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_SHORT, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_SHORT | TYPESPEC_INT, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_SHORT | TYPESPEC_INT, NULL },
+    { TYPESPEC_SIGNED, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_INT, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_LONG, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_LONG | TYPESPEC_INT, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_LONG | TYPESPEC_INT, NULL },
+    { TYPESPEC_LONG | TYPESPEC_DOUBLE, NULL },
+    { TYPESPEC_LONG | TYPESPEC_FLOAT, NULL },
+    { TYPESPEC_LONGLONG, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_LONGLONG, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_LONGLONG, NULL },
+    { TYPESPEC_LONGLONG | TYPESPEC_INT, NULL },
+    { TYPESPEC_SIGNED | TYPESPEC_LONGLONG | TYPESPEC_INT, NULL },
+    { TYPESPEC_UNSIGNED | TYPESPEC_LONGLONG | TYPESPEC_INT, NULL },
 };
 
 // .bss
@@ -284,21 +284,21 @@ TreeNode* normalize_type(int ts, int location) {
     for (i = 0; i < 34; i++) {
         if (legal_ts[i].unk_00 == ts) {
             if (i == 26) {
-                error(0x1200E9, 1, location);
+                error(0x1200E9, LEVEL_WARNING, location);
             }
             if (i == 27) {
-                error(0x1200EA, 0, location);
+                error(0x1200EA, LEVEL_DEFAULT, location);
             }
             return legal_ts[i].unk_04;
         }
     }
 
-    error(0x20101, 2, location);
+    error(0x20101, LEVEL_ERROR, location);
     return any_type;
 }
 
 int was_plain_char(int ts) {
-    if ((ts & 0x04000000) && !(ts & 0x00100000) && !(ts & 0x00200000)) {
+    if ((ts & TYPESPEC_CHAR) && !(ts & TYPESPEC_UNSIGNED) && !(ts & TYPESPEC_SIGNED)) {
         return TRUE;
     }
     return FALSE;
@@ -306,25 +306,25 @@ int was_plain_char(int ts) {
 
 char* type_to_string(unsigned int arg0) {
     switch (arg0) {
-        case 0x04000000:
+        case TYPESPEC_CHAR:
             return "char";
-        case 0x02000000:
+        case TYPESPEC_INT:
             return "int";
-        case 0x00100000:
+        case TYPESPEC_UNSIGNED:
             return "unsigned";
-        case 0x00400000:
+        case TYPESPEC_SHORT:
             return "short";
-        case 0x01000000:
+        case TYPESPEC_LONG:
             return "long";
-        case 0x10000000:
+        case TYPESPEC_FLOAT:
             return "float";
-        case 0x40000000:
+        case TYPESPEC_DOUBLE:
             return "double";
-        case 0x00000800:
+        case TYPESPEC_ENUM:
             return "enum";
-        case 0x00004000:
+        case TYPESPEC_VOID:
             return "void";
-        case 0x00200000:
+        case TYPESPEC_SIGNED:
             return "signed";
         default:
             return "((type))";

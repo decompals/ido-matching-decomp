@@ -945,7 +945,7 @@ static int scan_identifier(char firstChar) {
         tp = yylval.identifier.symbol->psymb->id; 
         if (tp == -1) {
             // typedef
-            if (cur_lvl->unk_04) {
+            if (cur_lvl->type_ident_expected) {
                 return TYPE_IDENT;
             } 
             yylval.identifier.was_typedef = TRUE;
