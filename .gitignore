@@ -55,6 +55,7 @@ dkms.conf
 
 build/
 asm/
+tools/ido_recomp/
 .vscode/settings.json
 ctx.c
 ctx.c.m2c
