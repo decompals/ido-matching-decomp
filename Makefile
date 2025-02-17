@@ -59,7 +59,7 @@ OBJDUMP    := $(MIPS_BINUTILS_PREFIX)objdump
 MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
-DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --aggressive-string-guesser --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
+DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --rodata-string-guesser 4 --pascal-rodata-string-guesser 4 --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
