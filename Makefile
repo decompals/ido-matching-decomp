@@ -141,7 +141,7 @@ build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 .PHONY: all clean distclean setup disasm
 .DEFAULT_GOAL:= all
 
-all: $(YACC) $(ELFS) $(O_FILES)
+all: $(ELFS) $(O_FILES)
 	./tools/diff_objfiles.py $(VERSION)
 
 clean:
@@ -151,6 +151,8 @@ distclean: clean
 	$(RM) -r $(RECOMP) $(ASM) $(YACC)
 
 setup: $(RECOMP) $(YACC)
+
+yacc: $(YACC)
 
 disasm: $(DISASM_TARGETS)
 	find asm -type f -name "*.s" | grep -v "/functions/" | xargs sed -i -e "s/glabel func_/llabel func_/; s/dlabel RO_/llabel RO_/; s/dlabel B_/llabel B_/; s/dlabel D_/llabel D_/; s/dlabel jtbl_/llabel jtbl_/;"
