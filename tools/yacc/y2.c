@@ -367,8 +367,8 @@ void setup(argc,argv) int argc; char *argv[];
 	end_toks();	/* all tokens dumped - get ready for reductions */
 	
 	(void) fprintf( ftable, "\n#include <malloc.h>\n" );
-	(void) fprintf( ftable, "#include <memory.h>\n" );
-	(void) fprintf( ftable, "#include <values.h>\n" );
+	//(void) fprintf( ftable, "#include <memory.h>\n" );
+	//(void) fprintf( ftable, "#include <values.h>\n" );
 	(void) fprintf( ftable, "\n#ifdef __cplusplus\n");
 	(void) fprintf( ftable, "\n#ifndef yyerror\n");
 	(void) fprintf( ftable, "	void yyerror(const char *);\n" );
