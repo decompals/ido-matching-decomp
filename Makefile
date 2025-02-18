@@ -141,7 +141,7 @@ build/src/7.1/ugen/%.o: OPTFLAGS := -O2
 .PHONY: all clean distclean setup disasm
 .DEFAULT_GOAL:= all
 
-all: $(ELFS) $(O_FILES)
+all: $(YACC) $(ELFS) $(O_FILES)
 	./tools/diff_objfiles.py $(VERSION)
 
 clean:
