@@ -44,6 +44,7 @@ BUILD   := build
 ASM     := asm
 SYMBOLS := symbols
 CONTEXT := context
+YACCDIR := tools/yacc
 
 ifeq ($(VERSION),7.1)
         CC	:= $(RECOMP)/7.1/cc
@@ -61,6 +62,7 @@ MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
 DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --rodata-string-guesser 4 --pascal-rodata-string-guesser 4 --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
+YACC := $(YACCDIR)/yacc
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
 
@@ -143,9 +145,11 @@ clean:
 	$(RM) -r $(BUILD)
 
 distclean: clean
-	$(RM) -r $(RECOMP) $(ASM)
+	$(RM) -r $(RECOMP) $(ASM) $(YACC)
 
-setup: $(RECOMP)
+setup: $(RECOMP) $(YACC)
+
+yacc: $(YACC)
 
 disasm: $(DISASM_TARGETS)
 	find asm -type f -name "*.s" | grep -v "/functions/" | xargs sed -i -e "s/glabel func_/llabel func_/; s/dlabel RO_/llabel RO_/; s/dlabel B_/llabel B_/; s/dlabel D_/llabel D_/; s/dlabel jtbl_/llabel jtbl_/;"
@@ -155,6 +159,9 @@ $(RECOMP):
 	mkdir -p $@/5.3 $@/7.1
 	curl -sL https://github.com/decompals/ido-static-recomp/releases/download/$(RECOMP_VERSION)/ido-5.3-recomp-$(DETECTED_OS).tar.gz | tar xz -C $@/5.3
 	curl -sL https://github.com/decompals/ido-static-recomp/releases/download/$(RECOMP_VERSION)/ido-7.1-recomp-$(DETECTED_OS).tar.gz | tar xz -C $@/7.1
+
+$(YACC):
+	gcc $(YACCDIR)/*.c -o $(YACC)
 
 $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)
