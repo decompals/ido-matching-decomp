@@ -1,10 +1,7 @@
 #ident	"@(#)yacc:dextern	1.15"
 # include <stdio.h>
 # include <ctype.h>
-# include <memory.h>
 # include <string.h>
-# include <malloc.h>
-# include <values.h>
 #include <unistd.h>
 
 #ifdef __STDC__

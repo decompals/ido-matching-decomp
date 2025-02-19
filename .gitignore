@@ -57,6 +57,7 @@ build/
 asm/
 tools/ido_recomp/
 tools/yacc/yacc
+src/*/cfe/c.c
 .vscode/settings.json
 ctx.c
 ctx.c.m2c

@@ -63,6 +63,8 @@ DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
 DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --rodata-string-guesser 4 --pascal-rodata-string-guesser 4 --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
 ASM_PROCESSOR := python3 tools/asm-processor/build.py
 YACC := $(YACCDIR)/yacc
+YFLAGS := -p $(YACCDIR)/yaccpar -t
+
 
 IINC       := -Iinclude -Iinclude/indy -Isrc
 
@@ -113,7 +115,10 @@ P_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.p)) # Pascal files
 S_FILES  := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
 COMBINED_S_FILES := $(sort $(foreach file, $(S_FILES:.s=), $(basename $(file))))
 
-O_FILES  := $(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
+Y_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.y))
+
+O_FILES  := $(foreach f,$(Y_FILES:.y=.o),$(BUILD)/$(f)) \
+			$(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
             $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
             $(foreach f,$(COMBINED_S_FILES),$(BUILD)/$(f).o)
 
@@ -123,7 +128,6 @@ DEP_FILES := $(O_FILES:.o=.d) \
 
 # create build directories
 $(shell mkdir -p $(foreach dir,$(SRC_DIRS) $(ASM_DIRS),$(BUILD)/$(dir)))
-
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
@@ -176,8 +180,9 @@ $(BUILD)/%.o: %.c
 $(BUILD)/%.o: %.p
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
-
-
+%.c: %.y
+	$(YACC) $(YFLAGS) $<
+	mv y.tab.c $@
 
 ## Disassembly
 
@@ -187,8 +192,6 @@ $(ASM)/$(VERSION)/cc/.disasm: $(IRIX_USR_DIR)/bin/cc
 
 $(ASM)/$(VERSION)/%/.disasm:
 	$(DISASSEMBLER) $(DISASSEMBLER_FLAGS) --file-splits $(SYMBOLS)/$(VERSION)/$*.splits.csv --split-functions $(ASM)/$(VERSION)/functions/$* --save-context $(CONTEXT)/$(VERSION)/$*.csv $(IRIX_USR_DIR)/lib/$* $(ASM)/$(VERSION)/$*
-
-
 
 print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
 

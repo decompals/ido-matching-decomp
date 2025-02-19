@@ -1,3 +1,17 @@
+
+typedef union
+#ifdef __cplusplus
+	YYSTYPE
+#endif
+ {
+	int location;
+	TreeNode* node; 
+	struct TokenIdentifier identifier;
+	struct DeclSpec declspec;
+	struct Declarator declarator;
+	struct TreeNodeList list;
+} YYSTYPE;
+extern YYSTYPE yylval;
 # define IDENTIFIER 257
 # define SIZEOF 258
 # define ALIGNOF 259

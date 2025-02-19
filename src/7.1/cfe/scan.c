@@ -1,22 +1,11 @@
 #include "common.h"
+#include "y.tab.h"
 
 char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/scan.c,v 1.32 1995/02/27 22:12:08 rdahl Exp $";
 
 #define BUFFER_SIZE 0x8000
 #define input() (isprint(*inbuf_ptr) ? *inbuf_ptr++ : input_any_char())
 #define unput() inbuf_ptr--; if (*inbuf_ptr == '\n') { yyline--; }
-
-typedef struct TokenIdentifier {
-    int unk_00;
-    Symbol* unk_04;
-    int unk_08;
-} TokenIdentifier;
-
-union YYLVAL {
-    TreeNode* node;
-    TokenIdentifier identifier;
-    int loc;
-};
 
 /* .bss       */
 /* 0x10023A90 */ static char input_buffer[BUFFER_SIZE + 1];
@@ -32,7 +21,7 @@ union YYLVAL {
 
 static char input_any_char(void);
 static char next_char(void);
-ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2);
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int level);
 
 void adjust_vwbuf(void) {
     tokenbuf_size *= 1.333;
@@ -948,25 +937,28 @@ static int scan_identifier(char firstChar) {
         *ptr++ = c;
     }
 
-    yylval.identifier.unk_04 = string_to_symbol(token, ptr - token);
-    yylval.identifier.unk_08 = curloc;
-    yylval.identifier.unk_00 = 0;
+    yylval.identifier.symbol = string_to_symbol(token, ptr - token);
+    yylval.identifier.location = curloc;
+    yylval.identifier.was_typedef = FALSE;
 
-    if (yylval.identifier.unk_04->unk_04 != NULL) {
-        tp = yylval.identifier.unk_04->unk_04->unk_04; 
+    if (yylval.identifier.symbol->psymb != NULL) {
+        tp = yylval.identifier.symbol->psymb->id; 
         if (tp == -1) {
-            if (cur_lvl->unk_04) {
+            // typedef
+            if (cur_lvl->type_ident_expected) {
                 return TYPE_IDENT;
             } 
-            yylval.identifier.unk_00 = 1;
+            yylval.identifier.was_typedef = TRUE;
             return IDENTIFIER;
         }
     
         if (tp == 0) {
+            // identifier
             return IDENTIFIER;
         }
-    
-        yylval.identifier.unk_00 = curloc;
+
+        // keyword
+        yylval.location = curloc;
         return tp;
     }
     return IDENTIFIER;
@@ -1047,7 +1039,7 @@ label2:
         case '{':
         case '}':
         case '~':
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return c;
         case ':':
             if (options[OPTION_CPLUSPLUS]) {
@@ -1055,7 +1047,7 @@ label2:
                 if (c == ':') {
                     c = input();
                     if (c == '*') {
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return COLCOLSTAR;
                     }
                     if (c == ' ' || c == '\t') {
@@ -1065,29 +1057,29 @@ label2:
                             }
                         }
                         if (c1 == '*') {
-                            yylval.loc = curloc;
+                            yylval.location = curloc;
                             return COLCOLSTAR;
                         }
                         unput();
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return COLONCOLON;
                     }
                     unput();
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return COLONCOLON;
                 }
                 unput();
             }
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return ':';
         case '+':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return ADD_ASSIGN;
             }
             if (c == '+') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return INC_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1099,35 +1091,35 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "+=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return ADD_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '+';
         case '-':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return SUB_ASSIGN;
             }
             if (c == '-') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return DEC_OP;
             }
             if (c == '>') {
                 if (options[OPTION_CPLUSPLUS]) {
                     c = input();
                     if (c == '*') {
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return MEMPTR_OP;
                     }
                     unput();
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return PTR_OP;
                 }
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return PTR_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1139,17 +1131,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "-=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return SUB_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '-';
         case '/':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return DIV_ASSIGN;
             }
             if (c == '*') {
@@ -1177,17 +1169,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "/=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return DIV_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '/';
         case '%':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return REM_ASSIGN;
             }
             if (c == ' ' || c == '\t') {
@@ -1199,21 +1191,21 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "%=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return REM_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '%';
         case '&':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return AND_ASSIGN;
             }
             if (c == '&') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return AND_OP;
             }
             if (!IS_ANSI) {
@@ -1226,22 +1218,22 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "&=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return AND_ASSIGN;
                     }
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '&';
         case '|':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return OR_ASSIGN;
             }
             if (c == '|') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return OR_OP;
             }
             if (c == ' ' || c == '\t') {
@@ -1253,17 +1245,17 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "|=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return OR_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '|';
         case '^':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return XOR_ASSIGN;
             }
             if (c == ' ' || c == '\t') {
@@ -1275,35 +1267,35 @@ label2:
 
                 if (c1 == '=') {
                     error(0x20111, LEVEL_DEFAULT, curloc, "^=");
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return XOR_ASSIGN;
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '^';
         case '!':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return NE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '!';
         case '=':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return EQ_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '=';
         case '*':
             c = input();
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return MUL_ASSIGN;
             }
             if (!IS_ANSI) {
@@ -1316,28 +1308,28 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "*=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return MUL_ASSIGN;
                     }
                 }
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '*';
         case '.':
             c = input();
             if (c == '.') {
                 c = input();
                 if (c == '.') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return ELLIPSIS;
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return 0x2E2E; // '..'
             }
             if (c == '*' && options[OPTION_CPLUSPLUS]) {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return MEMDOT_OP;
             }
             if (isdigit(c)) {
@@ -1345,14 +1337,14 @@ label2:
                 return scan_number(TRUE);
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '.';
         case '<':
             c = input();
             if (c == '<') {
                 c = input();
                 if (c == '=') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return LEFT_ASSIGN;
                 }
                 if (c == ' ' || c == '\t') {
@@ -1364,27 +1356,27 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, "<<=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return LEFT_ASSIGN;
                     }
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return LEFT_OP;
             }
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return LE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '<';
         case '>':
             c = input();
             if (c == '>') {
                 c = input();
                 if (c == '=') {
-                    yylval.loc = curloc;
+                    yylval.location = curloc;
                     return RIGHT_ASSIGN;
                 }
                 if (c == ' ' || c == '\t') {
@@ -1396,20 +1388,20 @@ label2:
     
                     if (c1 == '=') {
                         error(0x20111, LEVEL_DEFAULT, curloc, ">>=");
-                        yylval.loc = curloc;
+                        yylval.location = curloc;
                         return RIGHT_ASSIGN;
                     }
                 }
                 unput();
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return RIGHT_OP;
             }
             if (c == '=') {
-                yylval.loc = curloc;
+                yylval.location = curloc;
                 return GE_OP;
             }
             unput();
-            yylval.loc = curloc;
+            yylval.location = curloc;
             return '>';
         case 'L':
             c = input();
@@ -1700,21 +1692,21 @@ void init_scan(void) {
     __LONGLONG_MIN = -__LONGLONG_MAX - 1;
 }
 
-ParseSymbol* mk_parse_symb(Symbol* symb, int id, int arg2) {
+ParseSymbol* mk_parse_symb(Symbol* symb, int id, int level) {
     ParseSymbol* psymb;
     ParseSymbol* prev;
     
     psymb = (ParseSymbol*)get_link_elem(psymb_handle);
-    psymb->unk_04 = id;
-    psymb->unk_08 = arg2;
-    prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->unk_04);
-    symb->unk_04 = psymb;
+    psymb->id = id;
+    psymb->level = level;
+    prev = (ParseSymbol*)(psymb->link.next = (LinkedListEntry*)symb->psymb);
+    symb->psymb = psymb;
 
     if (debug_arr['P'] > 0) {
         fprintf(dbgout, "creating %.*s (0x%x:%d:%s) hides (0x%x:%d:%s)\n",
             symb->namelen, symb->name,
-            psymb, psymb->unk_08, GET_SYM_CAT(psymb->unk_04),
-            prev, prev != NULL ? prev->unk_08 : -1, prev != NULL ? GET_SYM_CAT(prev->unk_04) : "<nil>");
+            psymb, psymb->level, GET_SYM_CAT(psymb->id),
+            prev, prev != NULL ? prev->level : -1, prev != NULL ? GET_SYM_CAT(prev->id) : "<nil>");
     }
 
     return psymb;
