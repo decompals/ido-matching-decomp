@@ -7,6 +7,7 @@
 #include "mem.h"
 #include "linklist.h"
 #include "tree.h"
+#include "tree.h"
 
 #define GET_SYM_CAT(x) (x != 0 ? (x == -1 ? "typedef" : "keyword") : "regular")
 
@@ -21,10 +22,14 @@ typedef struct CppLineArr {
     Location* loc;
 } CppLineArr;
 
-typedef struct UnkChi {
-    int unk_00;
-    int unk_04;
-} UnkChi;
+typedef struct ParseLevel {
+    LinkedListEntry link;
+    int type_ident_expected;
+    int normal_ident;
+    int in_comp_expr;
+    int in_struct_def;
+    MemCtx* saved_ctx;
+} ParseLevel;
 
 typedef struct ErrorFmt {
     short unk_00;
@@ -58,7 +63,6 @@ extern int yyline;
 extern char* infile;
 extern int origfile;
 extern int curloc;
-extern union YYLVAL yylval;
 extern TreeNode* char_type;
 extern TreeNode* uchar_type;
 extern TreeNode* float_type;
@@ -91,7 +95,7 @@ extern unsigned short options[];
 extern unsigned long long __ULONGLONG_MAX;
 extern long long __LONGLONG_MAX;
 extern long long __LONGLONG_MIN;
-extern UnkChi* cur_lvl;
+extern ParseLevel* cur_lvl;
 extern MemCtx* pmhandle;
 extern LinkedList* psymb_handle;
 extern LinkedList* isymb_handle;
@@ -106,6 +110,9 @@ extern int bit_size[];
 extern int minimize_indirection_entries;
 extern char* sc_names[];
 extern MemCtx* tree_handle;
+extern MemCtx* temp_handle;
+extern int builtins[];
+extern Symbol* anonymous;
 
 int real_file_line(int, char**, int*, int);
 int __assert(char*, char*, int);

@@ -17,5 +17,6 @@ typedef struct LinkedList {
 LinkedList* link_start(MemCtx* mem, int size);
 void* link_pop(LinkedList* ll);
 void* get_link_elem(LinkedList* ll);
+void free_link_list(LinkedList* ll);
 
 #endif
