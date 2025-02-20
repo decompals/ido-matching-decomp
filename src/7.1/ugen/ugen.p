@@ -11,7 +11,7 @@
 #include "cmplrs/stinfc.h"
 
 {Macros}
-#define CASE_OPT(a) a:
+#define CASE_ARG(a) a:
 #define ARG_OPT(index, opt) (arg[index] = opt)
 #define IS_OPT(opt) streq(arg, opt)
 
@@ -100,7 +100,7 @@ var
     use_real_fp_for_all: boolean;
 
 
-#define CASE_OPT(a) a:
+#define CASE_ARG(a) a:
 #define ARG_OPT(index, opt) (arg[index] = opt)
 #define IS_OPT(opt) streq(arg, opt)
 
@@ -184,12 +184,12 @@ var
     procedure func_0044B384(opt: char; arg1: integer);
     begin
         case opt of                                 /* irregular */
-            CASE_OPT('a')
+            CASE_ARG('a')
             begin
                 n_parm_regs := arg1;
             end;
 
-            CASE_OPT('g')
+            CASE_ARG('g')
             begin
                 if (arg1 < 4) then begin
                     report_error(Internal, 16#8A, "ugen.p", "insufficient code generator registers");
@@ -199,17 +199,17 @@ var
                 end;
             end;
 
-            CASE_OPT('r')
+            CASE_ARG('r')
             begin
                 n_unsaved_regs := arg1;
             end;
 
-            CASE_OPT('e')
+            CASE_ARG('e')
             begin
                 n_saved_regs := arg1;
             end;
 
-            CASE_OPT(' ')
+            CASE_ARG(' ')
             otherwise:
             begin
                 report_error(Internal, 16#9A, "ugen.p", "illegal register type");
@@ -221,11 +221,11 @@ var
     procedure func_0044B640(opt: char; arg1: integer);
     begin
         case (opt) of
-            CASE_OPT('a')
+            CASE_ARG('a')
                 begin
                     n_fp_parm_regs := arg1;
                 end;
-            CASE_OPT('g')
+            CASE_ARG('g')
                 begin
                     if (arg1 < 2) then begin
                         report_error(Internal, 166, "ugen.p", "insufficient code generator fp registers");
@@ -234,15 +234,15 @@ var
                 end;
                 n_fp_cg_regs := arg1;
             end;
-            CASE_OPT('r')
+            CASE_ARG('r')
                 begin
                     n_unsaved_fp_regs := arg1;
                 end;
-            CASE_OPT('e')
+            CASE_ARG('e')
                 begin
                     n_saved_fp_regs := arg1;
                 end;
-            CASE_OPT(' ')
+            CASE_ARG(' ')
                 begin
                     n_fp_parm_regs := 0;
                     n_unsaved_fp_regs := 0;
@@ -406,12 +406,12 @@ begin
                 argv(index, arg);
                 if (arg[1] = '-') then begin
                     case arg[2] of
-                        CASE_OPT('j')
+                        CASE_ARG('j')
                             if (ARG_OPT(3, 'a')) and (ARG_OPT(4, 'l')) and (ARG_OPT(5, 'r')) then begin
                                 no_jal_use_jalr_only := true;
                             end else goto default;
 
-                        CASE_OPT('o')
+                        CASE_ARG('o')
                             if (ARG_OPT(3, ' ')) then begin
                                 if (index + 1 = argc) then begin
                                     writeln(err, 'filename required after -o');
@@ -421,7 +421,7 @@ begin
                                 argv(index, sp11C0);
                             end else goto default;
 
-                        CASE_OPT('u')
+                        CASE_ARG('u')
                             if (ARG_OPT(3, 'f') and ARG_OPT(4, 's')) then begin
                                 if (ARG_OPT(5, 'a')) then begin
                                     ufsa := true;
@@ -438,7 +438,7 @@ begin
                                 argv(index, sp9C0);
                             end else goto default;
 
-                        CASE_OPT('l')
+                        CASE_ARG('l')
                             if (ARG_OPT(3, ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -l");
@@ -449,7 +449,7 @@ begin
                                 ascii_out := true; {Assembly output: TRUE}
                             end else goto default;
 
-                        CASE_OPT('t')
+                        CASE_ARG('t')
                             if (ARG_OPT(3, 'e') and (ARG_OPT(4, 'm')) and (ARG_OPT(5, 'p'))) then begin
                                 if (succ(index) = argc) then begin
                                     writeln(err, "filename required after -temp");
@@ -471,7 +471,7 @@ begin
                                 argv(index, sp940);
                             end else goto default;
 
-                        CASE_OPT('e')
+                        CASE_ARG('e')
                             if (ARG_OPT(3,  ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -e");
@@ -485,7 +485,7 @@ begin
                                 excpt := true;
                             end else goto default;
 
-                        CASE_OPT('d')
+                        CASE_ARG('d')
                         begin
                             if (IS_OPT("-dwopcode")) then begin
                                 isa := ISA_MIPS3;
@@ -498,28 +498,28 @@ begin
                             end;
                         end;
 
-                        CASE_OPT('E')
+                        CASE_ARG('E')
                             if (ARG_OPT(3, 'L')) then begin
                                 lsb_first := true;
                             end else if (ARG_OPT(3,  'B')) then begin
                                 lsb_first := false;
                             end else goto default;
 
-                        CASE_OPT('g')
+                        CASE_ARG('g')
                             if (ARG_OPT(3, ' ')) then begin
                                 writeln(err, "numeric argument required for -g");
                             end else if ((arg[3] >= '0') and (arg[3] < '5')) then begin
                                 sp51C := u8(arg[3]) - ord('0');
                             end else goto default;
 
-                        CASE_OPT('O') 
+                        CASE_ARG('O') 
                             if (ARG_OPT(3, ' ')) then begin
                                 writeln(err, "numeric argument required for -O");
                             end else if ((arg[3] >= '0') and (arg[3] < '5')) then begin
                                 sp518 := opt_levels(ord(arg[3]) - ord('0'));
                             end else goto default;
 
-                        CASE_OPT('G')
+                        CASE_ARG('G')
                             if (ARG_OPT(3, ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "numeric argument required for -G");
@@ -538,125 +538,125 @@ begin
                                 
                             end else goto default;
 
-                    CASE_OPT('r')
-                        if ((ARG_OPT(3, 'e')) and (arg[4] = 'g')) then begin
-                            index := index + 1;
-                            var_s0 := arg[5];
-                            argv(index, arg);
-                            func_0044B384(var_s0, str_atoi(arg));
-                        end else goto default;
-
-                    CASE_OPT('f')
-                        if (ARG_OPT(3, 'r') and ARG_OPT(4, 'e') and ARG_OPT(5, 'g')) then begin
-                            index := index + 1;
-                            var_s0 := arg[6];
-                            argv(index, arg);
-                            func_0044B640(var_s0, str_atoi(arg));
-                        end else begin
-                            if (streq(arg, "-fp32regs")) then begin
-                                fp32regs := true;
+                        CASE_ARG('r')
+                            if ((ARG_OPT(3, 'e')) and (arg[4] = 'g')) then begin
+                                index := index + 1;
+                                var_s0 := arg[5];
+                                argv(index, arg);
+                                func_0044B384(var_s0, str_atoi(arg));
                             end else goto default;
-                        end;
 
-                    CASE_OPT('L')
-                        if (ARG_OPT(3, ' ')) then begin
-                            sp516 := true;
-                        end else goto default;
+                        CASE_ARG('f')
+                            if (ARG_OPT(3, 'r') and ARG_OPT(4, 'e') and ARG_OPT(5, 'g')) then begin
+                                index := index + 1;
+                                var_s0 := arg[6];
+                                argv(index, arg);
+                                func_0044B640(var_s0, str_atoi(arg));
+                            end else begin
+                                if (streq(arg, "-fp32regs")) then begin
+                                    fp32regs := true;
+                                end else goto default;
+                            end;   
 
-                    CASE_OPT('F')
-                        if (ARG_OPT(3, 'P')) then begin
-                            use_real_fp_for_all := true;
-                        end else goto default;
-
-                    CASE_OPT('v')
-                        if (ARG_OPT(3, ' ')) then begin
-                            verbose := true;
-                        end else goto default;
-
-                    CASE_OPT('n')
-                        if (IS_OPT("-nooffsetopt")) then begin
-                            nooffsetopt := true;
-                        end else begin
-                            if (IS_OPT("-nocpalias")) then begin
-                                cpalias_ok := false;
-                            end else if (IS_OPT("-notailopt")) then begin
-                                tail_call_opt := false;
-                            end else if (IS_OPT("-nounsignedconv")) then begin
-                                sgi_unsigned_conv := false;
+                        CASE_ARG('L')
+                            if (ARG_OPT(3, ' ')) then begin
+                                sp516 := true;
                             end else goto default;
-                        end;
 
-                    CASE_OPT('m')
-                        if (IS_OPT("-mips1")) then begin
-                            isa := ISA_MIPS1;
-                        end else if (IS_OPT("-mips2")) then begin
-                            isa := ISA_MIPS2;
-                        end else if (IS_OPT("-mips3")) then begin
-                            isa := ISA_MIPS3;
-                            opcode_arch := true;
-                        end else if (IS_OPT("-mscoff")) then begin
-                            mscoff := true;
-                        end else goto default;
-
-                    CASE_OPT('p')
-                    begin
-                        if (IS_OPT("-pic0")) then begin
-                            pic_level := 0;
-                        end else if (IS_OPT("-pic1") or IS_OPT("-pic")) then begin
-                            pic_level := 1;
-                        end else if (IS_OPT("-pic2")) then begin
-                            pic_level := 2;
-                        end else goto default;
-                        if (pic_level >= 2) then begin
-                            sdata_max := 0;
-                            if (saw_cap_g) then begin
-                                writeln(err, "-pic2 implies -G 0. -G option ignored");
-                            end;
-                        end;
-                    end;
-
-                    CASE_OPT('a')
-                        if (ARG_OPT(3, 'p') and ARG_OPT(4, 'c')) then begin
-                            apc := true; {Appollo pascal?}
-                        end else begin
-                            if (IS_OPT("-align8")) then begin
-                                align8 := true;
-                            end else if (IS_OPT("-align16")) then begin
-                                align16 := true;
-                            end else if (IS_OPT("-align32")) then begin
-                                align32 := true;
-                            end else if (IS_OPT("-align64")) then begin
-                                align64 := true;
+                        CASE_ARG('F')
+                            if (ARG_OPT(3, 'P')) then begin
+                                use_real_fp_for_all := true;
                             end else goto default;
+
+                        CASE_ARG('v')
+                            if (ARG_OPT(3, ' ')) then begin
+                                verbose := true;
+                            end else goto default;
+
+                        CASE_ARG('n')
+                            if (IS_OPT("-nooffsetopt")) then begin
+                                nooffsetopt := true;
+                            end else begin
+                                if (IS_OPT("-nocpalias")) then begin
+                                    cpalias_ok := false;
+                                end else if (IS_OPT("-notailopt")) then begin
+                                    tail_call_opt := false;
+                                end else if (IS_OPT("-nounsignedconv")) then begin
+                                    sgi_unsigned_conv := false;
+                                end else goto default;
+                            end;
+
+                        CASE_ARG('m')
+                            if (IS_OPT("-mips1")) then begin
+                                isa := ISA_MIPS1;
+                            end else if (IS_OPT("-mips2")) then begin
+                                isa := ISA_MIPS2;
+                            end else if (IS_OPT("-mips3")) then begin
+                                isa := ISA_MIPS3;
+                                opcode_arch := true;
+                            end else if (IS_OPT("-mscoff")) then begin
+                                mscoff := true;
+                            end else goto default;
+
+                        CASE_ARG('p')
+                        begin
+                            if (IS_OPT("-pic0")) then begin
+                                pic_level := 0;
+                            end else if (IS_OPT("-pic1") or IS_OPT("-pic")) then begin
+                                pic_level := 1;
+                            end else if (IS_OPT("-pic2")) then begin
+                                pic_level := 2;
+                            end else goto default;
+                            if (pic_level >= 2) then begin
+                                sdata_max := 0;
+                                if (saw_cap_g) then begin
+                                    writeln(err, "-pic2 implies -G 0. -G option ignored");
+                                end;
+                            end;
                         end;
 
-                    CASE_OPT('w')
-                        case arg[3] of 
-                            CASE_OPT('1')
-                            begin
-                                warn_level := ord(Info);
-                                print_warnings := false;
+                        CASE_ARG('a')
+                            if (ARG_OPT(3, 'p') and ARG_OPT(4, 'c')) then begin
+                                apc := true; {Enable Apollo Pascal extensions}
+                            end else begin
+                                if (IS_OPT("-align8")) then begin
+                                    align8 := true;
+                                end else if (IS_OPT("-align16")) then begin
+                                    align16 := true;
+                                end else if (IS_OPT("-align32")) then begin
+                                    align32 := true;
+                                end else if (IS_OPT("-align64")) then begin
+                                    align64 := true;
+                                end else goto default;
                             end;
 
-                            CASE_OPT('2')
-                            begin
-                                warn_level := ord(Warn);
+                        CASE_ARG('w')
+                            case arg[3] of 
+                                CASE_ARG('1')
+                                begin
+                                    warn_level := ord(Info);
+                                    print_warnings := false;
+                                end;
+
+                                CASE_ARG('2')
+                                begin
+                                    warn_level := ord(Warn);
+                                end;
+
+                                CASE_ARG('3')
+                                begin
+                                    warn_level := ord(Error);
+                                    print_warnings := false;
+                                end;
+
+                                otherwise:
+                                    print_warnings := false;
                             end;
 
-                            CASE_OPT('3')
-                            begin
-                                warn_level := ord(Error);
-                                print_warnings := false;
-                            end;
-
-                            otherwise:
-                                print_warnings := false;
-                        end;
-
-                    CASE_OPT('c')
-                        if (IS_OPT("-cpalias")) then begin
-                            cpalias_ok := true;
-                        end else if (IS_OPT("-checkstack")) then begin
+                        CASE_ARG('c')
+                            if (IS_OPT("-cpalias")) then begin
+                                cpalias_ok := true;
+                            end else if (IS_OPT("-checkstack")) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "numeric argument required for -checkstack");
                                     halt(1);
@@ -668,36 +668,36 @@ begin
                                 
                             end else goto default;
                         
-                    CASE_OPT('6')
-                        if (ARG_OPT(3, '4') and ARG_OPT(4, 'd') and ARG_OPT(5, 'a') and ARG_OPT(6, 't') and ARG_OPT(7, 'a') and ARG_OPT(8, ' ')) then begin
-                            isa := ISA_MIPS3;
-                            opcode_arch := true;
-                            basicint := true;
-                            addr_dtype := Wdt;
-                            unitsperaddr := 8;
-                        end else goto default;
+                        CASE_ARG('6')
+                            if (ARG_OPT(3, '4') and ARG_OPT(4, 'd') and ARG_OPT(5, 'a') and ARG_OPT(6, 't') and ARG_OPT(7, 'a') and ARG_OPT(8, ' ')) then begin
+                                isa := ISA_MIPS3;
+                                opcode_arch := true;
+                                basicint := true;
+                                addr_dtype := Wdt;
+                                unitsperaddr := 8;
+                            end else goto default;
 
-                    CASE_OPT('-')
-                        if ((xpg_env = true) and ARG_OPT(3, '-')) then begin
-                            argv(index, sp108);
+                        CASE_ARG('-')
+                            if ((xpg_env = true) and ARG_OPT(3, '-')) then begin
+                                argv(index, sp108);
 
-                            CONSUME_WHITESPACE(var_s1, sp108);
+                                CONSUME_WHITESPACE(var_s1, sp108);
 
-                            if (var_s1 <> 0) then begin
-                                sp108[var_s1+1] := chr(0);
-                            end else begin
-                                writeln(err, arg:0, " not understood");
+                                if (var_s1 <> 0) then begin
+                                    sp108[var_s1+1] := chr(0);
+                                end else begin
+                                    writeln(err, arg:0, " not understood");
+                                end;
+
+                                for var_a0 := 3 to var_s1 + 1 do begin
+                                    sp15C0[var_a0 - 2] := sp108[var_a0];
+                                end;
+
                             end;
-
-                            for var_a0 := 3 to var_s1 + 1 do begin
-                                sp15C0[var_a0 - 2] := sp108[var_a0];
-                            end;
-
-                        end;
                         
-                        otherwise: 
+                            otherwise: 
                             default:
-                            writeln(err, arg:0, " not understood");
+                                writeln(err, arg:0, " not understood");
                     end;                    
                 end else begin
                     argv(index, sp15C0);
