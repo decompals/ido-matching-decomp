@@ -1,7 +1,9 @@
 #include "report.h"
 #include "tree.h"
 #include "tree_utils.h"
+#include "u_tree.h"
 #include "ibuffer.h"
+#include "emit.h"
 #include "cmplrs/allocator.h"
 #include "cmplrs/uini.h"
 #include "cmplrs/uread.h"
@@ -15,16 +17,16 @@
 
 #define CONSUME_WHITESPACE(len, line)  len := sizeof(line); \
     while ((len <> 0) and (line[len] = ' ')) do begin  \
-    len := len - 1; \
+        len := len - 1; \
     end; \
 
 
-{Special types for ugen.p}
+{Special types for ugen.p }
 type
     debug_levels = 0..4 of integer;
     opt_levels = 0..3 of integer;
-    ugen_str =  packed array [1..12] of char;
-    opt_str = packed array [1..32] of char;
+    ugen_str =  packed array [1..12] of char; {Used for printing out the ucode parse tree phase (translate, build, etc..)}
+    opt_str = packed array [1..32] of char; {Used for checking the options}
 
 
 { Functions called from C }
@@ -34,29 +36,22 @@ procedure unlink(var path: Filename); external;
 function getenv(var arg0: Filename): integer; external;
 procedure output_inst_bin(var a0: binasm; a1: cardinal; var a2: binasm; a3: cardinal); external;
 procedure cat_files(var a1: Filename; var a2: Filename); external; 
-
+procedure open_bin_file(var str: Filename); external;
 procedure set_domtag(arg0: boolean); external;
+
 procedure print_tree(pFile: ^Text; arg1: ^tree; arg2: cardinal; arg3: cardinal); external;
-procedure labelopt(a0: ^Tree; a1: ^Text; debug: boolean; sp516: boolean); external;
-
-
+procedure labelopt(a0: ^Tree; a1: ^Text; debug: boolean; arg2: boolean); external;
 procedure initialize_tree(); external;
 procedure init_ibuffer(); external;
-procedure open_bin_file(var str: Filename); external;
 procedure clear_sym_tab(); external;
 procedure init_build(); external;
-procedure clear_ibuffer(); external;
 function build_tree(verbose: boolean): pointer; external; 
 function translate_tree(a: ^Tree): pointer; external;
-procedure u_tree(arg0: ^Tree); external;
 procedure init_eval(); external;
 procedure eval(arg0: ^Tree; arg1: u8); external;
 procedure close_bin_file(); external;
-procedure emit_vers(); external;
-procedure emit_pic(arg0: u8); external;
 procedure output_decls(); external;
 procedure output_inst_ascii(var f: Filename; var pFile: Text); external;
-function has_errors(warn_lvl: cardinal): boolean; external;
 
 var
     addr_dtype: Datatype;
@@ -73,12 +68,6 @@ var
     first_ent: boolean;
     fp32regs: boolean;
     fp_initialized: s8;
-    d_ptr : cardinal;
-    old_d_ptr : cardinal;
-    i_ptr : cardinal;
-    old_i_ptr : cardinal;
-    ibuffer : ^BinasmArray;
-    ibuffer_size: cardinal;
     init_dynmem: boolean;
     isa: mips_isa;
     lsb_first: boolean;
@@ -117,13 +106,14 @@ var
 
 #define CONSUME_WHITESPACE(len, line)  len := sizeof(line); \
     while ((len <> 0) and (line[len] = ' ')) do begin  \
-    len := len - 1; \
+        len := len - 1; \
     end; \
 
 
 procedure set_opts(arg0: opt_levels; arg1: debug_levels); external;
 
 {Program block}
+
 program ugen;
 
 label default;
@@ -378,7 +368,7 @@ begin
         sp51C := 0;
         sp518 := 1;
         debug_ugen := false;
-        warn_level := 0;
+        warn_level := ord(Fix);
         index := 1;
         pic_level := 0;
         cpalias_ok := false;
@@ -422,7 +412,7 @@ begin
                             end else goto default;
 
                         CASE_OPT('o')
-                            if (arg[3] = ' ') then begin
+                            if (ARG_OPT(3, ' ')) then begin
                                 if (index + 1 = argc) then begin
                                     writeln(err, 'filename required after -o');
                                     halt(1);
@@ -433,9 +423,9 @@ begin
 
                         CASE_OPT('u')
                             if (ARG_OPT(3, 'f') and ARG_OPT(4, 's')) then begin
-                                if (arg[5] = 'a') then begin
+                                if (ARG_OPT(5, 'a')) then begin
                                     ufsa := true;
-                                end else if (arg[5] = 'm') then begin
+                                end else if (ARG_OPT(5, 'm')) then begin
                                     ufsm := true;
                                 end else goto default
                                 
@@ -449,7 +439,7 @@ begin
                             end else goto default;
 
                         CASE_OPT('l')
-                            if (arg[3] = ' ') then begin
+                            if (ARG_OPT(3, ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -l");
                                     halt(1);
@@ -461,7 +451,6 @@ begin
 
                         CASE_OPT('t')
                             if (ARG_OPT(3, 'e') and (ARG_OPT(4, 'm')) and (ARG_OPT(5, 'p'))) then begin
-                                
                                 if (succ(index) = argc) then begin
                                     writeln(err, "filename required after -temp");
                                     halt(1);
@@ -484,11 +473,11 @@ begin
 
                         CASE_OPT('e')
                             if (ARG_OPT(3,  ' ')) then begin
-
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -e");
                                     halt(1);
                                 end;
+                                
                                 index := index + 1;
                                 argv(index, sp1DD0);
                                 debug := true;
@@ -645,18 +634,18 @@ begin
                         case arg[3] of 
                             CASE_OPT('1')
                             begin
-                                warn_level := 1;
+                                warn_level := ord(Info);
                                 print_warnings := false;
                             end;
 
                             CASE_OPT('2')
                             begin
-                                warn_level := 2;
+                                warn_level := ord(Warn);
                             end;
 
                             CASE_OPT('3')
                             begin
-                                warn_level := 3;
+                                warn_level := ord(Error);
                                 print_warnings := false;
                             end;
 

@@ -1,5 +1,17 @@
 #include "common.h"
-#include "ugen.h"
+
+var
+	print_warnings: boolean;
+	current_line: cardinal;
+	debug_ugen: boolean;
+	opcode_arch: boolean;
+	glevel: u8;
+	ignore_vreg: u8;
+	olevel: u8;
+	opt_cse: u8;
+	opt_labels: boolean;
+	opt_parms: u8;
+	tail_call_opt: u8;
 
 /* Special type for ugen */
 type
@@ -59,7 +71,7 @@ begin
     end;
 end;
 
-function has_error(error_kind: cardinal): boolean;
+function has_errors(error_kind: cardinal): boolean;
 begin
     if (error_kind >= cardinal(ord(Warn))) then begin
         return (errors[Internal] <> 0) and (errors[Warn] <> 0) and (errors[Error] <> 0 );
