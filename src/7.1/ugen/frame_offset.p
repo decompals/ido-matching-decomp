@@ -1,5 +1,4 @@
 #include "common.h"
-#include "ugen.h"
 
 type
 unk_frame_offset_record = Record

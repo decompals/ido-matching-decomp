@@ -1,5 +1,20 @@
 #include "common.h"
-#include "ugen.h"
+
+var
+    print_warnings: boolean;
+    current_line: cardinal;
+    debug_ugen: boolean;
+    opcode_arch: boolean;
+    glevel: u8;
+    ignore_vreg: u8;
+    olevel: u8;
+    opt_cse: u8;
+    opt_labels: boolean;
+    opt_parms: u8;
+    tail_call_opt: u8;
+
+
+
 #line 22 "opt.p"
 procedure set_opts(arg0: u8; arg1: u8);
 begin
