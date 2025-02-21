@@ -25,12 +25,12 @@ begin
     sub_overflow := cardinal(arg1) < cardinal(arg2);
 end;
 
-function is_constant(arg0: ^tree): boolean;
+function is_constant(arg0: Ptree): boolean;
 begin
     return (arg0^.u.Opc = Uldc) and (arg0^.u.Dtype in [Adt, Hdt..Kdt, Ldt, Wdt]);
 end;
 
-function llconst(p_tree: ^tree; dtype: Datatype): integer64;
+function llconst(p_tree: Ptree; dtype: Datatype): integer64;
 begin
     { Check for s64, u64, s64* }
     if (dtype in [Idt, Kdt, Wdt]) then begin
@@ -43,13 +43,13 @@ begin
     end;
 end;
 
-function fold(arg0: ^Tree): pointer;
+function fold(arg0: Ptree): pointer;
 var
     sp70: integer64;
     sp68: integer64;
     sp60: integer64;
     temp_a0_2: Datatype;
-    temp_a0_3: ^Tree;
+    temp_a0_3: Ptree;
 begin    
     if (arg0^.u.Opc = Ucvt) then begin
         if (IS_OVERFLOW_ATTR(arg0^.u.Lexlev)) then begin
