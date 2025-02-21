@@ -19,7 +19,7 @@ end;
 function sub_overflow(dtype: Datatype; arg1: integer; arg2: integer): boolean;
 begin
     if dtype = Jdt then begin
-    sub_overflow := (bitxor(arg1, arg2) < 0) and (bitxor(cardinal(arg1), (arg1 - arg2)) < 0)
+        sub_overflow := (bitxor(arg1, arg2) < 0) and (bitxor(cardinal(arg1), (arg1 - arg2)) < 0)
     end else
         sub_overflow := cardinal(arg1) < cardinal(arg2);
 end;
