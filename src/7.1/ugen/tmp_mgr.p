@@ -1,8 +1,11 @@
 #include "common.h"
-#include "ugen.h"
 #include "reg_mgr.h"
 #include "report.h"
 #include "frame_offset.h"
+
+{Extern variables}
+var
+    opcode_arch: boolean;
 
 type
     Ptemp = ^Temp_rec;
