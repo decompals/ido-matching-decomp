@@ -8,26 +8,25 @@ function fold_constant(arg0: Uopcode; arg1: Datatype; arg2: integer64;
 arg3: integer64; arg4: boolean; arg5: boolean; arg6: boolean; var arg7: integer): boolean; external;
 procedure free_tree_and_cse(arg0: pointer); external;
 
-function add_overflow(arg0: u8; arg1: integer; arg2: integer): boolean;
+function add_overflow(dtype: Datatype; arg1: integer; arg2: integer): boolean;
 begin
-    if arg0 = 6 then begin
+    if dtype = Jdt then begin
         add_overflow := (bitxor(arg1, arg2) >= 0) and (bitxor(cardinal(arg1), (arg1 + arg2)) < 0)
     end else
-    add_overflow := ~cardinal(arg1) < cardinal(arg2);
+        add_overflow := ~cardinal(arg1) < cardinal(arg2);
 end;
 
-function sub_overflow(arg0: u8; arg1: integer; arg2: integer): boolean;
+function sub_overflow(dtype: Datatype; arg1: integer; arg2: integer): boolean;
 begin
-    if arg0 = 6 then begin
+    if dtype = Jdt then begin
     sub_overflow := (bitxor(arg1, arg2) < 0) and (bitxor(cardinal(arg1), (arg1 - arg2)) < 0)
     end else
-
-    sub_overflow := cardinal(arg1) < cardinal(arg2);
+        sub_overflow := cardinal(arg1) < cardinal(arg2);
 end;
 
 function is_constant(arg0: Ptree): boolean;
 begin
-    return (arg0^.u.Opc = Uldc) and (arg0^.u.Dtype in [Adt, Hdt..Kdt, Ldt, Wdt]);
+    return (arg0^.u.Opc = Uldc) and (arg0^.u.Dtype in [Adt, Hdt, Idt, Jdt, Kdt, Ldt, Wdt]); {Maybe a special data type is missing...}
 end;
 
 function llconst(p_tree: Ptree; dtype: Datatype): integer64;
@@ -37,9 +36,9 @@ begin
         llconst := p_tree^.u.Constval.dwval; 
     { s64 s32 }
     end else if (dtype in [Idt, Jdt]) then begin
-        llconst := p_tree^.u.Constval.dwval_h;
+        llconst := p_tree^.u.Constval.Ival;
     end else begin
-        llconst := cardinal(p_tree^.u.Constval.dwval_h);
+        llconst := cardinal(p_tree^.u.Constval.Ival);
     end;
 end;
 
@@ -63,7 +62,7 @@ begin
         if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and not (arg0^.op1^.u.Dtype in [Idt, Kdt, Wdt]) then begin
             arg0^.op1^.u.Constval.dwval := llconst(arg0^.op1, arg0^.op1^.u.Dtype);
         end else if not (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (arg0^.op1^.u.Dtype in [Idt, Kdt, Wdt]) then begin
-            arg0^.op1^.u.Constval.dwval_h := arg0^.op1^.u.Constval.dwval;
+            arg0^.op1^.u.Constval.Ival := arg0^.op1^.u.Constval.dwval;
         end;
         arg0^.op1^.u.Dtype := arg0^.u.Dtype;
         return arg0^.op1;
