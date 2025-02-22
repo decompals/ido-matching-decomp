@@ -5,6 +5,7 @@
 #include "cmplrs/ucode.h"
 #include "cmplrs/binasm.h"
 type
+  Ptree = ^tree;
   tree = packed record
     { Pointer Fields }
     { 0x00 } op1: ^tree;
