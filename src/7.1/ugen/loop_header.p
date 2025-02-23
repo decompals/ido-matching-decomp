@@ -89,7 +89,6 @@ begin
             (arg0^.u.I1 = arg1^.u.I1) and (arg0^.u.Offset = arg1^.u.Offset) and 
             (arg0^.u.Length = arg1^.u.Length) and (arg0^.u.Lexlev = arg1^.u.Lexlev);
 
-            {Check for label}
             if (arg0^.u.Mtype = Rmt) then begin
                 spB8 := 0;
             end;
@@ -324,70 +323,70 @@ begin
     end;
 
     case arg0^.u.Opc of
-        Ucup,  {0x17}
-        Ulca,  {0x46}
-        Ulda,  {0x47}
-        Uldc,  {0x49}
-        Ulod,  {0x52}
-        Umst,  {0x5C}
-        Urcuf: {0x97}
+        Ucup, 
+        Ulca, 
+        Ulda, 
+        Uldc, 
+        Ulod, 
+        Umst, 
+        Urcuf:
         begin
             return true;
         end;
-        Ucg2,  {0x0B}
-        Uchkh, {0x0C}
-        Uchkl, {0x0D}
-        Uchkn, {0x0E}
-        Uchkt, {0x0F}
-        Uabs, {0x00}
-        Ucvt,  {0x18}
-        Uicuf, {0x2C}
-        Uijp,  {0x31}
-        Uilod, {0x36}
-        Uisld, {0x3D}
-        Ulnot, {0x50}
-        Uneg,  {0x5E}
-        Unot,  {0x61}
-        Upar,  {0x64}
-        Urnd,  {0x6E}
-        Utyp,  {0x86}
-        Ustr:  {0x7B}
+        Ucg2, 
+        Uchkh,
+        Uchkl,
+        Uchkn,
+        Uchkt,
+        Uabs,
+        Ucvt, 
+        Uicuf,
+        Uijp, 
+        Uilod,
+        Uisld,
+        Ulnot,
+        Uneg, 
+        Unot, 
+        Upar, 
+        Urnd, 
+        Utyp, 
+        Ustr: 
         begin
             return cmp_tree_again(arg0^.op1, arg1^.op1);
         end;
-        Uujp:  {0x88}
+        Uujp: 
             return cmp_tree_again(arg0^.op2, arg1^.op2);
-        Ucg1,  {0x0A}
-        Uadd,  {0x01}
-        Uand,  {0x04}
-        Udiv,  {0x1D}
-        Uequ,  {0x23}
-        Ufjp,  {0x26}
-        Ugeq,  {0x28}
-        Ugrt,  {0x29}
-        Uiequ, {0x2E}
-        Uigeq, {0x2F}
-        Uigrt, {0x30}
-        Uileq, {0x34}
+        Ucg1, 
+        Uadd, 
+        Uand, 
+        Udiv, 
+        Uequ, 
+        Ufjp, 
+        Ugeq, 
+        Ugrt, 
+        Uiequ,
+        Uigeq,
+        Uigrt,
+        Uileq,
         Uiles,
-        Uineq, {0x38}
-        Uior,  {0x3C}
-        Uisst, {0x3E}
-        Uistr, {0x3F}
-        Uleq,  {0x4D}
-        Ules,  {0x4E}
-        Umax,  {0x55}
-        Umin,  {0x56}
-        Umod,  {0x57}
-        Umov,  {0x58}
-        Umpy,  {0x5B}
-        Uneq,  {0x5F}
-        Urem,  {0x69}
-        Ushl,  {0x73}
-        Ushr,  {0x74}
-        Usub,  {0x7D}
-        Utjp,  {0x7F}
-        Uxor:  {0x8D}
+        Uineq,
+        Uior, 
+        Uisst,
+        Uistr,
+        Uleq, 
+        Ules, 
+        Umax, 
+        Umin, 
+        Umod, 
+        Umov, 
+        Umpy, 
+        Uneq, 
+        Urem, 
+        Ushl, 
+        Ushr, 
+        Usub, 
+        Utjp, 
+        Uxor: 
         begin
             return cmp_tree_again(arg0^.op1, arg1^.op1) and cmp_tree_again(arg0^.op2, arg1^.op2);
         end;
@@ -536,8 +535,6 @@ begin
     arg0^.op1^.ref_count2 := succ(arg0^.op1^.ref_count2);
     arg1^.op1^.ref_count2 := succ(arg1^.op1^.ref_count2);
 
-    {TODO: Match with the proper set data (D_100162C0) }
-
     if ((arg0^.op1^.u.Opc in [Uequ, Ugeq, Ugrt, Uleq, Ules, Uneq]) and (arg1^.op1^.u.Opc in [Uequ, Ugeq, Ugrt, Uleq, Ules, Uneq])) then begin
         
         if ((arg0^.u.Opc = arg1^.u.Opc) and (arg0^.op1^.u.Opc = inverse[arg1^.op1^.u.Opc]) or
@@ -606,7 +603,7 @@ begin
                     var_s0 := get_prior_stm(var_s0);
                 end;
 
-                if (var_s0 <> nil) then begin end; { FAKE }
+                if (var_s0 <> nil) then begin end; { Fake match }
 
                 var_s6 := make_new_label();
                 append(make_new_jump(var_s6), var_s2);
