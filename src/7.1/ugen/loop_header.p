@@ -11,24 +11,16 @@ var
     stop_ops: set of Uopcode := [Uaent, Uclab, Udef, Uent, Uoptn, Uregs, Uvreg, Uxjp];
     not_real_stms: set of Uopcode := [Ubgnb, Ucomm, Uendb, Uloc, Unop];
 
-    inverse: array [First(Uopcode)..Last(Uopcode)] of Uopcode := (
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Uneq, Unop, Unop, Unop, Unop,
-        Ules, Uleq, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Ugrt, Ugeq, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Uequ, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop, Unop,
-        Unop, Unop, Unop, Unop, Unop, Unop,
-    );
+    inverse: array [First(Uopcode)..Last(Uopcode)] of Uopcode := [
+    {Uopcode} {Initialize to}
+        Uequ:   Uneq,
+        Ugeq:   Ules,
+        Ugrt:   Uleq,
+        Uleq:   Ugrt,
+        Ules:   Ugeq,
+        Uneq:   Uequ,
+        otherwise: Unop (* For any other Uopcode value not listed explicitly, set it to Unop. *)
+    ];
 
 procedure insert(arg0: Ptree; arg1: Ptree);
 begin
@@ -209,7 +201,7 @@ begin
 
         Ulca:
         begin
-            cmp_tree := FALSE;
+            cmp_tree := false;
         end;
 
         Uabs,
@@ -260,7 +252,7 @@ begin
         end;
 
         Uchkh, {Check higher}
-        Uchkl: { Check lower}
+        Uchkl: {Check lower}
         begin
             cmp_tree := (arg0^.u.Dtype = arg1^.u.Dtype) and (arg0^.u.Length = arg1^.u.Length) 
             and (cmp_tree(arg0^.op1, arg1^.op1));
@@ -291,7 +283,7 @@ begin
             cmp_tree := true;
         end;
 
-        Ulbdy: ; { missing return? }
+        Ulbdy: ; {Missing return?}
 
         otherwise begin
             report_error(Internal, 247, "loop_header.p", "unknown u-code");
@@ -354,8 +346,12 @@ begin
         begin
             return cmp_tree_again(arg0^.op1, arg1^.op1);
         end;
+        
         Uujp: 
+        begin
             return cmp_tree_again(arg0^.op2, arg1^.op2);
+        end;
+
         Ucg1, 
         Uadd, 
         Uand, 
@@ -452,7 +448,7 @@ label found;
 var
     var_s1: Ptree;
     var_s3: Ptree;
-    var_s2: Ptree; {Probably real}
+    var_s2: Ptree;
     var_s6: Ptree;
     var_s7: boolean;
     var_s0: Ptree;
@@ -550,12 +546,12 @@ end;
 
 procedure match_conds(arg0: Ptree);
 var
-    var_s1: Ptree; {s0} 
-    var_s3: Ptree; {s4} 
-    var_s2: Ptree; {s2}
-    var_s6: Ptree; {s5}
-    var_s0: Ptree; {s1}
-    temp_v0: Ptree; {s3}
+    var_s1: Ptree;
+    var_s3: Ptree;
+    var_s2: Ptree;
+    var_s6: Ptree;
+    var_s0: Ptree;
+    temp_v0: Ptree;
 begin
     temp_v0 := find_br(arg0);
     pay := 0;
@@ -603,7 +599,7 @@ begin
                     var_s0 := get_prior_stm(var_s0);
                 end;
 
-                if (var_s0 <> nil) then begin end; { Fake match }
+                if (var_s0 <> nil) then begin end; {Fake match}
 
                 var_s6 := make_new_label();
                 append(make_new_jump(var_s6), var_s2);
@@ -645,6 +641,7 @@ begin
 
             otherwise:;
         end;
+        
         arg0 := arg0^.next;
     end;
 end;
