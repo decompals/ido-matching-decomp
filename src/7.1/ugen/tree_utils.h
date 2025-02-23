@@ -3,7 +3,7 @@
 procedure build_u(var u: Bcrec); external;
 procedure build_u1(var u: Bcrec; op1: ^Tree); external;
 procedure build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree); external;
-procedure build_op(arg0: Uopcode); external;
+function build_op(arg0: Uopcode): pointer; external;
 procedure free_node(arg0: ^Tree); external;
 procedure free_tree(t: ^tree); external;
 procedure delete_statement(arg0: ^tree); external;
