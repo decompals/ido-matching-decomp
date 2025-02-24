@@ -20,56 +20,54 @@ type
     FileOfBinasm = File of binasm;
 
     opcodes = (
-        op_000, op_001, op_002, op_003, op_004, op_005, op_006, op_007,
-        op_008, op_009, op_00A, op_00B, op_00C, op_00D, op_00E, op_00F,
-        op_010, op_011, op_012, op_013, op_014, op_015, op_016, op_017,
-        op_018, op_019, op_01A, op_01B, op_01C, op_01D, op_01E, op_01F,
-        op_020, op_021, op_022, op_023, op_024, op_025, op_026, op_027,
-        op_028, op_029, op_02A, op_02B, op_02C, op_02D, op_02E, op_02F,
-        op_030, op_031, op_032, op_033, op_034, op_035, op_036, op_037,
-        op_038, op_039, op_03A, op_03B, op_03C, op_03D, op_03E, op_03F,
-        op_040, op_041, op_042, op_043, op_044, op_045, op_046, op_047,
-        op_048, op_049, op_04A, op_04B, op_04C, op_04D, op_04E, op_04F,
-        op_050, op_051, op_052, op_053, op_054, op_055, op_056, op_057,
-        op_058, op_059, op_05A, op_05B, op_05C, op_05D, op_05E, op_05F,
-        op_060, op_061, op_062, op_063, op_064, op_065, op_066, op_067,
-        op_068, op_069, op_06A, op_06B, op_06C, op_06D, op_06E, op_06F,
-        op_070, op_071, op_072, op_073, op_074, op_075, op_076, op_077,
-        op_078, op_079, op_07A, op_07B, op_07C, op_07D, op_07E, op_07F,
-        op_080, op_081, op_082, op_083, op_084, op_085, op_086, op_087,
-        op_088, op_089, op_08A, op_08B, op_08C, op_08D, op_08E, op_08F,
-        op_090, op_091, op_092, op_093, op_094, op_095, op_096, op_097,
-        op_098, op_099, op_09A, op_09B, op_09C, op_09D, op_09E, op_09F,
-        op_0A0, op_0A1, op_0A2, op_0A3, op_0A4, op_0A5, op_0A6, op_0A7,
-        op_0A8, op_0A9, op_0AA, op_0AB, op_0AC, op_0AD, op_0AE, op_0AF,
-        op_0B0, op_0B1, op_0B2, op_0B3, op_0B4, op_0B5, op_0B6, op_0B7,
-        op_0B8, op_0B9, op_0BA, op_0BB, op_0BC, op_0BD, op_0BE, op_0BF,
-        op_0C0, op_0C1, op_0C2, op_0C3, op_0C4, op_0C5, op_0C6, op_0C7,
-        op_0C8, op_0C9, op_0CA, op_0CB, op_0CC, op_0CD, op_0CE, op_0CF,
-        op_0D0, op_0D1, op_0D2, op_0D3, op_0D4, op_0D5, op_0D6, op_0D7,
-        op_0D8, op_0D9, op_0DA, op_0DB, op_0DC, op_0DD, op_0DE, op_0DF,
-        op_0E0, op_0E1, op_0E2, op_0E3, op_0E4, op_0E5, op_0E6, op_0E7,
-        op_0E8, op_0E9, op_0EA, op_0EB, op_0EC, op_0ED, op_0EE, op_0EF,
-        op_0F0, op_0F1, op_0F2, op_0F3, op_0F4, op_0F5, op_0F6, op_0F7,
-        op_0F8, op_0F9, op_0FA, op_0FB, op_0FC, op_0FD, op_0FE, op_0FF,
-        op_100, op_101, op_102, op_103, op_104, op_105, op_106, op_107,
-        op_108, op_109, op_10A, op_10B, op_10C, op_10D, op_10E, op_10F,
-        op_110, op_111, op_112, op_113, op_114, op_115, op_116, op_117,
-        op_118, op_119, op_11A, op_11B, op_11C, op_11D, op_11E, op_11F,
-        op_120, op_121, op_122, op_123, op_124, op_125, op_126, op_127,
-        op_128, op_129, op_12A, op_12B, op_12C, op_12D, op_12E, op_12F,
-        op_130, op_131, op_132, op_133, op_134, op_135, op_136, op_137,
-        op_138, op_139, op_13A, op_13B, op_13C, op_13D, op_13E, op_13F,
-        op_140, op_141, op_142, op_143, op_144, op_145, op_146, op_147,
-        op_148, op_149, op_14A, op_14B, op_14C, op_14D, op_14E, op_14F,
-        op_150, op_151, op_152, op_153, op_154, op_155, op_156, op_157,
-        op_158, op_159, op_15A, op_15B, op_15C, op_15D, op_15E, op_15F
+        op_macro, op_znop, op_zsll, op_zsrl, op_zsra, op_zsllv, op_zsrlv, op_zsrav, { 0 - 7 }
+        op_008, op_009, op_zsyscall, op_zbreak, op_zmfhi, op_zmthi, op_zmflo, op_zmtlo, { 8 - 25 }
+        op_zmult, op_zmultu, op_zdiv, op_zdivu, op_zadd, op_zaddu, op_zsub, op_zsubu, { 16 - 23 }
+        op_zand, op_zor, op_zxor, op_znor, op_01C, op_01D, op_ztlt, op_ztltu, { 24 - 31 }
+        op_ztge, op_ztgeu, op_zteq, op_ztne, op_zdadd, op_zdaddu, op_zdsub, op_zdsubu, { 32 - 39 }
+        op_zdsll, op_zdsrl, op_zdsra, op_02B, op_02C, op_02D, op_zdsllv, op_zdsrlv, { 40 - 47 }
+        op_zdsrav, op_zdmult, op_zdmultu, op_zddiv, op_zddivu, op_zbltz, op_zbgez, op_037, { 48 - 55 }
+        op_zbal, op_zbc0f, op_zbc0t, op_zbc1f, op_zbc1t, op_zbc2f, op_zbc2t, op_zbltzl, { 56 - 63 }
+        op_zbgezl, op_zbltzall, op_zbgezall, op_zbc0fl, op_zbc0tl, op_zbc1fl, op_zbc1tl, op_zbc2fl, { 64 - 71 }
+        op_zbc2tl, op_zj, op_zjal, op_zbeq, op_zbne, op_zblez, op_zbgtz, op_zbeql, { 72 - 79 }
+        op_zbnel, op_zblezl, op_zbgtzl, op_zaddi, op_zaddiu, op_zslti, op_zsltiu, op_zandi, { 80 - 87 }
+        op_zori, op_zxori, op_zlui, op_05B, op_05C, op_05D, op_05E, op_05F, { 88 - 95 }
+        op_060, op_zdaddi, op_zdaddiu, op_zc0, op_zc1, op_zc2, op_zlb, op_zlh, { 96 - 103 }
+        op_zlwl, op_zlw, op_zlbu, op_zlhu, op_zlwr, op_zsb, op_zsh, op_zswl, { 104 - 111 }
+        op_zsw, op_zswr, op_zll, op_zlwc1, op_zlwc2, op_zsc, op_zswc1, op_zswc2, { 112 - 119 }
+        op_zlwu, op_zld, op_zsd, op_zldc1, op_zldc2, op_zsdc1, op_zsdc2, op_zldl, { 120 - 127 }
+        op_zldr, op_zlld, op_zsdl, op_zsdr, op_zscd, op_zlsc1, op_zssc1, op_zmovf, { 128 - 135 }
+        op_zmovt, op_zmovn, op_zmovz, op_zmfc0, op_zmfc1, op_zmfc2, op_zcfc1, op_zmtc0, { 136 - 143 }
+        op_zmtc1, op_zmtc2, op_zctc1, op_zrfe, op_ztlbr, op_ztlbwi, op_ztlbwr, op_ztlbp, { 144 - 151 }
+        op_zsync, op_zdmtc1, op_zdmfc1, op_zdmtc0, op_zdmfc0, op_zdmtc2, op_zdmfc2, op_zcache, { 152 - 159 }
+        op_fadd_s, op_fadd_d, op_fadd_e, op_fsub_s, op_fsub_d, op_fsub_e, op_fmul_s, op_fmul_d, { 160 - 167 }
+        op_fmul_e, op_fdiv_s, op_fdiv_d, op_fdiv_e, op_fsqrt_s, op_fsqrt_d, op_fsqrt_e, op_fabs_s, { 168 - 175 }
+        op_fabs_d, op_fabs_e, op_fmov_s, op_fmov_d, op_fmov_e, op_fneg_s, op_fneg_d, op_fneg_e, { 176 - 183 }
+        op_fcvt_s_d, op_fcvt_s_e, op_fcvt_s_w, op_fcvt_d_s, op_fcvt_d_e, op_fcvt_d_w, op_fcvt_e_s, op_fcvt_e_d, { 184 - 191 }
+        op_fcvt_e_w, op_fcvt_w_s, op_fcvt_w_d, op_fcvt_w_e, op_fc_f_s, op_fc_f_d, op_fc_f_e, op_fc_un_s, { 192 - 199 }
+        op_fc_un_d, op_fc_un_e, op_fc_eq_s, op_fc_eq_d, op_fc_eq_e, op_fc_ueq_s, op_fc_ueq_d, op_fc_ueq_e, { 200 - 207 }
+        op_fc_olt_s, op_fc_olt_d, op_fc_olt_e, op_fc_ult_s, op_fc_ult_d, op_fc_ult_e, op_fc_ole_s, op_fc_ole_d, { 208 - 215 }
+        op_fc_ole_e, op_fc_ule_s, op_fc_ule_d, op_fc_ule_e, op_fc_sf_s, op_fc_sf_d, op_fc_sf_e, op_fc_ngle_s, { 216 - 223 }
+        op_fc_ngle_d, op_fc_ngle_e, op_fc_seq_s, op_fc_seq_d, op_fc_seq_e, op_fc_ngl_s, op_fc_ngl_d, op_fc_ngl_e, { 224 - 231 }
+        op_fc_lt_s, op_fc_lt_d, op_fc_lt_e, op_fc_nge_s, op_fc_nge_d, op_fc_nge_e, op_fc_le_s, op_fc_le_d, { 232 - 239 }
+        op_fc_le_e, op_fc_ngt_s, op_fc_ngt_d, op_fc_ngt_e, op_zcfc0, op_zcfc2, op_zctc0, op_zctc2, { 240 - 247 }
+        op_fli_s, op_fli_d, op_fli_e, op_zround_w_s, op_zround_w_d, op_zround_w_e, op_ztrunc_w_s, op_ztrunc_w_d, { 248 - 255 }
+        op_ztrunc_w_e, op_zceil_w_s, op_zceil_w_d, op_zceil_w_e, op_zfloor_w_s, op_zfloor_w_d, op_zfloor_w_e, op_zround_l_s, { 256 - 263 }
+        op_ztrunc_l_s, op_zceil_l_s, op_zfloor_l_s, op_zround_l_d, op_ztrunc_l_d, op_zceil_l_d, op_zfloor_l_d, op_zround_l_e, { 264 - 271 }
+        op_ztrunc_l_e, op_zceil_l_e, op_zfloor_l_e, op_fcvt_l_s, op_fcvt_l_d, op_fcvt_l_e, op_fcvt_l_w, op_fcvt_s_l, { 272 - 279 }
+        op_fcvt_d_l, op_fcvt_e_l, op_fcvt_w_l, op_zeret, op_fmadd_s, op_fmadd_d, op_fmadd_e, op_fmsub_s, { 280 - 287 }
+        op_fmsub_d, op_fmsub_e, op_fnmadd_s, op_fnmadd_d, op_fnmadd_e, op_fnmsub_s, op_fnmsub_d, op_fnmsub_e, { 288 - 295 }
+        op_frecip_s, op_frecip_d, op_frsqrt_s, op_frsqrt_d, op_fmovf_s, op_fmovf_d, op_fmovt_s, op_fmovt_d, { 296 - 303 }
+        op_fmovn_s, op_fmovn_d, op_fmovz_s, op_fmovz_d, op_zlwxc1, op_zldxc1, op_zswxc1, op_zsdxc1, { 204 - 311 }
+        op_zpfetch, op_zdctr, op_zdctw, op_ztlbw, op_zpref, op_ztlbr1, op_ztlbp1, op_zbc3f, { 312 - 319 }
+        op_zbc3t, op_zc3, op_zlwc3, op_zswc3, op_zmfc3, op_zmtc3, op_zcfc3, op_zctc3, { 320 - 327 }
+        op_zmfpc, op_zmtpc, op_zmfps, op_zmtps { 328 - 331 }
 	);
 
-    opformats = (
-        opfmt_0, opfmt_1, opfmt_2, opfmt_3,
-        opfmt_4, opfmt_5, opfmt_6, opfmt_7,
-        opfmt_8, opfmt_9, opfmt_10
+    mipsformats = (
+        mipsfmt_0, mipsfmt_1, mipsfmt_2, mipsfmt_3,
+        mipsfmt_4, mipsfmt_5, mipsfmt_6, mipsfmt_7,
+        mipsfmt_8, mipsfmt_9, mipsfmt_10
     );
 
     asmformat = (
@@ -372,7 +370,7 @@ type
 
 var
     template: array [first(opcodes)..last(opcodes)] of cardinal;
-    opcodeformat: array [first(opcodes)..last(opcodes)] of opformats;
+    opcodeformat: array [first(opcodes)..last(opcodes)] of mipsformats;
     asm2op: array [first(asmcodes)..last(asmcodes)] of opcodes;
     asm2asmformat: array [first(asmcodes)..last(asmcodes)] of asmformat;
     gp_tables: array [0..15] of pointer;
@@ -571,14 +569,14 @@ procedure flush_line_no(); external;
 program main;
 var
     j: integer;
-    string1: GString;
+    input_fname: GString;
     string2: GString;
-    string3: GString;
-    string4: GString;
+    t_opt_string: GString;
+    e_opt_string: GString;
     sp104: String; { sp104 - sp154 }
     i: integer;
     
-procedure func_00441024();
+procedure init_all();
 var
     j: integer;
     index: integer;
@@ -594,14 +592,16 @@ var
     pad3: integer;
     pad4: integer;
     one: integer;
+
     
-    procedure func_00440E20(fop: opcodes; tmpl: cardinal; fmt: opformats);
+    
+    procedure set_mips_inst_template(fop: opcodes; tmpl: cardinal; fmt: mipsformats);
     begin
         template[fop] := tmpl;
         opcodeformat[fop] := fmt;
     end;
     
-    procedure func_00440E54(fasm: asmcodes; fmt: asmformat; op: opcodes);
+    procedure register_asmcode(fasm: asmcodes; fmt: asmformat; op: opcodes);
     begin
         asm2op[fasm] := op;
         asm2asmformat[fasm] := fmt;
@@ -639,7 +639,7 @@ var
         if (isa >= ISA_MIPS2) then begin
             func_00440F68 := arg0;
         end else begin
-            func_00440F68 := op_000;
+            func_00440F68 := op_macro;
         end;
     end;
     
@@ -654,16 +654,16 @@ var
 begin
     new(emptystring.z);
     emptystring.z^[1] := chr(0);
-    new(string3.f);
-    string3.f^[1] := chr(0);
+    new(t_opt_string.f);
+    t_opt_string.f^[1] := chr(0);
     new(string2.f);
     string2.f^[1] := chr(0);
-    new(string1.f);
-    string1.f^[1] := chr(0);
+    new(input_fname.f);
+    input_fname.f^[1] := chr(0);
     new(outname.f);
-    outname.o^ := "b.out\0"; { need to make it 32 bytes long }
-    new(string4.f);
-    string4.f^[1] := chr(0);
+    outname.o^ := "b.out\0";
+    new(e_opt_string.f);
+    e_opt_string.f^[1] := chr(0);
 
     one := 1; { required to match }
 
@@ -768,7 +768,8 @@ begin
     t5_ll_sc_bug := false;
     r4300_mul := false;
     fp_hack_flag := 4;
-    gp_fp_moves := [op_073, op_076, op_07B, op_07D, op_085, op_086, op_08C, op_08E, op_090, op_092, op_099, op_09A];
+    gp_fp_moves := [op_zlwc1, op_zswc1, op_zldc1, op_zsdc1, op_zlsc1, op_zssc1,
+                    op_zmfc1, op_zcfc1, op_zmtc1, op_zctc1, op_zdmtc1, op_zdmfc1];
     fromas0 := false;
     real_delays := false;
     gprmask := 0;
@@ -920,8 +921,8 @@ begin
                     option_e:
                         begin
                             index := index + 1;
-                            get_sstring(index, string4);
-                            dd_initialize(string4.f^);
+                            get_sstring(index, e_opt_string);
+                            dd_initialize(e_opt_string.f^);
                             use_ddopt_info := true;
                         end;
                     option_g0: debugflag := 0;
@@ -948,7 +949,7 @@ begin
                     option_t:
                         begin
                             index := index + 1;
-                            get_sstring(index, string3);
+                            get_sstring(index, t_opt_string);
                         end;
                     option__G:
                         begin
@@ -1030,10 +1031,10 @@ begin
                     option_trapuv: ; { no action }
                     otherwise:
                         if (xpg_flag and negative_file_opt(arg)) then begin
-                            if (string1.f^[1] = chr(0)) then begin
+                            if (input_fname.f^[1] = chr(0)) then begin
                                 get_sstring(index, string2);
                                 for i := 3 to 1024 do
-                                    string1.f^[i - 2] := string2.f^[i];
+                                    input_fname.f^[i - 2] := string2.f^[i];
                             end else begin
                                 PostError("too many file names on command line", emptystring, ErrorLevel_2);
                             end;
@@ -1041,8 +1042,8 @@ begin
                             PostError("unknown option", arg, ErrorLevel_2);
                         end;
                 end;
-            end else if (string1.f^[1] = chr(0)) then begin
-                get_sstring(index, string1);
+            end else if (input_fname.f^[1] = chr(0)) then begin
+                get_sstring(index, input_fname);
             end else begin
                 PostError("too many file names on command line", emptystring, ErrorLevel_2);
             end;
@@ -1051,8 +1052,8 @@ begin
     end;
 
     dispose(arg.o);
-    if (string1.o^[1] = chr(0)) then begin
-        string1.o^ := "binasm\0";
+    if (input_fname.o^[1] = chr(0)) then begin
+        input_fname.o^ := "binasm\0";
     end;
 
     if ((profileflag >= 2) and (debugflag <= 0)) then begin
@@ -1070,797 +1071,797 @@ begin
     init_reorg_state(var_s7);
     sexchange := (isbigendianhost <> bigendian);
 
-    br_always_ops := [op_035..op_03E, op_04B..op_04E, op_13F, op_140];
-    br_likely_ops := [op_03F..op_048, op_04F..op_052];
+    br_always_ops := [op_zbltz..op_zbc2t, op_zbeq..op_zbgtz, op_zbc3f, op_zbc3t];
+    br_likely_ops := [op_zbltzl..op_zbc2tl, op_zbeql..op_zbgtzl];
     branchops := br_always_ops + br_likely_ops;
-    storeops := [op_06D..op_071, op_075..op_077, op_07A, op_07D, op_07E, op_082..op_084, op_086, op_143];
-    alu3ops := [op_005..op_007, op_010..op_034, op_087..op_08A, op_134..op_138];
-    trapops := [op_01E..op_023];
-    fpops := [op_0A0..op_0F3, op_0FB..op_11A, op_11C..op_133];
-    c0123_moves := [op_08B..op_092, op_099..op_09E, op_0F4..op_0F7, op_144..op_14B];
-    mark2ops := [op_01E..op_023, op_03F..op_048, op_04F..op_052, op_05B..op_060, op_072, op_075, op_07B..op_07E, op_09F, op_11B];
-    mark3ops := [op_024..op_034, op_061, op_062, op_078..op_07A, op_07F..op_084, op_099..op_09E, op_107..op_11A];
-    mark4ops := [op_087..op_08A, op_11C..op_138, op_13C..op_13E, op_148..op_14B];
-    hilo_defs := [op_00D, op_00F..op_013, op_031..op_034];
-    c0_ops := [op_039, op_03A, op_063, op_08B, op_08F, op_094..op_097, op_09B, op_09C, op_09F, op_139..op_13B, op_13D, op_13E, op_148..op_14B];
-    c3_ops := [op_13F..op_147];
+    storeops := [op_zsb..op_zswr, op_zsc..op_zswc2, op_zsd, op_zsdc1, op_zsdc2, op_zsdl..op_zscd, op_zssc1, op_zswc3];
+    alu3ops := [op_zsllv..op_zsrav, op_zmult..op_zddivu, op_zmovf..op_zmovz, op_zlwxc1..op_zpfetch];
+    trapops := [op_ztlt..op_ztne];
+    fpops := [op_fadd_s..op_fc_ngt_e, op_zround_w_s..op_fcvt_w_l, op_fmadd_s..op_fmovz_d];
+    c0123_moves := [op_zmfc0..op_zctc1, op_zdmtc1..op_zdmfc2, op_zcfc0..op_zctc2, op_zmfc3..op_zmtps];
+    mark2ops := [op_ztlt..op_ztne, op_zbltzl..op_zbc2tl, op_zbeql..op_zbgtzl, op_05B..op_060, op_zll, op_zsc, op_zldc1..op_zsdc2, op_zcache, op_zeret];
+    mark3ops := [op_zdadd..op_zddivu, op_zdaddi, op_zdaddiu, op_zlwu..op_zsd, op_zldl..op_zscd, op_zdmtc1..op_zdmfc2, op_zround_l_s..op_fcvt_w_l];
+    mark4ops := [op_zmovf..op_zmovz, op_fmadd_s..op_zpfetch, op_zpref..op_ztlbp1, op_zmfpc..op_zmtps];
+    hilo_defs := [op_zmthi, op_zmtlo..op_zdivu, op_zdmult..op_zddivu];
+    c0_ops := [op_zbc0f, op_zbc0t, op_zc0, op_zmfc0, op_zmtc0, op_ztlbr..op_ztlbp, op_zdmtc0, op_zdmfc0, op_zcache, op_zdctr..op_ztlbw, op_ztlbr1, op_ztlbp1, op_zmfpc..op_zmtps];
+    c3_ops := [op_zbc3f..op_zctc3];
 
-    func_00440E54(zabs, afrr, op_000);
-    func_00440E54(zadd, afrrr, op_014);
-    func_00440E54(zaddu, afrrr, op_015);
-    func_00440E54(zaddou, afrrr, op_015);
-    func_00440E54(zand, afrrr, op_018);
-    func_00440E54(zb, afl, op_000);
-    func_00440E54(zbc0f, afl, op_039);
-    func_00440E54(zbc0t, afl, op_03A);
-    func_00440E54(zbc1f, afl, op_03B);
-    func_00440E54(zbc1t, afl, op_03C);
-    func_00440E54(zbc2f, afl, op_03D);
-    func_00440E54(zbc2t, afl, op_03E);
-    func_00440E54(zbc0fl, afl, op_043);
-    func_00440E54(zbc0tl, afl, op_044);
-    func_00440E54(zbc1fl, afl, op_045);
-    func_00440E54(zbc1tl, afl, op_046);
-    func_00440E54(zbc2fl, afl, op_047);
-    func_00440E54(zbc2tl, afl, op_048);
-    func_00440E54(zbeq, afrrl, op_04B);
-    func_00440E54(zbeqz, afrl, op_04B);
-    func_00440E54(zbne, afrrl, op_04C);
-    func_00440E54(zbnez, afrl, op_04C);
-    func_00440E54(zble, afrrl, op_000);
-    func_00440E54(zbleu, afrrl, op_000);
-    func_00440E54(zblez, afrl, op_04D);
-    func_00440E54(zbgt, afrrl, op_000);
-    func_00440E54(zbgtu, afrrl, op_000);
-    func_00440E54(zbgtz, afrl, op_04E);
-    func_00440E54(zblt, afrrl, op_000);
-    func_00440E54(zbltu, afrrl, op_000);
-    func_00440E54(zbltz, afrl, op_035);
-    func_00440E54(zbltzal, afrl, op_037);
-    func_00440E54(zbge, afrrl, op_000);
-    func_00440E54(zbgeu, afrrl, op_000);
-    func_00440E54(zbgez, afrl, op_036);
-    func_00440E54(zbgezal, afrl, op_038);
-    func_00440E54(zbal, afrl, op_038);
-    func_00440E54(zbeql, afrrl, op_04F);
-    func_00440E54(zbeqzl, afrl, op_04F);
-    func_00440E54(zbnel, afrrl, op_050);
-    func_00440E54(zbnezl, afrl, op_050);
-    func_00440E54(zblel, afrrl, op_000);
-    func_00440E54(zbleul, afrrl, op_000);
-    func_00440E54(zblezl, afrl, op_051);
-    func_00440E54(zbgtl, afrrl, op_000);
-    func_00440E54(zbgtul, afrrl, op_000);
-    func_00440E54(zbgtzl, afrl, op_052);
-    func_00440E54(zbltl, afrrl, op_000);
-    func_00440E54(zbltul, afrrl, op_000);
-    func_00440E54(zbltzl, afrl, op_03F);
-    func_00440E54(zbltzall, afrl, op_041);
-    func_00440E54(zbgel, afrrl, op_000);
-    func_00440E54(zbgeul, afrrl, op_000);
-    func_00440E54(zbgezl, afrl, op_040);
-    func_00440E54(zbgezall, afrl, op_042);
-    func_00440E54(zbreak, af, op_00B);
-    func_00440E54(zcia, afri, op_000);
-    func_00440E54(zc0, aforrr, op_063);
-    func_00440E54(zc1, aforrr, op_064);
-    func_00440E54(zc2, aforrr, op_065);
-    func_00440E54(zdiv, afrrr, op_012);
-    func_00440E54(zdivu, afrrr, op_013);
-    func_00440E54(zj, afa, op_049);
-    func_00440E54(zjal, afa, op_04A);
-    func_00440E54(zla, afra, op_000);
-    func_00440E54(zlb, afra, op_066);
-    func_00440E54(zlbu, afra, op_06A);
-    func_00440E54(zlh, afra, op_067);
-    func_00440E54(zlhu, afra, op_06B);
-    func_00440E54(zli, afri, op_000);
-    func_00440E54(zlw, afra, op_069);
-    func_00440E54(zll, afra, op_072);
-    func_00440E54(zlwc1, afra, op_073);
-    func_00440E54(zlwc2, afra, op_074);
-    func_00440E54(zlwl, afra, op_068);
-    func_00440E54(zlwr, afra, op_06C);
-    func_00440E54(zmfc0, afrr, op_08B);
-    func_00440E54(zmfc1, afrr, op_08C);
-    func_00440E54(zmfc1_d, afrr, op_08C);
-    func_00440E54(zmfc2, afrr, op_08D);
-    func_00440E54(zcfc0, afrr, op_0F4);
-    func_00440E54(zcfc1, afrr, op_08E);
-    func_00440E54(zcfc2, afrr, op_0F5);
-    func_00440E54(zmfhi, afr, op_00C);
-    func_00440E54(zmflo, afr, op_00E);
-    func_00440E54(zmove, afrr, op_000);
-    func_00440E54(zmtc0, afrr, op_08F);
-    func_00440E54(zmtc1, afrr, op_090);
-    func_00440E54(zmtc1_d, afrr, op_090);
-    func_00440E54(zmtc2, afrr, op_091);
-    func_00440E54(zctc0, afrr, op_0F6);
-    func_00440E54(zctc1, afrr, op_092);
-    func_00440E54(zctc2, afrr, op_0F7);
-    func_00440E54(zmthi, afr, op_00D);
-    func_00440E54(zmtlo, afr, op_00F);
-    func_00440E54(zmul, afrrr, op_000);
-    func_00440E54(zmulo, afrrr, op_000);
-    func_00440E54(zmulou, afrrr, op_000);
-    func_00440E54(zmult, afrr, op_010);
-    func_00440E54(zmultu, afrr, op_011);
-    func_00440E54(zneg, afrr, op_000);
-    func_00440E54(znegu, afrr, op_000);
-    func_00440E54(znop, af, op_001);
-    func_00440E54(znor, afrrr, op_01B);
-    func_00440E54(znot, afrr, op_000);
-    func_00440E54(zor, afrrr, op_019);
-    func_00440E54(zrem, afrrr, op_012);
-    func_00440E54(zremu, afrrr, op_013);
-    func_00440E54(zrfe, af, op_093);
-    func_00440E54(zrol, afrrr, op_000);
-    func_00440E54(zror, afrrr, op_000);
-    func_00440E54(zsb, afra, op_06D);
-    func_00440E54(zseq, afrrr, op_000);
-    func_00440E54(zsge, afrrr, op_000);
-    func_00440E54(zsgeu, afrrr, op_000);
-    func_00440E54(zsgt, afrrr, op_000);
-    func_00440E54(zsgtu, afrrr, op_000);
-    func_00440E54(zsh, afra, op_06E);
-    func_00440E54(zsle, afrrr, op_000);
-    func_00440E54(zsleu, afrrr, op_000);
-    func_00440E54(zsll, afrrr, op_002);
-    func_00440E54(zslt, afrrr, op_000);
-    func_00440E54(zsltu, afrrr, op_000);
-    func_00440E54(zsne, afrrr, op_000);
-    func_00440E54(zsra, afrrr, op_004);
-    func_00440E54(zsrl, afrrr, op_003);
-    func_00440E54(zsllv, afrrr, op_005);
-    func_00440E54(zsrlv, afrrr, op_006);
-    func_00440E54(zsrav, afrrr, op_007);
-    func_00440E54(zsub, afrrr, op_016);
-    func_00440E54(zsubu, afrrr, op_017);
-    func_00440E54(zsubou, afrrr, op_017);
-    func_00440E54(zsw, afra, op_070);
-    func_00440E54(zsc, afra, op_075);
-    func_00440E54(zswc1, afra, op_076);
-    func_00440E54(zswc2, afra, op_077);
-    func_00440E54(zswl, afra, op_06F);
-    func_00440E54(zswr, afra, op_071);
-    func_00440E54(zsyscall, af, op_00A);
-    func_00440E54(zxor, afrrr, op_01A);
-    func_00440E54(ztlbr, af, op_094);
-    func_00440E54(ztlbwi, af, op_095);
-    func_00440E54(ztlbwr, af, op_096);
-    func_00440E54(ztlbp, af, op_097);
-    func_00440E54(ztlbr1, af, op_13D);
-    func_00440E54(ztlbp1, af, op_13E);
-    func_00440E54(zsync, af, op_098);
-    func_00440E54(zld, afra, func_00440F68(op_079));
-    func_00440E54(zsd, afra, func_00440F68(op_07A));
-    func_00440E54(zldc1, afra, func_00440F68(op_07B));
-    func_00440E54(zldc2, afra, func_00440F68(op_07C));
-    func_00440E54(zsdc1, afra, func_00440F68(op_07D));
-    func_00440E54(zsdc2, afra, func_00440F68(op_07E));
-    func_00440E54(zaddi, afrrr, op_053);
-    func_00440E54(zaddiu, afrrr, op_054);
-    func_00440E54(zslti, afrrr, op_055);
-    func_00440E54(zsltiu, afrrr, op_056);
-    func_00440E54(zandi, afrrr, op_057);
-    func_00440E54(zori, afrrr, op_058);
-    func_00440E54(zxori, afrrr, op_059);
-    func_00440E54(zlui, afri, op_05A);
-    func_00440E54(zulw, afra, op_000);
-    func_00440E54(zulh, afra, op_000);
-    func_00440E54(zulhu, afra, op_000);
-    func_00440E54(zusw, afra, op_000);
-    func_00440E54(zush, afra, op_000);
-    func_00440E54(zdli, dli_dla, op_000);
-    func_00440E54(zdla, afra, op_000);
-    func_00440E54(zlgota, afra, op_000);
+    register_asmcode(zabs, afrr, op_macro);
+    register_asmcode(zadd, afrrr, op_zadd);
+    register_asmcode(zaddu, afrrr, op_zaddu);
+    register_asmcode(zaddou, afrrr, op_zaddu);
+    register_asmcode(zand, afrrr, op_zand);
+    register_asmcode(zb, afl, op_macro);
+    register_asmcode(zbc0f, afl, op_zbc0f);
+    register_asmcode(zbc0t, afl, op_zbc0t);
+    register_asmcode(zbc1f, afl, op_zbc1f);
+    register_asmcode(zbc1t, afl, op_zbc1t);
+    register_asmcode(zbc2f, afl, op_zbc2f);
+    register_asmcode(zbc2t, afl, op_zbc2t);
+    register_asmcode(zbc0fl, afl, op_zbc0fl);
+    register_asmcode(zbc0tl, afl, op_zbc0tl);
+    register_asmcode(zbc1fl, afl, op_zbc1fl);
+    register_asmcode(zbc1tl, afl, op_zbc1tl);
+    register_asmcode(zbc2fl, afl, op_zbc2fl);
+    register_asmcode(zbc2tl, afl, op_zbc2tl);
+    register_asmcode(zbeq, afrrl, op_zbeq);
+    register_asmcode(zbeqz, afrl, op_zbeq);
+    register_asmcode(zbne, afrrl, op_zbne);
+    register_asmcode(zbnez, afrl, op_zbne);
+    register_asmcode(zble, afrrl, op_macro);
+    register_asmcode(zbleu, afrrl, op_macro);
+    register_asmcode(zblez, afrl, op_zblez);
+    register_asmcode(zbgt, afrrl, op_macro);
+    register_asmcode(zbgtu, afrrl, op_macro);
+    register_asmcode(zbgtz, afrl, op_zbgtz);
+    register_asmcode(zblt, afrrl, op_macro);
+    register_asmcode(zbltu, afrrl, op_macro);
+    register_asmcode(zbltz, afrl, op_zbltz);
+    register_asmcode(zbltzal, afrl, op_037);
+    register_asmcode(zbge, afrrl, op_macro);
+    register_asmcode(zbgeu, afrrl, op_macro);
+    register_asmcode(zbgez, afrl, op_zbgez);
+    register_asmcode(zbgezal, afrl, op_zbal); { no op_zbgezal ? }
+    register_asmcode(zbal, afrl, op_zbal);
+    register_asmcode(zbeql, afrrl, op_zbeql);
+    register_asmcode(zbeqzl, afrl, op_zbeql);
+    register_asmcode(zbnel, afrrl, op_zbnel);
+    register_asmcode(zbnezl, afrl, op_zbnel);
+    register_asmcode(zblel, afrrl, op_macro);
+    register_asmcode(zbleul, afrrl, op_macro);
+    register_asmcode(zblezl, afrl, op_zblezl);
+    register_asmcode(zbgtl, afrrl, op_macro);
+    register_asmcode(zbgtul, afrrl, op_macro);
+    register_asmcode(zbgtzl, afrl, op_zbgtzl);
+    register_asmcode(zbltl, afrrl, op_macro);
+    register_asmcode(zbltul, afrrl, op_macro);
+    register_asmcode(zbltzl, afrl, op_zbltzl);
+    register_asmcode(zbltzall, afrl, op_zbltzall);
+    register_asmcode(zbgel, afrrl, op_macro);
+    register_asmcode(zbgeul, afrrl, op_macro);
+    register_asmcode(zbgezl, afrl, op_zbgezl);
+    register_asmcode(zbgezall, afrl, op_zbgezall);
+    register_asmcode(zbreak, af, op_zbreak);
+    register_asmcode(zcia, afri, op_macro);
+    register_asmcode(zc0, aforrr, op_zc0);
+    register_asmcode(zc1, aforrr, op_zc1);
+    register_asmcode(zc2, aforrr, op_zc2);
+    register_asmcode(zdiv, afrrr, op_zdiv);
+    register_asmcode(zdivu, afrrr, op_zdivu);
+    register_asmcode(zj, afa, op_zj);
+    register_asmcode(zjal, afa, op_zjal);
+    register_asmcode(zla, afra, op_macro);
+    register_asmcode(zlb, afra, op_zlb);
+    register_asmcode(zlbu, afra, op_zlbu);
+    register_asmcode(zlh, afra, op_zlh);
+    register_asmcode(zlhu, afra, op_zlhu);
+    register_asmcode(zli, afri, op_macro);
+    register_asmcode(zlw, afra, op_zlw);
+    register_asmcode(zll, afra, op_zll);
+    register_asmcode(zlwc1, afra, op_zlwc1);
+    register_asmcode(zlwc2, afra, op_zlwc2);
+    register_asmcode(zlwl, afra, op_zlwl);
+    register_asmcode(zlwr, afra, op_zlwr);
+    register_asmcode(zmfc0, afrr, op_zmfc0);
+    register_asmcode(zmfc1, afrr, op_zmfc1);
+    register_asmcode(zmfc1_d, afrr, op_zmfc1);
+    register_asmcode(zmfc2, afrr, op_zmfc2);
+    register_asmcode(zcfc0, afrr, op_zcfc0);
+    register_asmcode(zcfc1, afrr, op_zcfc1);
+    register_asmcode(zcfc2, afrr, op_zcfc2);
+    register_asmcode(zmfhi, afr, op_zmfhi);
+    register_asmcode(zmflo, afr, op_zmflo);
+    register_asmcode(zmove, afrr, op_macro);
+    register_asmcode(zmtc0, afrr, op_zmtc0);
+    register_asmcode(zmtc1, afrr, op_zmtc1);
+    register_asmcode(zmtc1_d, afrr, op_zmtc1);
+    register_asmcode(zmtc2, afrr, op_zmtc2);
+    register_asmcode(zctc0, afrr, op_zctc0);
+    register_asmcode(zctc1, afrr, op_zctc1);
+    register_asmcode(zctc2, afrr, op_zctc2);
+    register_asmcode(zmthi, afr, op_zmthi);
+    register_asmcode(zmtlo, afr, op_zmtlo);
+    register_asmcode(zmul, afrrr, op_macro);
+    register_asmcode(zmulo, afrrr, op_macro);
+    register_asmcode(zmulou, afrrr, op_macro);
+    register_asmcode(zmult, afrr, op_zmult);
+    register_asmcode(zmultu, afrr, op_zmultu);
+    register_asmcode(zneg, afrr, op_macro);
+    register_asmcode(znegu, afrr, op_macro);
+    register_asmcode(znop, af, op_znop);
+    register_asmcode(znor, afrrr, op_znor);
+    register_asmcode(znot, afrr, op_macro);
+    register_asmcode(zor, afrrr, op_zor);
+    register_asmcode(zrem, afrrr, op_zdiv);
+    register_asmcode(zremu, afrrr, op_zdivu);
+    register_asmcode(zrfe, af, op_zrfe);
+    register_asmcode(zrol, afrrr, op_macro);
+    register_asmcode(zror, afrrr, op_macro);
+    register_asmcode(zsb, afra, op_zsb);
+    register_asmcode(zseq, afrrr, op_macro);
+    register_asmcode(zsge, afrrr, op_macro);
+    register_asmcode(zsgeu, afrrr, op_macro);
+    register_asmcode(zsgt, afrrr, op_macro);
+    register_asmcode(zsgtu, afrrr, op_macro);
+    register_asmcode(zsh, afra, op_zsh);
+    register_asmcode(zsle, afrrr, op_macro);
+    register_asmcode(zsleu, afrrr, op_macro);
+    register_asmcode(zsll, afrrr, op_zsll);
+    register_asmcode(zslt, afrrr, op_macro);
+    register_asmcode(zsltu, afrrr, op_macro);
+    register_asmcode(zsne, afrrr, op_macro);
+    register_asmcode(zsra, afrrr, op_zsra);
+    register_asmcode(zsrl, afrrr, op_zsrl);
+    register_asmcode(zsllv, afrrr, op_zsllv);
+    register_asmcode(zsrlv, afrrr, op_zsrlv);
+    register_asmcode(zsrav, afrrr, op_zsrav);
+    register_asmcode(zsub, afrrr, op_zsub);
+    register_asmcode(zsubu, afrrr, op_zsubu);
+    register_asmcode(zsubou, afrrr, op_zsubu);
+    register_asmcode(zsw, afra, op_zsw);
+    register_asmcode(zsc, afra, op_zsc);
+    register_asmcode(zswc1, afra, op_zswc1);
+    register_asmcode(zswc2, afra, op_zswc2);
+    register_asmcode(zswl, afra, op_zswl);
+    register_asmcode(zswr, afra, op_zswr);
+    register_asmcode(zsyscall, af, op_zsyscall);
+    register_asmcode(zxor, afrrr, op_zxor);
+    register_asmcode(ztlbr, af, op_ztlbr);
+    register_asmcode(ztlbwi, af, op_ztlbwi);
+    register_asmcode(ztlbwr, af, op_ztlbwr);
+    register_asmcode(ztlbp, af, op_ztlbp);
+    register_asmcode(ztlbr1, af, op_ztlbr1);
+    register_asmcode(ztlbp1, af, op_ztlbp1);
+    register_asmcode(zsync, af, op_zsync);
+    register_asmcode(zld, afra, func_00440F68(op_zld));
+    register_asmcode(zsd, afra, func_00440F68(op_zsd));
+    register_asmcode(zldc1, afra, func_00440F68(op_zldc1));
+    register_asmcode(zldc2, afra, func_00440F68(op_zldc2));
+    register_asmcode(zsdc1, afra, func_00440F68(op_zsdc1));
+    register_asmcode(zsdc2, afra, func_00440F68(op_zsdc2));
+    register_asmcode(zaddi, afrrr, op_zaddi);
+    register_asmcode(zaddiu, afrrr, op_zaddiu);
+    register_asmcode(zslti, afrrr, op_zslti);
+    register_asmcode(zsltiu, afrrr, op_zsltiu);
+    register_asmcode(zandi, afrrr, op_zandi);
+    register_asmcode(zori, afrrr, op_zori);
+    register_asmcode(zxori, afrrr, op_zxori);
+    register_asmcode(zlui, afri, op_zlui);
+    register_asmcode(zulw, afra, op_macro);
+    register_asmcode(zulh, afra, op_macro);
+    register_asmcode(zulhu, afra, op_macro);
+    register_asmcode(zusw, afra, op_macro);
+    register_asmcode(zush, afra, op_macro);
+    register_asmcode(zdli, dli_dla, op_macro);
+    register_asmcode(zdla, afra, op_macro);
+    register_asmcode(zlgota, afra, op_macro);
 
-    func_00440E20(op_014, 16#00000020, opfmt_3);
-    func_00440E20(op_053, 16#20000000, opfmt_0);
-    func_00440E20(op_054, 16#24000000, opfmt_0);
-    func_00440E20(op_015, 16#00000021, opfmt_3);
-    func_00440E20(op_018, 16#00000024, opfmt_3);
-    func_00440E20(op_057, 16#30000000, opfmt_0);
-    func_00440E20(op_039, 16#41000000, opfmt_2);
-    func_00440E20(op_03A, 16#41010000, opfmt_2);
-    func_00440E20(op_03B, 16#45000000, opfmt_2);
-    func_00440E20(op_03C, 16#45010000, opfmt_2);
-    func_00440E20(op_03D, 16#49000000, opfmt_2);
-    func_00440E20(op_03E, 16#49010000, opfmt_2);
-    func_00440E20(op_043, 16#41020000, opfmt_2);
-    func_00440E20(op_044, 16#41030000, opfmt_2);
-    func_00440E20(op_045, 16#45020000, opfmt_2);
-    func_00440E20(op_046, 16#45030000, opfmt_2);
-    func_00440E20(op_047, 16#49020000, opfmt_2);
-    func_00440E20(op_048, 16#49030000, opfmt_2);
-    func_00440E20(op_04B, 16#10000000, opfmt_1);
-    func_00440E20(op_04C, 16#14000000, opfmt_1);
-    func_00440E20(op_04D, 16#18000000, opfmt_2);
-    func_00440E20(op_04E, 16#1C000000, opfmt_2);
-    func_00440E20(op_035, 16#04000000, opfmt_2);
-    func_00440E20(op_037, 16#04100000, opfmt_2);
-    func_00440E20(op_036, 16#04010000, opfmt_2);
-    func_00440E20(op_038, 16#04110000, opfmt_2);
-    func_00440E20(op_04F, 16#50000000, opfmt_1);
-    func_00440E20(op_050, 16#54000000, opfmt_1);
-    func_00440E20(op_051, 16#58000000, opfmt_2);
-    func_00440E20(op_052, 16#5C000000, opfmt_2);
-    func_00440E20(op_03F, 16#04020000, opfmt_2);
-    func_00440E20(op_041, 16#04120000, opfmt_2);
-    func_00440E20(op_040, 16#04030000, opfmt_2);
-    func_00440E20(op_042, 16#04130000, opfmt_2);
-    func_00440E20(op_00B, 16#0000000D, opfmt_3);
-    func_00440E20(op_063, 16#42000000, opfmt_5);
-    func_00440E20(op_064, 16#46000000, opfmt_5);
-    func_00440E20(op_065, 16#4A000000, opfmt_5);
-    func_00440E20(op_012, 16#0000001A, opfmt_3);
-    func_00440E20(op_013, 16#0000001B, opfmt_3);
-    func_00440E20(op_04A, 16#0C000000, opfmt_4);
-    func_00440E20(op_009, 16#00000009, opfmt_3);
-    func_00440E20(op_049, 16#08000000, opfmt_4);
-    func_00440E20(op_008, 16#00000008, opfmt_3);
-    func_00440E20(op_066, 16#80000000, opfmt_6);
-    func_00440E20(op_06A, 16#90000000, opfmt_6);
-    func_00440E20(op_067, 16#84000000, opfmt_6);
-    func_00440E20(op_06B, 16#94000000, opfmt_6);
-    func_00440E20(op_05A, 16#3C000000, opfmt_0);
-    func_00440E20(op_069, 16#8C000000, opfmt_6);
-    func_00440E20(op_079, 16#DC000000, opfmt_6);
-    func_00440E20(op_072, 16#C0000000, opfmt_6);
-    func_00440E20(op_073, 16#C4000000, opfmt_6);
-    func_00440E20(op_074, 16#C8000000, opfmt_6);
-    func_00440E20(op_068, 16#88000000, opfmt_6);
-    func_00440E20(op_06C, 16#98000000, opfmt_6);
-    func_00440E20(op_00C, 16#00000010, opfmt_3);
-    func_00440E20(op_00E, 16#00000012, opfmt_3);
-    func_00440E20(op_07B, 16#D4000000, opfmt_6);
-    func_00440E20(op_07C, 16#D8000000, opfmt_6);
-    func_00440E20(op_07D, 16#F4000000, opfmt_6);
-    func_00440E20(op_07E, 16#F8000000, opfmt_6);
-    func_00440E20(op_08B, 16#40000000, opfmt_5);
-    func_00440E20(op_08C, 16#44000000, opfmt_5);
-    func_00440E20(op_08D, 16#48000000, opfmt_5);
-    func_00440E20(op_0F4, 16#40400000, opfmt_5);
-    func_00440E20(op_08E, 16#44400000, opfmt_5);
-    func_00440E20(op_0F5, 16#48400000, opfmt_5);
-    func_00440E20(op_08F, 16#40800000, opfmt_5);
-    func_00440E20(op_090, 16#44800000, opfmt_5);
-    func_00440E20(op_091, 16#48800000, opfmt_5);
-    func_00440E20(op_0F6, 16#40C00000, opfmt_5);
-    func_00440E20(op_092, 16#44C00000, opfmt_5);
-    func_00440E20(op_0F7, 16#48C00000, opfmt_5);
-    func_00440E20(op_00D, 16#00000011, opfmt_3);
-    func_00440E20(op_00F, 16#00000013, opfmt_3);
-    func_00440E20(op_010, 16#00000018, opfmt_3);
-    func_00440E20(op_011, 16#00000019, opfmt_3);
-    func_00440E20(op_01B, 16#00000027, opfmt_3);
-    func_00440E20(op_019, 16#00000025, opfmt_3);
-    func_00440E20(op_058, 16#34000000, opfmt_0);
-    func_00440E20(op_093, 16#42000010, opfmt_5);
-    func_00440E20(op_094, 16#42000001, opfmt_5);
-    func_00440E20(op_095, 16#42000002, opfmt_5);
-    func_00440E20(op_096, 16#42000006, opfmt_5);
-    func_00440E20(op_097, 16#42000008, opfmt_5);
-    func_00440E20(op_13D, 16#43000001, opfmt_5);
-    func_00440E20(op_13E, 16#43000008, opfmt_5);
-    func_00440E20(op_098, 16#0000000F, opfmt_3);
-    func_00440E20(op_06D, 16#A0000000, opfmt_6);
-    func_00440E20(op_06E, 16#A4000000, opfmt_6);
-    func_00440E20(op_002, 16#00000000, opfmt_3);
-    func_00440E20(op_005, 16#00000004, opfmt_3);
-    func_00440E20(op_016, 16#00000022, opfmt_3);
-    func_00440E20(op_017, 16#00000023, opfmt_3);
-    func_00440E20(op_01C, 16#0000002A, opfmt_3);
-    func_00440E20(op_01D, 16#0000002B, opfmt_3);
-    func_00440E20(op_020, 16#00000030, opfmt_3);
-    func_00440E20(op_021, 16#00000031, opfmt_3);
-    func_00440E20(op_01E, 16#00000032, opfmt_3);
-    func_00440E20(op_01F, 16#00000033, opfmt_3);
-    func_00440E20(op_022, 16#00000034, opfmt_3);
-    func_00440E20(op_023, 16#00000036, opfmt_3);
-    func_00440E20(op_05D, 16#04080000, opfmt_9);
-    func_00440E20(op_05E, 16#04090000, opfmt_9);
-    func_00440E20(op_05B, 16#040A0000, opfmt_9);
-    func_00440E20(op_05C, 16#040B0000, opfmt_9);
-    func_00440E20(op_05F, 16#040C0000, opfmt_9);
-    func_00440E20(op_060, 16#040E0000, opfmt_9);
-    func_00440E20(op_055, 16#28000000, opfmt_0);
-    func_00440E20(op_056, 16#2C000000, opfmt_0);
-    func_00440E20(op_004, 16#00000003, opfmt_3);
-    func_00440E20(op_007, 16#00000007, opfmt_3);
-    func_00440E20(op_003, 16#00000002, opfmt_3);
-    func_00440E20(op_006, 16#00000006, opfmt_3);
-    func_00440E20(op_070, 16#AC000000, opfmt_6);
-    func_00440E20(op_07A, 16#FC000000, opfmt_6);
-    func_00440E20(op_075, 16#E0000000, opfmt_6);
-    func_00440E20(op_076, 16#E4000000, opfmt_6);
-    func_00440E20(op_077, 16#E8000000, opfmt_6);
-    func_00440E20(op_06F, 16#A8000000, opfmt_6);
-    func_00440E20(op_071, 16#B8000000, opfmt_6);
-    func_00440E20(op_00A, 16#0000000C, opfmt_3);
-    func_00440E20(op_01A, 16#00000026, opfmt_3);
-    func_00440E20(op_059, 16#38000000, opfmt_0);
+    set_mips_inst_template(op_zadd, 16#00000020, mipsfmt_3);
+    set_mips_inst_template(op_zaddi, 16#20000000, mipsfmt_0);
+    set_mips_inst_template(op_zaddiu, 16#24000000, mipsfmt_0);
+    set_mips_inst_template(op_zaddu, 16#00000021, mipsfmt_3);
+    set_mips_inst_template(op_zand, 16#00000024, mipsfmt_3);
+    set_mips_inst_template(op_zandi, 16#30000000, mipsfmt_0);
+    set_mips_inst_template(op_zbc0f, 16#41000000, mipsfmt_2);
+    set_mips_inst_template(op_zbc0t, 16#41010000, mipsfmt_2);
+    set_mips_inst_template(op_zbc1f, 16#45000000, mipsfmt_2);
+    set_mips_inst_template(op_zbc1t, 16#45010000, mipsfmt_2);
+    set_mips_inst_template(op_zbc2f, 16#49000000, mipsfmt_2);
+    set_mips_inst_template(op_zbc2t, 16#49010000, mipsfmt_2);
+    set_mips_inst_template(op_zbc0fl, 16#41020000, mipsfmt_2);
+    set_mips_inst_template(op_zbc0tl, 16#41030000, mipsfmt_2);
+    set_mips_inst_template(op_zbc1fl, 16#45020000, mipsfmt_2);
+    set_mips_inst_template(op_zbc1tl, 16#45030000, mipsfmt_2);
+    set_mips_inst_template(op_zbc2fl, 16#49020000, mipsfmt_2);
+    set_mips_inst_template(op_zbc2tl, 16#49030000, mipsfmt_2);
+    set_mips_inst_template(op_zbeq, 16#10000000, mipsfmt_1);
+    set_mips_inst_template(op_zbne, 16#14000000, mipsfmt_1);
+    set_mips_inst_template(op_zblez, 16#18000000, mipsfmt_2);
+    set_mips_inst_template(op_zbgtz, 16#1C000000, mipsfmt_2);
+    set_mips_inst_template(op_zbltz, 16#04000000, mipsfmt_2);
+    set_mips_inst_template(op_037, 16#04100000, mipsfmt_2);
+    set_mips_inst_template(op_zbgez, 16#04010000, mipsfmt_2);
+    set_mips_inst_template(op_zbal, 16#04110000, mipsfmt_2);
+    set_mips_inst_template(op_zbeql, 16#50000000, mipsfmt_1);
+    set_mips_inst_template(op_zbnel, 16#54000000, mipsfmt_1);
+    set_mips_inst_template(op_zblezl, 16#58000000, mipsfmt_2);
+    set_mips_inst_template(op_zbgtzl, 16#5C000000, mipsfmt_2);
+    set_mips_inst_template(op_zbltzl, 16#04020000, mipsfmt_2);
+    set_mips_inst_template(op_zbltzall, 16#04120000, mipsfmt_2);
+    set_mips_inst_template(op_zbgezl, 16#04030000, mipsfmt_2);
+    set_mips_inst_template(op_zbgezall, 16#04130000, mipsfmt_2);
+    set_mips_inst_template(op_zbreak, 16#0000000D, mipsfmt_3);
+    set_mips_inst_template(op_zc0, 16#42000000, mipsfmt_5);
+    set_mips_inst_template(op_zc1, 16#46000000, mipsfmt_5);
+    set_mips_inst_template(op_zc2, 16#4A000000, mipsfmt_5);
+    set_mips_inst_template(op_zdiv, 16#0000001A, mipsfmt_3);
+    set_mips_inst_template(op_zdivu, 16#0000001B, mipsfmt_3);
+    set_mips_inst_template(op_zjal, 16#0C000000, mipsfmt_4);
+    set_mips_inst_template(op_009, 16#00000009, mipsfmt_3);
+    set_mips_inst_template(op_zj, 16#08000000, mipsfmt_4);
+    set_mips_inst_template(op_008, 16#00000008, mipsfmt_3);
+    set_mips_inst_template(op_zlb, 16#80000000, mipsfmt_6);
+    set_mips_inst_template(op_zlbu, 16#90000000, mipsfmt_6);
+    set_mips_inst_template(op_zlh, 16#84000000, mipsfmt_6);
+    set_mips_inst_template(op_zlhu, 16#94000000, mipsfmt_6);
+    set_mips_inst_template(op_zlui, 16#3C000000, mipsfmt_0);
+    set_mips_inst_template(op_zlw, 16#8C000000, mipsfmt_6);
+    set_mips_inst_template(op_zld, 16#DC000000, mipsfmt_6);
+    set_mips_inst_template(op_zll, 16#C0000000, mipsfmt_6);
+    set_mips_inst_template(op_zlwc1, 16#C4000000, mipsfmt_6);
+    set_mips_inst_template(op_zlwc2, 16#C8000000, mipsfmt_6);
+    set_mips_inst_template(op_zlwl, 16#88000000, mipsfmt_6);
+    set_mips_inst_template(op_zlwr, 16#98000000, mipsfmt_6);
+    set_mips_inst_template(op_zmfhi, 16#00000010, mipsfmt_3);
+    set_mips_inst_template(op_zmflo, 16#00000012, mipsfmt_3);
+    set_mips_inst_template(op_zldc1, 16#D4000000, mipsfmt_6);
+    set_mips_inst_template(op_zldc2, 16#D8000000, mipsfmt_6);
+    set_mips_inst_template(op_zsdc1, 16#F4000000, mipsfmt_6);
+    set_mips_inst_template(op_zsdc2, 16#F8000000, mipsfmt_6);
+    set_mips_inst_template(op_zmfc0, 16#40000000, mipsfmt_5);
+    set_mips_inst_template(op_zmfc1, 16#44000000, mipsfmt_5);
+    set_mips_inst_template(op_zmfc2, 16#48000000, mipsfmt_5);
+    set_mips_inst_template(op_zcfc0, 16#40400000, mipsfmt_5);
+    set_mips_inst_template(op_zcfc1, 16#44400000, mipsfmt_5);
+    set_mips_inst_template(op_zcfc2, 16#48400000, mipsfmt_5);
+    set_mips_inst_template(op_zmtc0, 16#40800000, mipsfmt_5);
+    set_mips_inst_template(op_zmtc1, 16#44800000, mipsfmt_5);
+    set_mips_inst_template(op_zmtc2, 16#48800000, mipsfmt_5);
+    set_mips_inst_template(op_zctc0, 16#40C00000, mipsfmt_5);
+    set_mips_inst_template(op_zctc1, 16#44C00000, mipsfmt_5);
+    set_mips_inst_template(op_zctc2, 16#48C00000, mipsfmt_5);
+    set_mips_inst_template(op_zmthi, 16#00000011, mipsfmt_3);
+    set_mips_inst_template(op_zmtlo, 16#00000013, mipsfmt_3);
+    set_mips_inst_template(op_zmult, 16#00000018, mipsfmt_3);
+    set_mips_inst_template(op_zmultu, 16#00000019, mipsfmt_3);
+    set_mips_inst_template(op_znor, 16#00000027, mipsfmt_3);
+    set_mips_inst_template(op_zor, 16#00000025, mipsfmt_3);
+    set_mips_inst_template(op_zori, 16#34000000, mipsfmt_0);
+    set_mips_inst_template(op_zrfe, 16#42000010, mipsfmt_5);
+    set_mips_inst_template(op_ztlbr, 16#42000001, mipsfmt_5);
+    set_mips_inst_template(op_ztlbwi, 16#42000002, mipsfmt_5);
+    set_mips_inst_template(op_ztlbwr, 16#42000006, mipsfmt_5);
+    set_mips_inst_template(op_ztlbp, 16#42000008, mipsfmt_5);
+    set_mips_inst_template(op_ztlbr1, 16#43000001, mipsfmt_5);
+    set_mips_inst_template(op_ztlbp1, 16#43000008, mipsfmt_5);
+    set_mips_inst_template(op_zsync, 16#0000000F, mipsfmt_3);
+    set_mips_inst_template(op_zsb, 16#A0000000, mipsfmt_6);
+    set_mips_inst_template(op_zsh, 16#A4000000, mipsfmt_6);
+    set_mips_inst_template(op_zsll, 16#00000000, mipsfmt_3);
+    set_mips_inst_template(op_zsllv, 16#00000004, mipsfmt_3);
+    set_mips_inst_template(op_zsub, 16#00000022, mipsfmt_3);
+    set_mips_inst_template(op_zsubu, 16#00000023, mipsfmt_3);
+    set_mips_inst_template(op_01C, 16#0000002A, mipsfmt_3);
+    set_mips_inst_template(op_01D, 16#0000002B, mipsfmt_3);
+    set_mips_inst_template(op_ztge, 16#00000030, mipsfmt_3);
+    set_mips_inst_template(op_ztgeu, 16#00000031, mipsfmt_3);
+    set_mips_inst_template(op_ztlt, 16#00000032, mipsfmt_3);
+    set_mips_inst_template(op_ztltu, 16#00000033, mipsfmt_3);
+    set_mips_inst_template(op_zteq, 16#00000034, mipsfmt_3);
+    set_mips_inst_template(op_ztne, 16#00000036, mipsfmt_3);
+    set_mips_inst_template(op_05D, 16#04080000, mipsfmt_9);
+    set_mips_inst_template(op_05E, 16#04090000, mipsfmt_9);
+    set_mips_inst_template(op_05B, 16#040A0000, mipsfmt_9);
+    set_mips_inst_template(op_05C, 16#040B0000, mipsfmt_9);
+    set_mips_inst_template(op_05F, 16#040C0000, mipsfmt_9);
+    set_mips_inst_template(op_060, 16#040E0000, mipsfmt_9);
+    set_mips_inst_template(op_zslti, 16#28000000, mipsfmt_0);
+    set_mips_inst_template(op_zsltiu, 16#2C000000, mipsfmt_0);
+    set_mips_inst_template(op_zsra, 16#00000003, mipsfmt_3);
+    set_mips_inst_template(op_zsrav, 16#00000007, mipsfmt_3);
+    set_mips_inst_template(op_zsrl, 16#00000002, mipsfmt_3);
+    set_mips_inst_template(op_zsrlv, 16#00000006, mipsfmt_3);
+    set_mips_inst_template(op_zsw, 16#AC000000, mipsfmt_6);
+    set_mips_inst_template(op_zsd, 16#FC000000, mipsfmt_6);
+    set_mips_inst_template(op_zsc, 16#E0000000, mipsfmt_6);
+    set_mips_inst_template(op_zswc1, 16#E4000000, mipsfmt_6);
+    set_mips_inst_template(op_zswc2, 16#E8000000, mipsfmt_6);
+    set_mips_inst_template(op_zswl, 16#A8000000, mipsfmt_6);
+    set_mips_inst_template(op_zswr, 16#B8000000, mipsfmt_6);
+    set_mips_inst_template(op_zsyscall, 16#0000000C, mipsfmt_3);
+    set_mips_inst_template(op_zxor, 16#00000026, mipsfmt_3);
+    set_mips_inst_template(op_zxori, 16#38000000, mipsfmt_0);
 
-    func_00440E54(fli_s, afri_fp, op_0F8);
-    func_00440E54(fli_d, afri_fp, op_0F9);
-    func_00440E54(fli_e, afri_fp, op_0FA);
-    func_00440E54(fl_s, afra, op_000);
-    func_00440E54(fl_d, afra, op_000);
-    func_00440E54(fl_e, afra, op_000);
-    func_00440E54(fs_s, afra, op_000);
-    func_00440E54(fs_d, afra, op_000);
-    func_00440E54(fs_e, afra, op_000);
-    func_00440E54(fadd_s, afrrr, op_0A0);
-    func_00440E54(fadd_d, afrrr, op_0A1);
-    func_00440E54(fadd_e, afrrr, op_0A2);
-    func_00440E54(fsub_s, afrrr, op_0A3);
-    func_00440E54(fsub_d, afrrr, op_0A4);
-    func_00440E54(fsub_e, afrrr, op_0A5);
-    func_00440E54(fmul_s, afrrr, op_0A6);
-    func_00440E54(fmul_d, afrrr, op_0A7);
-    func_00440E54(fmul_e, afrrr, op_0A8);
-    func_00440E54(fdiv_s, afrrr, op_0A9);
-    func_00440E54(fdiv_d, afrrr, op_0AA);
-    func_00440E54(fdiv_e, afrrr, op_0AB);
-    func_00440E54(fsqrt_s, afrrr, op_0AC);
-    func_00440E54(fsqrt_d, afrrr, op_0AD);
-    func_00440E54(fsqrt_e, afrrr, op_0AE);
-    func_00440E54(fmov_s, afrrr, op_0B2);
-    func_00440E54(fmov_d, afrrr, op_0B3);
-    func_00440E54(fmov_e, afrrr, op_0B4);
-    func_00440E54(fabs_s, afrrr, op_0AF);
-    func_00440E54(fabs_d, afrrr, op_0B0);
-    func_00440E54(fabs_e, afrrr, op_0B1);
-    func_00440E54(fneg_s, afrrr, op_0B5);
-    func_00440E54(fneg_d, afrrr, op_0B6);
-    func_00440E54(fneg_e, afrrr, op_0B7);
-    func_00440E54(fcvt_s_d, afrrr, op_0B8);
-    func_00440E54(fcvt_s_e, afrrr, op_0B9);
-    func_00440E54(fcvt_s_w, afrrr, op_0BA);
-    func_00440E54(fcvt_d_s, afrrr, op_0BB);
-    func_00440E54(fcvt_d_e, afrrr, op_0BC);
-    func_00440E54(fcvt_d_w, afrrr, op_0BD);
-    func_00440E54(fcvt_e_s, afrrr, op_0BE);
-    func_00440E54(fcvt_e_d, afrrr, op_0BF);
-    func_00440E54(fcvt_e_w, afrrr, op_0C0);
-    func_00440E54(fcvt_w_s, afrrr, op_0C1);
-    func_00440E54(fcvt_w_d, afrrr, op_0C2);
-    func_00440E54(fcvt_w_e, afrrr, op_0C3);
-    func_00440E54(fc_f_s, afrrr, op_0C4);
-    func_00440E54(fc_f_d, afrrr, op_0C5);
-    func_00440E54(fc_f_e, afrrr, op_0C6);
-    func_00440E54(fc_un_s, afrrr, op_0C7);
-    func_00440E54(fc_un_d, afrrr, op_0C8);
-    func_00440E54(fc_un_e, afrrr, op_0C9);
-    func_00440E54(fc_eq_s, afrrr, op_0CA);
-    func_00440E54(fc_eq_d, afrrr, op_0CB);
-    func_00440E54(fc_eq_e, afrrr, op_0CC);
-    func_00440E54(fc_ueq_s, afrrr, op_0CD);
-    func_00440E54(fc_ueq_d, afrrr, op_0CE);
-    func_00440E54(fc_ueq_e, afrrr, op_0CF);
-    func_00440E54(fc_olt_s, afrrr, op_0D0);
-    func_00440E54(fc_olt_d, afrrr, op_0D1);
-    func_00440E54(fc_olt_e, afrrr, op_0D2);
-    func_00440E54(fc_ult_s, afrrr, op_0D3);
-    func_00440E54(fc_ult_d, afrrr, op_0D4);
-    func_00440E54(fc_ult_e, afrrr, op_0D5);
-    func_00440E54(fc_ole_s, afrrr, op_0D6);
-    func_00440E54(fc_ole_d, afrrr, op_0D7);
-    func_00440E54(fc_ole_e, afrrr, op_0D8);
-    func_00440E54(fc_ule_s, afrrr, op_0D9);
-    func_00440E54(fc_ule_d, afrrr, op_0DA);
-    func_00440E54(fc_ule_e, afrrr, op_0DB);
-    func_00440E54(fc_sf_s, afrrr, op_0DC);
-    func_00440E54(fc_sf_d, afrrr, op_0DD);
-    func_00440E54(fc_sf_e, afrrr, op_0DE);
-    func_00440E54(fc_ngle_s, afrrr, op_0DF);
-    func_00440E54(fc_ngle_d, afrrr, op_0E0);
-    func_00440E54(fc_ngle_e, afrrr, op_0E1);
-    func_00440E54(fc_seq_s, afrrr, op_0E2);
-    func_00440E54(fc_seq_d, afrrr, op_0E3);
-    func_00440E54(fc_seq_e, afrrr, op_0E4);
-    func_00440E54(fc_ngl_s, afrrr, op_0E5);
-    func_00440E54(fc_ngl_d, afrrr, op_0E6);
-    func_00440E54(fc_ngl_e, afrrr, op_0E7);
-    func_00440E54(fc_lt_s, afrrr, op_0E8);
-    func_00440E54(fc_lt_d, afrrr, op_0E9);
-    func_00440E54(fc_lt_e, afrrr, op_0EA);
-    func_00440E54(fc_nge_s, afrrr, op_0EB);
-    func_00440E54(fc_nge_d, afrrr, op_0EC);
-    func_00440E54(fc_nge_e, afrrr, op_0ED);
-    func_00440E54(fc_le_s, afrrr, op_0EE);
-    func_00440E54(fc_le_d, afrrr, op_0EF);
-    func_00440E54(fc_le_e, afrrr, op_0F0);
-    func_00440E54(fc_ngt_s, afrrr, op_0F1);
-    func_00440E54(fc_ngt_d, afrrr, op_0F2);
-    func_00440E54(fc_ngt_e, afrrr, op_0F3);
+    register_asmcode(fli_s, afri_fp, op_fli_s);
+    register_asmcode(fli_d, afri_fp, op_fli_d);
+    register_asmcode(fli_e, afri_fp, op_fli_e);
+    register_asmcode(fl_s, afra, op_macro);
+    register_asmcode(fl_d, afra, op_macro);
+    register_asmcode(fl_e, afra, op_macro);
+    register_asmcode(fs_s, afra, op_macro);
+    register_asmcode(fs_d, afra, op_macro);
+    register_asmcode(fs_e, afra, op_macro);
+    register_asmcode(fadd_s, afrrr, op_fadd_s);
+    register_asmcode(fadd_d, afrrr, op_fadd_d);
+    register_asmcode(fadd_e, afrrr, op_fadd_e);
+    register_asmcode(fsub_s, afrrr, op_fsub_s);
+    register_asmcode(fsub_d, afrrr, op_fsub_d);
+    register_asmcode(fsub_e, afrrr, op_fsub_e);
+    register_asmcode(fmul_s, afrrr, op_fmul_s);
+    register_asmcode(fmul_d, afrrr, op_fmul_d);
+    register_asmcode(fmul_e, afrrr, op_fmul_e);
+    register_asmcode(fdiv_s, afrrr, op_fdiv_s);
+    register_asmcode(fdiv_d, afrrr, op_fdiv_d);
+    register_asmcode(fdiv_e, afrrr, op_fdiv_e);
+    register_asmcode(fsqrt_s, afrrr, op_fsqrt_s);
+    register_asmcode(fsqrt_d, afrrr, op_fsqrt_d);
+    register_asmcode(fsqrt_e, afrrr, op_fsqrt_e);
+    register_asmcode(fmov_s, afrrr, op_fmov_s);
+    register_asmcode(fmov_d, afrrr, op_fmov_d);
+    register_asmcode(fmov_e, afrrr, op_fmov_e);
+    register_asmcode(fabs_s, afrrr, op_fabs_s);
+    register_asmcode(fabs_d, afrrr, op_fabs_d);
+    register_asmcode(fabs_e, afrrr, op_fabs_e);
+    register_asmcode(fneg_s, afrrr, op_fneg_s);
+    register_asmcode(fneg_d, afrrr, op_fneg_d);
+    register_asmcode(fneg_e, afrrr, op_fneg_e);
+    register_asmcode(fcvt_s_d, afrrr, op_fcvt_s_d);
+    register_asmcode(fcvt_s_e, afrrr, op_fcvt_s_e);
+    register_asmcode(fcvt_s_w, afrrr, op_fcvt_s_w);
+    register_asmcode(fcvt_d_s, afrrr, op_fcvt_d_s);
+    register_asmcode(fcvt_d_e, afrrr, op_fcvt_d_e);
+    register_asmcode(fcvt_d_w, afrrr, op_fcvt_d_w);
+    register_asmcode(fcvt_e_s, afrrr, op_fcvt_e_s);
+    register_asmcode(fcvt_e_d, afrrr, op_fcvt_e_d);
+    register_asmcode(fcvt_e_w, afrrr, op_fcvt_e_w);
+    register_asmcode(fcvt_w_s, afrrr, op_fcvt_w_s);
+    register_asmcode(fcvt_w_d, afrrr, op_fcvt_w_d);
+    register_asmcode(fcvt_w_e, afrrr, op_fcvt_w_e);
+    register_asmcode(fc_f_s, afrrr, op_fc_f_s);
+    register_asmcode(fc_f_d, afrrr, op_fc_f_d);
+    register_asmcode(fc_f_e, afrrr, op_fc_f_e);
+    register_asmcode(fc_un_s, afrrr, op_fc_un_s);
+    register_asmcode(fc_un_d, afrrr, op_fc_un_d);
+    register_asmcode(fc_un_e, afrrr, op_fc_un_e);
+    register_asmcode(fc_eq_s, afrrr, op_fc_eq_s);
+    register_asmcode(fc_eq_d, afrrr, op_fc_eq_d);
+    register_asmcode(fc_eq_e, afrrr, op_fc_eq_e);
+    register_asmcode(fc_ueq_s, afrrr, op_fc_ueq_s);
+    register_asmcode(fc_ueq_d, afrrr, op_fc_ueq_d);
+    register_asmcode(fc_ueq_e, afrrr, op_fc_ueq_e);
+    register_asmcode(fc_olt_s, afrrr, op_fc_olt_s);
+    register_asmcode(fc_olt_d, afrrr, op_fc_olt_d);
+    register_asmcode(fc_olt_e, afrrr, op_fc_olt_e);
+    register_asmcode(fc_ult_s, afrrr, op_fc_ult_s);
+    register_asmcode(fc_ult_d, afrrr, op_fc_ult_d);
+    register_asmcode(fc_ult_e, afrrr, op_fc_ult_e);
+    register_asmcode(fc_ole_s, afrrr, op_fc_ole_s);
+    register_asmcode(fc_ole_d, afrrr, op_fc_ole_d);
+    register_asmcode(fc_ole_e, afrrr, op_fc_ole_e);
+    register_asmcode(fc_ule_s, afrrr, op_fc_ule_s);
+    register_asmcode(fc_ule_d, afrrr, op_fc_ule_d);
+    register_asmcode(fc_ule_e, afrrr, op_fc_ule_e);
+    register_asmcode(fc_sf_s, afrrr, op_fc_sf_s);
+    register_asmcode(fc_sf_d, afrrr, op_fc_sf_d);
+    register_asmcode(fc_sf_e, afrrr, op_fc_sf_e);
+    register_asmcode(fc_ngle_s, afrrr, op_fc_ngle_s);
+    register_asmcode(fc_ngle_d, afrrr, op_fc_ngle_d);
+    register_asmcode(fc_ngle_e, afrrr, op_fc_ngle_e);
+    register_asmcode(fc_seq_s, afrrr, op_fc_seq_s);
+    register_asmcode(fc_seq_d, afrrr, op_fc_seq_d);
+    register_asmcode(fc_seq_e, afrrr, op_fc_seq_e);
+    register_asmcode(fc_ngl_s, afrrr, op_fc_ngl_s);
+    register_asmcode(fc_ngl_d, afrrr, op_fc_ngl_d);
+    register_asmcode(fc_ngl_e, afrrr, op_fc_ngl_e);
+    register_asmcode(fc_lt_s, afrrr, op_fc_lt_s);
+    register_asmcode(fc_lt_d, afrrr, op_fc_lt_d);
+    register_asmcode(fc_lt_e, afrrr, op_fc_lt_e);
+    register_asmcode(fc_nge_s, afrrr, op_fc_nge_s);
+    register_asmcode(fc_nge_d, afrrr, op_fc_nge_d);
+    register_asmcode(fc_nge_e, afrrr, op_fc_nge_e);
+    register_asmcode(fc_le_s, afrrr, op_fc_le_s);
+    register_asmcode(fc_le_d, afrrr, op_fc_le_d);
+    register_asmcode(fc_le_e, afrrr, op_fc_le_e);
+    register_asmcode(fc_ngt_s, afrrr, op_fc_ngt_s);
+    register_asmcode(fc_ngt_d, afrrr, op_fc_ngt_d);
+    register_asmcode(fc_ngt_e, afrrr, op_fc_ngt_e);
     if (isa >= ISA_MIPS2) then begin
-        func_00440E54(zround_w_s, afrrr, op_0FB);
-        func_00440E54(zround_w_d, afrrr, op_0FC);
-        func_00440E54(zround_w_e, afrrr, op_0FD);
-        func_00440E54(zroundu_w_s, afrrr, op_0FB);
-        func_00440E54(zroundu_w_d, afrrr, op_0FC);
-        func_00440E54(zroundu_w_e, afrrr, op_0FD);
-        func_00440E54(ztrunc_w_s, afrrr, op_0FE);
-        func_00440E54(ztrunc_w_d, afrrr, op_0FF);
-        func_00440E54(ztrunc_w_e, afrrr, op_100);
-        func_00440E54(ztruncu_w_s, afrrr, op_0FE);
-        func_00440E54(ztruncu_w_d, afrrr, op_0FF);
-        func_00440E54(ztruncu_w_e, afrrr, op_100);
-        func_00440E54(zceil_w_s, afrrr, op_101);
-        func_00440E54(zceil_w_d, afrrr, op_102);
-        func_00440E54(zceil_w_e, afrrr, op_103);
-        func_00440E54(zceilu_w_s, afrrr, op_101);
-        func_00440E54(zceilu_w_d, afrrr, op_102);
-        func_00440E54(zceilu_w_e, afrrr, op_103);
-        func_00440E54(zfloor_w_s, afrrr, op_104);
-        func_00440E54(zfloor_w_d, afrrr, op_105);
-        func_00440E54(zfloor_w_e, afrrr, op_106);
-        func_00440E54(zflooru_w_s, afrrr, op_104);
-        func_00440E54(zflooru_w_d, afrrr, op_105);
-        func_00440E54(zflooru_w_e, afrrr, op_106);
+        register_asmcode(zround_w_s, afrrr, op_zround_w_s);
+        register_asmcode(zround_w_d, afrrr, op_zround_w_d);
+        register_asmcode(zround_w_e, afrrr, op_zround_w_e);
+        register_asmcode(zroundu_w_s, afrrr, op_zround_w_s);
+        register_asmcode(zroundu_w_d, afrrr, op_zround_w_d);
+        register_asmcode(zroundu_w_e, afrrr, op_zround_w_e);
+        register_asmcode(ztrunc_w_s, afrrr, op_ztrunc_w_s);
+        register_asmcode(ztrunc_w_d, afrrr, op_ztrunc_w_d);
+        register_asmcode(ztrunc_w_e, afrrr, op_ztrunc_w_e);
+        register_asmcode(ztruncu_w_s, afrrr, op_ztrunc_w_s);
+        register_asmcode(ztruncu_w_d, afrrr, op_ztrunc_w_d);
+        register_asmcode(ztruncu_w_e, afrrr, op_ztrunc_w_e);
+        register_asmcode(zceil_w_s, afrrr, op_zceil_w_s);
+        register_asmcode(zceil_w_d, afrrr, op_zceil_w_d);
+        register_asmcode(zceil_w_e, afrrr, op_zceil_w_e);
+        register_asmcode(zceilu_w_s, afrrr, op_zceil_w_s);
+        register_asmcode(zceilu_w_d, afrrr, op_zceil_w_d);
+        register_asmcode(zceilu_w_e, afrrr, op_zceil_w_e);
+        register_asmcode(zfloor_w_s, afrrr, op_zfloor_w_s);
+        register_asmcode(zfloor_w_d, afrrr, op_zfloor_w_d);
+        register_asmcode(zfloor_w_e, afrrr, op_zfloor_w_e);
+        register_asmcode(zflooru_w_s, afrrr, op_zfloor_w_s);
+        register_asmcode(zflooru_w_d, afrrr, op_zfloor_w_d);
+        register_asmcode(zflooru_w_e, afrrr, op_zfloor_w_e);
     end else begin
-        func_00440E54(zround_w_s, afrrr, op_0C1);
-        func_00440E54(zround_w_d, afrrr, op_0C2);
-        func_00440E54(zround_w_e, afrrr, op_0C3);
-        func_00440E54(zroundu_w_s, afrrr, op_0C1);
-        func_00440E54(zroundu_w_d, afrrr, op_0C2);
-        func_00440E54(zroundu_w_e, afrrr, op_0C3);
-        func_00440E54(ztrunc_w_s, afrrr, op_0C1);
-        func_00440E54(ztrunc_w_d, afrrr, op_0C2);
-        func_00440E54(ztrunc_w_e, afrrr, op_0C3);
-        func_00440E54(ztruncu_w_s, afrrr, op_0C1);
-        func_00440E54(ztruncu_w_d, afrrr, op_0C2);
-        func_00440E54(ztruncu_w_e, afrrr, op_0C3);
-        func_00440E54(zceil_w_s, afrrr, op_0C1);
-        func_00440E54(zceil_w_d, afrrr, op_0C2);
-        func_00440E54(zceil_w_e, afrrr, op_0C3);
-        func_00440E54(zceilu_w_s, afrrr, op_0C1);
-        func_00440E54(zceilu_w_d, afrrr, op_0C2);
-        func_00440E54(zceilu_w_e, afrrr, op_0C3);
-        func_00440E54(zfloor_w_s, afrrr, op_0C1);
-        func_00440E54(zfloor_w_d, afrrr, op_0C2);
-        func_00440E54(zfloor_w_e, afrrr, op_0C3);
-        func_00440E54(zflooru_w_s, afrrr, op_0C1);
-        func_00440E54(zflooru_w_d, afrrr, op_0C2);
-        func_00440E54(zflooru_w_e, afrrr, op_0C3);
+        register_asmcode(zround_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zround_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zround_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(zroundu_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zroundu_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zroundu_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(ztrunc_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(ztrunc_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(ztrunc_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(ztruncu_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(ztruncu_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(ztruncu_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(zceil_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zceil_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zceil_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(zceilu_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zceilu_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zceilu_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(zfloor_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zfloor_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zfloor_w_e, afrrr, op_fcvt_w_e);
+        register_asmcode(zflooru_w_s, afrrr, op_fcvt_w_s);
+        register_asmcode(zflooru_w_d, afrrr, op_fcvt_w_d);
+        register_asmcode(zflooru_w_e, afrrr, op_fcvt_w_e);
     end;
-    func_00440E54(ztlt, afrrr, op_01E);
-    func_00440E54(ztltu, afrrr, op_01F);
-    func_00440E54(ztge, afrrr, op_020);
-    func_00440E54(ztgeu, afrrr, op_021);
-    func_00440E54(zteq, afrrr, op_022);
-    func_00440E54(ztne, afrrr, op_023);
+    register_asmcode(ztlt, afrrr, op_ztlt);
+    register_asmcode(ztltu, afrrr, op_ztltu);
+    register_asmcode(ztge, afrrr, op_ztge);
+    register_asmcode(ztgeu, afrrr, op_ztgeu);
+    register_asmcode(zteq, afrrr, op_zteq);
+    register_asmcode(ztne, afrrr, op_ztne);
 
-    func_00440E20(op_0A0, 16#46000000, opfmt_8);
-    func_00440E20(op_0A1, 16#46200000, opfmt_8);
-    func_00440E20(op_0A2, 16#46400000, opfmt_8);
-    func_00440E20(op_0A3, 16#46000001, opfmt_8);
-    func_00440E20(op_0A4, 16#46200001, opfmt_8);
-    func_00440E20(op_0A5, 16#46400001, opfmt_8);
-    func_00440E20(op_0A6, 16#46000002, opfmt_8);
-    func_00440E20(op_0A7, 16#46200002, opfmt_8);
-    func_00440E20(op_0A8, 16#46400002, opfmt_8);
-    func_00440E20(op_0A9, 16#46000003, opfmt_8);
-    func_00440E20(op_0AA, 16#46200003, opfmt_8);
-    func_00440E20(op_0AB, 16#46400003, opfmt_8);
-    func_00440E20(op_0AC, 16#46000004, opfmt_8);
-    func_00440E20(op_0AD, 16#46200004, opfmt_8);
-    func_00440E20(op_0AE, 16#46400004, opfmt_8);
-    func_00440E20(op_0AF, 16#46000005, opfmt_8);
-    func_00440E20(op_0B0, 16#46200005, opfmt_8);
-    func_00440E20(op_0B1, 16#46400005, opfmt_8);
-    func_00440E20(op_0B5, 16#46000007, opfmt_8);
-    func_00440E20(op_0B6, 16#46200007, opfmt_8);
-    func_00440E20(op_0B7, 16#46400007, opfmt_8);
-    func_00440E20(op_0B2, 16#46000006, opfmt_8);
-    func_00440E20(op_0B3, 16#46200006, opfmt_8);
-    func_00440E20(op_0B4, 16#46400006, opfmt_8);
-    func_00440E20(op_0B8, 16#46200020, opfmt_8);
-    func_00440E20(op_0B9, 16#46400020, opfmt_8);
-    func_00440E20(op_0BA, 16#46800020, opfmt_8);
-    func_00440E20(op_0BB, 16#46000021, opfmt_8);
-    func_00440E20(op_0BC, 16#46400021, opfmt_8);
-    func_00440E20(op_0BD, 16#46800021, opfmt_8);
-    func_00440E20(op_0BE, 16#46000022, opfmt_8);
-    func_00440E20(op_0BF, 16#46200022, opfmt_8);
-    func_00440E20(op_0C0, 16#46800022, opfmt_8);
-    func_00440E20(op_0C1, 16#46000024, opfmt_8);
-    func_00440E20(op_0C2, 16#46200024, opfmt_8);
-    func_00440E20(op_0C3, 16#46400024, opfmt_8);
-    func_00440E20(op_0C4, 16#46000030, opfmt_8);
-    func_00440E20(op_0C5, 16#46200030, opfmt_8);
-    func_00440E20(op_0C6, 16#46400030, opfmt_8);
-    func_00440E20(op_0C7, 16#46000031, opfmt_8);
-    func_00440E20(op_0C8, 16#46200031, opfmt_8);
-    func_00440E20(op_0C9, 16#46400031, opfmt_8);
-    func_00440E20(op_0CA, 16#46000032, opfmt_8);
-    func_00440E20(op_0CB, 16#46200032, opfmt_8);
-    func_00440E20(op_0CC, 16#46400032, opfmt_8);
-    func_00440E20(op_0CD, 16#46000033, opfmt_8);
-    func_00440E20(op_0CE, 16#46200033, opfmt_8);
-    func_00440E20(op_0CF, 16#46400033, opfmt_8);
-    func_00440E20(op_0D0, 16#46000034, opfmt_8);
-    func_00440E20(op_0D1, 16#46200034, opfmt_8);
-    func_00440E20(op_0D2, 16#46400034, opfmt_8);
-    func_00440E20(op_0D3, 16#46000035, opfmt_8);
-    func_00440E20(op_0D4, 16#46200035, opfmt_8);
-    func_00440E20(op_0D5, 16#46400035, opfmt_8);
-    func_00440E20(op_0D6, 16#46000036, opfmt_8);
-    func_00440E20(op_0D7, 16#46200036, opfmt_8);
-    func_00440E20(op_0D8, 16#46400036, opfmt_8);
-    func_00440E20(op_0D9, 16#46000037, opfmt_8);
-    func_00440E20(op_0DA, 16#46200037, opfmt_8);
-    func_00440E20(op_0DB, 16#46400037, opfmt_8);
-    func_00440E20(op_0DC, 16#46000038, opfmt_8);
-    func_00440E20(op_0DD, 16#46200038, opfmt_8);
-    func_00440E20(op_0DE, 16#46400038, opfmt_8);
-    func_00440E20(op_0DF, 16#46000039, opfmt_8);
-    func_00440E20(op_0E0, 16#46200039, opfmt_8);
-    func_00440E20(op_0E1, 16#46400039, opfmt_8);
-    func_00440E20(op_0E2, 16#4600003A, opfmt_8);
-    func_00440E20(op_0E3, 16#4620003A, opfmt_8);
-    func_00440E20(op_0E4, 16#4640003A, opfmt_8);
-    func_00440E20(op_0E5, 16#4600003B, opfmt_8);
-    func_00440E20(op_0E6, 16#4620003B, opfmt_8);
-    func_00440E20(op_0E7, 16#4640003B, opfmt_8);
-    func_00440E20(op_0E8, 16#4600003C, opfmt_8);
-    func_00440E20(op_0E9, 16#4620003C, opfmt_8);
-    func_00440E20(op_0EA, 16#4640003C, opfmt_8);
-    func_00440E20(op_0EB, 16#4600003D, opfmt_8);
-    func_00440E20(op_0EC, 16#4620003D, opfmt_8);
-    func_00440E20(op_0ED, 16#4640003D, opfmt_8);
-    func_00440E20(op_0EE, 16#4600003E, opfmt_8);
-    func_00440E20(op_0EF, 16#4620003E, opfmt_8);
-    func_00440E20(op_0F0, 16#4640003E, opfmt_8);
-    func_00440E20(op_0F1, 16#4600003F, opfmt_8);
-    func_00440E20(op_0F2, 16#4620003F, opfmt_8);
-    func_00440E20(op_0F3, 16#4640003F, opfmt_8);
-    func_00440E20(op_0FB, 16#4600000C, opfmt_8);
-    func_00440E20(op_0FC, 16#4620000C, opfmt_8);
-    func_00440E20(op_0FD, 16#4640000C, opfmt_8);
-    func_00440E20(op_0FE, 16#4600000D, opfmt_8);
-    func_00440E20(op_0FF, 16#4620000D, opfmt_8);
-    func_00440E20(op_100, 16#4640000D, opfmt_8);
-    func_00440E20(op_101, 16#4600000E, opfmt_8);
-    func_00440E20(op_102, 16#4620000E, opfmt_8);
-    func_00440E20(op_103, 16#4640000E, opfmt_8);
-    func_00440E20(op_104, 16#4600000F, opfmt_8);
-    func_00440E20(op_105, 16#4620000F, opfmt_8);
-    func_00440E20(op_106, 16#4640000F, opfmt_8);
-    func_00440E20(op_0F8, 16#46000026, opfmt_8);
-    func_00440E20(op_0F9, 16#46200026, opfmt_8);
-    func_00440E20(op_0FA, 16#46400026, opfmt_8);
+    set_mips_inst_template(op_fadd_s, 16#46000000, mipsfmt_8);
+    set_mips_inst_template(op_fadd_d, 16#46200000, mipsfmt_8);
+    set_mips_inst_template(op_fadd_e, 16#46400000, mipsfmt_8);
+    set_mips_inst_template(op_fsub_s, 16#46000001, mipsfmt_8);
+    set_mips_inst_template(op_fsub_d, 16#46200001, mipsfmt_8);
+    set_mips_inst_template(op_fsub_e, 16#46400001, mipsfmt_8);
+    set_mips_inst_template(op_fmul_s, 16#46000002, mipsfmt_8);
+    set_mips_inst_template(op_fmul_d, 16#46200002, mipsfmt_8);
+    set_mips_inst_template(op_fmul_e, 16#46400002, mipsfmt_8);
+    set_mips_inst_template(op_fdiv_s, 16#46000003, mipsfmt_8);
+    set_mips_inst_template(op_fdiv_d, 16#46200003, mipsfmt_8);
+    set_mips_inst_template(op_fdiv_e, 16#46400003, mipsfmt_8);
+    set_mips_inst_template(op_fsqrt_s, 16#46000004, mipsfmt_8);
+    set_mips_inst_template(op_fsqrt_d, 16#46200004, mipsfmt_8);
+    set_mips_inst_template(op_fsqrt_e, 16#46400004, mipsfmt_8);
+    set_mips_inst_template(op_fabs_s, 16#46000005, mipsfmt_8);
+    set_mips_inst_template(op_fabs_d, 16#46200005, mipsfmt_8);
+    set_mips_inst_template(op_fabs_e, 16#46400005, mipsfmt_8);
+    set_mips_inst_template(op_fneg_s, 16#46000007, mipsfmt_8);
+    set_mips_inst_template(op_fneg_d, 16#46200007, mipsfmt_8);
+    set_mips_inst_template(op_fneg_e, 16#46400007, mipsfmt_8);
+    set_mips_inst_template(op_fmov_s, 16#46000006, mipsfmt_8);
+    set_mips_inst_template(op_fmov_d, 16#46200006, mipsfmt_8);
+    set_mips_inst_template(op_fmov_e, 16#46400006, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_s_d, 16#46200020, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_s_e, 16#46400020, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_s_w, 16#46800020, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_d_s, 16#46000021, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_d_e, 16#46400021, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_d_w, 16#46800021, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_e_s, 16#46000022, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_e_d, 16#46200022, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_e_w, 16#46800022, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_w_s, 16#46000024, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_w_d, 16#46200024, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_w_e, 16#46400024, mipsfmt_8);
+    set_mips_inst_template(op_fc_f_s, 16#46000030, mipsfmt_8);
+    set_mips_inst_template(op_fc_f_d, 16#46200030, mipsfmt_8);
+    set_mips_inst_template(op_fc_f_e, 16#46400030, mipsfmt_8);
+    set_mips_inst_template(op_fc_un_s, 16#46000031, mipsfmt_8);
+    set_mips_inst_template(op_fc_un_d, 16#46200031, mipsfmt_8);
+    set_mips_inst_template(op_fc_un_e, 16#46400031, mipsfmt_8);
+    set_mips_inst_template(op_fc_eq_s, 16#46000032, mipsfmt_8);
+    set_mips_inst_template(op_fc_eq_d, 16#46200032, mipsfmt_8);
+    set_mips_inst_template(op_fc_eq_e, 16#46400032, mipsfmt_8);
+    set_mips_inst_template(op_fc_ueq_s, 16#46000033, mipsfmt_8);
+    set_mips_inst_template(op_fc_ueq_d, 16#46200033, mipsfmt_8);
+    set_mips_inst_template(op_fc_ueq_e, 16#46400033, mipsfmt_8);
+    set_mips_inst_template(op_fc_olt_s, 16#46000034, mipsfmt_8);
+    set_mips_inst_template(op_fc_olt_d, 16#46200034, mipsfmt_8);
+    set_mips_inst_template(op_fc_olt_e, 16#46400034, mipsfmt_8);
+    set_mips_inst_template(op_fc_ult_s, 16#46000035, mipsfmt_8);
+    set_mips_inst_template(op_fc_ult_d, 16#46200035, mipsfmt_8);
+    set_mips_inst_template(op_fc_ult_e, 16#46400035, mipsfmt_8);
+    set_mips_inst_template(op_fc_ole_s, 16#46000036, mipsfmt_8);
+    set_mips_inst_template(op_fc_ole_d, 16#46200036, mipsfmt_8);
+    set_mips_inst_template(op_fc_ole_e, 16#46400036, mipsfmt_8);
+    set_mips_inst_template(op_fc_ule_s, 16#46000037, mipsfmt_8);
+    set_mips_inst_template(op_fc_ule_d, 16#46200037, mipsfmt_8);
+    set_mips_inst_template(op_fc_ule_e, 16#46400037, mipsfmt_8);
+    set_mips_inst_template(op_fc_sf_s, 16#46000038, mipsfmt_8);
+    set_mips_inst_template(op_fc_sf_d, 16#46200038, mipsfmt_8);
+    set_mips_inst_template(op_fc_sf_e, 16#46400038, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngle_s, 16#46000039, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngle_d, 16#46200039, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngle_e, 16#46400039, mipsfmt_8);
+    set_mips_inst_template(op_fc_seq_s, 16#4600003A, mipsfmt_8);
+    set_mips_inst_template(op_fc_seq_d, 16#4620003A, mipsfmt_8);
+    set_mips_inst_template(op_fc_seq_e, 16#4640003A, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngl_s, 16#4600003B, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngl_d, 16#4620003B, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngl_e, 16#4640003B, mipsfmt_8);
+    set_mips_inst_template(op_fc_lt_s, 16#4600003C, mipsfmt_8);
+    set_mips_inst_template(op_fc_lt_d, 16#4620003C, mipsfmt_8);
+    set_mips_inst_template(op_fc_lt_e, 16#4640003C, mipsfmt_8);
+    set_mips_inst_template(op_fc_nge_s, 16#4600003D, mipsfmt_8);
+    set_mips_inst_template(op_fc_nge_d, 16#4620003D, mipsfmt_8);
+    set_mips_inst_template(op_fc_nge_e, 16#4640003D, mipsfmt_8);
+    set_mips_inst_template(op_fc_le_s, 16#4600003E, mipsfmt_8);
+    set_mips_inst_template(op_fc_le_d, 16#4620003E, mipsfmt_8);
+    set_mips_inst_template(op_fc_le_e, 16#4640003E, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngt_s, 16#4600003F, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngt_d, 16#4620003F, mipsfmt_8);
+    set_mips_inst_template(op_fc_ngt_e, 16#4640003F, mipsfmt_8);
+    set_mips_inst_template(op_zround_w_s, 16#4600000C, mipsfmt_8);
+    set_mips_inst_template(op_zround_w_d, 16#4620000C, mipsfmt_8);
+    set_mips_inst_template(op_zround_w_e, 16#4640000C, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_w_s, 16#4600000D, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_w_d, 16#4620000D, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_w_e, 16#4640000D, mipsfmt_8);
+    set_mips_inst_template(op_zceil_w_s, 16#4600000E, mipsfmt_8);
+    set_mips_inst_template(op_zceil_w_d, 16#4620000E, mipsfmt_8);
+    set_mips_inst_template(op_zceil_w_e, 16#4640000E, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_w_s, 16#4600000F, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_w_d, 16#4620000F, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_w_e, 16#4640000F, mipsfmt_8);
+    set_mips_inst_template(op_fli_s, 16#46000026, mipsfmt_8);
+    set_mips_inst_template(op_fli_d, 16#46200026, mipsfmt_8);
+    set_mips_inst_template(op_fli_e, 16#46400026, mipsfmt_8);
 
-    func_00440E54(zldl, afra, op_07F);
-    func_00440E54(zldr, afra, op_080);
-    func_00440E54(zlld, afra, op_081);
-    func_00440E54(zsdl, afra, op_082);
-    func_00440E54(zsdr, afra, op_083);
-    func_00440E54(zscd, afra, op_084);
-    func_00440E54(zdaddi, afrrr, op_061);
-    func_00440E54(zdaddiu, afrrr, op_062);
-    func_00440E54(zdadd, afrrr, op_024);
-    func_00440E54(zdaddu, afrrr, op_025);
-    func_00440E54(zdsub, afrrr, op_026);
-    func_00440E54(zdsubu, afrrr, op_027);
-    func_00440E54(zdsll, afrrr, op_028);
-    func_00440E54(zdsrl, afrrr, op_029);
-    func_00440E54(zdsra, afrrr, op_02A);
-    func_00440E54(zdsllv, afrrr, op_02E);
-    func_00440E54(zdsrlv, afrrr, op_02F);
-    func_00440E54(zdsrav, afrrr, op_030);
-    func_00440E54(zdmult, afrr, op_031);
-    func_00440E54(zdmultu, afrr, op_032);
-    func_00440E54(zddiv, afrrr, op_033);
-    func_00440E54(zddivu, afrrr, op_034);
-    func_00440E54(zlsc1, afra, op_085);
-    func_00440E54(zssc1, afra, op_086);
-    func_00440E54(zdmtc1, afrr, op_099);
-    func_00440E54(zdmfc1, afrr, op_09A);
-    func_00440E54(zdmtc0, afrr, op_09B);
-    func_00440E54(zdmfc0, afrr, op_09C);
-    func_00440E54(zdmtc2, afrr, op_09D);
-    func_00440E54(zdmfc2, afrr, op_09E);
-    func_00440E54(zlwu, afra, op_078);
-    func_00440E54(zeret, af, op_11B);
-    func_00440E54(fcvt_l_s, afrrr, op_113);
-    func_00440E54(fcvt_l_d, afrrr, op_114);
-    func_00440E54(fcvt_l_e, afrrr, op_115);
-    func_00440E54(fcvt_l_w, afrrr, op_116);
-    func_00440E54(fcvt_s_l, afrrr, op_117);
-    func_00440E54(fcvt_d_l, afrrr, op_118);
-    func_00440E54(fcvt_e_l, afrrr, op_119);
-    func_00440E54(fcvt_w_l, afrrr, op_11A);
-    func_00440E54(zround_l_s, afrrr, op_107);
-    func_00440E54(ztrunc_l_s, afrrr, op_108);
-    func_00440E54(zceil_l_s, afrrr, op_109);
-    func_00440E54(zfloor_l_s, afrrr, op_10A);
-    func_00440E54(zround_l_d, afrrr, op_10B);
-    func_00440E54(ztrunc_l_d, afrrr, op_10C);
-    func_00440E54(zceil_l_d, afrrr, op_10D);
-    func_00440E54(zfloor_l_d, afrrr, op_10E);
-    func_00440E54(zround_l_e, afrrr, op_10F);
-    func_00440E54(ztrunc_l_e, afrrr, op_110);
-    func_00440E54(zceil_l_e, afrrr, op_111);
-    func_00440E54(zfloor_l_e, afrrr, op_112);
-    func_00440E54(zcache, afra, op_09F);
-    func_00440E54(zuld, afra, op_000);
-    func_00440E54(zusd, afra, op_000);
-    func_00440E54(zdabs, afrr, op_000);
-    func_00440E54(zdneg, afrr, op_000);
-    func_00440E54(zdnegu, afrr, op_000);
-    func_00440E54(zdmul, afrrr, op_000);
-    func_00440E54(zdmulo, afrrr, op_000);
-    func_00440E54(zdmulou, afrrr, op_000);
-    func_00440E54(zdrem, afrrr, op_033);
-    func_00440E54(zdremu, afrrr, op_034);
-    func_00440E54(zdrol, afrrr, op_000);
-    func_00440E54(zdror, afrrr, op_000);
-    func_00440E54(zdaddou, afrrr, op_025);
-    func_00440E54(zdsubou, afrrr, op_027);
-    func_00440E54(zulwu, afra, op_000);
-    func_00440E54(zmovf, afrrr, op_087);
-    func_00440E54(zmovt, afrrr, op_088);
-    func_00440E54(zmovn, afrrr, op_089);
-    func_00440E54(zmovz, afrrr, op_08A);
-    func_00440E54(fmadd_s, afrrrr, op_11C);
-    func_00440E54(fmadd_d, afrrrr, op_11D);
-    func_00440E54(fmadd_e, afrrrr, op_11E);
-    func_00440E54(fmsub_s, afrrrr, op_11F);
-    func_00440E54(fmsub_d, afrrrr, op_120);
-    func_00440E54(fmsub_e, afrrrr, op_121);
-    func_00440E54(fnmadd_s, afrrrr, op_122);
-    func_00440E54(fnmadd_d, afrrrr, op_123);
-    func_00440E54(fnmadd_e, afrrrr, op_124);
-    func_00440E54(fnmsub_s, afrrrr, op_125);
-    func_00440E54(fnmsub_d, afrrrr, op_126);
-    func_00440E54(fnmsub_e, afrrrr, op_127);
-    func_00440E54(frecip_s, afrrr, op_128);
-    func_00440E54(frecip_d, afrrr, op_129);
-    func_00440E54(frsqrt_s, afrrr, op_12A);
-    func_00440E54(frsqrt_d, afrrr, op_12B);
-    func_00440E54(fmovf_s, afrrr, op_12C);
-    func_00440E54(fmovf_d, afrrr, op_12D);
-    func_00440E54(fmovt_s, afrrr, op_12E);
-    func_00440E54(fmovt_d, afrrr, op_12F);
-    func_00440E54(fmovn_s, afrrr, op_130);
-    func_00440E54(fmovn_d, afrrr, op_131);
-    func_00440E54(fmovz_s, afrrr, op_132);
-    func_00440E54(fmovz_d, afrrr, op_133);
-    func_00440E54(zlwxc1, afrrr, op_134);
-    func_00440E54(zldxc1, afrrr, op_135);
-    func_00440E54(zswxc1, afrrr, op_136);
-    func_00440E54(zsdxc1, afrrr, op_137);
-    func_00440E54(zpfetch, afrrr, op_138);
-    func_00440E54(zpref, afra, op_13C);
-    func_00440E54(zdctr, af, op_139);
-    func_00440E54(zdctw, af, op_13A);
-    func_00440E54(ztlbw, af, op_13B);
+    register_asmcode(zldl, afra, op_zldl);
+    register_asmcode(zldr, afra, op_zldr);
+    register_asmcode(zlld, afra, op_zlld);
+    register_asmcode(zsdl, afra, op_zsdl);
+    register_asmcode(zsdr, afra, op_zsdr);
+    register_asmcode(zscd, afra, op_zscd);
+    register_asmcode(zdaddi, afrrr, op_zdaddi);
+    register_asmcode(zdaddiu, afrrr, op_zdaddiu);
+    register_asmcode(zdadd, afrrr, op_zdadd);
+    register_asmcode(zdaddu, afrrr, op_zdaddu);
+    register_asmcode(zdsub, afrrr, op_zdsub);
+    register_asmcode(zdsubu, afrrr, op_zdsubu);
+    register_asmcode(zdsll, afrrr, op_zdsll);
+    register_asmcode(zdsrl, afrrr, op_zdsrl);
+    register_asmcode(zdsra, afrrr, op_zdsra);
+    register_asmcode(zdsllv, afrrr, op_zdsllv);
+    register_asmcode(zdsrlv, afrrr, op_zdsrlv);
+    register_asmcode(zdsrav, afrrr, op_zdsrav);
+    register_asmcode(zdmult, afrr, op_zdmult);
+    register_asmcode(zdmultu, afrr, op_zdmultu);
+    register_asmcode(zddiv, afrrr, op_zddiv);
+    register_asmcode(zddivu, afrrr, op_zddivu);
+    register_asmcode(zlsc1, afra, op_zlsc1);
+    register_asmcode(zssc1, afra, op_zssc1);
+    register_asmcode(zdmtc1, afrr, op_zdmtc1);
+    register_asmcode(zdmfc1, afrr, op_zdmfc1);
+    register_asmcode(zdmtc0, afrr, op_zdmtc0);
+    register_asmcode(zdmfc0, afrr, op_zdmfc0);
+    register_asmcode(zdmtc2, afrr, op_zdmtc2);
+    register_asmcode(zdmfc2, afrr, op_zdmfc2);
+    register_asmcode(zlwu, afra, op_zlwu);
+    register_asmcode(zeret, af, op_zeret);
+    register_asmcode(fcvt_l_s, afrrr, op_fcvt_l_s);
+    register_asmcode(fcvt_l_d, afrrr, op_fcvt_l_d);
+    register_asmcode(fcvt_l_e, afrrr, op_fcvt_l_e);
+    register_asmcode(fcvt_l_w, afrrr, op_fcvt_l_w);
+    register_asmcode(fcvt_s_l, afrrr, op_fcvt_s_l);
+    register_asmcode(fcvt_d_l, afrrr, op_fcvt_d_l);
+    register_asmcode(fcvt_e_l, afrrr, op_fcvt_e_l);
+    register_asmcode(fcvt_w_l, afrrr, op_fcvt_w_l);
+    register_asmcode(zround_l_s, afrrr, op_zround_l_s);
+    register_asmcode(ztrunc_l_s, afrrr, op_ztrunc_l_s);
+    register_asmcode(zceil_l_s, afrrr, op_zceil_l_s);
+    register_asmcode(zfloor_l_s, afrrr, op_zfloor_l_s);
+    register_asmcode(zround_l_d, afrrr, op_zround_l_d);
+    register_asmcode(ztrunc_l_d, afrrr, op_ztrunc_l_d);
+    register_asmcode(zceil_l_d, afrrr, op_zceil_l_d);
+    register_asmcode(zfloor_l_d, afrrr, op_zfloor_l_d);
+    register_asmcode(zround_l_e, afrrr, op_zround_l_e);
+    register_asmcode(ztrunc_l_e, afrrr, op_ztrunc_l_e);
+    register_asmcode(zceil_l_e, afrrr, op_zceil_l_e);
+    register_asmcode(zfloor_l_e, afrrr, op_zfloor_l_e);
+    register_asmcode(zcache, afra, op_zcache);
+    register_asmcode(zuld, afra, op_macro);
+    register_asmcode(zusd, afra, op_macro);
+    register_asmcode(zdabs, afrr, op_macro);
+    register_asmcode(zdneg, afrr, op_macro);
+    register_asmcode(zdnegu, afrr, op_macro);
+    register_asmcode(zdmul, afrrr, op_macro);
+    register_asmcode(zdmulo, afrrr, op_macro);
+    register_asmcode(zdmulou, afrrr, op_macro);
+    register_asmcode(zdrem, afrrr, op_zddiv);
+    register_asmcode(zdremu, afrrr, op_zddivu);
+    register_asmcode(zdrol, afrrr, op_macro);
+    register_asmcode(zdror, afrrr, op_macro);
+    register_asmcode(zdaddou, afrrr, op_zdaddu);
+    register_asmcode(zdsubou, afrrr, op_zdsubu);
+    register_asmcode(zulwu, afra, op_macro);
+    register_asmcode(zmovf, afrrr, op_zmovf);
+    register_asmcode(zmovt, afrrr, op_zmovt);
+    register_asmcode(zmovn, afrrr, op_zmovn);
+    register_asmcode(zmovz, afrrr, op_zmovz);
+    register_asmcode(fmadd_s, afrrrr, op_fmadd_s);
+    register_asmcode(fmadd_d, afrrrr, op_fmadd_d);
+    register_asmcode(fmadd_e, afrrrr, op_fmadd_e);
+    register_asmcode(fmsub_s, afrrrr, op_fmsub_s);
+    register_asmcode(fmsub_d, afrrrr, op_fmsub_d);
+    register_asmcode(fmsub_e, afrrrr, op_fmsub_e);
+    register_asmcode(fnmadd_s, afrrrr, op_fnmadd_s);
+    register_asmcode(fnmadd_d, afrrrr, op_fnmadd_d);
+    register_asmcode(fnmadd_e, afrrrr, op_fnmadd_e);
+    register_asmcode(fnmsub_s, afrrrr, op_fnmsub_s);
+    register_asmcode(fnmsub_d, afrrrr, op_fnmsub_d);
+    register_asmcode(fnmsub_e, afrrrr, op_fnmsub_e);
+    register_asmcode(frecip_s, afrrr, op_frecip_s);
+    register_asmcode(frecip_d, afrrr, op_frecip_d);
+    register_asmcode(frsqrt_s, afrrr, op_frsqrt_s);
+    register_asmcode(frsqrt_d, afrrr, op_frsqrt_d);
+    register_asmcode(fmovf_s, afrrr, op_fmovf_s);
+    register_asmcode(fmovf_d, afrrr, op_fmovf_d);
+    register_asmcode(fmovt_s, afrrr, op_fmovt_s);
+    register_asmcode(fmovt_d, afrrr, op_fmovt_d);
+    register_asmcode(fmovn_s, afrrr, op_fmovn_s);
+    register_asmcode(fmovn_d, afrrr, op_fmovn_d);
+    register_asmcode(fmovz_s, afrrr, op_fmovz_s);
+    register_asmcode(fmovz_d, afrrr, op_fmovz_d);
+    register_asmcode(zlwxc1, afrrr, op_zlwxc1);
+    register_asmcode(zldxc1, afrrr, op_zldxc1);
+    register_asmcode(zswxc1, afrrr, op_zswxc1);
+    register_asmcode(zsdxc1, afrrr, op_zsdxc1);
+    register_asmcode(zpfetch, afrrr, op_zpfetch);
+    register_asmcode(zpref, afra, op_zpref);
+    register_asmcode(zdctr, af, op_zdctr);
+    register_asmcode(zdctw, af, op_zdctw);
+    register_asmcode(ztlbw, af, op_ztlbw);
 
-    func_00440E20(op_11B, 16#42000018, opfmt_5);
-    func_00440E20(op_113, 16#46000025, opfmt_8);
-    func_00440E20(op_114, 16#46200025, opfmt_8);
-    func_00440E20(op_115, 16#46400025, opfmt_8);
-    func_00440E20(op_116, 16#46800025, opfmt_8);
-    func_00440E20(op_117, 16#46A00020, opfmt_8);
-    func_00440E20(op_118, 16#46A00021, opfmt_8);
-    func_00440E20(op_119, 16#46A00022, opfmt_8);
-    func_00440E20(op_11A, 16#46A00024, opfmt_8);
-    func_00440E20(op_107, 16#46000008, opfmt_8);
-    func_00440E20(op_108, 16#46000009, opfmt_8);
-    func_00440E20(op_109, 16#4600000A, opfmt_8);
-    func_00440E20(op_10A, 16#4600000B, opfmt_8);
-    func_00440E20(op_10B, 16#46200008, opfmt_8);
-    func_00440E20(op_10C, 16#46200009, opfmt_8);
-    func_00440E20(op_10D, 16#4620000A, opfmt_8);
-    func_00440E20(op_10E, 16#4620000B, opfmt_8);
-    func_00440E20(op_10F, 16#46400008, opfmt_8);
-    func_00440E20(op_110, 16#46400009, opfmt_8);
-    func_00440E20(op_111, 16#4640000A, opfmt_8);
-    func_00440E20(op_112, 16#4640000B, opfmt_8);
-    func_00440E20(op_07F, 16#68000000, opfmt_6);
-    func_00440E20(op_080, 16#6C000000, opfmt_6);
-    func_00440E20(op_081, 16#D0000000, opfmt_6);
-    func_00440E20(op_082, 16#B0000000, opfmt_6);
-    func_00440E20(op_083, 16#B4000000, opfmt_6);
-    func_00440E20(op_084, 16#F0000000, opfmt_6);
-    func_00440E20(op_061, 16#60000000, opfmt_0);
-    func_00440E20(op_062, 16#64000000, opfmt_0);
-    func_00440E20(op_024, 16#0000002C, opfmt_3);
-    func_00440E20(op_025, 16#0000002D, opfmt_3);
-    func_00440E20(op_026, 16#0000002E, opfmt_3);
-    func_00440E20(op_027, 16#0000002F, opfmt_3);
-    func_00440E20(op_028, 16#00000038, opfmt_3);
-    func_00440E20(op_029, 16#0000003A, opfmt_3);
-    func_00440E20(op_02A, 16#0000003B, opfmt_3);
-    func_00440E20(op_02B, 16#0000003C, opfmt_3);
-    func_00440E20(op_02C, 16#0000003E, opfmt_3);
-    func_00440E20(op_02D, 16#0000003F, opfmt_3);
-    func_00440E20(op_02E, 16#00000014, opfmt_3);
-    func_00440E20(op_02F, 16#00000016, opfmt_3);
-    func_00440E20(op_030, 16#00000017, opfmt_3);
-    func_00440E20(op_031, 16#0000001C, opfmt_3);
-    func_00440E20(op_032, 16#0000001D, opfmt_3);
-    func_00440E20(op_033, 16#0000001E, opfmt_3);
-    func_00440E20(op_034, 16#0000001F, opfmt_3);
-    func_00440E20(op_085, 16#CC000000, opfmt_6);
-    func_00440E20(op_086, 16#EC000000, opfmt_6);
-    func_00440E20(op_099, 16#44A00000, opfmt_5);
-    func_00440E20(op_09A, 16#44200000, opfmt_5);
-    func_00440E20(op_09B, 16#40A00000, opfmt_5);
-    func_00440E20(op_09C, 16#40200000, opfmt_5);
-    func_00440E20(op_09D, 16#48A00000, opfmt_5);
-    func_00440E20(op_09E, 16#48200000, opfmt_5);
-    func_00440E20(op_078, 16#9C000000, opfmt_6);
-    func_00440E20(op_09F, 16#BC000000, opfmt_10);
-    func_00440E20(op_087, 16#00000001, opfmt_5);
-    func_00440E20(op_088, 16#00010001, opfmt_5);
-    func_00440E20(op_08A, 16#0000000A, opfmt_5);
-    func_00440E20(op_089, 16#0000000B, opfmt_5);
-    func_00440E20(op_11C, 16#4C000020, opfmt_8);
-    func_00440E20(op_11D, 16#4C000021, opfmt_8);
-    func_00440E20(op_11E, 16#4C000022, opfmt_8);
-    func_00440E20(op_11F, 16#4C000028, opfmt_8);
-    func_00440E20(op_120, 16#4C000029, opfmt_8);
-    func_00440E20(op_121, 16#4C00002A, opfmt_8);
-    func_00440E20(op_122, 16#4C000030, opfmt_8);
-    func_00440E20(op_123, 16#4C000031, opfmt_8);
-    func_00440E20(op_124, 16#4C000032, opfmt_8);
-    func_00440E20(op_125, 16#4C000038, opfmt_8);
-    func_00440E20(op_126, 16#4C000039, opfmt_8);
-    func_00440E20(op_127, 16#4C00003A, opfmt_8);
-    func_00440E20(op_128, 16#46000015, opfmt_8);
-    func_00440E20(op_129, 16#46200015, opfmt_8);
-    func_00440E20(op_12A, 16#46000016, opfmt_8);
-    func_00440E20(op_12B, 16#46200016, opfmt_8);
-    func_00440E20(op_12C, 16#46000011, opfmt_8);
-    func_00440E20(op_12D, 16#46200011, opfmt_8);
-    func_00440E20(op_12E, 16#46010011, opfmt_8);
-    func_00440E20(op_12F, 16#46210011, opfmt_8);
-    func_00440E20(op_132, 16#46000012, opfmt_8);
-    func_00440E20(op_133, 16#46200012, opfmt_8);
-    func_00440E20(op_130, 16#46000013, opfmt_8);
-    func_00440E20(op_131, 16#46200013, opfmt_8);
-    func_00440E20(op_134, 16#4C000000, opfmt_5);
-    func_00440E20(op_135, 16#4C000001, opfmt_5);
-    func_00440E20(op_136, 16#4C000008, opfmt_5);
-    func_00440E20(op_137, 16#4C000009, opfmt_5);
-    func_00440E20(op_138, 16#4C00000F, opfmt_5);
-    func_00440E20(op_13C, 16#CC000000, opfmt_6);
-    func_00440E20(op_139, 16#43000009, opfmt_5);
-    func_00440E20(op_13A, 16#4300000A, opfmt_5);
-    func_00440E20(op_13B, 16#43000002, opfmt_5);
+    set_mips_inst_template(op_zeret, 16#42000018, mipsfmt_5);
+    set_mips_inst_template(op_fcvt_l_s, 16#46000025, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_l_d, 16#46200025, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_l_e, 16#46400025, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_l_w, 16#46800025, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_s_l, 16#46A00020, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_d_l, 16#46A00021, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_e_l, 16#46A00022, mipsfmt_8);
+    set_mips_inst_template(op_fcvt_w_l, 16#46A00024, mipsfmt_8);
+    set_mips_inst_template(op_zround_l_s, 16#46000008, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_l_s, 16#46000009, mipsfmt_8);
+    set_mips_inst_template(op_zceil_l_s, 16#4600000A, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_l_s, 16#4600000B, mipsfmt_8);
+    set_mips_inst_template(op_zround_l_d, 16#46200008, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_l_d, 16#46200009, mipsfmt_8);
+    set_mips_inst_template(op_zceil_l_d, 16#4620000A, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_l_d, 16#4620000B, mipsfmt_8);
+    set_mips_inst_template(op_zround_l_e, 16#46400008, mipsfmt_8);
+    set_mips_inst_template(op_ztrunc_l_e, 16#46400009, mipsfmt_8);
+    set_mips_inst_template(op_zceil_l_e, 16#4640000A, mipsfmt_8);
+    set_mips_inst_template(op_zfloor_l_e, 16#4640000B, mipsfmt_8);
+    set_mips_inst_template(op_zldl, 16#68000000, mipsfmt_6);
+    set_mips_inst_template(op_zldr, 16#6C000000, mipsfmt_6);
+    set_mips_inst_template(op_zlld, 16#D0000000, mipsfmt_6);
+    set_mips_inst_template(op_zsdl, 16#B0000000, mipsfmt_6);
+    set_mips_inst_template(op_zsdr, 16#B4000000, mipsfmt_6);
+    set_mips_inst_template(op_zscd, 16#F0000000, mipsfmt_6);
+    set_mips_inst_template(op_zdaddi, 16#60000000, mipsfmt_0);
+    set_mips_inst_template(op_zdaddiu, 16#64000000, mipsfmt_0);
+    set_mips_inst_template(op_zdadd, 16#0000002C, mipsfmt_3);
+    set_mips_inst_template(op_zdaddu, 16#0000002D, mipsfmt_3);
+    set_mips_inst_template(op_zdsub, 16#0000002E, mipsfmt_3);
+    set_mips_inst_template(op_zdsubu, 16#0000002F, mipsfmt_3);
+    set_mips_inst_template(op_zdsll, 16#00000038, mipsfmt_3);
+    set_mips_inst_template(op_zdsrl, 16#0000003A, mipsfmt_3);
+    set_mips_inst_template(op_zdsra, 16#0000003B, mipsfmt_3);
+    set_mips_inst_template(op_02B, 16#0000003C, mipsfmt_3);
+    set_mips_inst_template(op_02C, 16#0000003E, mipsfmt_3);
+    set_mips_inst_template(op_02D, 16#0000003F, mipsfmt_3);
+    set_mips_inst_template(op_zdsllv, 16#00000014, mipsfmt_3);
+    set_mips_inst_template(op_zdsrlv, 16#00000016, mipsfmt_3);
+    set_mips_inst_template(op_zdsrav, 16#00000017, mipsfmt_3);
+    set_mips_inst_template(op_zdmult, 16#0000001C, mipsfmt_3);
+    set_mips_inst_template(op_zdmultu, 16#0000001D, mipsfmt_3);
+    set_mips_inst_template(op_zddiv, 16#0000001E, mipsfmt_3);
+    set_mips_inst_template(op_zddivu, 16#0000001F, mipsfmt_3);
+    set_mips_inst_template(op_zlsc1, 16#CC000000, mipsfmt_6);
+    set_mips_inst_template(op_zssc1, 16#EC000000, mipsfmt_6);
+    set_mips_inst_template(op_zdmtc1, 16#44A00000, mipsfmt_5);
+    set_mips_inst_template(op_zdmfc1, 16#44200000, mipsfmt_5);
+    set_mips_inst_template(op_zdmtc0, 16#40A00000, mipsfmt_5);
+    set_mips_inst_template(op_zdmfc0, 16#40200000, mipsfmt_5);
+    set_mips_inst_template(op_zdmtc2, 16#48A00000, mipsfmt_5);
+    set_mips_inst_template(op_zdmfc2, 16#48200000, mipsfmt_5);
+    set_mips_inst_template(op_zlwu, 16#9C000000, mipsfmt_6);
+    set_mips_inst_template(op_zcache, 16#BC000000, mipsfmt_10);
+    set_mips_inst_template(op_zmovf, 16#00000001, mipsfmt_5);
+    set_mips_inst_template(op_zmovt, 16#00010001, mipsfmt_5);
+    set_mips_inst_template(op_zmovz, 16#0000000A, mipsfmt_5);
+    set_mips_inst_template(op_zmovn, 16#0000000B, mipsfmt_5);
+    set_mips_inst_template(op_fmadd_s, 16#4C000020, mipsfmt_8);
+    set_mips_inst_template(op_fmadd_d, 16#4C000021, mipsfmt_8);
+    set_mips_inst_template(op_fmadd_e, 16#4C000022, mipsfmt_8);
+    set_mips_inst_template(op_fmsub_s, 16#4C000028, mipsfmt_8);
+    set_mips_inst_template(op_fmsub_d, 16#4C000029, mipsfmt_8);
+    set_mips_inst_template(op_fmsub_e, 16#4C00002A, mipsfmt_8);
+    set_mips_inst_template(op_fnmadd_s, 16#4C000030, mipsfmt_8);
+    set_mips_inst_template(op_fnmadd_d, 16#4C000031, mipsfmt_8);
+    set_mips_inst_template(op_fnmadd_e, 16#4C000032, mipsfmt_8);
+    set_mips_inst_template(op_fnmsub_s, 16#4C000038, mipsfmt_8);
+    set_mips_inst_template(op_fnmsub_d, 16#4C000039, mipsfmt_8);
+    set_mips_inst_template(op_fnmsub_e, 16#4C00003A, mipsfmt_8);
+    set_mips_inst_template(op_frecip_s, 16#46000015, mipsfmt_8);
+    set_mips_inst_template(op_frecip_d, 16#46200015, mipsfmt_8);
+    set_mips_inst_template(op_frsqrt_s, 16#46000016, mipsfmt_8);
+    set_mips_inst_template(op_frsqrt_d, 16#46200016, mipsfmt_8);
+    set_mips_inst_template(op_fmovf_s, 16#46000011, mipsfmt_8);
+    set_mips_inst_template(op_fmovf_d, 16#46200011, mipsfmt_8);
+    set_mips_inst_template(op_fmovt_s, 16#46010011, mipsfmt_8);
+    set_mips_inst_template(op_fmovt_d, 16#46210011, mipsfmt_8);
+    set_mips_inst_template(op_fmovz_s, 16#46000012, mipsfmt_8);
+    set_mips_inst_template(op_fmovz_d, 16#46200012, mipsfmt_8);
+    set_mips_inst_template(op_fmovn_s, 16#46000013, mipsfmt_8);
+    set_mips_inst_template(op_fmovn_d, 16#46200013, mipsfmt_8);
+    set_mips_inst_template(op_zlwxc1, 16#4C000000, mipsfmt_5);
+    set_mips_inst_template(op_zldxc1, 16#4C000001, mipsfmt_5);
+    set_mips_inst_template(op_zswxc1, 16#4C000008, mipsfmt_5);
+    set_mips_inst_template(op_zsdxc1, 16#4C000009, mipsfmt_5);
+    set_mips_inst_template(op_zpfetch, 16#4C00000F, mipsfmt_5);
+    set_mips_inst_template(op_zpref, 16#CC000000, mipsfmt_6);
+    set_mips_inst_template(op_zdctr, 16#43000009, mipsfmt_5);
+    set_mips_inst_template(op_zdctw, 16#4300000A, mipsfmt_5);
+    set_mips_inst_template(op_ztlbw, 16#43000002, mipsfmt_5);
 
-    func_00440E54(zbc3f, afl, op_13F);
-    func_00440E54(zbc3t, afl, op_140);
-    func_00440E54(zc3, aforrr, op_141);
-    func_00440E54(zlwc3, afra, op_142);
-    func_00440E54(zswc3, afra, op_143);
-    func_00440E54(zmfc3, afrr, op_144);
-    func_00440E54(zmtc3, afrr, op_145);
-    func_00440E54(zcfc3, afrr, op_146);
-    func_00440E54(zctc3, afrr, op_147);
+    register_asmcode(zbc3f, afl, op_zbc3f);
+    register_asmcode(zbc3t, afl, op_zbc3t);
+    register_asmcode(zc3, aforrr, op_zc3);
+    register_asmcode(zlwc3, afra, op_zlwc3);
+    register_asmcode(zswc3, afra, op_zswc3);
+    register_asmcode(zmfc3, afrr, op_zmfc3);
+    register_asmcode(zmtc3, afrr, op_zmtc3);
+    register_asmcode(zcfc3, afrr, op_zcfc3);
+    register_asmcode(zctc3, afrr, op_zctc3);
 
-    func_00440E20(op_13F, 16#4D000000, opfmt_2);
-    func_00440E20(op_140, 16#4D010000, opfmt_2);
-    func_00440E20(op_141, 16#4E000000, opfmt_5);
-    func_00440E20(op_142, 16#CC000000, opfmt_6);
-    func_00440E20(op_143, 16#EC000000, opfmt_6);
-    func_00440E20(op_144, 16#4C000000, opfmt_5);
-    func_00440E20(op_145, 16#4C800000, opfmt_5);
-    func_00440E20(op_146, 16#4C400000, opfmt_5);
-    func_00440E20(op_147, 16#4CC00000, opfmt_5);
+    set_mips_inst_template(op_zbc3f, 16#4D000000, mipsfmt_2);
+    set_mips_inst_template(op_zbc3t, 16#4D010000, mipsfmt_2);
+    set_mips_inst_template(op_zc3, 16#4E000000, mipsfmt_5);
+    set_mips_inst_template(op_zlwc3, 16#CC000000, mipsfmt_6);
+    set_mips_inst_template(op_zswc3, 16#EC000000, mipsfmt_6);
+    set_mips_inst_template(op_zmfc3, 16#4C000000, mipsfmt_5);
+    set_mips_inst_template(op_zmtc3, 16#4C800000, mipsfmt_5);
+    set_mips_inst_template(op_zcfc3, 16#4C400000, mipsfmt_5);
+    set_mips_inst_template(op_zctc3, 16#4CC00000, mipsfmt_5);
 
-    func_00440E54(zmfpc, afrr, op_148);
-    func_00440E54(zmtpc, afrr, op_149);
-    func_00440E54(zmfps, afrr, op_14A);
-    func_00440E54(zmtps, afrr, op_14B);
+    register_asmcode(zmfpc, afrr, op_zmfpc);
+    register_asmcode(zmtpc, afrr, op_zmtpc);
+    register_asmcode(zmfps, afrr, op_zmfps);
+    register_asmcode(zmtps, afrr, op_zmtps);
 
-    func_00440E20(op_148, 16#4000C801, opfmt_5);
-    func_00440E20(op_149, 16#4080C801, opfmt_5);
-    func_00440E20(op_14A, 16#4000C800, opfmt_5);
-    func_00440E20(op_14B, 16#4080C800, opfmt_5);
+    set_mips_inst_template(op_zmfpc, 16#4000C801, mipsfmt_5);
+    set_mips_inst_template(op_zmtpc, 16#4080C801, mipsfmt_5);
+    set_mips_inst_template(op_zmfps, 16#4000C800, mipsfmt_5);
+    set_mips_inst_template(op_zmtps, 16#4080C800, mipsfmt_5);
     
     regnum[xnoreg] := 0;
     for j := 0 to 31 do begin
@@ -1982,39 +1983,39 @@ begin
         sp6A := 'T';
     end;
 
-    if (string3.f^[1] = chr(0)) then begin
-        sp70 := strlen(string1.f);
+    if (t_opt_string.f^[1] = chr(0)) then begin
+        sp70 := strlen(input_fname.f);
         if (sp70 >= 1022) then begin
-            PostError("File name too long on command line", string1, ErrorLevel_1);
+            PostError("File name too long on command line", input_fname, ErrorLevel_1);
             exit(1);
         end;
 
         for i := 1 to sp70 do begin
-            string3.f^[i] := string1.f^[i];
+            t_opt_string.f^[i] := input_fname.f^[i];
         end;
 
-        if ((sp70 >= 3) and (string1.f^[sp70] = 'G') and (string1.f^[sp70 - 1] = '.')) then begin
-            string3.f^[sp70 - 1] := sp6B;
-            string3.f^[sp70] := sp6A;
+        if ((sp70 >= 3) and (input_fname.f^[sp70] = 'G') and (input_fname.f^[sp70 - 1] = '.')) then begin
+            t_opt_string.f^[sp70 - 1] := sp6B;
+            t_opt_string.f^[sp70] := sp6A;
         end else begin
             sp70 := sp70 + 1;
-            string3.f^[sp70] := sp6B;
+            t_opt_string.f^[sp70] := sp6B;
             sp70 := sp70 + 1;
-            string3.f^[sp70] := sp6A;
+            t_opt_string.f^[sp70] := sp6A;
         end;
         
-        string3.f^[sp70 + 1] := chr(0);
+        t_opt_string.f^[sp70 + 1] := chr(0);
     end;
 
     if not(mscoff) then begin
-        if (st_readbinary(string3.st^, 'a') = -2) then begin
-            call_perror(1, string3);
+        if (st_readbinary(t_opt_string.st^, 'a') = -2) then begin
+            call_perror(1, t_opt_string);
         end else begin
-            string3.f^[1] := chr(0);
-            st_asinit(string3.f^, debugflag);
+            t_opt_string.f^[1] := chr(0);
+            st_asinit(t_opt_string.f^, debugflag);
         end;
-    end else if (ms_readsym(string3.f^) = -1) then begin
-        call_perror(1, string3);
+    end else if (ms_readsym(t_opt_string.f^) = -1) then begin
+        call_perror(1, t_opt_string);
     end;
 end;
 
@@ -2022,15 +2023,15 @@ procedure func_0044A0C0();
 var
     i: integer;
 begin
-    if (string3.f^[1] <> chr(0)) then begin
-        PostError("Because file contains iasm0 directive, -t option is ignored", string1, ErrorLevel_2);
+    if (t_opt_string.f^[1] <> chr(0)) then begin
+        PostError("Because file contains iasm0 directive, -t option is ignored", input_fname, ErrorLevel_2);
     end;
     
     st_cuinit();
     for i := 1 to strlen(outname.f) + 1 do begin
-        string3.f^[i] := outname.f^[i];
+        t_opt_string.f^[i] := outname.f^[i];
     end;
-    st_asinit(string3.f^, debugflag);
+    st_asinit(t_opt_string.f^, debugflag);
 end;
 
 begin { start of main }
@@ -2041,11 +2042,11 @@ begin { start of main }
         xpg_flag := TRUE;
     end;
 
-    func_00441024();
-    reset(binasm_file, string1.f^);
+    init_all();
+    reset(binasm_file, input_fname.f^);
 
     if (Eof(binasm_file) and (Filesize(binasm_file) <> 0)) then begin
-        call_perror(1, string1);
+        call_perror(1, input_fname);
         return 0;
     end;
     
@@ -2055,7 +2056,7 @@ begin { start of main }
     end else if (binasmfyle^.instr = iverstamp) then begin
         func_00449DCC();
     end else begin
-        PostError("Obsolete or corrupt binasm file ", string1, ErrorLevel_1);
+        PostError("Obsolete or corrupt binasm file ", input_fname, ErrorLevel_1);
     end;
 
     if ((severity >= severity_level_2) and not(eof(binasm_file))) then begin
