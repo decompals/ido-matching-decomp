@@ -21,18 +21,18 @@ type
 
     opcodes = (
         op_macro, op_znop, op_zsll, op_zsrl, op_zsra, op_zsllv, op_zsrlv, op_zsrav, { 0 - 7 }
-        op_008, op_009, op_zsyscall, op_zbreak, op_zmfhi, op_zmthi, op_zmflo, op_zmtlo, { 8 - 25 }
+        op_zjr, op_zjalr, op_zsyscall, op_zbreak, op_zmfhi, op_zmthi, op_zmflo, op_zmtlo, { 8 - 25 }
         op_zmult, op_zmultu, op_zdiv, op_zdivu, op_zadd, op_zaddu, op_zsub, op_zsubu, { 16 - 23 }
-        op_zand, op_zor, op_zxor, op_znor, op_01C, op_01D, op_ztlt, op_ztltu, { 24 - 31 }
+        op_zand, op_zor, op_zxor, op_znor, op_zslt, op_zsltu, op_ztlt, op_ztltu, { 24 - 31 }
         op_ztge, op_ztgeu, op_zteq, op_ztne, op_zdadd, op_zdaddu, op_zdsub, op_zdsubu, { 32 - 39 }
-        op_zdsll, op_zdsrl, op_zdsra, op_02B, op_02C, op_02D, op_zdsllv, op_zdsrlv, { 40 - 47 }
-        op_zdsrav, op_zdmult, op_zdmultu, op_zddiv, op_zddivu, op_zbltz, op_zbgez, op_037, { 48 - 55 }
-        op_zbal, op_zbc0f, op_zbc0t, op_zbc1f, op_zbc1t, op_zbc2f, op_zbc2t, op_zbltzl, { 56 - 63 }
+        op_zdsll, op_zdsrl, op_zdsra, op_zdsll32, op_zdsrl32, op_zdsra32, op_zdsllv, op_zdsrlv, { 40 - 47 }
+        op_zdsrav, op_zdmult, op_zdmultu, op_zddiv, op_zddivu, op_zbltz, op_zbgez, op_zbltzal, { 48 - 55 }
+        op_zbgezal, op_zbc0f, op_zbc0t, op_zbc1f, op_zbc1t, op_zbc2f, op_zbc2t, op_zbltzl, { 56 - 63 }
         op_zbgezl, op_zbltzall, op_zbgezall, op_zbc0fl, op_zbc0tl, op_zbc1fl, op_zbc1tl, op_zbc2fl, { 64 - 71 }
         op_zbc2tl, op_zj, op_zjal, op_zbeq, op_zbne, op_zblez, op_zbgtz, op_zbeql, { 72 - 79 }
         op_zbnel, op_zblezl, op_zbgtzl, op_zaddi, op_zaddiu, op_zslti, op_zsltiu, op_zandi, { 80 - 87 }
-        op_zori, op_zxori, op_zlui, op_05B, op_05C, op_05D, op_05E, op_05F, { 88 - 95 }
-        op_060, op_zdaddi, op_zdaddiu, op_zc0, op_zc1, op_zc2, op_zlb, op_zlh, { 96 - 103 }
+        op_zori, op_zxori, op_zlui, op_ztlti, op_ztltiu, op_ztgei, op_ztgeiu, op_zteqi, { 88 - 95 }
+        op_ztnei, op_zdaddi, op_zdaddiu, op_zc0, op_zc1, op_zc2, op_zlb, op_zlh, { 96 - 103 }
         op_zlwl, op_zlw, op_zlbu, op_zlhu, op_zlwr, op_zsb, op_zsh, op_zswl, { 104 - 111 }
         op_zsw, op_zswr, op_zll, op_zlwc1, op_zlwc2, op_zsc, op_zswc1, op_zswc2, { 112 - 119 }
         op_zlwu, op_zld, op_zsd, op_zldc1, op_zldc2, op_zsdc1, op_zsdc2, op_zldl, { 120 - 127 }
@@ -58,7 +58,7 @@ type
         op_fcvt_d_l, op_fcvt_e_l, op_fcvt_w_l, op_zeret, op_fmadd_s, op_fmadd_d, op_fmadd_e, op_fmsub_s, { 280 - 287 }
         op_fmsub_d, op_fmsub_e, op_fnmadd_s, op_fnmadd_d, op_fnmadd_e, op_fnmsub_s, op_fnmsub_d, op_fnmsub_e, { 288 - 295 }
         op_frecip_s, op_frecip_d, op_frsqrt_s, op_frsqrt_d, op_fmovf_s, op_fmovf_d, op_fmovt_s, op_fmovt_d, { 296 - 303 }
-        op_fmovn_s, op_fmovn_d, op_fmovz_s, op_fmovz_d, op_zlwxc1, op_zldxc1, op_zswxc1, op_zsdxc1, { 204 - 311 }
+        op_fmovn_s, op_fmovn_d, op_fmovz_s, op_fmovz_d, op_zlwxc1, op_zldxc1, op_zswxc1, op_zsdxc1, { 304 - 311 }
         op_zpfetch, op_zdctr, op_zdctw, op_ztlbw, op_zpref, op_ztlbr1, op_ztlbp1, op_zbc3f, { 312 - 319 }
         op_zbc3t, op_zc3, op_zlwc3, op_zswc3, op_zmfc3, op_zmtc3, op_zcfc3, op_zctc3, { 320 - 327 }
         op_zmfpc, op_zmtpc, op_zmfps, op_zmtps { 328 - 331 }
@@ -130,8 +130,8 @@ type
         { 0x50 } unk50: integer;
         { 0x54 } unk54: integer;
         { 0x58 } unk58: integer;
-        { 0x5C } unk5C: integer;
-        { 0x60 } unk60: integer;
+        { 0x5C } currfile: integer;
+        { 0x60 } currline: integer;
     end;
 
     PUnkAlpha = ^UnkAlpha;
@@ -560,7 +560,7 @@ function strlen(p : ^Filename): integer; external;
 procedure parsestmt(); external;
 procedure restore_gp(); external;
 function filesize(var f: FileOfBinasm): integer; external;
-function l_addr(ptr: pointer): pointer; external;
+function l_addr(var value: integer): pointer; external;
 function enter_undef_sym(ptr: pointer): pointer; external;
 procedure traverse_bb(); external;
 procedure create_function_table(); external;
@@ -573,14 +573,14 @@ var
     string2: GString;
     t_opt_string: GString;
     e_opt_string: GString;
-    sp104: String; { sp104 - sp154 }
+    xpg_string: String;
     i: integer;
     
 procedure init_all();
 var
     j: integer;
     index: integer;
-    var_s7: Reorg_Enum;
+    reorg: Reorg_Enum;
     arg: GString;
     sym: ^UnkAlpha;
     pad2: integer;
@@ -755,7 +755,7 @@ begin
     saw_pic_flag := false;
     maybe_r4000 := true;
     cprestore_offset := -1;
-    var_s7 := Reorg_Val_0;
+    reorg := Reorg_Val_0;
     
     func_00440FA0(s_pool_symbol, 5);
     func_00440FA0(d_pool_symbol, 6);
@@ -821,25 +821,25 @@ begin
             get_lstring(index, arg);
             if (arg.o^[1] = '-') then begin
                 case (which_opt(arg)) of 
-                    option_r3000: { after mips options ? }
+                    option_r3000:
                         begin
-                            var_s7 := Reorg_Val_1;
+                            reorg := Reorg_Val_1;
                             maybe_r4000 := false;
                         end;
                     option_mips1: isa := ISA_MIPS1;
                     option_mips2: isa := ISA_MIPS2;
                     option_mips3: isa := ISA_MIPS3;
-                    option_r4000: var_s7 := Reorg_Val_3;
-                    option_r4200: var_s7 := Reorg_Val_4;
-                    option_r4600: var_s7 := Reorg_Val_5;
-                    option_tfp: var_s7 := Reorg_Val_11;
+                    option_r4000: reorg := Reorg_Val_3;
+                    option_r4200: reorg := Reorg_Val_4;
+                    option_r4600: reorg := Reorg_Val_5;
+                    option_tfp: reorg := Reorg_Val_11;
                     option_t5_r31: t5_jal := true;
                     option_t5_mtc1: t5_mtc1 := true;
                     option_t5_muldiv: t5_muldiv := true;
                     option_t5_ll_sc_bug: t5_ll_sc_bug := true;
                     option_r6000:
                         begin
-                            var_s7 := Reorg_Val_6;
+                            reorg := Reorg_Val_6;
                             maybe_r4000 := false;
                         end;
                     option_mips4:
@@ -1015,7 +1015,7 @@ begin
                     option_multi_issue:
                         begin
                             index := index + 1;
-                            var_s7 := Reorg_Val_10; get_lstring(index, arg);
+                            reorg := Reorg_Val_10; get_lstring(index, arg);
                             num_issue := atol(arg.o);
                         end;
                     option_nonzero_scnbase: nonzero_scnbase := true;
@@ -1068,23 +1068,89 @@ begin
         xbb_opt := false;
     end;
 
-    init_reorg_state(var_s7);
+    init_reorg_state(reorg);
     sexchange := (isbigendianhost <> bigendian);
 
-    br_always_ops := [op_zbltz..op_zbc2t, op_zbeq..op_zbgtz, op_zbc3f, op_zbc3t];
-    br_likely_ops := [op_zbltzl..op_zbc2tl, op_zbeql..op_zbgtzl];
+    br_always_ops := [op_zbltz, op_zbgez, op_zbltzal, op_zbgezal, op_zbc0f,
+                      op_zbc0t, op_zbc1f, op_zbc1t, op_zbc2f, op_zbc2t,
+                      op_zbeq, op_zbne, op_zblez, op_zbgtz, op_zbc3f, op_zbc3t];
+    br_likely_ops := [op_zbltzl, op_zbgezl, op_zbltzall, op_zbgezall, op_zbc0fl,
+                      op_zbc0tl, op_zbc1fl, op_zbc1tl, op_zbc2fl, op_zbc2tl,
+                      op_zbeql, op_zbnel, op_zblezl, op_zbgtzl];
     branchops := br_always_ops + br_likely_ops;
-    storeops := [op_zsb..op_zswr, op_zsc..op_zswc2, op_zsd, op_zsdc1, op_zsdc2, op_zsdl..op_zscd, op_zssc1, op_zswc3];
-    alu3ops := [op_zsllv..op_zsrav, op_zmult..op_zddivu, op_zmovf..op_zmovz, op_zlwxc1..op_zpfetch];
-    trapops := [op_ztlt..op_ztne];
-    fpops := [op_fadd_s..op_fc_ngt_e, op_zround_w_s..op_fcvt_w_l, op_fmadd_s..op_fmovz_d];
-    c0123_moves := [op_zmfc0..op_zctc1, op_zdmtc1..op_zdmfc2, op_zcfc0..op_zctc2, op_zmfc3..op_zmtps];
-    mark2ops := [op_ztlt..op_ztne, op_zbltzl..op_zbc2tl, op_zbeql..op_zbgtzl, op_05B..op_060, op_zll, op_zsc, op_zldc1..op_zsdc2, op_zcache, op_zeret];
-    mark3ops := [op_zdadd..op_zddivu, op_zdaddi, op_zdaddiu, op_zlwu..op_zsd, op_zldl..op_zscd, op_zdmtc1..op_zdmfc2, op_zround_l_s..op_fcvt_w_l];
-    mark4ops := [op_zmovf..op_zmovz, op_fmadd_s..op_zpfetch, op_zpref..op_ztlbp1, op_zmfpc..op_zmtps];
-    hilo_defs := [op_zmthi, op_zmtlo..op_zdivu, op_zdmult..op_zddivu];
-    c0_ops := [op_zbc0f, op_zbc0t, op_zc0, op_zmfc0, op_zmtc0, op_ztlbr..op_ztlbp, op_zdmtc0, op_zdmfc0, op_zcache, op_zdctr..op_ztlbw, op_ztlbr1, op_ztlbp1, op_zmfpc..op_zmtps];
-    c3_ops := [op_zbc3f..op_zctc3];
+    storeops := [op_zsb, op_zsh, op_zswl, op_zsw, op_zswr,
+                 op_zsc, op_zswc1, op_zswc2, op_zsd, op_zsdc1,
+                 op_zsdc2, op_zsdl, op_zsdr, op_zscd, op_zssc1, op_zswc3];
+    alu3ops := [op_zsllv, op_zsrlv, op_zsrav, op_zmult, op_zmultu,
+                op_zdiv, op_zdivu, op_zadd, op_zaddu, op_zsub,
+                op_zsubu, op_zand, op_zor, op_zxor, op_znor,
+                op_zslt, op_zsltu, op_ztlt, op_ztltu, op_ztge,
+                op_ztgeu, op_zteq, op_ztne, op_zdadd, op_zdaddu,
+                op_zdsub, op_zdsubu, op_zdsll, op_zdsrl, op_zdsra,
+                op_zdsll32, op_zdsrl32, op_zdsra32, op_zdsllv, op_zdsrlv,
+                op_zdsrav, op_zdmult, op_zdmultu, op_zddiv, op_zddivu,
+                op_zmovf, op_zmovt, op_zmovn, op_zmovz, op_zlwxc1,
+                op_zldxc1, op_zswxc1, op_zsdxc1, op_zpfetch];
+    trapops := [op_ztlt, op_ztltu, op_ztge, op_ztgeu, op_zteq, op_ztne];
+    fpops := [op_fadd_s, op_fadd_d, op_fadd_e, op_fsub_s, op_fsub_d,
+              op_fsub_e, op_fmul_s, op_fmul_d, op_fmul_e, op_fdiv_s,
+              op_fdiv_d, op_fdiv_e, op_fsqrt_s, op_fsqrt_d, op_fsqrt_e,
+              op_fabs_s, op_fabs_d, op_fabs_e, op_fmov_s, op_fmov_d,
+              op_fmov_e, op_fneg_s, op_fneg_d, op_fneg_e,op_fcvt_s_d,
+              op_fcvt_s_e, op_fcvt_s_w, op_fcvt_d_s, op_fcvt_d_e, op_fcvt_d_w,
+              op_fcvt_e_s, op_fcvt_e_d, op_fcvt_e_w, op_fcvt_w_s, op_fcvt_w_d,
+              op_fcvt_w_e, op_fc_f_s, op_fc_f_d, op_fc_f_e, op_fc_un_s,
+              op_fc_un_d, op_fc_un_e, op_fc_eq_s, op_fc_eq_d, op_fc_eq_e,
+              op_fc_ueq_s, op_fc_ueq_d, op_fc_ueq_e, op_fc_olt_s, op_fc_olt_d,
+              op_fc_olt_e, op_fc_ult_s, op_fc_ult_d, op_fc_ult_e, op_fc_ole_s,
+              op_fc_ole_d, op_fc_ole_e, op_fc_ule_s, op_fc_ule_d, op_fc_ule_e,
+              op_fc_sf_s, op_fc_sf_d, op_fc_sf_e, op_fc_ngle_s, op_fc_ngle_d,
+              op_fc_ngle_e, op_fc_seq_s, op_fc_seq_d, op_fc_seq_e, op_fc_ngl_s,
+              op_fc_ngl_d, op_fc_ngl_e, op_fc_lt_s, op_fc_lt_d, op_fc_lt_e,
+              op_fc_nge_s, op_fc_nge_d, op_fc_nge_e, op_fc_le_s, op_fc_le_d,
+              op_fc_le_e, op_fc_ngt_s, op_fc_ngt_d, op_fc_ngt_e, op_zround_w_s,
+              op_zround_w_d, op_zround_w_e, op_ztrunc_w_s, op_ztrunc_w_d, op_ztrunc_w_e,
+              op_zceil_w_s, op_zceil_w_d, op_zceil_w_e, op_zfloor_w_s, op_zfloor_w_d,
+              op_zfloor_w_e, op_zround_l_s, op_ztrunc_l_s, op_zceil_l_s, op_zfloor_l_s,
+              op_zround_l_d, op_ztrunc_l_d, op_zceil_l_d, op_zfloor_l_d, op_zround_l_e,
+              op_ztrunc_l_e, op_zceil_l_e, op_zfloor_l_e, op_fcvt_l_s, op_fcvt_l_d,
+              op_fcvt_l_e, op_fcvt_l_w, op_fcvt_s_l, op_fcvt_d_l, op_fcvt_e_l,
+              op_fcvt_w_l, op_fmadd_s, op_fmadd_d, op_fmadd_e, op_fmsub_s,
+              op_fmsub_d, op_fmsub_e, op_fnmadd_s, op_fnmadd_d, op_fnmadd_e,
+              op_fnmsub_s, op_fnmsub_d, op_fnmsub_e, op_frecip_s, op_frecip_d,
+              op_frsqrt_s, op_frsqrt_d, op_fmovf_s, op_fmovf_d, op_fmovt_s,
+              op_fmovt_d, op_fmovn_s, op_fmovn_d, op_fmovz_s, op_fmovz_d];
+    c0123_moves := [op_zmfc0, op_zmfc1, op_zmfc2, op_zcfc1, op_zmtc0,
+                    op_zmtc1, op_zmtc2, op_zctc1, op_zdmtc1, op_zdmfc1,
+                    op_zdmtc0, op_zdmfc0, op_zdmtc2, op_zdmfc2, op_zcfc0,
+                    op_zcfc2, op_zctc0, op_zctc2, op_zmfc3, op_zmtc3,
+                    op_zcfc3, op_zctc3, op_zmfpc, op_zmtpc, op_zmfps, op_zmtps];
+    mark2ops := [op_ztlt, op_ztltu, op_ztge, op_ztgeu, op_zteq,
+                 op_ztne, op_zbltzl, op_zbgezl, op_zbltzall, op_zbgezall,
+                 op_zbc0fl, op_zbc0tl, op_zbc1fl, op_zbc1tl, op_zbc2fl,
+                 op_zbc2tl, op_zbeql, op_zbnel, op_zblezl, op_zbgtzl,
+                 op_ztlti, op_ztltiu, op_ztgei, op_ztgeiu, op_zteqi,
+                 op_ztnei, op_zll, op_zsc, op_zldc1, op_zldc2,
+                 op_zsdc1, op_zsdc2, op_zcache, op_zeret];
+    mark3ops := [op_zdadd, op_zdaddu, op_zdsub, op_zdsubu, op_zdsll,
+                 op_zdsrl, op_zdsra, op_zdsll32, op_zdsrl32, op_zdsra32,
+                 op_zdsllv, op_zdsrlv, op_zdsrav, op_zdmult, op_zdmultu,
+                 op_zddiv, op_zddivu, op_zdaddi, op_zdaddiu, op_zlwu,
+                 op_zld, op_zsd, op_zldl, op_zldr, op_zlld,
+                 op_zsdl, op_zsdr, op_zscd, op_zdmtc1, op_zdmfc1,
+                 op_zdmtc0, op_zdmfc0, op_zdmtc2, op_zdmfc2, op_zround_l_s,
+                 op_ztrunc_l_s, op_zceil_l_s, op_zfloor_l_s, op_zround_l_d, op_ztrunc_l_d,
+                 op_zceil_l_d, op_zfloor_l_d, op_zround_l_e, op_ztrunc_l_e, op_zceil_l_e,
+                 op_zfloor_l_e, op_fcvt_l_s, op_fcvt_l_d, op_fcvt_l_e, op_fcvt_l_w,
+                 op_fcvt_s_l, op_fcvt_d_l, op_fcvt_e_l, op_fcvt_w_l];
+    mark4ops := [op_zmovf, op_zmovt, op_zmovn, op_zmovz, op_fmadd_s, op_fmadd_d, op_fmadd_e, op_fmsub_s, op_fmsub_d, op_fmsub_e, op_fnmadd_s, op_fnmadd_d, op_fnmadd_e, op_fnmsub_s, op_fnmsub_d, op_fnmsub_e, op_frecip_s, op_frecip_d, op_frsqrt_s, op_frsqrt_d, op_fmovf_s, op_fmovf_d, op_fmovt_s, op_fmovt_d, op_fmovn_s, op_fmovn_d, op_fmovz_s, op_fmovz_d, op_zlwxc1, op_zldxc1, op_zswxc1, op_zsdxc1, op_zpfetch, op_zpref, op_ztlbr1, op_ztlbp1, op_zmfpc, op_zmtpc, op_zmfps, op_zmtps];
+    hilo_defs := [op_zmthi, op_zmtlo, op_zmult, op_zmultu, op_zdiv,
+                  op_zdivu, op_zdmult, op_zdmultu, op_zddiv, op_zddivu];
+    c0_ops := [op_zbc0f, op_zbc0t, op_zc0, op_zmfc0, op_zmtc0,
+               op_ztlbr, op_ztlbwi, op_ztlbwr, op_ztlbp, op_zdmtc0,
+               op_zdmfc0, op_zcache, op_zdctr, op_zdctw, op_ztlbw,
+               op_ztlbr1, op_ztlbp1, op_zmfpc, op_zmtpc, op_zmfps, op_zmtps];
+    c3_ops := [op_zbc3f, op_zbc3t, op_zc3, op_zlwc3, op_zswc3, op_zmfc3, op_zmtc3, op_zcfc3, op_zctc3];
 
     register_asmcode(zabs, afrr, op_macro);
     register_asmcode(zadd, afrrr, op_zadd);
@@ -1117,12 +1183,12 @@ begin
     register_asmcode(zblt, afrrl, op_macro);
     register_asmcode(zbltu, afrrl, op_macro);
     register_asmcode(zbltz, afrl, op_zbltz);
-    register_asmcode(zbltzal, afrl, op_037);
+    register_asmcode(zbltzal, afrl, op_zbltzal);
     register_asmcode(zbge, afrrl, op_macro);
     register_asmcode(zbgeu, afrrl, op_macro);
     register_asmcode(zbgez, afrl, op_zbgez);
-    register_asmcode(zbgezal, afrl, op_zbal); { no op_zbgezal ? }
-    register_asmcode(zbal, afrl, op_zbal);
+    register_asmcode(zbgezal, afrl, op_zbgezal);
+    register_asmcode(zbal, afrl, op_zbgezal); { why? }
     register_asmcode(zbeql, afrrl, op_zbeql);
     register_asmcode(zbeqzl, afrl, op_zbeql);
     register_asmcode(zbnel, afrrl, op_zbnel);
@@ -1279,9 +1345,9 @@ begin
     set_mips_inst_template(op_zblez, 16#18000000, mipsfmt_2);
     set_mips_inst_template(op_zbgtz, 16#1C000000, mipsfmt_2);
     set_mips_inst_template(op_zbltz, 16#04000000, mipsfmt_2);
-    set_mips_inst_template(op_037, 16#04100000, mipsfmt_2);
+    set_mips_inst_template(op_zbltzal, 16#04100000, mipsfmt_2);
     set_mips_inst_template(op_zbgez, 16#04010000, mipsfmt_2);
-    set_mips_inst_template(op_zbal, 16#04110000, mipsfmt_2);
+    set_mips_inst_template(op_zbgezal, 16#04110000, mipsfmt_2);
     set_mips_inst_template(op_zbeql, 16#50000000, mipsfmt_1);
     set_mips_inst_template(op_zbnel, 16#54000000, mipsfmt_1);
     set_mips_inst_template(op_zblezl, 16#58000000, mipsfmt_2);
@@ -1297,9 +1363,9 @@ begin
     set_mips_inst_template(op_zdiv, 16#0000001A, mipsfmt_3);
     set_mips_inst_template(op_zdivu, 16#0000001B, mipsfmt_3);
     set_mips_inst_template(op_zjal, 16#0C000000, mipsfmt_4);
-    set_mips_inst_template(op_009, 16#00000009, mipsfmt_3);
+    set_mips_inst_template(op_zjalr, 16#00000009, mipsfmt_3);
     set_mips_inst_template(op_zj, 16#08000000, mipsfmt_4);
-    set_mips_inst_template(op_008, 16#00000008, mipsfmt_3);
+    set_mips_inst_template(op_zjr, 16#00000008, mipsfmt_3);
     set_mips_inst_template(op_zlb, 16#80000000, mipsfmt_6);
     set_mips_inst_template(op_zlbu, 16#90000000, mipsfmt_6);
     set_mips_inst_template(op_zlh, 16#84000000, mipsfmt_6);
@@ -1351,20 +1417,20 @@ begin
     set_mips_inst_template(op_zsllv, 16#00000004, mipsfmt_3);
     set_mips_inst_template(op_zsub, 16#00000022, mipsfmt_3);
     set_mips_inst_template(op_zsubu, 16#00000023, mipsfmt_3);
-    set_mips_inst_template(op_01C, 16#0000002A, mipsfmt_3);
-    set_mips_inst_template(op_01D, 16#0000002B, mipsfmt_3);
+    set_mips_inst_template(op_zslt, 16#0000002A, mipsfmt_3);
+    set_mips_inst_template(op_zsltu, 16#0000002B, mipsfmt_3);
     set_mips_inst_template(op_ztge, 16#00000030, mipsfmt_3);
     set_mips_inst_template(op_ztgeu, 16#00000031, mipsfmt_3);
     set_mips_inst_template(op_ztlt, 16#00000032, mipsfmt_3);
     set_mips_inst_template(op_ztltu, 16#00000033, mipsfmt_3);
     set_mips_inst_template(op_zteq, 16#00000034, mipsfmt_3);
     set_mips_inst_template(op_ztne, 16#00000036, mipsfmt_3);
-    set_mips_inst_template(op_05D, 16#04080000, mipsfmt_9);
-    set_mips_inst_template(op_05E, 16#04090000, mipsfmt_9);
-    set_mips_inst_template(op_05B, 16#040A0000, mipsfmt_9);
-    set_mips_inst_template(op_05C, 16#040B0000, mipsfmt_9);
-    set_mips_inst_template(op_05F, 16#040C0000, mipsfmt_9);
-    set_mips_inst_template(op_060, 16#040E0000, mipsfmt_9);
+    set_mips_inst_template(op_ztgei, 16#04080000, mipsfmt_9);
+    set_mips_inst_template(op_ztgeiu, 16#04090000, mipsfmt_9);
+    set_mips_inst_template(op_ztlti, 16#040A0000, mipsfmt_9);
+    set_mips_inst_template(op_ztltiu, 16#040B0000, mipsfmt_9);
+    set_mips_inst_template(op_zteqi, 16#040C0000, mipsfmt_9);
+    set_mips_inst_template(op_ztnei, 16#040E0000, mipsfmt_9);
     set_mips_inst_template(op_zslti, 16#28000000, mipsfmt_0);
     set_mips_inst_template(op_zsltiu, 16#2C000000, mipsfmt_0);
     set_mips_inst_template(op_zsra, 16#00000003, mipsfmt_3);
@@ -1775,9 +1841,9 @@ begin
     set_mips_inst_template(op_zdsll, 16#00000038, mipsfmt_3);
     set_mips_inst_template(op_zdsrl, 16#0000003A, mipsfmt_3);
     set_mips_inst_template(op_zdsra, 16#0000003B, mipsfmt_3);
-    set_mips_inst_template(op_02B, 16#0000003C, mipsfmt_3);
-    set_mips_inst_template(op_02C, 16#0000003E, mipsfmt_3);
-    set_mips_inst_template(op_02D, 16#0000003F, mipsfmt_3);
+    set_mips_inst_template(op_zdsll32, 16#0000003C, mipsfmt_3);
+    set_mips_inst_template(op_zdsrl32, 16#0000003E, mipsfmt_3);
+    set_mips_inst_template(op_zdsra32, 16#0000003F, mipsfmt_3);
     set_mips_inst_template(op_zdsllv, 16#00000014, mipsfmt_3);
     set_mips_inst_template(op_zdsrlv, 16#00000016, mipsfmt_3);
     set_mips_inst_template(op_zdsrav, 16#00000017, mipsfmt_3);
@@ -1915,8 +1981,8 @@ var
     begin
         if (arg0 <> nil) and not arg0^.unk37 then begin
             if (arg0^.unk2C <> nil) then begin
-                currentline := arg0^.unk60;
-                currentfile := arg0^.unk5C;
+                currentline := arg0^.currline;
+                currentfile := arg0^.currfile;
                 if (arg0^.unk0C.f^[1] <> chr(0)) then begin
                     if ((arg0^.unk0C.f^[1] >= '0') and (arg0^.unk0C.f^[1] <= '9')) then begin
                         v0 := 1;
@@ -1970,7 +2036,7 @@ end;
 
 procedure func_00449DCC();
 var
-    sp70: integer;
+    len: integer;
     i: integer;
     sp6B: char;
     sp6A: char;        
@@ -1984,30 +2050,30 @@ begin
     end;
 
     if (t_opt_string.f^[1] = chr(0)) then begin
-        sp70 := strlen(input_fname.f);
-        if (sp70 >= 1022) then begin
+        len := strlen(input_fname.f);
+        if (len >= 1022) then begin
             PostError("File name too long on command line", input_fname, ErrorLevel_1);
             exit(1);
         end;
 
-        for i := 1 to sp70 do begin
+        for i := 1 to len do begin
             t_opt_string.f^[i] := input_fname.f^[i];
         end;
 
-        if ((sp70 >= 3) and (input_fname.f^[sp70] = 'G') and (input_fname.f^[sp70 - 1] = '.')) then begin
-            t_opt_string.f^[sp70 - 1] := sp6B;
-            t_opt_string.f^[sp70] := sp6A;
+        if (len >= 3) and (input_fname.f^[len] = 'G') and (input_fname.f^[len - 1] = '.') then begin
+            t_opt_string.f^[len - 1] := sp6B;
+            t_opt_string.f^[len] := sp6A;
         end else begin
-            sp70 := sp70 + 1;
-            t_opt_string.f^[sp70] := sp6B;
-            sp70 := sp70 + 1;
-            t_opt_string.f^[sp70] := sp6A;
+            len := len + 1;
+            t_opt_string.f^[len] := sp6B;
+            len := len + 1;
+            t_opt_string.f^[len] := sp6A;
         end;
         
-        t_opt_string.f^[sp70 + 1] := chr(0);
+        t_opt_string.f^[len + 1] := chr(0);
     end;
 
-    if not(mscoff) then begin
+    if not mscoff then begin
         if (st_readbinary(t_opt_string.st^, 'a') = -2) then begin
             call_perror(1, t_opt_string);
         end else begin
@@ -2036,16 +2102,16 @@ end;
 
 begin { start of main }
     xpg_flag := false;
-    sp104 := "_XPG";
-    sp104[5] := chr(0);
-    if (getenv(sp104) <> 0) then begin
+    xpg_string := "_XPG";
+    xpg_string[5] := chr(0);
+    if (getenv(xpg_string) <> 0) then begin
         xpg_flag := TRUE;
     end;
 
     init_all();
     reset(binasm_file, input_fname.f^);
 
-    if (Eof(binasm_file) and (Filesize(binasm_file) <> 0)) then begin
+    if Eof(binasm_file) and (Filesize(binasm_file) <> 0) then begin
         call_perror(1, input_fname);
         return 0;
     end;
@@ -2059,9 +2125,9 @@ begin { start of main }
         PostError("Obsolete or corrupt binasm file ", input_fname, ErrorLevel_1);
     end;
 
-    if ((severity >= severity_level_2) and not(eof(binasm_file))) then begin
+    if (severity >= severity_level_2) and not eof(binasm_file) then begin
         if (profileflag >= 2) then begin 
-            mcount_address := enter_undef_sym(l_addr(addr(mcount_sym)));
+            mcount_address := enter_undef_sym(l_addr(mcount_sym));
         end;
 
         repeat 
@@ -2090,7 +2156,7 @@ begin { start of main }
                 end;
             end;
 
-            if (eof(binasm_file) or (lastinstr = iend) and not pendinginstr) then begin
+            if eof(binasm_file) or (lastinstr = iend) and not pendinginstr then begin
                 traverse_bb();
             end;
         until eof(binasm_file) and not pendinginstr;
@@ -2120,12 +2186,12 @@ begin { start of main }
         end;
     end;
 
-    if (use_ddopt_info) then begin
+    if use_ddopt_info then begin
         dd_close();
     end;
 
     if (severity >= severity_level_2) then begin
-        if (not elf_flag) then begin
+        if not elf_flag then begin
             nonzero_scnbase := true;
         end;
         wrobj();
@@ -2135,7 +2201,7 @@ begin { start of main }
         writeln(err);
     end;
 
-    if ((severity <= severity_level_1) or (warnexitflag and (severity <= severity_level_2))) then begin
+    if (severity <= severity_level_1) or warnexitflag and (severity <= severity_level_2) then begin
         halt(1);
     end;
     return 0;
