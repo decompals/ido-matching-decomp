@@ -87,12 +87,13 @@ begin
     p_tree^.op2 := op2;
 end;
 
-procedure build_op(arg0: Uopcode);
+function build_op(arg0: Uopcode): pointer;
 var
     p_tree: ^tree;
 begin
     p_tree := new_tree();
     p_tree^.u.Opc := arg0;
+    return p_tree;
 end;
 
 function build_1op(uopc: Uopcode; op: ^tree): pointer;
@@ -297,7 +298,6 @@ begin
 
     return temp_v0;
 end;
-
 
 function rvalue(Dtype: Datatype; arg1: String): pointer;
 var
