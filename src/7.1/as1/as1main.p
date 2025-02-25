@@ -545,7 +545,6 @@ function grow_array(var arg0: integer; arg1: integer; arg2: cardinal; arg3: poin
 function init_gp_table(size: integer): pointer; external;
 procedure dd_initialize(var arg0: Filename); external;
 function negative_file_opt(s: GString): boolean; external;
-procedure exit(code: integer); external;
 procedure st_asinit(var arg0: Filename; arg1: integer); external;
 function ms_readsym(var arg0: Filename): integer; external;
 procedure init_j_def_live(); external;
@@ -2053,7 +2052,7 @@ begin
         len := strlen(input_fname.f);
         if (len >= 1022) then begin
             PostError("File name too long on command line", input_fname, ErrorLevel_1);
-            exit(1);
+            halt(1);
         end;
 
         for i := 1 to len do begin
