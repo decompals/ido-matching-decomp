@@ -203,7 +203,7 @@ type
   Valuptr = ^Valu;
   Stringtext = record
 		case integer of
-		0: (ss: packed array [1..Strglgth] of char);
+		0: (ss: packed array[1..Strglgth] of char);
 		1:  (ssarray: array[1..
 			(Strglgth+HostCharsPerWord-1) div HostCharsPerWord] of
 			integer);
