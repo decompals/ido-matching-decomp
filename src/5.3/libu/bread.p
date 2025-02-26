@@ -26,61 +26,64 @@ var
 procedure readuinstr(var u: Bcrec; strptr: stringtextptr);
 var
     i: integer;
-    instlength: integer; { sp58 }
+    instlength: integer;
     strlength: integer;
-    urec: UtabRec; { sp41 (size 0x13) }
+    urec: UtabRec;
     pad: integer;
 
-    procedure fix_infinity(var str: Filename; var len: integer); internal;
+    procedure fix_infinity(var str: Stringtext; var len: integer); internal;
     begin
-        if 
+    if 
         ((len = 8)
-            and (str[1] = 'I')
-            and (str[2] = 'n')
-            and (str[3] = 'f')
-            and (str[4] = 'i')
-            and (str[5] = 'n')
-            and (str[6] = 'i')
-            and (str[7] = 't')
-            and (str[8] = 'y'))
+            and (str.ss[1] = 'I')
+            and (str.ss[2] = 'n')
+            and (str.ss[3] = 'f')
+            and (str.ss[4] = 'i')
+            and (str.ss[5] = 'n')
+            and (str.ss[6] = 'i')
+            and (str.ss[7] = 't')
+            and (str.ss[8] = 'y'))
         or ((len = 3)
-            and (str[1] = 'i')
-            and (str[2] = 'n')
-            and (str[3] = 'f'))
+            and (str.ss[1] = 'i')
+            and (str.ss[2] = 'n')
+            and (str.ss[3] = 'f'))
         then begin
-            str[1] := '9';
-            str[2] := '9';
-            str[3] := '.';
-            str[4] := '9';
-            str[5] := 'e';
-            str[6] := '9';
-            str[7] := '9';
-            str[8] := '9';
+            str.ss[1] := '9';
+            str.ss[2] := '9';
+            str.ss[3] := '.';
+            str.ss[4] := '9';
+            str.ss[5] := 'e';
+            str.ss[6] := '9';
+            str.ss[7] := '9';
+            str.ss[8] := '9';
             len := 8;
-        end else if ((len = 9)
-            and (str[1] = '-')
-            and (str[2] = 'I')
-            and (str[3] = 'n')
-            and (str[4] = 'f')
-            and (str[5] = 'i')
-            and (str[6] = 'n')
-            and (str[7] = 'i')
-            and (str[8] = 't')
-            and (str[9] = 'y'))
+        end
+        else
+        if 
+        ((len = 9)
+            and (str.ss[1] = '-')
+            and (str.ss[2] = 'I')
+            and (str.ss[3] = 'n')
+            and (str.ss[4] = 'f')
+            and (str.ss[5] = 'i')
+            and (str.ss[6] = 'n')
+            and (str.ss[7] = 'i')
+            and (str.ss[8] = 't')
+            and (str.ss[9] = 'y'))
         or ((len = 4)
-            and (str[1] = '-')
-            and (str[2] = 'i')
-            and (str[3] = 'n')
-            and (str[4] = 'f'))
+            and (str.ss[1] = '-')
+            and (str.ss[2] = 'i')
+            and (str.ss[3] = 'n')
+            and (str.ss[4] = 'f'))
         then begin
-            str[2] := '9';
-            str[3] := '9';
-            str[4] := '.';
-            str[5] := '9';
-            str[6] := 'e';
-            str[7] := '9';
-            str[8] := '9';
-            str[9] := '9';
+            str.ss[2] := '9';
+            str.ss[3] := '9';
+            str.ss[4] := '.';
+            str.ss[5] := '9';
+            str.ss[6] := 'e';
+            str.ss[7] := '9';
+            str.ss[8] := '9';
+            str.ss[9] := '9';
             len := 9;
         end;
     end;
@@ -122,9 +125,9 @@ begin
 
                 if ((u.Dtype in [Qdt, Rdt])) then begin
                     if (u.Opc <> Uinit) then begin
-                        fix_infinity(strptr^.ss, u.Constval.Ival);
+                        fix_infinity(strptr^, u.Constval.Ival);
                     end else begin
-                        fix_infinity(strptr^.ss, u.Initval.Ival);
+                        fix_infinity(strptr^, u.Initval.Ival);
                     end;
                 end;
 
@@ -171,7 +174,6 @@ begin
     mtytype['A'] := Amt;
 end;
 
-{UNUSED}
 procedure ubytetobit(var u: Bcrec);
 begin
     if (u.Opc in [Uaent, Ubgnb, Ucia, Uclab, Uclbd, Uctrl, Ucubd, Ucup, Udef, Udup, Uendb, Uicuf, Ulab, Ulbdy, Ulbgn, Ulend, Uloc, Ultrm, Umst, Unop, Uret, Ustep, Uujp]) then begin
