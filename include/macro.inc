@@ -10,17 +10,20 @@
 \name:
 .endm
 
-.macro dlabel label
-    .global \label
-    \label:
+.macro dlabel name, visibility=global
+.\visibility \name
+.type \name, @object
+\name:
 .endm
 
-.macro jlabel label
-    \label:
+.macro jlabel label, visibility=global
+.\visibility \label
+.type \label, @object
+\label:
 .endm
 
-.macro llabel label
-    \label:
+.macro llabel label, visibility=global
+\label:
 .endm
 
 # Float register aliases (o32 ABI, odd ones are rarely used)
