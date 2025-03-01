@@ -176,20 +176,19 @@ end;
 
 procedure ubytetobit(var u: Bcrec);
 begin
-    if (u.Opc in [Uaent, Ubgnb, Ucia, Uclab, Uclbd, Uctrl, Ucubd, Ucup, Udef, Udup, Uendb, Uicuf, Ulab, Ulbdy, Ulbgn, Ulend, Uloc, Ultrm, Umst, Unop, Uret, Ustep, Uujp]) then begin
+    if (u.Opc in [Uadj, Uisld, Uisst, Ulod, Umpmv, Upar, Updef, Upmov, Uregs, Urlda, Urpar, Ustr, Uvreg]) then begin
         u.Offset := u.Offset * 8;
         u.Length := u.Length * 8;
         return;
     end;
     
-
-    if (u.Opc in [Uisst, Ustr]) then begin
+    if (u.Opc in [Uildv, Uilod, Uistr, Uistv, Urldc]) then begin
         u.I1 := u.I1 * 8;
         u.Length := u.Length * 8;
         return;
     end;
 
-    if (u.Opc in [Uisst, Ustr]) then begin
+    if (u.Opc in [Uilda, Ulda, Urlod, Urstr]) then begin
         u.Offset := u.Offset * 8;
         u.Length := u.Length * 8;
         u.Offset2 := u.Offset2 * 8;
@@ -200,8 +199,9 @@ begin
         u.I1 := u.I1 * 8;
         return;
     end;
-
-    if (u.Opc in [Uabs..Uirsv]) then begin
+    
+    if (u.Opc in [Udef, Udif, Ufill, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Uinn, Uint, Ulca, 
+    Uldc, Umov, Usdef, Usgs, Uuni]) then begin
         u.Length := u.Length * 8;
         return;
     end;
@@ -218,5 +218,4 @@ begin
         u.Length := u.Length * 8;
         return;
     end;
-    
 end;
