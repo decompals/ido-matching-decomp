@@ -365,10 +365,10 @@ type
 		frrl : ();		{ reg1, reg2, sym		      }
 	      );
 	    ioption: (
-#if IDO53
-	      option: opt_type;		{ which option (e.g. "O" for "-O3")   }
-#elif IDO71
+#ifdef IDO_71
 	      option: opt_compat_align;	{ which 2-bit option (e.g. "O" for "-O3")  }
+#else
+	      option: opt_type;		{ which option (e.g. "O" for "-O3")   }
 #endif
 	      fill04: 0 .. 16#3fffffff; { pad to 32-bit boundary	      }
 	      case opt_arg_type of	{ associated arg (e.g. "3" for "-O3") }
