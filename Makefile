@@ -12,9 +12,11 @@ WERROR ?= 0
 CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
+	IDO_VERSION := IDO71
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
 	IDO_TC      := cc cfe ugen as1 umerge
 else ifeq ($(VERSION),5.3)
+	IDO_VERSION := IDO53
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe as0
 else
@@ -94,7 +96,7 @@ MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
-CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS)
+CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
 
 
 # -- Location of original IDO binaries

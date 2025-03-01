@@ -255,7 +255,8 @@ type
   opt_type = (
 	o_undefined,
 	o_optimize,
-	o_pic
+	o_pic,
+	o_exception_info
 	);
 
   opt_arg_type = (
@@ -270,6 +271,7 @@ type
   reg_compat_align = firstof(registers)..lastof(registers) of integer;
   form_compat_align = firstof(format)..lastof(format) of integer;
   form_extn_compat_align = firstof(format_extn)..lastof(format_extn) of integer;
+  opt_compat_align = firstof(opt_type)..lastof(opt_type) of integer;
 
   binasm = packed record
     case kind of
@@ -363,7 +365,11 @@ type
 		frrl : ();		{ reg1, reg2, sym		      }
 	      );
 	    ioption: (
+#if IDO53
 	      option: opt_type;		{ which option (e.g. "O" for "-O3")   }
+#elif IDO71
+	      option: opt_compat_align;	{ which 2-bit option (e.g. "O" for "-O3")  }
+#endif
 	      fill04: 0 .. 16#3fffffff; { pad to 32-bit boundary	      }
 	      case opt_arg_type of	{ associated arg (e.g. "3" for "-O3") }
 		opt_none: ();
@@ -621,10 +627,11 @@ typedef enum {
 typedef enum {
 	o_undefined,
 	o_optimize,
-	o_pic
+	o_pic,
+	o_exception_info
     } opt_type;
 
-#define n_opt_type	 3
+#define n_opt_type	 4
 
 
 typedef enum {
