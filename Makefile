@@ -12,9 +12,11 @@ WERROR ?= 0
 CC_CHECK_COMP ?= gcc
 
 ifeq ($(VERSION),7.1)
+	IDO_VERSION := IDO_71
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
 	IDO_TC      := cc cfe ugen as1 umerge
 else ifeq ($(VERSION),5.3)
+	IDO_VERSION := IDO_53
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
 	IDO_TC      := cc cfe as0
 else
@@ -94,7 +96,7 @@ MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
-CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS)
+CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
 
 
 # -- Location of original IDO binaries
@@ -106,7 +108,7 @@ IRIX_USR_DIR ?= $(IRIX_BASE)/$(VERSION)/usr
 DISASM_TARGETS := $(foreach binary,$(IDO_TC),$(ASM)/$(VERSION)/$(binary)/.disasm)
 
 
-SRC_DIRS := $(shell find src/$(VERSION) -type d)
+SRC_DIRS := $(shell find src -type d)
 ASM_DIRS := $(shell find asm/$(VERSION) -type d -not -path "asm/$(VERSION)/functions*")
 
 C_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
@@ -117,17 +119,17 @@ COMBINED_S_FILES := $(sort $(foreach file, $(S_FILES:.s=), $(basename $(file))))
 
 Y_FILES  := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.y))
 
-O_FILES  := $(foreach f,$(Y_FILES:.y=.o),$(BUILD)/$(f)) \
-			$(foreach f,$(C_FILES:.c=.o),$(BUILD)/$(f)) \
-            $(foreach f,$(P_FILES:.p=.o),$(BUILD)/$(f)) \
-            $(foreach f,$(COMBINED_S_FILES),$(BUILD)/$(f).o)
+O_FILES  := $(Y_FILES:src/%.y=$(BUILD)/src/$(VERSION)/%.o) \
+            $(C_FILES:src/%.c=$(BUILD)/src/$(VERSION)/%.o) \
+            $(P_FILES:src/%.p=$(BUILD)/src/$(VERSION)/%.o) \
+            $(COMBINED_S_FILES:asm/$(VERSION)/%=$(BUILD)/asm/$(VERSION)/%.o)
 
 # Automatic dependency files
 DEP_FILES := $(O_FILES:.o=.d) \
              $(O_FILES:.o=.asmproc.d)
 
 # create build directories
-$(shell mkdir -p $(foreach dir,$(SRC_DIRS) $(ASM_DIRS),$(BUILD)/$(dir)))
+$(shell mkdir -p $(SRC_DIRS:src/%=$(BUILD)/src/$(VERSION)/%) $(ASM_DIRS:asm/$(VERSION)/%=$(BUILD)/asm/$(VERSION)/%))
 
 $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
@@ -147,6 +149,7 @@ all: $(ELFS) $(O_FILES)
 
 clean:
 	$(RM) -r $(BUILD)
+	$(RM) $(Y_FILES:.y=.c)
 
 distclean: clean
 	$(RM) -r $(RECOMP) $(ASM) $(YACC)
@@ -173,11 +176,11 @@ $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 $(BUILD)/$(ASM)/%.o: $(ASM)/%.*.s
 	$(AS) $(ASFLAGS) $^ -o $@
 
-$(BUILD)/%.o: %.c
+$(BUILD)/src/$(VERSION)/%.o: src/%.c
 	$(CC_CHECK) $(CC_CHECK_FLAGS) $(IINC) $(CHECK_WARNINGS) $(MIPS_BUILTIN_DEFS) -o $@ $<
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
-$(BUILD)/%.o: %.p
+$(BUILD)/src/$(VERSION)/%.o: src/%.p
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
 %.c: %.y
