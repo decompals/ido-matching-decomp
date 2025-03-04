@@ -1,4 +1,5 @@
 #include "common.h"
+#include "cmplrs/binasm.h"
 #include "reg_mgr.h"
 #include "report.h"
 #include "frame_offset.h"

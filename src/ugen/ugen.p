@@ -42,7 +42,6 @@ procedure set_domtag(arg0: boolean); external;
 procedure print_tree(pFile: ^Text; arg1: ^tree; arg2: cardinal; arg3: cardinal); external;
 procedure labelopt(a0: ^Tree; a1: ^Text; debug: boolean; arg2: boolean); external;
 procedure initialize_tree(); external;
-procedure init_ibuffer(); external;
 procedure clear_sym_tab(); external;
 procedure init_build(); external;
 function build_tree(verbose: boolean): pointer; external; 

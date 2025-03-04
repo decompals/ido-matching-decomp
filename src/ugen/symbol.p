@@ -3,17 +3,9 @@
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
 #include "cmplrs/uoptions.h"
-
-{ TODO: find a home for these }
-procedure demit_dir0(arg0: integer; arg1: integer); external;
-procedure demit_dir1(arg0: integer; arg1: integer; arg2: integer); external;
-procedure demit_dir2(arg0: integer; arg1: integer; arg2: integer; arg3: integer); external;
-procedure demit_edata(arg0: integer; arg1: integer; arg2: integer); external;
-procedure demit_weakext(arg0: integer; arg1: integer); external;
-procedure emit_dir0(arg0: integer; arg1: integer); external;
-procedure emit_label_val(arg0: integer; arg1: integer; arg2: integer; arg3: cardinal); external;
-procedure emit_val(arg0: integer; arg1: u8; var arg2: Valu; arg3: cardinal); external;
-function find_val_type(dtype: Datatype; size: cardinal): u8; external;
+#include "cmplrs/binasm.h"
+#include "emit.h"
+#include "emit_dw.h"
 
 type
     SymbolInit = packed record
@@ -203,7 +195,7 @@ begin
 
         Uasym: begin
             if (((u^.lexlev & 1) = 1) and (u^.Length = 0)) then begin
-                emit_dir0(16#12, u^.I1);
+                emit_dir0(iweakext, u^.I1);
                 return;
             end;
             sym := lookup_sym(u^.Length);
@@ -597,11 +589,11 @@ var
 begin
     var_v0 := data_area;
     case (var_v0) of
-        0: if (size > sdata_max) then demit_dir0(16#A, 0) else demit_dir0(16#19, 0);
-        1: demit_dir0(16#1A, 0);
-        2: demit_dir0(16#19, 0);
-        3: demit_dir0(16#A, 0);
-        4: demit_dir0(16#15, 0);
+        0: if (size > sdata_max) then demit_dir0(idata, 0) else demit_dir0(isdata, 0);
+        1: demit_dir0(irdata, 0);
+        2: demit_dir0(isdata, 0);
+        3: demit_dir0(idata, 0);
+        4: demit_dir0(itext, 0);
         5: if (excpt <> 0) then demit_edata(0, 0, 0);
     end;
 end;
@@ -609,9 +601,9 @@ end;
 procedure force_alignment(arg0: u8);
 begin
     if (arg0 <> 0) then begin
-        demit_dir1(4, 0, arg0);
+        demit_dir1(ialign, 0, arg0);
     end;
-    demit_dir1(4, 0, 0);
+    demit_dir1(ialign, 0, 0);
 end;
 
 procedure emit_init(sym: ^Symbol);
@@ -625,14 +617,14 @@ var
     var_s0_3: integer;
     var_a3: integer;
 begin
-    demit_dir0(0, sym^.unk0);
+    demit_dir0(ilabel, sym^.unk0);
 
     var_s0 := sym^.unk28;
     while (var_s0 <> nil) do begin
         if (var_s0^.unk4 = 1) then begin
             demit_weakext(var_s0^.unk0, 0);
         end;
-        demit_dir0(0, var_s0^.unk0);
+        demit_dir0(ilabel, var_s0^.unk0);
         var_s0 := var_s0^.next;
     end;
 
@@ -651,13 +643,13 @@ begin
                 end;
                 var_a2 := 0;
             end;
-            demit_dir1(16#14, 0, var_a2);
+            demit_dir1(ispace, 0, var_a2);
         end;
 
         if (temp_s2 = 8) then begin
             if (var_s3^.u.Lexlev <> 0) then begin
                 if (temp_s6 = 2) then begin
-                    demit_dir1(16#39, 0, var_s3^.u.Lexlev);
+                    demit_dir1(ishift_addr, 0, var_s3^.u.Lexlev);
                 end else begin
                     report_error(Warn, 825, "symbol.p", "Illegal shift in INIT. Shift ignored");
                 end;
@@ -692,7 +684,7 @@ begin
             end;
             var_a2 := 0;
         end;
-        demit_dir1(16#14, 0, var_a2);
+        demit_dir1(ispace, 0, var_a2);
     end;
 end;
 
@@ -704,23 +696,23 @@ begin
         1: begin
             if (sym^.size <> 0) then begin
                 if (sym^.data_area = 2) then begin
-                    demit_dir2(16#2D, sym^.unk0, sym^.size, 1);
+                    demit_dir2(iextern, sym^.unk0, sym^.size, 1);
                 end else begin
-                    demit_dir2(16#2D, sym^.unk0, sym^.size, 0);
+                    demit_dir2(iextern, sym^.unk0, sym^.size, 0);
                 end;
             end;
         end;
 
         2, 4: begin
             if (sym^.kind = 2) then begin
-                demit_dir0(2, sym^.unk0);
+                demit_dir0(iglobal, sym^.unk0);
             end;
             if (sym^.size <> 0) then begin
                 if (sym^.unk1C = nil) then begin
                     if (sym^.data_area = 2) then begin
-                        demit_dir2(9, sym^.unk0, sym^.size, 1);
+                        demit_dir2(ilcomm, sym^.unk0, sym^.size, 1);
                     end else begin
-                        demit_dir2(9, sym^.unk0, sym^.size, 0);
+                        demit_dir2(ilcomm, sym^.unk0, sym^.size, 0);
                     end;
                 end else begin
                     choose_area(sym^.data_area, sym^.size);
@@ -734,13 +726,13 @@ begin
             if (sym^.unk1C = nil) then begin
                 if (sym^.size <> 0) then begin
                     if (sym^.data_area = 2) then begin
-                        demit_dir2(8, sym^.unk0, sym^.size, 1);
+                        demit_dir2(icomm, sym^.unk0, sym^.size, 1);
                     end else begin
-                        demit_dir2(8, sym^.unk0, sym^.size, 0);
+                        demit_dir2(icomm, sym^.unk0, sym^.size, 0);
                     end;
                 end;
             end else begin
-                demit_dir0(2, sym^.unk0);
+                demit_dir0(iglobal, sym^.unk0);
                 choose_area(sym^.data_area, sym^.size);
                 force_alignment(3);
                 emit_init(sym);
@@ -802,14 +794,14 @@ begin
         return;
     end;
 
-    demit_dir0(0, arg0);
+    demit_dir0(ilabel, arg0);
 
     var_s0 := sym^.unk28;
     while (var_s0 <> nil) do begin
         if (sym^.kind = 10) then begin
-            demit_dir0(2, var_s0^.unk0);
+            demit_dir0(iglobal, var_s0^.unk0);
         end;
-        demit_dir0(0, var_s0^.unk0);
+        demit_dir0(ilabel, var_s0^.unk0);
         var_s0 := var_s0^.next;
     end;
 end;
