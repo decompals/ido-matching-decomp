@@ -1,3 +1,4 @@
+#include "cmplrs/stinfc.h"
 #include "common.h"
 #include "report.h"
 #include "tree.h"
@@ -7,9 +8,6 @@
 #include "ibuffer.h"
 #include "reg_mgr.h"
 #include "symbol.h"
-
-{ TODO: move to a header }
-function st_str_idn(arg0: integer): pointer; external;
 
 procedure home_parameters(arg0: cardinal; arg1: integer); forward;
 procedure gen_reg_save_restore(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: boolean; arg5: integer; arg6: integer); forward;
@@ -786,7 +784,7 @@ end;
 procedure emit_file{(arg0: integer; arg1: boolean)};
 var
     sp108: Filename;
-    temp_v0: ^Filename;
+    temp_v0: pst_string;
     i: integer;
     var_s3: cardinal;
     var_v0: integer;
