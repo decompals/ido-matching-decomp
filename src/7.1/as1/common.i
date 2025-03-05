@@ -26,7 +26,7 @@ type
 
     opcodes = (
         op_macro, op_znop, op_zsll, op_zsrl, op_zsra, op_zsllv, op_zsrlv, op_zsrav, { 0 - 7 }
-        op_zjr, op_zjalr, op_zsyscall, op_zbreak, op_zmfhi, op_zmthi, op_zmflo, op_zmtlo, { 8 - 25 }
+        op_zjr, op_zjalr, op_zsyscall, op_zbreak, op_zmfhi, op_zmthi, op_zmflo, op_zmtlo, { 8 - 15 }
         op_zmult, op_zmultu, op_zdiv, op_zdivu, op_zadd, op_zaddu, op_zsub, op_zsubu, { 16 - 23 }
         op_zand, op_zor, op_zxor, op_znor, op_zslt, op_zsltu, op_ztlt, op_ztltu, { 24 - 31 }
         op_ztge, op_ztgeu, op_zteq, op_ztne, op_zdadd, op_zdaddu, op_zdsub, op_zdsubu, { 32 - 39 }
@@ -140,6 +140,31 @@ type
         size: cardinal;
     end;
 
+    PreReorderPeepholesRec = record
+        unk_00: integer;
+        unk_04: integer;
+        unk_08: integer;
+        unk_0C: integer;
+        unk_10: integer;
+        unk_14: packed array [1..32] of char;
+    end;
+
+    segments = 0..20; { TODO enum }
+
+    PrevSDataType = Record
+        { 0x00 } unk00: integer;
+        { 0x04 } unk04: boolean;
+        { 0x08 } unk08: integer;
+        { 0x0C } unk0C: integer;
+        { 0x10 } unk10: integer;
+    end;
+
+    IntegerArr = array [0..0] of integer;
+    IntegerArray = record;
+        data: ^IntegerArr;
+        size: cardinal;
+    end;
+
 var
     emptystring: extern GString;
     gpreg: extern registers;
@@ -158,6 +183,20 @@ var
     proc_instr_base: extern integer;
     rld_list: extern RldListArray;
     nextrld: extern integer;
+    atflag: extern boolean;
+    bigendian: extern boolean;
+    moxieflag: extern boolean;
+    picflag: extern integer;
+    big_got: extern boolean;
+    branchops: extern set of opcodes;
+    pre_reorder_peepholes: extern PreReorderPeepholesRec;
+    currsegment: extern segments;
+    prev_sdata: extern array[1..2] of PrevSDataType;
+    prev_align: extern array[0..20] of PrevSDataType;
+    seg_ic: extern IntegerArray;
+    aligning: extern boolean;
+    currsegmentindex: extern integer;
 
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
 procedure p_assertion_failed(arg0: String; arg1: String; arg2: cardinal); external;
+procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;

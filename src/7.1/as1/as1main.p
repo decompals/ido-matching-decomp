@@ -39,14 +39,6 @@ type
         severity_level_4
     );
 
-    PrevSDataType = Record
-        { 0x00 } unk00: integer;
-        { 0x04 } unk04: Byte;
-        { 0x08 } unk08: integer;
-        { 0x0C } unk0C: integer;
-        { 0x10 } unk10: integer;
-    end;
-
     Reorg_Enum = (
         Reorg_Val_0,
         Reorg_Val_1,
@@ -192,8 +184,6 @@ type
         unk_1E: boolean;
     end;
 
-    segments = 0..20; { TODO enum }
-
     MemoryRec = record;
         unk_00: integer;
         unk_04: integer;
@@ -213,25 +203,10 @@ type
         size: cardinal;
     end;
 
-    IntegerArr = array [0..0] of integer;
-    IntegerArray = record;
-        data: ^IntegerArr;
-        size: cardinal;
-    end;
-
     SymTabRecArr = array [0..0] of PUnkAlpha;
     SymTabRecArray = record
         data: ^SymTabRecArr;
         size: cardinal;
-    end;
-
-    PreReorderPeepholesRec = record
-        unk_00: integer;
-        unk_04: integer;
-        unk_08: integer;
-        unk_0C: integer;
-        unk_10: integer;
-        unk_14: packed array [1..32] of char;
     end;
 
 { global variables }
@@ -239,14 +214,11 @@ type
 var
     template: array [first(opcodes)..last(opcodes)] of cardinal;
     opcodeformat: array [first(opcodes)..last(opcodes)] of mipsformats;
-    asm2op: array [first(asmcodes)..last(asmcodes)] of opcodes;
     asm2asmformat: array [first(asmcodes)..last(asmcodes)] of asmformat;
     gp_tables: array [0..15] of pointer;
     gprelsize: integer;
-    prev_sdata: array[1..2] of PrevSDataType;
     br_always_ops: set of opcodes;
     br_likely_ops: set of opcodes;
-    branchops: set of opcodes;
     storeops: set of opcodes;
     alu3ops: set of opcodes;
     trapops: set of opcodes;
@@ -261,16 +233,13 @@ var
     gp_fp_moves: set of opcodes;
     regnum: array [first(registers)..last(registers)] of integer;
     knownregs: set of registers;
-    bbindex: integer;
     shftaddr: integer;
     memory: MemoryRecArray;
-    seg_ic: IntegerArray;
     nextlabelchain: IntegerArray;
     multireloc_list: IntegerArray;
     multirelocinstr_list: IntegerArray;
     sym_tab: SymTabRecArray;
     neg_sym_tab: SymTabRecArray;
-    pre_reorder_peepholes: PreReorderPeepholesRec;
     isa: mips_isa;
     opts: OptRecord;
     s_pool_symbol: PUnkAlpha;
@@ -278,15 +247,12 @@ var
     currfunc_sym: ^UnkAlpha;
     nopinserted: integer;
     new_hilo: boolean;
-    diag_flag: boolean;
     fpstall_nop: boolean;
     nopsremaining: integer;
     transform_flag: boolean;
     macroflag: boolean;
-    atflag: boolean;
     non_pic_flag: boolean;
     num_issue: integer;
-    picflag: integer;
     mscoff: boolean;
     force_branch_fixup: boolean;
     mscoff1: boolean;
@@ -309,7 +275,6 @@ var
     initial_loc: boolean;
     ent_pending: boolean;
     last_bb: array [1..3] of Byte;
-    currsegment: segments;
     is_nonleaf: boolean;
     currfunc_hasedata: boolean;
     currentline: integer;
@@ -323,7 +288,6 @@ var
     savelastloc: boolean;
     lastsym: integer;
     peep_debug: integer;
-    aligning: boolean;
     lastic: integer;
     lastsegment: segments;
     realsegments: set of segments;
@@ -335,12 +299,10 @@ var
     reorder: boolean;
     debugflag: integer;
     profileflag: integer;
-    moxieflag: boolean;
     sexchange: boolean;
     optflag: integer;
     elf_flag: boolean;
     abi_flag: boolean;
-    bigendian: boolean;
     isbigendianhost: boolean;
     pendinginstr: boolean;
     notandm: boolean;
@@ -350,7 +312,6 @@ var
     verbose: boolean;
     warnexitflag: boolean;
     saw_cap_g: boolean;
-    big_got: boolean;
     gp_disp_address: integer;
     saw_pic_flag: boolean;
     maybe_r4000: boolean;
@@ -365,7 +326,6 @@ var
     dwopcode: boolean;
     r4300_mul: boolean;
     fp_hack_flag: 0..4; { TODO enum ? }
-    binasmfyle: ^binasm;
     mcount_address: pointer;
     mcount_sym: integer;
     lastinstr: itype;
@@ -384,7 +344,6 @@ var
     nowarnflag: boolean;
     sixtyfour_bit: boolean;
     fp32regs: boolean;
-    currsegmentindex: integer;
     binasm_file: FileOfBinasm;
     
 
@@ -410,7 +369,6 @@ procedure init_j_def_live(); external;
 procedure init_inst_heap(); external;
 procedure call_perror(arg0: integer; str: GString); external;
 procedure init_binasm(); external;
-procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;
 procedure dd_close(); external;
 procedure wrobj(); external;
 function strlen(p : ^Filename): integer; external;
@@ -484,7 +442,7 @@ var
         for i := 1 to 2 do begin
             prev_sdata[i].unk00 := 0;
             prev_sdata[i].unk0C := 0;
-            prev_sdata[i].unk04 := 0;
+            prev_sdata[i].unk04 := false;
             prev_sdata[i].unk08 := 1;            
             prev_sdata[i].unk10 := 1;
         end;
