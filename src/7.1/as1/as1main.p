@@ -184,30 +184,7 @@ type
         unk_1E: boolean;
     end;
 
-    MemoryRec = record;
-        unk_00: integer;
-        unk_04: integer;
-        unk_08: Byte;
-        unk_0C: integer;
-        unk_10: integer;
-        unk_14: integer;
-        unk_18: integer;
-        unk_1C: integer;
-        unk_20: integer;
-        unk_24: integer;
-        unk_28: integer;
-    end;
-    MemoryRecArr = array [0..0] of MemoryRec;
-    MemoryRecArray = record;
-        data: ^MemoryRecArr;
-        size: cardinal;
-    end;
-
-    SymTabRecArr = array [0..0] of PUnkAlpha;
-    SymTabRecArray = record
-        data: ^SymTabRecArr;
-        size: cardinal;
-    end;
+    ARRAY_DECLARE(PUnkAlpha);
 
 { global variables }
 
@@ -215,8 +192,7 @@ var
     template: array [first(opcodes)..last(opcodes)] of cardinal;
     opcodeformat: array [first(opcodes)..last(opcodes)] of mipsformats;
     asm2asmformat: array [first(asmcodes)..last(asmcodes)] of asmformat;
-    gp_tables: array [0..15] of pointer;
-    gprelsize: integer;
+    gp_tables: array [seg_text..seg_15] of pointer;
     br_always_ops: set of opcodes;
     br_likely_ops: set of opcodes;
     storeops: set of opcodes;
@@ -234,17 +210,14 @@ var
     regnum: array [first(registers)..last(registers)] of integer;
     knownregs: set of registers;
     shftaddr: integer;
-    memory: MemoryRecArray;
-    nextlabelchain: IntegerArray;
-    multireloc_list: IntegerArray;
-    multirelocinstr_list: IntegerArray;
-    sym_tab: SymTabRecArray;
-    neg_sym_tab: SymTabRecArray;
+    multireloc_list: ARRAY_OF(integer);
+    multirelocinstr_list: ARRAY_OF(integer);
+    sym_tab: ARRAY_OF(PUnkALpha);
+    neg_sym_tab: ARRAY_OF(PUnkALpha);
     isa: mips_isa;
     opts: OptRecord;
     s_pool_symbol: PUnkAlpha;
     d_pool_symbol: PUnkAlpha;
-    currfunc_sym: ^UnkAlpha;
     nopinserted: integer;
     new_hilo: boolean;
     fpstall_nop: boolean;
@@ -275,41 +248,29 @@ var
     initial_loc: boolean;
     ent_pending: boolean;
     last_bb: array [1..3] of Byte;
-    is_nonleaf: boolean;
-    currfunc_hasedata: boolean;
-    currentline: integer;
-    currentent: integer;
-    currentent_name: integer;
     swpipe_debug: integer;
     first_pdr: integer;
-    excpt_opt: boolean;
     last_pdr: integer;
-    currentfile: integer;
     savelastloc: boolean;
     lastsym: integer;
     peep_debug: integer;
     lastic: integer;
     lastsegment: segments;
-    realsegments: set of segments;
     lastrld: integer;
     nextmultireloc: integer;
     nextmultirelocinstr: integer;
     severity: severity_levels;
     tracereorder: boolean;
     reorder: boolean;
-    debugflag: integer;
     profileflag: integer;
-    sexchange: boolean;
     optflag: integer;
     elf_flag: boolean;
     abi_flag: boolean;
     isbigendianhost: boolean;
-    pendinginstr: boolean;
     notandm: boolean;
     xbb_debug: integer;
     listingflag: boolean;
     fp_pool_flag: boolean;
-    verbose: boolean;
     warnexitflag: boolean;
     saw_cap_g: boolean;
     gp_disp_address: integer;
@@ -328,7 +289,6 @@ var
     fp_hack_flag: 0..4; { TODO enum ? }
     mcount_address: pointer;
     mcount_sym: integer;
-    lastinstr: itype;
     olimit_value: integer;
     gprmask: cardinal;
     fprmask: cardinal;
@@ -338,8 +298,6 @@ var
     fixup_count: integer;
     use_ddopt_info: boolean;
     nonzero_scnbase: boolean;
-    firstusertextseg: integer;
-    lastusertextseg: integer;
     xpg_flag: boolean;
     nowarnflag: boolean;
     sixtyfour_bit: boolean;
@@ -350,7 +308,6 @@ var
 { external functions }
 
 function memset(x: pointer; y: integer; z: integer): pointer; external;
-function xmalloc(size: integer): pointer; external;
 procedure new_error(); external;
 function atol(arg0: ^Identname): integer; external;
 function getenv(var arg0: String): integer; external;
@@ -359,7 +316,6 @@ procedure get_lstring(arg0: integer; arg1: GString); external;
 procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure init_reorg_state(arg0: Reorg_Enum); external;
 function which_opt(arg0: GString): options; external;
-function grow_array(var arg0: integer; arg1: integer; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
 function init_gp_table(size: integer): pointer; external;
 procedure dd_initialize(var arg0: Filename); external;
 function negative_file_opt(s: GString): boolean; external;
@@ -371,7 +327,6 @@ procedure call_perror(arg0: integer; str: GString); external;
 procedure init_binasm(); external;
 procedure dd_close(); external;
 procedure wrobj(); external;
-function strlen(p : ^Filename): integer; external;
 procedure parsestmt(); external;
 procedure restore_gp(); external;
 function filesize(var f: FileOfBinasm): integer; external;
@@ -424,12 +379,12 @@ var
     
     function func_00440E8C(): boolean;
     var
-        i: integer;
+        i: segments;
         ret: boolean;
     begin
         ret := true;
-        for i := 0 to 15 do begin
-            if (i in [1,3]) then begin
+        for i := seg_text to seg_15 do begin
+            if (i in [seg_sdata, seg_3]) then begin
                 gp_tables[i] := init_gp_table(gprelsize);
                 if (gp_tables[i] = nil) then begin
                     ret := false;
@@ -439,7 +394,7 @@ var
             end;
         end;
     
-        for i := 1 to 2 do begin
+        for i := seg_sdata to seg_data do begin
             prev_sdata[i].unk00 := 0;
             prev_sdata[i].unk0C := 0;
             prev_sdata[i].unk04 := false;
@@ -518,7 +473,7 @@ begin
     symregs_opt := true;
     global_opt := true;
     initial_loc := true;
-    currsegment := 0;
+    currsegment := seg_text;
     is_nonleaf := false;
     currfunc_hasedata := false;
 
@@ -527,11 +482,11 @@ begin
     currfunc_sym^.unk35 := 0;
     currfunc_sym^.unk30 := 0;
 
-    realsegments := [0, 1, 2, 5, 6, 9, 15];
+    realsegments := [seg_text, seg_sdata, seg_data, seg_5, seg_6, seg_rdata, seg_15];
     
     currentline := 0;
     currentent := 0;
-    currentent_name := 0;
+    currentent_name.f := nil;
     first_pdr := 0;
     last_pdr := 0;
     currentfile := -1;
@@ -539,7 +494,7 @@ begin
     lastsym := 0;
     aligning := true;
     lastic := 0;
-    lastsegment := 0;
+    lastsegment := seg_text;
     lastrld := 0;
     nextrld := one;
     nextmultireloc := one;
@@ -619,10 +574,10 @@ begin
     multirelocinstr_list.size := 0;
 
     for j := 0 to 15 do begin
-        memory.data^[j].unk_04 := 0;
-        memory.data^[j].unk_08 := j;
-        seg_ic.data^[j] := 0;
-        nextlabelchain.data^[j] := 0;
+        ARRAY_AT(memory, j).unk_00.size := 0;
+        ARRAY_AT(memory, j).unk_08 := j;
+        ARRAY_AT(seg_ic, j) := 0;
+        ARRAY_AT(nextlabelchain, j) := 0;
     end;            
 
     sym_tab.size := 0;
@@ -694,7 +649,7 @@ begin
                     option_excpt:
                         begin
                             excpt_opt := true;
-                            realsegments := [0, 1, 2, 5, 6, 7, 8, 9, 15];
+                            realsegments := [seg_text, seg_sdata, seg_data, seg_5, seg_6, seg_7, seg_8, seg_rdata, seg_15];
                         end;
                     option_r6000LHU: r6000_lhu_flag := true;
                     option_fli: float_li_flag := true;
@@ -1774,7 +1729,7 @@ begin
     if not(currsegment in realsegments) then begin
         p_assertion_failed("CurrSegment in realsegments\0", "as1main.p", 1637);
     end;
-    lastic := seg_ic.data^[currsegmentindex];
+    lastic := ARRAY_AT(seg_ic, currsegmentindex);
     pre_reorder_peepholes.unk_00 := -1;
     pre_reorder_peepholes.unk_10 := -1;
     for i := 1 to 32 do begin
@@ -1810,14 +1765,11 @@ var
                         s1 := arg0^.unk2C;
                         fixup_count := fixup_count - 1;
                         while (s1 <> nil) do begin
-                            if (nextrld >= rld_list.size) then begin
-                                rld_list.data := grow_array(rld_list.size, nextrld, sizeof(RldRec), rld_list.data, false);
-                            end;
-                            
-                            rld_list.data^[nextrld].unk00 := 0;
-                            rld_list.data^[nextrld].unk04 := s1^.unk00;
-                            rld_list.data^[nextrld].unk10 := 17;
-                            rld_list.data^[nextrld].unk08 := arg0;                            
+                            ARRAY_GROW(rld_list, nextrld);
+                            ARRAY_AT(rld_list, nextrld).unk00 := 0;
+                            ARRAY_AT(rld_list, nextrld).unk04 := s1^.unk00;
+                            ARRAY_AT(rld_list, nextrld).unk10 := 17;
+                            ARRAY_AT(rld_list, nextrld).unk08 := arg0;                        
                             nextrld := nextrld + 1;
                             arg0^.unk20 := arg0^.unk20 + 1;
                             a0 := s1;
@@ -1837,11 +1789,11 @@ begin
     PostError("Not all branch-label symbols were defined", emptystring, ErrorLevel_1);
 
     for i := 0 to sym_tab.size - 1 do begin
-        func_004498E8(sym_tab.data^[i], i);
+        func_004498E8(ARRAY_AT(sym_tab, i), i);
     end;
 
     for i := 0 to neg_sym_tab.size - 1 do begin
-        func_004498E8(neg_sym_tab.data^[i], -i);
+        func_004498E8(ARRAY_AT(neg_sym_tab, i), -i);
     end;
 
     if (fixup_count <> 0) then begin

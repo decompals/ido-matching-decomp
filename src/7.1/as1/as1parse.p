@@ -1,6 +1,5 @@
 #include "common.i"
 
-
 var
     { .data }
     last_globl_symno: integer := 0;
@@ -15,10 +14,22 @@ var
     branchpending: boolean;
     frame_ptr: registers;
     fpop_src3: registers;
+    currfunc_start: integer;
+    currfunc_end: integer;
+    currfunc_handle: integer;
+    currfunc_data: integer;
+    currfunc_prolog: integer;
+    lastsymno: integer;
+    lastdata: integer;
+    lexicallevel: integer;
+    ignore_frames: boolean;
 
-procedure fill_pseudo(reg1: registers; reg2: registers; reg3: registers; val1: integer; val2: integer; val3: integer); external; { TODO signature }
+procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: integer; arg5: integer); external; { TODO signature }
+procedure fill_ascii_pseudo(var str: st_string; size: integer; arg2: boolean); external;
 procedure get_binasm(var b: PBinasm); external;
 function stp(symno: integer): PUnkAlpha; external;
+procedure enterstp(symno: integer); external;
+procedure enterlabel(symno: integer); external;
 procedure _setrld(sym: PUnkAlpha; arg1: integer; arg2: integer); external;
 procedure loadimmed(arg0: integer; arg1: registers; arg2: PUnkAlpha); external;
 procedure emitloadstore(op: opcodes; reg1: registers; offset: integer; reg2: registers); external;
@@ -37,6 +48,13 @@ function call_as0(var arg0: Filename; var arg1: Filename; var arg2: Filename) : 
 function is_dso_static(arg0: integer): boolean; external;
 function islocalsym(arg0: PUnkAlpha): boolean; external;
 function power2(arg0: integer): integer; external;
+procedure enter_symbol(name: ^Filename; size: integer; arg2: integer); external;
+procedure reenter_symbol(name: ^Filename; size: integer); external;
+procedure add_data_to_gp_table(seg: segments; arg1: integer); external;
+function st_add_deltasym(sc: integer; arg1: integer; index: integer): integer; external;
+function pseudo_type(arg0: integer): integer; external;
+procedure save_cur_proc_id(var arg0: Filename); external;
+procedure call_name_and_line(arg0: integer); external;
 
 procedure macro_error;
 begin
@@ -85,7 +103,7 @@ begin
         emitalu3(op_zor, cpalias_register, xr0, xr28);
         gpreg := cpalias_register;
         cpalias_pending := false;
-        fill_pseudo(xr28, gpreg, xr29, 0, 0, 0);
+        fill_pseudo(28, integer(gpreg), 29, 0, 0, 0);
     end;
 end;
 
@@ -190,8 +208,8 @@ begin
         if sym <> nil then begin
             _setrld(sym, 13, bbindex + proc_instr_base);
         end;
-        rld_list.data^[nextrld - 1].unk14 := immediate; { NON MATCHING line }
-        rld_list.data^[nextrld - 1].unk11 := reg;
+        ARRAY_AT(rld_list, nextrld - 1).unk14 := immediate; { NON MATCHING LINE }
+        ARRAY_AT(rld_list, nextrld - 1).unk11 := reg;
         return;
     end;
 
@@ -885,14 +903,17 @@ end;
 
 procedure parseafr(fasm: asmcodes);
 var
+    reg1: registers;
     ba: ^binasm;
 begin
     ba := binasmfyle;
-
+    
     if ba^.form <> fr then begin
         p_assertion_failed("form = fr\0", "as1parse.p", 1031);
     end;
-    emitreg2(asm2op[fasm], ba^.reg1, xnoreg);
+
+    reg1 := ba^.reg1;
+    emitreg2(asm2op[fasm], reg1, xnoreg);
     pre_reorder_peepholes.unk_10 := bbindex;
 end;
 
@@ -913,24 +934,450 @@ begin
     n := binasmfyle^.length;
     v := power2(n);
 
-    if (currsegment = 1) or (currsegment = 2) then begin
+    if (currsegment = seg_sdata) or (currsegment = seg_data) then begin
         if prev_sdata[currsegment].unk04 then begin
             prev_sdata[currsegment].unk08 := Max(prev_sdata[currsegment].unk08, binasmfyle^.length); { maybe bug? }
         end else begin
-            prev_sdata[currsegment].unk0C := seg_ic.data^[currsegmentindex];
+            prev_sdata[currsegment].unk0C := ARRAY_AT(seg_ic, currsegmentindex);
             prev_sdata[currsegment].unk04 := true;
             prev_sdata[currsegment].unk08 := v;
         end;
     end;
 
-    if (currsegment = 0) or (currsegment = 2) or (currsegment = 9) or (currsegment = 1) then begin
+    if (currsegment = seg_text) or (currsegment = seg_data) or (currsegment = seg_rdata) or (currsegment = seg_sdata) then begin
         prev_align[currsegment].unk08 := Max(prev_align[currsegment].unk08, v);
     end;
 
-    if (currsegment <> 0) and (currsegment <> 15) then begin
+    if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
         aligning := n > 0;
         definealabel(currsegmentindex, v, 0);
     end else begin
-        fill_pseudo(xr11, registers(v), xr0, 0, 0, 0); { TODO arg2 type }
+        fill_pseudo(11, v, 0, 0, 0, 0);
     end;
+end;
+
+procedure parseascii(arg0: boolean);
+var
+    i, j, k: integer;
+    buffer: st_string;
+begin
+    if not(currsegment in realsegments) then begin
+        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1091);
+    end;
+
+    if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
+        definealabel(currsegmentindex, 1, 0);
+    end;
+
+    k := 0;
+    j := 17;
+
+    for i := 1 to binasmfyle^.length do begin
+        if j = 17 then begin
+            get_binasm(binasmfyle);
+            j := 1;
+        end;
+
+        if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := binasmfyle^.data[j];
+            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+        end else begin
+            if k >= 128 then begin
+                fill_ascii_pseudo(buffer, 128, false);
+                k := 0;
+            end;
+            k := k + 1;
+            buffer[k] := binasmfyle^.data[j];
+        end;
+        j := j + 1;
+    end;
+
+    if (currsegment = seg_text) or (currsegment = seg_15) then begin
+        if (k > 0) or arg0 then begin
+            fill_ascii_pseudo(buffer, k, arg0);
+        end;
+    end;
+
+    if arg0 then begin
+        if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
+            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+        end;
+    end;
+end;
+
+procedure remember_symbol_size(symno: integer; size: integer);
+var
+    sym: PUnkAlpha;
+begin
+    if symno <> 0 then begin
+        sym := stp(symno);
+        label_size := label_size + size;
+        reenter_symbol(sym^.unk0C.f, label_size);
+    end;
+end;
+
+procedure parsebyte;
+var
+    count: integer;
+    c: integer;
+    ba: ^binasm;
+begin
+    remember_symbol_size(last_globl_symno, 1);
+    ba := binasmfyle;
+
+    if (currsegment = seg_text) or (currsegment = seg_15) then begin
+        fill_pseudo(16, ba^.replicate, ba^.expression, 0, 0, 0);
+        return;
+    end;
+
+    definealabel(currsegmentindex, 1, 0);
+
+    if not(currsegment in realsegments) then begin
+        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1156);
+    end;
+
+    c := ba^.expression;
+    c := bitand(c, 16#FF);
+    
+    count := ba^.replicate;
+    if count > 0 then begin
+        repeat
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := chr(c);
+            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+            count := count - 1;
+        until count = 0;
+    end;
+end;
+
+procedure parsecomm(which: itype);
+var
+    spC4: PUnkAlpha;
+    spC0: integer;
+    spBC: integer;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    spC0 := ba^.length;
+    spC4 := stp(ba^.symno);
+    spBC := ba^.rep; { ?? }
+
+    enter_symbol(spC4^.unk0C.f, ba^.length, spBC);
+
+    if (picflag <> 1) or not spC4^.unk3C then begin
+        if not(spC4^.unk34 in ['D', 'U', 'u']) then begin
+            PostError("redefinition of symbol", spC4^.unk0C, ErrorLevel_1);
+            return;
+        end;
+
+        case which of
+            icomm:
+                begin
+                    spC4^.unk34 := 'C';
+                    spC4^.unk30 := 12;
+                    if spBC = 1 then begin
+                        spC4^.unk34 := 'E';
+                    end;
+                end;
+            ilcomm:
+                begin
+                    if spC4^.unk34 = 'u' then begin
+                        spC4^.unk34 := 'b';
+                    end else begin
+                        spC4^.unk34 := 'B';
+                    end;
+
+                    if (picflag > 0) and (spC4^.unk35 <> 0) then begin
+                        spC4^.unk30 := 4;
+                    end else if (spC0 <= gprelsize) and (spC0 > 0) then begin
+                        spC4^.unk30 := 3;
+                    end else if spBC = 1 then begin
+                        spC4^.unk30 := 3;
+                    end else begin
+                        spC4^.unk30 := 4;
+                    end;
+                end;
+            iextern:
+                begin
+                    if (spC0 <= gprelsize) and (spC0 > 0) then begin
+                        spC4^.unk30 := 13;
+                        spC4^.unk34 := 'V';
+                    end else if spBC = 1 then begin
+                        spC4^.unk30 := 13;
+                        spC4^.unk34 := 'V';
+                    end else begin
+                        spC4^.unk30 := 12;
+                        spC4^.unk34 := 'U';
+                    end;
+                end;
+            otherwise:
+                if which <> iextern then begin
+                    p_assertion_failed("which = iextern\0", "as1parse.p", 1242);
+                end;
+        end;
+    end;
+
+    if (which = icomm) or (which = iextern) then begin
+        spC4^.unk35 := 1;
+    end;
+
+    if which = ilcomm then begin
+        spC4^.unk37 := true;
+    end;
+
+    spC4^.unk28 := spC0;
+    last_globl_symno := 0;
+    label_size := 0;
+end;
+
+{ TODO match this }
+procedure parseseg(seg: segments);
+var
+    length: integer;
+    i: integer;
+    j: integer;
+begin
+    if (currsegment = seg_sdata) or (currsegment = seg_data) then begin
+        add_data_to_gp_table(currsegment, 1);
+    end;
+
+    currsegment := seg;
+    currsegmentindex := ord(seg);
+
+    length := binasmfyle^.length;
+    if (seg = seg_text) and (length <> 0) then begin
+        currsegment := seg_15;
+        
+        get_binasm(binasmfyle);
+
+        if lastusertextseg = -1 then begin
+            lastusertextseg := firstusertextseg;
+            currsegmentindex := firstusertextseg;
+
+            for i := 1 to length do begin
+                ARRAY_AT(memory, currsegmentindex).unk_09[i] := binasmfyle^.data[i];
+            end;
+            ARRAY_AT(memory, currsegmentindex).unk_09[i] := chr(0);
+        end else begin
+            currsegmentindex := -1;
+            for j := firstusertextseg to lastusertextseg do begin
+                for i := 1 to length do begin
+                    if ARRAY_AT(memory, j).unk_09[i] <> binasmfyle^.data[i] then begin
+                        break;
+                    end;
+                end;
+
+                if i > length then begin
+                    currsegmentindex := j;
+                    break; { j := lastusertextseg + 1; }
+                end;
+            end;
+
+            if currsegmentindex = -1 then begin
+                { create new segment }
+                lastusertextseg := lastusertextseg + 1;
+                currsegmentindex := lastusertextseg;
+                ARRAY_GROW(memory, currsegmentindex);
+                ARRAY_GROW(seg_ic, currsegmentindex);
+                ARRAY_GROW(nextlabelchain, currsegmentindex);
+
+                for i := 1 to length do begin
+                    ARRAY_AT(memory, currsegmentindex).unk_09[i] := binasmfyle^.data[i];
+                end;
+                ARRAY_AT(memory, currsegmentindex).unk_09[i] := chr(0);
+                ARRAY_AT(memory, currsegmentindex).unk_08 := 15;
+                ARRAY_AT(memory, currsegmentindex).unk_00.size := 0;
+
+                ARRAY_AT(seg_ic, currsegmentindex) := 0;
+                ARRAY_AT(nextlabelchain, currsegmentindex) := 0;
+            end;
+        end;
+    end;
+
+    if (currsegment = seg_text) or (currsegment = seg_15) then begin
+        currtextindex := currsegmentindex;
+    end;
+
+    endofbasicb := true;
+    aligning := true;
+    label_size := 0;
+end;
+
+procedure create_function_table;
+    procedure func_00454458(arg0: integer; arg1: cardinal; arg2: boolean);
+    var
+        s0: cardinal;
+        rld: ^RldRec;
+    begin
+        if sexchange then begin
+            arg1 := bitand(lshift(arg1, 24), 16#FF000000) + 
+                    bitand(rshift(arg1, 24), 16#000000FF) +
+                    bitand(lshift(arg1,  8), 16#00FF0000) + 
+                    bitand(rshift(arg1,  8), 16#0000FF00);
+        end;
+
+        s0 := ARRAY_AT(seg_ic, ord(seg_8));
+        if bitand(s0, 3) <> 0 then begin
+            s0 := bitand(s0 + 3, 16#FFFFFFFC);
+        end;
+
+        ARRAY_GROW(ARRAY_AT(memory, ord(seg_8)).unk_00, s0);
+        ARRAY_AT(ARRAY_AT(memory, ord(seg_8)).unk_00, s0) := char(arg1); { TODO }
+        ARRAY_AT(seg_ic, ord(seg_8)) := s0 + 4;
+
+        if arg2 then begin
+            rld := addr(ARRAY_AT(rld_list, nextrld));
+            ARRAY_GROW(rld_list, nextrld);              
+            rld^.unk00 := 0;
+            rld^.unk04 := s0;
+            currfunc_sym^.unk30 := currtextindex;
+
+            if arg0 <> 0 then begin
+                rld^.unk08 := stp(arg0);
+            end else begin
+                rld^.unk08 := currfunc_sym;
+            end;
+
+            rld^.unk08^.unk20 := rld^.unk08^.unk20 + 1;
+            rld^.unk0C := 8;
+            rld^.unk10 := 8;
+            nextrld := nextrld + 1;
+        end;
+    end;
+begin
+    if excpt_opt then begin
+        currfunc_end := ARRAY_AT(seg_ic, currtextindex);
+        func_00454458(0, currfunc_start, true);
+        func_00454458(0, currfunc_end, true);
+        func_00454458(currfunc_handle, 0, currfunc_hasedata);
+        func_00454458(currfunc_data, 0, currfunc_hasedata);
+        func_00454458(0, currfunc_prolog, true);
+
+        is_nonleaf := false;
+        currfunc_hasedata := false;
+        currfunc_start := 0;
+        currfunc_end := 0;
+        currfunc_prolog := 0;
+        currfunc_handle := 0;
+        currfunc_data := 0;
+    end;
+end;
+
+procedure parseedata;
+var
+    ba: ^binasm;
+begin
+    if excpt_opt then begin
+        ba := binasmfyle;
+        if ba^.flag = 0 then begin
+            parseseg(seg_7);
+        end else begin
+            enterstp(ba^.edata);
+            lastsymno := ba^.symno;
+            lastdata := ba^.edata;
+            lastinstr := iedata;
+            pendinginstr := true;
+            endofbasicb := true;
+        end;
+    end;
+end;
+
+procedure parsealloc;
+var
+    temp: integer;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    if not adjust_frame_by_ld then begin
+        p_assertion_failed("adjust_frame_by_ld\0", "as1parse.p", 1386);
+    end;
+    temp := st_add_deltasym(27, 0, ba^.symno); { lclinst ? }
+    enterstp(temp);
+end;
+
+procedure parseprologue;
+begin
+    if excpt_opt then begin
+        endofbasicb := true;
+        fill_pseudo(20, binasmfyle^.lexlevel, 0, 0, 0, 0);
+    end;
+end;
+
+procedure parseend(which: itype);
+var
+    sp84: PUnkAlpha;
+    sp80: integer;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+
+    if (bbindex = 0) or
+       (which in [iend, ient, iaent]) or
+       (pinstruction^[bbindex].rfd <> 16#7FFFFFFF) or
+       not(pseudo_type(bbindex) in [23, 24, 25, 26]) or
+       ((currsegment <> seg_text) and (currsegment <> seg_15)) then
+    begin
+        if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
+            definealabel(currsegmentindex, 1, 0);
+        end;
+
+        endofbasicb := true;
+        lastinstr := which;
+        lastsymno := ba^.symno;
+        pendinginstr := true;
+
+        if (which = ient) or (which = iaent) then begin
+            sp84 := stp(ba^.symno);
+            save_cur_proc_id(sp84^.unk0C.f^);
+
+            if verbose and (sp84^.unk0C.f^[1] <> chr(0)) then begin
+                call_name_and_line(3);
+                if sp84^.unk0C.f^[1] <> chr(0) then begin
+                    Write(err, sp84^.unk0C.f^:strlen(sp84^.unk0C.f), ' ');
+                    Flush(err);
+                end;
+            end;
+        end;
+    end;
+
+    case which of
+        ient:
+            begin
+                if (debugflag > 0) and (currentfile = -1) then begin
+                    PostError(".loc should precede .ent when using -g", emptystring, ErrorLevel_2);
+                end;
+                ignore_frames := false;
+                currentent := ba^.symno;
+                currentent_name.f := xmalloc(strlen(sp84^.unk0C.f));
+                strcpy(currentent_name.f, sp84^.unk0C.f);
+                sp84^.unk0C := currentent_name;                    
+                lexicallevel := 0;
+                cprestore_offset := -1;
+                cpalias_pending := false;
+                return;
+            end;
+        iend:
+            begin
+                ignore_frames := false;
+                cprestore_offset := -1;
+                cpalias_pending := false;
+                need_cprestore := false;
+                return;
+            end;
+        ibgnb: sp80 := 23;
+        iendb: sp80 := 24;
+        ilab:
+            begin
+                if cpalias_set then begin
+                    init_cpalias();
+                end;
+                sp84 := stp(ba^.symno);
+                enterlabel(ba^.symno);
+                sp80 := 25;
+            end;
+    end;
+    fill_pseudo(sp80, ba^.symno, currentline, debugflag, integer(sp84), 0);
 end;

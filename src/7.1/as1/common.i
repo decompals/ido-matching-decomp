@@ -1,6 +1,7 @@
 #include "cmplrs/stinfc.h"
 #include "cmplrs/usys.h"
 #include "cmplrs/binasm.h"
+#include "array.h"
 
 type
     Byte = 0..16#FF;
@@ -105,12 +106,12 @@ type
         { 0x28 } unk28: integer;
         { 0x2C } unk2C: ^UnkKappa;
         { 0x30 } unk30: integer;
-        { 0x34 } unk34: Byte;
+        { 0x34 } unk34: char;
         { 0x35 } unk35: Byte;
         { 0x36 } unk36: Byte;
         { 0x37 } unk37: boolean;
         { 0x38 } unk38: integer;
-        { 0x3C } unk3C: integer;
+        { 0x3C } unk3C: boolean;
         { 0x40 } unk40: integer;
         { 0x44 } unk44: integer;
         { 0x48 } unk48: integer;
@@ -134,11 +135,7 @@ type
         { 0x14 } unk14: integer;
     end;
 
-    RldListArr = array [0..1] of RldRec;
-    RldListArray = record
-        data: ^RldListArr;
-        size: cardinal;
-    end;
+    ARRAY_DECLARE(RldRec);
 
     PreReorderPeepholesRec = record
         unk_00: integer;
@@ -149,7 +146,29 @@ type
         unk_14: packed array [1..32] of char;
     end;
 
-    segments = 0..20; { TODO enum }
+    segments = (
+        seg_text,
+        seg_sdata,
+        seg_data,
+        seg_3,
+        seg_4,
+        seg_5,
+        seg_6,
+        seg_7,
+        seg_8,
+        seg_rdata,
+        seg_10,
+        seg_11,
+        seg_12,
+        seg_13,
+        seg_14,
+        seg_15,
+        seg_16,
+        seg_17,
+        seg_18,
+        seg_19,
+        seg_20
+    );
 
     PrevSDataType = Record
         { 0x00 } unk00: integer;
@@ -159,11 +178,15 @@ type
         { 0x10 } unk10: integer;
     end;
 
-    IntegerArr = array [0..0] of integer;
-    IntegerArray = record;
-        data: ^IntegerArr;
-        size: cardinal;
+    ARRAY_DECLARE(integer);
+    ARRAY_DECLARE(char);
+
+    MemoryRec = record;
+        unk_00: ARRAY_OF(char);
+        unk_08: Byte;
+        unk_09: packed array [1..32] of char;
     end;
+    ARRAY_DECLARE(MemoryRec);
 
 var
     emptystring: extern GString;
@@ -181,7 +204,7 @@ var
     in_cia_binasm: extern boolean;
     diag_flag: extern boolean;
     proc_instr_base: extern integer;
-    rld_list: extern RldListArray;
+    rld_list: extern ARRAY_OF(RldRec);
     nextrld: extern integer;
     atflag: extern boolean;
     bigendian: extern boolean;
@@ -191,12 +214,37 @@ var
     branchops: extern set of opcodes;
     pre_reorder_peepholes: extern PreReorderPeepholesRec;
     currsegment: extern segments;
-    prev_sdata: extern array[1..2] of PrevSDataType;
-    prev_align: extern array[0..20] of PrevSDataType;
-    seg_ic: extern IntegerArray;
+    prev_sdata: extern array[seg_sdata..seg_data] of PrevSDataType;
+    prev_align: extern array[seg_text..seg_20] of PrevSDataType;
+    seg_ic: extern ARRAY_OF(integer);
     aligning: extern boolean;
     currsegmentindex: extern integer;
+    realsegments: extern set of segments;
+    memory: extern ARRAY_OF(MemoryRec);
+    gprelsize: extern integer;
+    firstusertextseg: extern integer;
+    lastusertextseg: extern integer;
+    nextlabelchain: extern ARRAY_OF(integer);
+    currtextindex: extern integer;
+    excpt_opt: extern boolean;
+    currfunc_hasedata: extern boolean;
+    is_nonleaf: extern boolean;
+    sexchange: extern boolean;
+    currfunc_sym: extern ^UnkAlpha;
+    lastinstr: extern itype;
+    pendinginstr: extern boolean;
+    adjust_frame_by_ld: extern boolean;
+    currentline: extern integer;
+    debugflag: extern integer;
+    verbose: extern boolean;
+    currentfile: extern integer;
+    currentent: extern integer;
+    currentent_name: extern GString;
 
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
 procedure p_assertion_failed(arg0: String; arg1: String; arg2: cardinal); external;
 procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;
+function grow_array(var arg0: integer; arg1: integer; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
+function strlen(p : ^Filename): integer; external;
+procedure strcpy(dst : ^Filename; src: ^Filename); external;
+function xmalloc(size: integer): pointer; external;
