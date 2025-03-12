@@ -23,13 +23,14 @@ var
     lastdata: integer;
     lexicallevel: integer;
     ignore_frames: boolean;
+    saw_option_pic: boolean;
 
-procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: integer; arg5: integer); external; { TODO signature }
+procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PUnkALpha; arg5: integer); external; { TODO signature }
 procedure fill_ascii_pseudo(var str: st_string; size: integer; arg2: boolean); external;
 procedure get_binasm(var b: PBinasm); external;
 function stp(symno: integer): PUnkAlpha; external;
 procedure enterstp(symno: integer); external;
-procedure enterlabel(symno: integer); external;
+procedure enterlabel(symno: integer; var sym: PUnkAlpha); external;
 procedure _setrld(sym: PUnkAlpha; arg1: integer; arg2: integer); external;
 procedure loadimmed(arg0: integer; arg1: registers; arg2: PUnkAlpha); external;
 procedure emitloadstore(op: opcodes; reg1: registers; offset: integer; reg2: registers); external;
@@ -55,6 +56,7 @@ function st_add_deltasym(sc: integer; arg1: integer; index: integer): integer; e
 function pseudo_type(arg0: integer): integer; external;
 procedure save_cur_proc_id(var arg0: Filename); external;
 procedure call_name_and_line(arg0: integer); external;
+procedure byte_at_a_time(segm: integer; arg1: integer; arg2: integer; arg3: integer); external;
 
 procedure macro_error;
 begin
@@ -103,7 +105,7 @@ begin
         emitalu3(op_zor, cpalias_register, xr0, xr28);
         gpreg := cpalias_register;
         cpalias_pending := false;
-        fill_pseudo(28, integer(gpreg), 29, 0, 0, 0);
+        fill_pseudo(28, integer(gpreg), 29, 0, nil, 0);
     end;
 end;
 
@@ -952,7 +954,7 @@ begin
         aligning := n > 0;
         definealabel(currsegmentindex, v, 0);
     end else begin
-        fill_pseudo(11, v, 0, 0, 0, 0);
+        fill_pseudo(11, v, 0, 0, nil, 0);
     end;
 end;
 
@@ -979,8 +981,8 @@ begin
         end;
 
         if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
-            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
-            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := binasmfyle^.data[j];
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := binasmfyle^.data[j];
             ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
         end else begin
             if k >= 128 then begin
@@ -1001,8 +1003,8 @@ begin
 
     if arg0 then begin
         if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
-            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
-            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
             ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
         end;
     end;
@@ -1029,7 +1031,7 @@ begin
     ba := binasmfyle;
 
     if (currsegment = seg_text) or (currsegment = seg_15) then begin
-        fill_pseudo(16, ba^.replicate, ba^.expression, 0, 0, 0);
+        fill_pseudo(16, ba^.replicate, ba^.expression, 0, nil, 0);
         return;
     end;
 
@@ -1045,8 +1047,8 @@ begin
     count := ba^.replicate;
     if count > 0 then begin
         repeat
-            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex));
-            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00, ARRAY_AT(seg_ic, currsegmentindex)) := chr(c);
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(c);
             ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
             count := count - 1;
         until count = 0;
@@ -1188,8 +1190,8 @@ begin
                     ARRAY_AT(memory, currsegmentindex).unk_09[i] := binasmfyle^.data[i];
                 end;
                 ARRAY_AT(memory, currsegmentindex).unk_09[i] := chr(0);
-                ARRAY_AT(memory, currsegmentindex).unk_08 := 15;
-                ARRAY_AT(memory, currsegmentindex).unk_00.size := 0;
+                ARRAY_AT(memory, currsegmentindex).unk_08 := seg_15;
+                ARRAY_AT(memory, currsegmentindex).unk_00.b.size := 0;
 
                 ARRAY_AT(seg_ic, currsegmentindex) := 0;
                 ARRAY_AT(nextlabelchain, currsegmentindex) := 0;
@@ -1224,13 +1226,13 @@ procedure create_function_table;
             s0 := bitand(s0 + 3, 16#FFFFFFFC);
         end;
 
-        ARRAY_GROW(ARRAY_AT(memory, ord(seg_8)).unk_00, s0);
-        ARRAY_AT(ARRAY_AT(memory, ord(seg_8)).unk_00, s0) := char(arg1); { TODO }
+        ARRAY_GROW(ARRAY_AT(memory, ord(seg_8)).unk_00.b, s0);
+        ARRAY_AT(ARRAY_AT(memory, ord(seg_8)).unk_00.w, s0) := arg1; { TODO }
         ARRAY_AT(seg_ic, ord(seg_8)) := s0 + 4;
 
         if arg2 then begin
             rld := addr(ARRAY_AT(rld_list, nextrld));
-            ARRAY_GROW(rld_list, nextrld);              
+            ARRAY_GROW(rld_list, nextrld);
             rld^.unk00 := 0;
             rld^.unk04 := s0;
             currfunc_sym^.unk30 := currtextindex;
@@ -1302,25 +1304,27 @@ procedure parseprologue;
 begin
     if excpt_opt then begin
         endofbasicb := true;
-        fill_pseudo(20, binasmfyle^.lexlevel, 0, 0, 0, 0);
+        fill_pseudo(20, binasmfyle^.lexlevel, 0, 0, nil, 0);
     end;
 end;
 
+{ NON_MATCHING, regalloc }
 procedure parseend(which: itype);
 var
     sp84: PUnkAlpha;
     sp80: integer;
     ba: ^binasm;
+    ptr: pointer; 
+    
 begin
     ba := binasmfyle;
 
     if (bbindex = 0) or
        (which in [iend, ient, iaent]) or
-       (pinstruction^[bbindex].rfd <> 16#7FFFFFFF) or
-       not(pseudo_type(bbindex) in [23, 24, 25, 26]) or
-       ((currsegment <> seg_text) and (currsegment <> seg_15)) then
+       not((pinstruction^[bbindex].rfd = 16#7FFFFFFF) and (pseudo_type(bbindex) in [23, 24, 25, 26])) or
+       not((currsegment = seg_text) or (currsegment = seg_15)) then
     begin
-        if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
+        if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
             definealabel(currsegmentindex, 1, 0);
         end;
 
@@ -1337,47 +1341,658 @@ begin
                 call_name_and_line(3);
                 if sp84^.unk0C.f^[1] <> chr(0) then begin
                     Write(err, sp84^.unk0C.f^:strlen(sp84^.unk0C.f), ' ');
-                    Flush(err);
+                end;
+                Flush(err);
+            end;
+        end;
+
+        if which = ient then begin
+            if (debugflag > 0) and (currentfile = -1) then begin
+                PostError(".loc should precede .ent when using -g", emptystring, ErrorLevel_2);
+            end;
+            ignore_frames := false;
+            currentent := ba^.symno;
+            currentent_name.f := xmalloc(strlen(sp84^.unk0C.f));
+            ptr := strcpy(currentent_name.f, sp84^.unk0C.f);
+            sp84^.unk0C := currentent_name;                    
+            lexicallevel := 0;
+            cprestore_offset := -1;
+            cpalias_pending := false;
+        end else if which = iend then begin
+            ignore_frames := false;
+            cprestore_offset := -1;
+            cpalias_pending := false;
+            need_cprestore := false;
+        end;
+    end else begin
+        case which of
+            ibgnb: sp80 := 23;
+            iendb: sp80 := 24;
+            ilab:
+                begin
+                    if cpalias_set then begin
+                        init_cpalias();
+                    end;
+                    sp84 := stp(ba^.symno);
+                    enterlabel(ba^.symno, sp84);
+                    sp80 := 25;
+                end;
+        end;
+        fill_pseudo(sp80, ba^.symno, currentline, debugflag, sp84, 0);
+    end;
+end;
+
+procedure parserepeat;
+begin
+    PostError(".repeat allowed only in as0", emptystring, ErrorLevel_1);
+end;
+
+procedure parseendrep;
+begin
+    PostError(".endr allowed only in as0", emptystring, ErrorLevel_1);
+end;
+
+{ NON_MATCHING }
+procedure parsefile;
+var
+    i, count: integer;
+begin
+    count := (binasmfyle^.length + 15) div 16;
+    for i := 1 to count do begin
+        get_binasm(binasmfyle);
+    end;
+end;
+
+procedure parseloc(var arg0: boolean);
+var
+    tmp: boolean;
+    sym: PUnkALpha;
+begin
+    if (currsegment = seg_text) or (currsegment = seg_15) then begin
+        if (bbindex <> 0) and
+            (((binasmfyle^.filenumber <> currentfile) and not initial_loc) or
+            ((optflag > 0) and reorderflag and not(debugflag in [0,3]))) then
+        begin
+            endofbasicb := true;
+            arg0 := true;
+            tmp := initial_loc;
+        end else begin
+            currentline := binasmfyle^.linenumber;
+            currentfile := binasmfyle^.filenumber;
+            if fromas0 then begin
+                sym := stp(currentfile);
+                if sym <> nil then begin
+                    sym^.unk34 := 'F';
                 end;
             end;
+            tmp := initial_loc;
+        end;
+        
+        if tmp then begin
+            initial_loc := false;
+        end;
+    end;
+end;
+
+procedure parseglobl;
+var
+    sym: PUnkALpha;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    sym := stp(ba^.symno);
+    last_globl_symno := ba^.symno;
+    label_size := 0;
+    if sym^.unk34 = ' ' then begin
+        sym^.unk34 := 'U';
+    end else if sym^.unk34 = 'u' then begin
+        sym^.unk34 := 'U';
+    end else if sym^.unk34 = 'b' then begin
+        sym^.unk34 := 'B';
+    end else if sym^.unk34 = 'd' then begin
+        sym^.unk34 := 'D';
+    end else if sym^.unk34 = 't' then begin
+        sym^.unk34 := 'T';
+    end;
+    sym^.unk35 := 1;
+end;
+
+procedure parseweakext;
+var
+    sym: PUnkALpha;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    sym := stp(ba^.symno);
+    sym^.unk3C := true;
+    sym^.unk44 := ba^.lexlevel;
+end;
+
+procedure parseglobabs;
+var
+    sym: PUnkALpha;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    sym := stp(ba^.symno);
+    sym^.unk34 := 'A';
+    sym^.unk10 := binasmfyle^.length;
+    sym^.unk35 := 1;
+end;
+
+procedure parse_option;
+var
+    str: GString;
+    pdr: ^PdrRec;
+begin
+    if (binasmfyle^.option = o_optimize) and (binasmfyle^.opt_int_value >= 0) and (binasmfyle^.opt_int_value <= 4) then begin
+        if optflag <> binasmfyle^.opt_int_value then begin
+            new(str.o);
+            ltoa(binasmfyle^.opt_int_value, str.c);
+            PostError("Binasm file dictates -O", str, ErrorLevel_2);
+            dispose(str.o);
+        end;
+        optflag := binasmfyle^.opt_int_value;
+    end else if (binasmfyle^.option = o_pic) and (binasmfyle^.opt_int_value >= 0) and (binasmfyle^.opt_int_value <= 3) then begin
+        if saw_pic_flag and (picflag <> binasmfyle^.opt_int_value) then begin
+            new(str.o);
+            ltoa(binasmfyle^.opt_int_value, str.c);
+            PostError("Binasm file dictates -pic", str, ErrorLevel_2);
+            dispose(str.o);
+        end;
+
+        if saw_option_pic then begin
+            PostError("Multiple .option pic specified, ignored.", emptystring, ErrorLevel_2);
+        end else begin
+            saw_option_pic := true;
+            picflag := binasmfyle^.opt_int_value;
+            if (picflag = 2) and saw_cap_g and (gprelsize <> 0) then begin
+                PostError(".option pic2 implies -G 0.  -G flag ignored", emptystring, ErrorLevel_2);
+                gprelsize := 0;
+            end;
+        end;
+    end else if (binasmfyle^.option = o_exception_info) then begin
+        new(pdr);
+        if (last_pdr = nil) and (first_pdr = nil) then begin
+            first_pdr := pdr;
+            last_pdr := pdr;
+        end else begin
+            last_pdr^.next := pdr;
+        end;
+        pdr^.next := nil;
+        pdr^.unk0C := binasmfyle^.opt_int_value;
+        pdr^.unk10 := stp(currentent);
+        pdr^.unk14 := stp(binasmfyle^.opt_int_value);
+        last_pdr := pdr;
+    end else begin
+        PostError("Unsupported option in binasm file", emptystring, ErrorLevel_0);
+    end;
+end;
+
+procedure parse_alias(which: itype);
+    function func_00455984(reg: registers): boolean;
+    var
+        ret: boolean;
+    begin
+        if reg <= xr31 then begin
+            ret := true;
+        end else begin
+            PostError(".noalias and .alias require gp registers", emptystring, ErrorLevel_1);
+            ret := false;
+        end;
+        return ret;
+    end;
+begin
+    if func_00455984(binasmfyle^.basereg1) and func_00455984(binasmfyle^.basereg2) then begin
+        fill_pseudo(integer(which = inoalias) + 27, ord(binasmfyle^.basereg1), ord(binasmfyle^.basereg2), 0, nil, 0);
+    end;
+end;
+
+procedure parseset(var arg0: boolean);
+var
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+    case set_value(ba^.length) of
+        set_reorder:
+            begin
+                if not(reorderflag) and (bbindex <> 0) then begin
+                    endofbasicb := true;
+                    arg0 := true;
+                end else begin
+                    reorderflag := true;
+                    if not macroflag then begin
+                        PostError("reorder requires macro", emptystring, ErrorLevel_2);
+                    end;
+                end;
+            end;
+        set_noreorder:
+            begin
+                has_noreorder := true;
+                if non_reorg_flag = 0 then begin
+                    non_reorg_flag := 16#4000;
+                end;
+                if reorderflag and (bbindex <> 0) then begin
+                    endofbasicb := true;
+                    arg0 := true;
+                end else begin
+                    reorderflag := false;
+                end;
+            end;
+        set_transform:
+            if not(transform_flag) and (bbindex <> 0) then begin
+                endofbasicb := true;
+                arg0 := true;
+            end else begin
+                transform_flag := true;
+            end;
+        set_notransform:
+            if transform_flag and (bbindex <> 0) then begin
+                endofbasicb := true;
+                arg0 := true;
+            end else begin
+                transform_flag := false;
+            end;
+        set_macro:
+            begin
+                macroflag := true;
+            end;
+        set_nomacro:
+            begin
+                macroflag := false;
+                if reorderflag then begin
+                    PostError("nomacro requires noreorder", emptystring, ErrorLevel_2);
+                end;
+            end;
+        set_at:
+            begin
+                atflag := true;
+            end;
+        set_noat:
+            begin
+                atflag := false;
+            end;
+        set_volatile:
+            begin
+                if non_reorg_flag = 0 then begin
+                    non_reorg_flag := 16#4000;
+                end;
+                volatileflag := true;
+            end;
+        set_novolatile:
+            begin
+                volatileflag := false;
+            end;
+        set_move:
+            begin
+                movableflag := true;
+            end;
+        set_nomove:
+            begin
+                if non_reorg_flag = 0 then begin
+                    non_reorg_flag := 16#4000;
+                end;
+                movableflag := false;
+                PostError(".set nomove is obsolete", emptystring, ErrorLevel_2);
+            end;
+        set_bopt:
+            begin
+                opts.unk_00[5] := true;
+            end;
+        set_nobopt:
+            begin
+                opts.unk_00[5] := false;
+            end;
+        set_reposition,
+        set_noreposition:
+    end;
+end;
+
+{ NON_MATCHING }
+procedure parsespace;
+var
+    counter: integer;
+    ba: ^binasm;
+begin
+    ba := binasmfyle;
+
+    if (currsegment = seg_text) or (currsegment = seg_15) then begin
+        fill_pseudo(13, ba^.length, 0, 0, nil, 0);
+        return;
+    end;
+
+    definealabel(currsegmentindex, 1, 0);
+    if not(currsegment in realsegments) then begin
+        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1813);
+    end;
+
+    if ba^.length > 0 then begin
+
+        counter := ba^.length;
+        repeat
+            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+            if ARRAY_AT(memory, currsegmentindex).unk_00.b.data = nil then begin
+                PostError("could not allocate enough memory for .space", emptystring, ErrorLevel_1);
+                halt(1);
+            end;
+            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
+            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+            counter := counter - 1;
+        until counter = 0;
+    end;
+end;
+
+{ not matching }
+procedure doword(arg0: integer; arg1: integer; arg2: cardinal; arg3: PUnkALpha; arg4: integer; arg5: boolean);
+var
+    s0: Byte;
+    spF3: boolean;
+    s2: cardinal;
+    rld: ^RldRec;
+begin
+    definealabel(arg4, arg0, 0);
+
+    if arg0 = 2 then begin
+        s0 := 1;
+        if shftaddr = 1 then begin
+            arg2 := rshift(integer(arg2), 1);
+        end;
+        arg2 := bitand(arg2, 16#FFFF);
+        if sexchange then begin
+            arg2 := bitand(lshift(arg2,  8), 16#FF00) + 
+                    bitand(rshift(arg2,  8), 16#00FF);
+        end;
+    end else begin
+        s0 := 2;
+        if sexchange then begin
+            arg2 := bitand(lshift(arg2, 24), 16#FF000000) + 
+                    bitand(rshift(arg2, 24), 16#000000FF) +
+                    bitand(lshift(arg2,  8), 16#00FF0000) + 
+                    bitand(rshift(arg2,  8), 16#0000FF00);
         end;
     end;
 
-    case which of
-        ient:
-            begin
-                if (debugflag > 0) and (currentfile = -1) then begin
-                    PostError(".loc should precede .ent when using -g", emptystring, ErrorLevel_2);
-                end;
-                ignore_frames := false;
-                currentent := ba^.symno;
-                currentent_name.f := xmalloc(strlen(sp84^.unk0C.f));
-                strcpy(currentent_name.f, sp84^.unk0C.f);
-                sp84^.unk0C := currentent_name;                    
-                lexicallevel := 0;
-                cprestore_offset := -1;
-                cpalias_pending := false;
-                return;
-            end;
-        iend:
-            begin
-                ignore_frames := false;
-                cprestore_offset := -1;
-                cpalias_pending := false;
-                need_cprestore := false;
-                return;
-            end;
-        ibgnb: sp80 := 23;
-        iendb: sp80 := 24;
-        ilab:
-            begin
-                if cpalias_set then begin
-                    init_cpalias();
-                end;
-                sp84 := stp(ba^.symno);
-                enterlabel(ba^.symno);
-                sp80 := 25;
-            end;
+    if not(ARRAY_AT(memory, arg4).unk_08 in realsegments) then begin
+        p_assertion_failed("MEM_ACCESS(segm, seg) in realsegments\0", "as1parse.p", 1858);
     end;
-    fill_pseudo(sp80, ba^.symno, currentline, debugflag, integer(sp84), 0);
+
+    if bitand(ARRAY_AT(seg_ic, arg4), arg0 - 1) <> 0 then begin
+        spF3 := true;
+        if aligning and (s0 <= opts.unk_1C) then begin
+            if arg0 = 2 then begin
+                PostError(".half not on halfword boundary", emptystring, ErrorLevel_1);
+            end else begin
+                PostError(".word not on word boundary", emptystring, ErrorLevel_1);
+            end;
+        end;
+    end else begin
+        spF3 := false;
+    end;
+
+    if arg1 > 0 then begin
+        repeat
+            s2 := ARRAY_AT(seg_ic, arg4);
+            if arg3 <> nil then begin
+                ARRAY_GROW(rld_list, nextrld);
+                { if nextrld >= rld_list.size then
+                    rld_list.data := grow_array(rld_list.size, nextrld, sizeof(ARRAY_AT(rld_list, 0)), rld_list.data, false); }
+                rld := addr(ARRAY_AT(rld_list, nextrld));
+
+                rld^.unk00 := 0;
+                rld^.unk04 := s2;
+                rld^.unk08 := arg3;
+                
+                arg3^.unk20 := arg3^.unk20 + 1;
+                arg3^.unk3D := true;
+
+                rld^.unk0C := arg4;
+
+                if arg0 = 2 then begin
+                    if shftaddr = 1 then begin
+                        rld^.unk10 := 12;
+                    end else begin
+                        rld^.unk10 := 10;
+                    end;
+                end else begin
+                    if arg5 then begin
+                        rld^.unk10 := 18;
+                        if not islocalsym(arg3) then begin
+                            PostError(".gpword expression references global symbol", emptystring, ErrorLevel_1);
+                        end;
+                    end else begin
+                        rld^.unk10 := 8;
+                    end;
+                end;
+
+                nextrld := nextrld + 1;
+            end;
+
+            if spF3 then begin
+                byte_at_a_time(arg4, arg2, s2, arg0);
+                shftaddr := 0;
+            end else begin
+                ARRAY_GROW(ARRAY_AT(memory, arg4).unk_00.b, s2);
+                shftaddr := 0;
+                if arg0 = 2 then begin
+                    ARRAY_AT(ARRAY_AT(memory, arg4).unk_00.h, s2 div 2) := arg2;
+                end else begin
+                    ARRAY_AT(ARRAY_AT(memory, arg4).unk_00.w, s2 div 4) := arg2;
+                end;
+            end;
+
+            ARRAY_AT(seg_ic, arg4) := s2 + arg0;
+            arg1 := arg1 - 1;
+        until arg1 = 0;
+    end;
+end;
+
+{ not matching }
+procedure dodword(arg0: integer; arg1: integer; arg2: cardinal; arg22: cardinal; arg3: PUnkALpha; arg5: integer);
+var
+    
+    spF3: boolean;
+    tempval: cardinal;
+    unused: integer;
+    s2: cardinal;
+    rld: ^RldRec;
+begin
+    definealabel(arg5, arg0, 0);
+    if sexchange then begin
+        tempval := bitand(lshift(arg2, 24), 16#FF000000) + 
+                   bitand(rshift(arg2, 24), 16#000000FF) +
+                   bitand(lshift(arg2,  8), 16#00FF0000) + 
+                   bitand(rshift(arg2,  8), 16#0000FF00);
+        arg2 := bitand(lshift(arg22, 24), 16#FF000000) + 
+                bitand(rshift(arg22, 24), 16#000000FF) +
+                bitand(lshift(arg22,  8), 16#00FF0000) + 
+                bitand(rshift(arg22,  8), 16#0000FF00);
+        arg22 := tempval;
+    end;
+
+    if not(ARRAY_AT(memory, arg5).unk_08 in realsegments) then begin
+        p_assertion_failed("MEM_ACCESS(segm, seg) in realsegments\0", "as1parse.p", 1858);
+    end;
+
+    if bitand(ARRAY_AT(seg_ic, arg5), arg0 - 1) <> 0 then begin
+        spF3 := true;
+        PostError(".dword not on double-word boundary", emptystring, ErrorLevel_1);
+    end else begin
+        spF3 := false;
+    end;
+
+    if not(spF3) and (arg1 > 0) then begin
+        repeat
+            s2 := ARRAY_AT(seg_ic, arg5);
+            if arg3 <> nil then begin
+                ARRAY_GROW(rld_list, nextrld);
+                { if nextrld >= rld_list.size then
+                    rld_list.data := grow_array(rld_list.size, nextrld, sizeof(ARRAY_AT(rld_list, 0)), rld_list.data, false); }
+                rld := addr(ARRAY_AT(rld_list, nextrld));
+
+                rld^.unk00 := 0;
+                rld^.unk04 := s2;
+                rld^.unk08 := arg3;
+                arg3^.unk20 := arg3^.unk20 + 1;
+                rld^.unk0C := arg5;
+
+                if sixtyfour_bit and elf_flag then begin
+                    rld^.unk10 := 7;
+                end else if sexchange then begin
+                    rld^.unk10 := 8;
+                end else begin
+                    rld^.unk10 := 7;
+                end;
+                nextrld := nextrld + 1;
+            end;
+
+            ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2);
+            ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, s2 div 4) := arg2;
+            
+            if not (sixtyfour_bit and elf_flag) and (arg3 <> nil) then begin
+                ARRAY_GROW(rld_list, nextrld);
+                { if nextrld >= rld_list.size then
+                    rld_list.data := grow_array(rld_list.size, nextrld, sizeof(ARRAY_AT(rld_list, 0)), rld_list.data, false); }
+                rld := addr(ARRAY_AT(rld_list, nextrld));
+
+                rld^.unk00 := 0;
+                rld^.unk04 := s2;
+                rld^.unk08 := arg3;
+                arg3^.unk20 := arg3^.unk20 + 1;
+                rld^.unk0C := arg5;
+
+                if sexchange then begin
+                    rld^.unk10 := 8;
+                end else begin
+                    rld^.unk10 := 7;
+                end;
+                nextrld := nextrld + 1;
+            end;
+
+            ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2 + 4);
+            ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, (s2 + 4) div 4) := arg22;
+
+            ARRAY_AT(seg_ic, arg5) := s2 + 4 + arg0;            
+            arg1 := arg1 - 1;
+        until arg1 = 0;
+    end;
+end;
+
+
+procedure parsecpload;
+var
+    reg: registers;
+    saved_flag: integer;
+begin
+    if reorderflag then begin
+        PostError(".cpload must be inside noreorder", emptystring, ErrorLevel_1);
+    end;
+
+    if picflag > 0 then begin
+        saved_flag := profileflag;
+        profileflag := 0;
+        if gp_disp_address = nil then begin
+            gp_disp_address := enter_undef_sym(l_addr(gp_disp_sym));
+        end;
+        reg := binasmfyle^.reg1;
+
+        emitalui(op_zlui, xr28, xr0, disp(true, 0));
+        _setrld(gp_disp_address, 2, bbindex + proc_instr_base);
+        emitalui(op_zaddiu, xr28, xr28, disp(false, 0));
+        _setrld(gp_disp_address, 3, bbindex + proc_instr_base);
+        emitalu3(op_zaddu, xr28, xr28, reg);
+
+        profileflag := saved_flag;
+    end;
+end;
+
+procedure parsecpadd;
+var
+    reg: registers;
+begin
+    if picflag = 2 then begin
+        reg := binasmfyle^.reg1;
+        if not cpalias_set or cpalias_pending then begin
+            emitalu3(op_zaddu, reg, reg, xr28);
+        end else begin
+            emitalu3(op_zaddu, reg, reg, cpalias_register);
+        end;
+    end;
+end;
+
+procedure parsecprestore;
+begin
+    if ((binasmfyle^.instr = icprestore) and cpalias_set) or ((binasmfyle^.instr = icpalias) and (cprestore_offset <> -1)) then begin
+        PostError("Both .cpalias and .cprestore used in the same .ent/.end pair", emptystring, ErrorLevel_1);
+    end;
+
+    if (binasmfyle^.instr = icprestore) and (cprestore_offset <> -1) and (cprestore_offset <> binasmfyle^.length) then begin
+        PostError(".cprestore offsets do not match between .ent/.end pair", emptystring, ErrorLevel_1);
+    end;
+
+    if (binasmfyle^.instr = icpalias) and cpalias_set and (cpalias_register <> binasmfyle^.reg1) then begin
+        PostError(".cpalias registers do not match between .ent/.end pair", emptystring, ErrorLevel_1);
+    end;
+
+    if picflag > 0 then begin
+        if binasmfyle^.instr = icprestore then begin
+            cprestore_offset := binasmfyle^.length;
+            if (cprestore_offset >= -16#8000) and (cprestore_offset <= 16#7FFF) then begin
+                emitloadstore(op_zsw, xr28, cprestore_offset, xr29);
+            end else if not atflag then begin
+                macro_error();
+            end else if (cprestore_offset >= 16#8000) and (cprestore_offset < 16#FFFF) then begin
+                emitalui(op_zaddiu, xr1, xr29, 16#7FFF);
+                emitloadstore(op_zsw, xr28, cprestore_offset - 16#7FFF, xr1);
+            end else begin
+                emitalui(op_zlui, xr1, xr0, disp(true, cprestore_offset));
+                emitalu3(op_zaddu, xr1, xr1, xr29);
+                emitloadstore(op_zsw, xr28, disp(false, cprestore_offset), xr1);
+            end;
+        end else begin
+            cpalias_set := true;
+            cpalias_pending := true;
+            cpalias_register := binasmfyle^.reg1;
+        end;
+    end;
+end;
+
+{ not matching }
+procedure parseword(arg0: cardinal);
+var
+    sp3C: PUnkAlpha;
+    sp38: integer;
+    sp34: integer;
+    ba: ^binasm;
+    sp2C: boolean; 
+begin
+    remember_symbol_size(last_globl_symno, arg0);
+    ba := binasmfyle;
+
+    if ba^.symno <> 0 then begin
+        sp3C := stp(ba^.symno);
+    end else begin
+        sp3C := nil;
+    end;
+
+    sp2C := (ba^.instr = igpword) and (picflag = 2);
+    if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
+        if arg0 > 4 then begin
+            sp34 := ba^.expression;
+            get_binasm(binasmfyle);
+            dodword(arg0, ba^.replicate, sp34, binasmfyle^.expression, sp3C, currsegmentindex);
+        end else begin
+            doword(arg0, ba^.replicate, ba^.expression, sp3C, currsegmentindex, sp2C);
+        end;
+    end else if arg0 > 4 then begin
+        sp34 := ba^.expression;
+        get_binasm(binasmfyle);
+        fill_pseudo(18, ba^.replicate, sp34, binasmfyle^.expression, sp3C, 0);
+    end else if (arg0 = 2) and (shftaddr = 1) then begin
+        fill_pseudo(17, 0, 1, 0, nil, 0);
+        shftaddr := 0;
+    end else if sp2C then begin
+        fill_pseudo(22, ba^.replicate, ba^.expression, arg0, sp3C, 0);
+    end else begin
+        fill_pseudo(15, ba^.replicate, ba^.expression, arg0, sp3C, 0);
+    end;
 end;

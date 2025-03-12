@@ -5,6 +5,7 @@
 
 type
     Byte = 0..16#FF;
+    short = 0..16#FFFF;
 
     ZeroString = packed array[1..4] of char;
     GString = record
@@ -112,6 +113,7 @@ type
         { 0x37 } unk37: boolean;
         { 0x38 } unk38: integer;
         { 0x3C } unk3C: boolean;
+        { 0x3D } unk3D: boolean;
         { 0x40 } unk40: integer;
         { 0x44 } unk44: integer;
         { 0x48 } unk48: integer;
@@ -179,14 +181,39 @@ type
     end;
 
     ARRAY_DECLARE(integer);
+    ARRAY_DECLARE(short);
     ARRAY_DECLARE(char);
 
-    MemoryRec = record;
-        unk_00: ARRAY_OF(char);
-        unk_08: Byte;
+    MemoryUnion = record
+    case integer of
+        1: (b: ARRAY_OF(char););
+        2: (h: ARRAY_OF(short));
+        4: (w: ARRAY_OF(integer));
+    end;
+
+    MemoryRec = record
+        unk_00: MemoryUnion;
+        unk_08: segments;
         unk_09: packed array [1..32] of char;
     end;
     ARRAY_DECLARE(MemoryRec);
+
+    PdrRec = record
+        next: ^PdrRec;
+        unk04: integer;
+        unk08: integer;
+        unk0C: integer;
+        unk10: PUnkAlpha;
+        unk14: PUnkAlpha;
+    end;
+
+    OptRecord = record;
+        unk_00: array[1..5] of boolean;
+        unk_08: array[1..5] of integer;
+        unk_1C: Byte;
+        unk_1D: boolean;
+        unk_1E: boolean;
+    end;
 
 var
     emptystring: extern GString;
@@ -240,11 +267,34 @@ var
     currentfile: extern integer;
     currentent: extern integer;
     currentent_name: extern GString;
-
+    initial_loc: extern boolean;
+    optflag: extern integer;
+    fromas0: extern boolean;
+    saw_pic_flag: extern boolean;
+    saw_cap_g: extern boolean;
+    first_pdr: extern ^PdrRec;
+    last_pdr: extern ^PdrRec;
+    macroflag: extern boolean;
+    has_noreorder: extern boolean;
+    non_reorg_flag: extern cardinal;
+    transform_flag: extern boolean;
+    opts: extern OptRecord;
+    volatileflag: extern boolean;
+    movableflag: extern boolean;
+    shftaddr: extern integer;
+    sixtyfour_bit: extern boolean;
+    elf_flag: extern boolean;
+    gp_disp_address: extern PUnkAlpha;
+    gp_disp_sym: extern st_string;
+    profileflag: extern integer;
+    
+procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
 procedure p_assertion_failed(arg0: String; arg1: String; arg2: cardinal); external;
 procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;
 function grow_array(var arg0: integer; arg1: integer; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
 function strlen(p : ^Filename): integer; external;
-procedure strcpy(dst : ^Filename; src: ^Filename); external;
+function strcpy(dst : ^Filename; src: ^Filename): pointer; external;
 function xmalloc(size: integer): pointer; external;
+function l_addr(var value: st_string): pointer; external;
+function enter_undef_sym(ptr: pointer): PUnkAlpha; external;

@@ -176,14 +176,6 @@ type
         option_r4300_mul
     );
 
-    OptRecord = record;
-        unk_00: array[1..5] of boolean;
-        unk_08: array[1..5] of integer;
-        unk_1C: Byte;
-        unk_1D: boolean;
-        unk_1E: boolean;
-    end;
-
     ARRAY_DECLARE(PUnkAlpha);
 
 { global variables }
@@ -209,31 +201,24 @@ var
     gp_fp_moves: set of opcodes;
     regnum: array [first(registers)..last(registers)] of integer;
     knownregs: set of registers;
-    shftaddr: integer;
     multireloc_list: ARRAY_OF(integer);
     multirelocinstr_list: ARRAY_OF(integer);
     sym_tab: ARRAY_OF(PUnkALpha);
     neg_sym_tab: ARRAY_OF(PUnkALpha);
     isa: mips_isa;
-    opts: OptRecord;
     s_pool_symbol: PUnkAlpha;
     d_pool_symbol: PUnkAlpha;
     nopinserted: integer;
     new_hilo: boolean;
     fpstall_nop: boolean;
-    nopsremaining: integer;
-    transform_flag: boolean;
-    macroflag: boolean;
+    nopsremaining: integer;    
     non_pic_flag: boolean;
     num_issue: integer;
     mscoff: boolean;
     force_branch_fixup: boolean;
     mscoff1: boolean;
-    volatileflag: boolean;
-    movableflag: boolean;
     keepflag: boolean;
     deferred_line_no: integer;
-    has_noreorder: boolean;
     dwalign: boolean;
     r6000_lhu_flag: boolean;
     float_li_flag: boolean;
@@ -245,12 +230,9 @@ var
     branch_opt: boolean;
     symregs_opt: boolean;
     global_opt: boolean;
-    initial_loc: boolean;
     ent_pending: boolean;
     last_bb: array [1..3] of Byte;
     swpipe_debug: integer;
-    first_pdr: integer;
-    last_pdr: integer;
     savelastloc: boolean;
     lastsym: integer;
     peep_debug: integer;
@@ -262,9 +244,6 @@ var
     severity: severity_levels;
     tracereorder: boolean;
     reorder: boolean;
-    profileflag: integer;
-    optflag: integer;
-    elf_flag: boolean;
     abi_flag: boolean;
     isbigendianhost: boolean;
     notandm: boolean;
@@ -272,9 +251,6 @@ var
     listingflag: boolean;
     fp_pool_flag: boolean;
     warnexitflag: boolean;
-    saw_cap_g: boolean;
-    gp_disp_address: integer;
-    saw_pic_flag: boolean;
     maybe_r4000: boolean;
     cprestore_offset: integer;
     t5_jal: boolean;
@@ -287,20 +263,18 @@ var
     dwopcode: boolean;
     r4300_mul: boolean;
     fp_hack_flag: 0..4; { TODO enum ? }
-    mcount_address: pointer;
-    mcount_sym: integer;
+    mcount_address: PUnkALpha;
+    mcount_sym: st_string;
     olimit_value: integer;
     gprmask: cardinal;
     fprmask: cardinal;
     liveset: integer;
-    real_delays: boolean;
-    fromas0: boolean;
+    real_delays: boolean;    
     fixup_count: integer;
     use_ddopt_info: boolean;
     nonzero_scnbase: boolean;
     xpg_flag: boolean;
     nowarnflag: boolean;
-    sixtyfour_bit: boolean;
     fp32regs: boolean;
     binasm_file: FileOfBinasm;
     
@@ -313,7 +287,6 @@ function atol(arg0: ^Identname): integer; external;
 function getenv(var arg0: String): integer; external;
 procedure get_sstring(arg0: integer; arg1: GString); external;
 procedure get_lstring(arg0: integer; arg1: GString); external;
-procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure init_reorg_state(arg0: Reorg_Enum); external;
 function which_opt(arg0: GString): options; external;
 function init_gp_table(size: integer): pointer; external;
@@ -330,8 +303,6 @@ procedure wrobj(); external;
 procedure parsestmt(); external;
 procedure restore_gp(); external;
 function filesize(var f: FileOfBinasm): integer; external;
-function l_addr(var value: integer): pointer; external;
-function enter_undef_sym(ptr: pointer): pointer; external;
 procedure traverse_bb(); external;
 procedure create_function_table(); external;
 procedure flush_line_no(); external;
@@ -487,8 +458,8 @@ begin
     currentline := 0;
     currentent := 0;
     currentent_name.f := nil;
-    first_pdr := 0;
-    last_pdr := 0;
+    first_pdr := nil;
+    last_pdr := nil;
     currentfile := -1;
     savelastloc := false;
     lastsym := 0;
@@ -521,7 +492,7 @@ begin
     saw_cap_g := false;
     picflag := 0;
     big_got := false;
-    gp_disp_address := 0;
+    gp_disp_address := nil;
     saw_pic_flag := false;
     maybe_r4000 := true;
     cprestore_offset := -1;
@@ -574,8 +545,8 @@ begin
     multirelocinstr_list.size := 0;
 
     for j := 0 to 15 do begin
-        ARRAY_AT(memory, j).unk_00.size := 0;
-        ARRAY_AT(memory, j).unk_08 := j;
+        ARRAY_AT(memory, j).unk_00.b.size := 0;
+        ARRAY_AT(memory, j).unk_08 := segments(j);
         ARRAY_AT(seg_ic, j) := 0;
         ARRAY_AT(nextlabelchain, j) := 0;
     end;            
