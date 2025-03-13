@@ -19,6 +19,7 @@ type
     end;
     
     PBinasm = ^binasm;
+    FileOfBinasm = File of binasm;
 
     ErrorLevel = (
         ErrorLevel_0,
@@ -71,6 +72,26 @@ type
         op_zmfpc, op_zmtpc, op_zmfps, op_zmtps { 328 - 331 }
 	);
 
+    asmformat = (
+        af,
+        afra,
+        afri,
+        afrrr,
+        afrr,
+        afa,
+        afrrl,
+        afrl,
+        afl,
+        aforrr,
+        afr,
+        afri_fp,
+        af_12, { unused ? }
+        af_13, { unused ? }
+        dli_dla,
+        af_15, { unused ? }
+        afrrrr
+	);
+
     UnkPiInstr_Record = Record;
         rfd: cardinal;
         unk4: integer;
@@ -111,10 +132,15 @@ type
         { 0x35 } unk35: Byte;
         { 0x36 } unk36: Byte;
         { 0x37 } unk37: boolean;
-        { 0x38 } unk38: integer;
+        { 0x38 } unk38: boolean;
+        { 0x39 } unk39: boolean;
+        { 0x3A } unk3A: boolean;
+        { 0x3B } unk3B: boolean;
         { 0x3C } unk3C: boolean;
         { 0x3D } unk3D: boolean;
-        { 0x40 } unk40: integer;
+        { 0x3D } unk3E: boolean;
+        { 0x3D } unk3F: registers;
+        { 0x40 } unk40: registers;
         { 0x44 } unk44: integer;
         { 0x48 } unk48: integer;
         { 0x4C } unk4C: integer;
@@ -287,6 +313,21 @@ var
     gp_disp_address: extern PUnkAlpha;
     gp_disp_sym: extern st_string;
     profileflag: extern integer;
+    binasm_file: extern FileOfBinasm;
+    last_bb: extern array [1..3] of Byte;
+    known_framesize: extern integer;
+    max_arg_build: extern integer;
+    ent_pending: extern boolean;
+    gjaldef: extern aligned_regset;
+    gjallive: extern aligned_regset;
+    gjrlive: extern aligned_regset;
+    restext: extern boolean;
+    liveset: extern integer;
+    binlive: extern cardinal;
+    fltlive: extern cardinal;
+    asm2asmformat: extern array [first(asmcodes)..last(asmcodes)] of asmformat;
+    br_likely_ops: extern set of opcodes;
+    num_pseudo: extern integer;
     
 procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
@@ -298,3 +339,18 @@ function strcpy(dst : ^Filename; src: ^Filename): pointer; external;
 function xmalloc(size: integer): pointer; external;
 function l_addr(var value: st_string): pointer; external;
 function enter_undef_sym(ptr: pointer): PUnkAlpha; external;
+function idn_for_data(): integer; external;
+procedure defineasym(arg0: integer; arg1: PUnkAlpha; arg2: integer); external;
+function ll_load_immed(arg0: integer; arg1: integer; arg2: registers): boolean; external;
+procedure do_parseafra(arg0: asmcodes; arg1: registers; arg2: PUnkAlpha; arg3: integer; arg4: registers); external;
+function fixup_symno(symno: integer): integer; external;
+procedure fixup_preceding_labels(align: integer); external;
+procedure parsefpconst(which: itype); external;
+procedure parse_mtag(tagnumber: integer; tagtype: integer); external;
+procedure parse_malias(memtag1: integer; memtag2: integer); external;
+procedure init_multi_relocinst(); external;
+procedure init_malias_table(); external;
+procedure initbb(var index: integer); external;
+procedure parseafrrr(fasm: asmcodes); external;
+procedure parseafra(fasm: asmcodes); external;
+procedure parseafri_fp(fasm: asmcodes); external;

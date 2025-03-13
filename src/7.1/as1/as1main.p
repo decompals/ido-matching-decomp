@@ -3,33 +3,11 @@
 { global types }
 
 type
-    FileOfBinasm = File of binasm;
-
     mipsformats = (
         mipsfmt_0, mipsfmt_1, mipsfmt_2, mipsfmt_3,
         mipsfmt_4, mipsfmt_5, mipsfmt_6, mipsfmt_7,
         mipsfmt_8, mipsfmt_9, mipsfmt_10
     );
-
-    asmformat = (
-        af,
-        afra,
-        afri,
-        afrrr,
-        afrr,
-        afa,
-        afrrl,
-        afrl,
-        afl,
-        aforrr,
-        afr,
-        afri_fp,
-        af_12, { unused ? }
-        af_13, { unused ? }
-        dli_dla,
-        af_15, { unused ? }
-        afrrrr
-	);
 
     severity_levels = (
         severity_level_0,
@@ -183,10 +161,8 @@ type
 var
     template: array [first(opcodes)..last(opcodes)] of cardinal;
     opcodeformat: array [first(opcodes)..last(opcodes)] of mipsformats;
-    asm2asmformat: array [first(asmcodes)..last(asmcodes)] of asmformat;
     gp_tables: array [seg_text..seg_15] of pointer;
     br_always_ops: set of opcodes;
-    br_likely_ops: set of opcodes;
     storeops: set of opcodes;
     alu3ops: set of opcodes;
     trapops: set of opcodes;
@@ -230,8 +206,6 @@ var
     branch_opt: boolean;
     symregs_opt: boolean;
     global_opt: boolean;
-    ent_pending: boolean;
-    last_bb: array [1..3] of Byte;
     swpipe_debug: integer;
     savelastloc: boolean;
     lastsym: integer;
@@ -268,7 +242,6 @@ var
     olimit_value: integer;
     gprmask: cardinal;
     fprmask: cardinal;
-    liveset: integer;
     real_delays: boolean;    
     fixup_count: integer;
     use_ddopt_info: boolean;
@@ -276,7 +249,6 @@ var
     xpg_flag: boolean;
     nowarnflag: boolean;
     fp32regs: boolean;
-    binasm_file: FileOfBinasm;
     
 
 { external functions }
