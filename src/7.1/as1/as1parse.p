@@ -56,7 +56,7 @@ procedure enter_symbol(name: ^Filename; size: integer; arg2: integer); external;
 procedure reenter_symbol(name: ^Filename; size: integer); external;
 procedure add_data_to_gp_table(seg: segments; arg1: integer); external;
 function st_add_deltasym(sc: integer; arg1: integer; index: integer): integer; external;
-function pseudo_type(arg0: integer): integer; external;
+function pseudo_type(arg0: cardinal): integer; external;
 procedure save_cur_proc_id(var arg0: Filename); external;
 procedure call_name_and_line(arg0: integer); external;
 procedure byte_at_a_time(segm: integer; arg1: integer; arg2: integer; arg3: integer); external;
@@ -67,6 +67,8 @@ begin
 end;
 { required to match caseerror }
 { #line 100 "as1parse.p" }
+
+{ this is FF symbol, required to match caserror page number }
 
 function disp(arg0: boolean; arg1: cardinal): cardinal;
 begin
@@ -213,8 +215,8 @@ begin
         if sym <> nil then begin
             _setrld(sym, 13, bbindex + proc_instr_base);
         end;
-        ARRAY_AT(rld_list, nextrld - 1).unk14 := immediate; { NON MATCHING LINE }
-        ARRAY_AT(rld_list, nextrld - 1).unk11 := reg;
+        ARRAY_AT(rld_list, cardinal(nextrld) - 1).unk14 := immediate;
+        ARRAY_AT(rld_list, cardinal(nextrld) - 1).unk11 := reg;
         return;
     end;
 
@@ -402,7 +404,6 @@ begin
                                 if spC0 = -1 then begin
                                     return;
                                 end;
-                                { t9 := spC0; }
                                 spC0 := spC0 + 1;
                             end;
                         zbgel:
@@ -463,7 +464,6 @@ begin
                                 if spC0 = -1 then begin
                                     return;
                                 end;
-                                { t9 := spC0; }
                                 spC0 := spC0 + 1;                                
                             end;
                         otherwise:
@@ -1138,7 +1138,7 @@ begin
     label_size := 0;
 end;
 
-{ TODO match this }
+{ NOT MATCHING }
 procedure parseseg(seg: segments);
 var
     length: integer;
@@ -1151,8 +1151,8 @@ begin
 
     currsegment := seg;
     currsegmentindex := ord(seg);
-
     length := binasmfyle^.length;
+    
     if (seg = seg_text) and (length <> 0) then begin
         currsegment := seg_15;
         
@@ -1160,7 +1160,7 @@ begin
 
         if lastusertextseg = -1 then begin
             lastusertextseg := firstusertextseg;
-            currsegmentindex := firstusertextseg;
+            currsegmentindex := lastusertextseg;
 
             for i := 1 to length do begin
                 ARRAY_AT(memory, currsegmentindex).unk_09[i] := binasmfyle^.data[i];
@@ -1168,17 +1168,18 @@ begin
             ARRAY_AT(memory, currsegmentindex).unk_09[i] := chr(0);
         end else begin
             currsegmentindex := -1;
-            for j := firstusertextseg to lastusertextseg do begin
-                for i := 1 to length do begin
-                    if ARRAY_AT(memory, j).unk_09[i] <> binasmfyle^.data[i] then begin
-                        break;
-                    end;
+            j := firstusertextseg;
+            while j <= lastusertextseg do begin
+                i := 1;
+                while (i <= length) and (ARRAY_AT(memory, j).unk_09[i] = binasmfyle^.data[i]) do begin
+                    i := i + 1;
                 end;
-
+                
                 if i > length then begin
                     currsegmentindex := j;
-                    break; { j := lastusertextseg + 1; }
+                    j := lastusertextseg + 1;
                 end;
+                j := j + 1;
             end;
 
             if currsegmentindex = -1 then begin
@@ -1214,7 +1215,8 @@ end;
 procedure create_function_table;
     procedure func_00454458(arg0: integer; arg1: cardinal; arg2: boolean);
     var
-        s0: cardinal;
+        unused: integer;
+        s0: cardinal;        
         rld: ^RldRec;
     begin
         if sexchange then begin
@@ -1230,16 +1232,17 @@ procedure create_function_table;
         end;
 
         ARRAY_GROW(ARRAY_AT(memory, ord(seg_8)).unk_00.b, s0);
-        ARRAY_AT(ARRAY_AT(memory, ord(seg_8)).unk_00.w, s0) := arg1; { TODO }
+        ARRAY_AT(ARRAY_AT(memory, ord(seg_8)).unk_00.w, s0 div 4) := arg1;
         ARRAY_AT(seg_ic, ord(seg_8)) := s0 + 4;
 
         if arg2 then begin
-            rld := addr(ARRAY_AT(rld_list, nextrld));
             ARRAY_GROW(rld_list, nextrld);
+            
+            rld := addr(ARRAY_AT(rld_list, nextrld));
             rld^.unk00 := 0;
             rld^.unk04 := s0;
+            
             currfunc_sym^.unk30 := currtextindex;
-
             if arg0 <> 0 then begin
                 rld^.unk08 := stp(arg0);
             end else begin
@@ -1299,7 +1302,7 @@ begin
     if not adjust_frame_by_ld then begin
         p_assertion_failed("adjust_frame_by_ld\0", "as1parse.p", 1386);
     end;
-    temp := st_add_deltasym(27, 0, ba^.symno); { lclinst ? }
+    temp := st_add_deltasym(27, 0, ba^.symno);
     enterstp(temp);
 end;
 
@@ -2083,12 +2086,9 @@ var
     spE3: boolean;
     spE2: boolean;
     ba: ^binasm;
-    instr: itype;
 begin
     endofbasicb := false;
     branchpending := false;
-
-    { spE4 := 0; }
 
     if pendinginstr then begin
         pendinginstr := false;
@@ -2122,7 +2122,7 @@ begin
         ba := binasmfyle;
         spE4 := binasmfyle^;
 
-        if (spE4.symno <> 0) and (binasmfyle^.instr <> iend) then begin
+        if (spE4.symno <> 0) and (ba^.instr <> iend) then begin
             if in_cia_binasm then begin
                 spE4.symno := fixup_symno(spE4.symno);
                 binasmfyle^.symno := spE4.symno;
@@ -2131,9 +2131,8 @@ begin
             enterstp(spE4.symno);
         end;
 
-        instr := ba^.instr;
         if ((currsegment = seg_text) or (currsegment = seg_15)) and (picflag > 0) and
-           (instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
+           (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
         begin
             PostError("Cannot use data generating directives in .text. Use the .rdata section instead.", emptystring, ErrorLevel_1);
         end;
