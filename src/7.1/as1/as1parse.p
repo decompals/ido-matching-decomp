@@ -1,5 +1,15 @@
 #include "common.i"
 
+#define WORD_1 16#FF000000
+#define WORD_2 16#00FF0000
+#define WORD_3 16#0000FF00
+#define WORD_4 16#000000FF
+#define SWAP_WORD(x) \
+    bitand(lshift(x, 24), WORD_1) + \
+    bitand(rshift(cardinal(x), 24), WORD_4) + \
+    bitand(lshift(x,  8), WORD_2) + \
+    bitand(rshift(cardinal(x),  8), WORD_3)
+
 var
     { .data }
     last_globl_symno: integer := 0;
@@ -66,7 +76,7 @@ begin
     PostError("macro instruction used $at", emptystring, ErrorLevel_2);
 end;
 { required to match caseerror }
-{ #line 100 "as1parse.p" }
+{ #line 79 "as1parse.p" }
 
 { this is FF symbol, required to match caserror page number }
 
@@ -964,7 +974,7 @@ var
     buffer: st_string;
 begin
     if not(currsegment in realsegments) then begin
-        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1091);
+        p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1091);
     end;
 
     if (currsegment <> seg_text) and (currsegment <> seg_15) then begin
@@ -1038,7 +1048,7 @@ begin
     definealabel(currsegmentindex, 1, 0);
 
     if not(currsegment in realsegments) then begin
-        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1156);
+        p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1156);
     end;
 
     c := ba^.expression;
@@ -1070,7 +1080,7 @@ begin
     enter_symbol(spC4^.unk0C.f, ba^.length, spBC);
 
     if (picflag <> 1) or not spC4^.unk3C then begin
-        if not(spC4^.unk34 in ['D', 'U', 'u']) then begin
+        if not(spC4^.unk34 in ['C', 'U', 'u']) then begin
             PostError("redefinition of symbol", spC4^.unk0C, ErrorLevel_1);
             return;
         end;
@@ -1309,17 +1319,15 @@ begin
     end;
 end;
 
-{ NON_MATCHING, regalloc }
 procedure parseend(which: itype);
 var
     sp84: PUnkAlpha;
     sp80: integer;
     ba: ^binasm;
-    ptr: pointer;
-    
+    unused: integer;
 begin
     ba := binasmfyle;
-
+    
     if (bbindex = 0) or
        (which in [iend, ient, iaent]) or
        not((pinstruction^[bbindex].rfd = 16#7FFFFFFF) and (pseudo_type(bbindex) in [23, 24, 25, 26])) or
@@ -1354,8 +1362,8 @@ begin
             ignore_frames := false;
             currentent := ba^.symno;
             currentent_name.f := xmalloc(strlen(sp84^.unk0C.f));
-            ptr := strcpy(currentent_name.f, sp84^.unk0C.f);
-            sp84^.unk0C := currentent_name;                    
+            strcpy(currentent_name.f, sp84^.unk0C.f);
+            sp84^.unk0C.f := currentent_name.f;
             lexicallevel := 0;
             cprestore_offset := -1;
             cpalias_pending := false;
@@ -1393,13 +1401,12 @@ begin
     PostError(".endr allowed only in as0", emptystring, ErrorLevel_1);
 end;
 
-{ NON_MATCHING }
 procedure parsefile;
 var
     i, count: integer;
 begin
-    count := (binasmfyle^.length + 15) div 16;
-    for i := 1 to count do begin
+    count := binasmfyle^.length;
+    for i := 1 to (count + 15) div 16 do begin
         get_binasm(binasmfyle);
     end;
 end;
@@ -1664,7 +1671,7 @@ begin
 
     definealabel(currsegmentindex, 1, 0);
     if not(currsegment in realsegments) then begin
-        p_assertion_failed("currsegment in realsegments\0", "as1parse.p", 1813);
+        p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1813);
     end;
 
     if ba^.length > 0 then begin
@@ -1712,7 +1719,7 @@ begin
     end;
 
     if not(ARRAY_AT(memory, arg4).unk_08 in realsegments) then begin
-        p_assertion_failed("MEM_ACCESS(segm, seg) in realsegments\0", "as1parse.p", 1858);
+        p_assertion_failed("MEM_ACCESS(segm,seg) in realsegments\0", "as1parse.p", 1858);
     end;
 
     if bitand(ARRAY_AT(seg_ic, arg4), arg0 - 1) <> 0 then begin
@@ -1784,91 +1791,83 @@ begin
     end;
 end;
 
-{ not matching }
-procedure dodword(arg0: integer; arg1: integer; arg2: cardinal; arg22: cardinal; arg3: PUnkALpha; arg5: integer);
+procedure dodword(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PUnkALpha; arg5: integer);
 var
-    
     spF3: boolean;
     tempval: cardinal;
     s2: cardinal;
 begin
     definealabel(arg5, arg0, 0);
     if sexchange then begin
-        tempval := bitand(lshift(arg2, 24), 16#FF000000) + 
-                   bitand(rshift(arg2, 24), 16#000000FF) +
-                   bitand(lshift(arg2,  8), 16#00FF0000) + 
-                   bitand(rshift(arg2,  8), 16#0000FF00);
-        arg2 := bitand(lshift(arg22, 24), 16#FF000000) + 
-                bitand(rshift(arg22, 24), 16#000000FF) +
-                bitand(lshift(arg22,  8), 16#00FF0000) + 
-                bitand(rshift(arg22,  8), 16#0000FF00);
-        arg22 := tempval;
+        tempval := SWAP_WORD(arg2);
+        arg2 := SWAP_WORD(arg3);
+        arg3 := tempval;
     end;
 
     if not(ARRAY_AT(memory, arg5).unk_08 in realsegments) then begin
-        p_assertion_failed("MEM_ACCESS(segm, seg) in realsegments\0", "as1parse.p", 1858);
+        p_assertion_failed("MEM_ACCESS(segm,seg) in realsegments\0", "as1parse.p", 1940);
     end;
 
     if bitand(ARRAY_AT(seg_ic, arg5), arg0 - 1) <> 0 then begin
-        spF3 := true;
         PostError(".dword not on double-word boundary", emptystring, ErrorLevel_1);
+        spF3 := true;
     end else begin
         spF3 := false;
     end;
 
-    if not(spF3) and (arg1 > 0) then begin
-        repeat
-            s2 := ARRAY_AT(seg_ic, arg5);
-            if arg3 <> nil then begin
-                ARRAY_GROW(rld_list, nextrld);
-                with ARRAY_AT(rld_list, nextrld) do begin
-                    unk00 := 0;
-                    unk04 := s2;
-                    unk08 := arg3;
-                    arg3^.unk20 := arg3^.unk20 + 1;
-                    unk0C := arg5;
+    if spF3 then begin
+        return;
+    end;
 
-                    if sixtyfour_bit and elf_flag then begin
-                        unk10 := 7;
-                    end else if sexchange then begin
-                        unk10 := 8;
-                    end else begin
-                        unk10 := 7;
-                    end;
+    for arg1 := arg1 downto 1 do begin
+        s2 := ARRAY_AT(seg_ic, arg5);
+        if arg4 <> nil then begin
+            ARRAY_GROW(rld_list, nextrld);
+            with ARRAY_AT(rld_list, nextrld) do begin
+                unk00 := 0;
+                unk04 := s2;
+                unk08 := arg4;
+                arg4^.unk20 := arg4^.unk20 + 1;
+                unk0C := arg5;
+
+                if sixtyfour_bit and elf_flag then begin
+                    unk10 := 7;
+                end else if sexchange then begin
+                    unk10 := 8;
+                end else begin
+                    unk10 := 7;
                 end;
-                nextrld := nextrld + 1;
             end;
+            nextrld := nextrld + 1;
+        end;
 
-            ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2);
-            ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, s2 div 4) := arg2;
-            
-            if not (sixtyfour_bit and elf_flag) and (arg3 <> nil) then begin
-                ARRAY_GROW(rld_list, nextrld);
-                with ARRAY_AT(rld_list, nextrld) do begin
-                    unk00 := 0;
-                    unk04 := s2;
-                    unk08 := arg3;
-                    arg3^.unk20 := arg3^.unk20 + 1;
-                    unk0C := arg5;
+        ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2);
+        ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, s2 div 4) := arg2;
+        
+        if not (sixtyfour_bit and elf_flag) and (arg4 <> nil) then begin
+            ARRAY_GROW(rld_list, nextrld);
+            with ARRAY_AT(rld_list, nextrld) do begin
+                unk00 := 0;
+                unk04 := s2 + 4;
+                unk08 := arg4;
+                arg4^.unk20 := arg4^.unk20 + 1;
+                unk0C := arg5;
 
-                    if sexchange then begin
-                        unk10 := 8;
-                    end else begin
-                        unk10 := 7;
-                    end;
+                if sexchange then begin
+                    unk10 := 7;
+                end else begin
+                    unk10 := 8;
                 end;
-                nextrld := nextrld + 1;
             end;
+            nextrld := nextrld + 1;
+        end;
 
-            ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2 + 4);
-            ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, (s2 + 4) div 4) := arg22;
+        ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2 + 4);
+        ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, (s2 + 4) div 4) := arg3;
 
-            ARRAY_AT(seg_ic, arg5) := s2 + 4 + arg0;            
-            arg1 := arg1 - 1;
-        until arg1 = 0;
+        ARRAY_AT(seg_ic, arg5) := s2 + arg0;
     end;
 end;
-
 
 procedure parsecpload;
 var
@@ -2032,7 +2031,7 @@ begin
         spC3 := binasmfyle^.reg1;
 
         if binasmfyle^.form <> fri then begin
-            p_assertion_failed("binasmfyle^.form <> fri\0", "as1parse.p", 2186);
+            p_assertion_failed("binasmfyle^.form = fri\0", "as1parse.p", 2186);
         end;
 
         if ll_load_immed(spCC, s0, spC3) then begin
@@ -2121,7 +2120,7 @@ begin
         if ((currsegment = seg_text) or (currsegment = seg_15)) and (picflag > 0) and
            (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
         begin
-            PostError("Cannot use data generating directives in .text. Use the .rdata section instead.", emptystring, ErrorLevel_1);
+            PostError("Cannot use data generating directives in .text.  Use the .rdata section instead.", emptystring, ErrorLevel_1);
         end;
 
         if ((currsegment = seg_text) or (currsegment = seg_15)) and (bbindex > 0) and
@@ -2252,7 +2251,7 @@ begin
                         end else begin
                             spFC := stp(currentent);
                             if spFC = nil then begin
-                                PostError(".mask without .ent", emptystring, ErrorLevel_1);
+                                PostError(".fmask without .ent", emptystring, ErrorLevel_1);
                             end else begin
                                 spFC^.unk3B := true;
                                 spFC^.unk54 := ba^.regmask;
@@ -2383,7 +2382,7 @@ begin
             end;
 
             if ((currsegment = seg_sdata) or (currsegment = seg_data)) and
-                (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
+                (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, iword, iextended]) then
             begin
                 prev_sdata[currsegment].unk04 := false;
             end;
