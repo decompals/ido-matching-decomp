@@ -333,7 +333,7 @@ procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
 procedure p_assertion_failed(arg0: String; arg1: String; arg2: cardinal); external;
 procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;
-function grow_array(var arg0: integer; arg1: integer; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
+function grow_array(var arg0: integer; arg1: cardinal; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
 function strlen(p : ^Filename): integer; external;
 function strcpy(dst : ^Filename; src: ^Filename): pointer; external;
 function xmalloc(size: integer): pointer; external;
