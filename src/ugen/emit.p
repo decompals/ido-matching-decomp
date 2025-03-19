@@ -1059,13 +1059,13 @@ begin
     inst.symno := symno;
 
     if arg3 then begin
-        emit_dir0(iset, 2);
+        emit_dir0(iset, ord(set_noreorder));
         append_i(inst);
-        emit_dir0(iset, 1);
+        emit_dir0(iset, ord(set_reorder));
     end else begin
-        demit_dir0(iset, 2);
+        demit_dir0(iset, ord(set_noreorder));
         append_d(inst);
-        demit_dir0(iset, 1);
+        demit_dir0(iset, ord(set_reorder));
     end;
 end;
 
