@@ -141,7 +141,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rab: ', op, ' ', reg1, immediate, ' ', reg2);
         assert(op <> zbad);
     end;
@@ -164,7 +164,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rab: ', op, ' ', reg1, immediate, ' ', reg2);
     end;
 end;
@@ -186,7 +186,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rllb: ', op, ' ', reg1, immediate, labelno, ' ', reg2);
     end;
 end;
@@ -210,7 +210,7 @@ begin
 
     uses_gp := true;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_ra: ', op, ' ', reg1, immediate);
     end;
 end;
@@ -231,7 +231,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_ri: ', op, ' ', reg1, immediate);
     end;
 end;
@@ -281,7 +281,7 @@ begin
 
     uses_gp := true;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rfi: ', op, ' ', reg1);
     end;
 
@@ -314,7 +314,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rl: ', op, ' ', reg1, symno);
     end;
 end;
@@ -334,7 +334,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rrr: ', op, ' ', reg1, ' ', reg2, ' ', reg3);
     end;
 end;
@@ -355,7 +355,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rri: ', op, ' ', reg1, ' ', reg2, immediate);
     end;
 end;
@@ -376,7 +376,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rrri: ', op, ' ', reg1, ' ', reg2, symno);
     end;
 end;
@@ -395,7 +395,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rr: ', op, ' ', reg1, ' ', reg2);
     end;
 end;
@@ -418,7 +418,7 @@ begin
 
     has_calls := true;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_a: ', op, immediate);
     end;
 end;
@@ -441,7 +441,7 @@ begin
         has_calls := true;
     end;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_r: ', op, ' ', reg1);
     end;
 end;
@@ -461,7 +461,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_i: ', op, immediate);
     end;
 end;
@@ -480,7 +480,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rrl: ', op, ' ', reg1, ' ', reg2, symno);
     end;
 end;
@@ -499,7 +499,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rrll: ', op, ' ', reg1, ' ', reg2, labelno);
     end;
 end;
@@ -519,7 +519,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rl: ', op, ' ', reg1, symno);
     end;
 end;
@@ -539,7 +539,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rll: ', op, ' ', reg1, labelno);
     end;
 end;
@@ -558,7 +558,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_l: ', op, symno);
     end;
 end;
@@ -577,7 +577,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_ll: ', op, labelno);
     end;
 end;
@@ -597,7 +597,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_ril: ', op, ' ', reg1, immediate, symno);
     end;
 end;
@@ -617,7 +617,7 @@ begin
     end;
     i_ptr := i_ptr + 1;
 
-    if (debug_ugen) then begin
+    if debug_ugen then begin
         writeln('emit_rill: ', op, ' ', reg1, immediate, labelno);
     end;
 end;
