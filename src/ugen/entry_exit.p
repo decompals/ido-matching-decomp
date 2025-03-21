@@ -87,7 +87,7 @@ begin
     output_entry_point(arg0);
     emit_optimize_level(olevel);
     if (pic_level = 1) or ((pic_level = 2) and (not arg5 or (u8(olevel) < 2) or uses_gp or (i_ptr >= 1000))) then begin
-        emit_cpload(xr25, 0, arg0, 0);
+        emit_cpload(xr25, 0, arg0, false);
     end;
     if arg3 = 0 then begin
         argE := 0;
@@ -95,7 +95,7 @@ begin
     if init_dynmem and (arg3 <> 0) then begin
         spC2 := get_free_reg(0, 1);
         spC1 := get_free_reg(0, 1);
-        demit_ri(zli, spC2, -16#5A5A6, 0);
+        demit_ri(zli, spC2, -16#5A5A6, franone);
         demit_rr(zmove, spC1, xr29);
     end;
     if arg3 <> 0 then begin
@@ -103,20 +103,20 @@ begin
             if arg3 >= max_stack then begin
                 get_reg(xr24, 0, 1);
                 demit_rr(zmove, xr25, xr31);
-                demit_ri(zli, xr24, arg3, 0);
+                demit_ri(zli, xr24, arg3, franone);
                 demit_regmask(ilivereg, 16#C0, 0);
                 demit_a(zjal, stack_limit_bn, 0);
                 demit_rrr(zsubu, xr29, xr29, xr24);
                 free_reg(xr24);
                 demit_rr(zmove, xr31, xr25);
             end else begin
-                demit_ri(zsubu, xr29, arg3, 0);
-                demit_rob_(zsw, xr0, 0, xr29, 0);
+                demit_ri(zsubu, xr29, arg3, franone);
+                demit_rob_(zsw, xr0, 0, xr29, franone);
             end;
         end else if reversed_stack then begin
-            demit_ri(zaddu, xr29, arg3, 0);
+            demit_ri(zaddu, xr29, arg3, franone);
         end else begin
-            demit_ri(zsubu, xr29, arg3, 0);
+            demit_ri(zsubu, xr29, arg3, franone);
         end;
     end;
     spBB := xr23;
@@ -150,13 +150,13 @@ begin
         spBC := gen_label_id();
         ddefine_label(spBC);
         if reversed_stack then begin
-            demit_rob_(zsw, spC2, 0, spC1, 0);
-            demit_rob_(zsw, spC2, 4, spC1, 0);
-            demit_ri(zaddu, spC1, 8, 0);
+            demit_rob_(zsw, spC2, 0, spC1, franone);
+            demit_rob_(zsw, spC2, 4, spC1, franone);
+            demit_ri(zaddu, spC1, 8, franone);
         end else begin
-            demit_ri(zsubu, spC1, 8, 0);
-            demit_rob_(zsw, spC2, 0, spC1, 0);
-            demit_rob_(zsw, spC2, 4, spC1, 0);
+            demit_ri(zsubu, spC1, 8, franone);
+            demit_rob_(zsw, spC2, 0, spC1, franone);
+            demit_rob_(zsw, spC2, 4, spC1, franone);
         end;
         demit_rrll(zbne, spC1, xr29, spBC);
         free_reg(spC2);
@@ -171,9 +171,9 @@ begin
             define_label(gen_label_id());
         end;
         if reversed_stack then begin
-            emit_ri_(zsubu, xr29, arg3, 0);
+            emit_ri_(zsubu, xr29, arg3, franone);
         end else begin
-            emit_ri_(zaddu, xr29, arg3, 0);
+            emit_ri_(zaddu, xr29, arg3, franone);
         end;
     end;
     if arg12 = -1 then begin
@@ -182,9 +182,9 @@ begin
     demit_frame(arg3, frame_pointer, xr31);
     if framesz_relocatable then begin
         if reversed_stack then begin
-            demit_ri(zaddu, xr29, argB, 6);
+            demit_ri(zaddu, xr29, argB, frcprel);
         end else begin
-            demit_ri(zsubu, xr29, argB, 6);
+            demit_ri(zsubu, xr29, argB, frcprel);
         end;
     end;
     if excpt then begin
@@ -207,7 +207,7 @@ begin
     emit_dir1(iaent, arg0, arg1);
     emit_dir0(ilabel, arg0);
     if pic_level > 0 then begin
-        emit_cpload(xr25, 0, arg0, 1);
+        emit_cpload(xr25, 0, arg0, true);
     end;
     if arg2 = 0 then begin
         arg5 := 0;
@@ -215,7 +215,7 @@ begin
     if init_dynmem and (arg2 <> 0) then begin
         sp2B := get_free_reg(0, 1);
         sp2A := get_free_reg(0, 1);
-        emit_ri_(zli, sp2B, -16#5A5A6, 0);
+        emit_ri_(zli, sp2B, -16#5A5A6, franone);
         emit_rr(zmove, sp2A, xr29);
     end;
     if arg2 <> 0 then begin
@@ -223,9 +223,9 @@ begin
             if frame_pointer <> xr29 then begin
                 demit_rr(zmove, frame_pointer, xr29);
             end;
-            emit_ri_(zaddu, xr29, arg2, 0);
+            emit_ri_(zaddu, xr29, arg2, franone);
         end else begin
-            emit_ri_(zsubu, xr29, arg2, 0);
+            emit_ri_(zsubu, xr29, arg2, franone);
         end;
     end;
     if init_dynmem and (arg2 <> 0) then begin
@@ -234,9 +234,9 @@ begin
         if reversed_stack then begin
             emit_rob(zsw, sp2B, 0, sp2A, 0);
             emit_rob(zsw, sp2B, 4, sp2A, 0);
-            emit_ri_(zaddu, sp2A, 8, 0);
+            emit_ri_(zaddu, sp2A, 8, franone);
         end else begin
-            emit_ri_(zsubu, sp2A, 8, 0);
+            emit_ri_(zsubu, sp2A, 8, franone);
             emit_rob(zsw, sp2B, 0, sp2A, 0);
             emit_rob(zsw, sp2B, 4, sp2A, 0);
         end;
@@ -276,17 +276,17 @@ begin
         if basicint = 0 then begin
             if (var_s2 in saved_regs) or home_vararg_reg then begin
                 if reversed_stack then begin
-                    demit_rob_(zsw, var_s2, -(arg0 + var_s4 * 4) - 4, xr29, 0);
+                    demit_rob_(zsw, var_s2, -(arg0 + var_s4 * 4) - 4, xr29, franone);
                 end else begin
-                    demit_rob_(zsw, var_s2, arg0 + var_s4 * 4, xr29, 0);
+                    demit_rob_(zsw, var_s2, arg0 + var_s4 * 4, xr29, franone);
                 end;
             end;
         end else begin
             if (var_s2 in saved_regs) or home_vararg_reg then begin
                 if reversed_stack then begin
-                    demit_rob_(zsd, var_s2, -(arg0 + var_s4 * 8) - 8, xr29, 0);
+                    demit_rob_(zsd, var_s2, -(arg0 + var_s4 * 8) - 8, xr29, franone);
                 end else begin
-                    demit_rob_(zsd, var_s2, arg0 + var_s4 * 4, xr29, 0);
+                    demit_rob_(zsd, var_s2, arg0 + var_s4 * 4, xr29, franone);
                 end;
             end;
         end;
@@ -301,9 +301,9 @@ begin
         var_s3 := fs_s;
         if var_s2 in saved_regs then begin
             if reversed_stack then begin
-                demit_rob_(fs_s, var_s2, -(arg0 + var_s0) - 4, xr29, 0);
+                demit_rob_(fs_s, var_s2, -(arg0 + var_s0) - 4, xr29, franone);
                 if succ(var_s2) in saved_regs then begin
-                    demit_rob_(fs_s, succ(var_s2), -(arg0 + var_s0) - 8, xr29, 0);
+                    demit_rob_(fs_s, succ(var_s2), -(arg0 + var_s0) - 8, xr29, franone);
                     var_s0 := var_s0 + 4;
                 end;
             end else begin
@@ -313,7 +313,7 @@ begin
                 if (var_s3 = fs_d) and (var_v1 = fs_s) then begin
                     var_s0 := ((var_s0 + 7) div 8) * 8;
                 end;
-                demit_rob_(var_s3, var_s2, arg0 + var_s0, xr29, 0);
+                demit_rob_(var_s3, var_s2, arg0 + var_s0, xr29, franone);
             end;
         end;
         var_s4 := var_s4 + 1;
@@ -330,18 +330,18 @@ begin
         if var_s0_2 <> 0 then begin
             if (arg1 & integer(16#FFFF)) = 0 then begin
                 if reversed_stack then begin
-                    demit_rob_(fs_s, xfr12, -(arg0 - var_s0_2) - 4, xr29, 0);
-                    demit_rob_(fs_s, xfr13, -(arg0 - var_s0_2) - 8, xr29, 0);
+                    demit_rob_(fs_s, xfr12, -(arg0 - var_s0_2) - 4, xr29, franone);
+                    demit_rob_(fs_s, xfr13, -(arg0 - var_s0_2) - 8, xr29, franone);
                 end else begin
-                    demit_rob_(fs_d, xfr12, arg0 - var_s0_2, xr29, 0);
+                    demit_rob_(fs_d, xfr12, arg0 - var_s0_2, xr29, franone);
                 end;
             end;
             var_s0_2 := var_s0_2 + 8;
             if reversed_stack then begin
-                demit_rob_(fs_s, xfr14, -(arg0 - var_s0_2) - 4, xr29, 0);
-                demit_rob_(fs_s, xfr15, -(arg0 - var_s0_2) - 8, xr29, 0);
+                demit_rob_(fs_s, xfr14, -(arg0 - var_s0_2) - 4, xr29, franone);
+                demit_rob_(fs_s, xfr15, -(arg0 - var_s0_2) - 8, xr29, franone);
             end else begin
-                demit_rob_(fs_d, xfr14, arg0 - var_s0_2, xr29, 0);
+                demit_rob_(fs_d, xfr14, arg0 - var_s0_2, xr29, franone);
             end;
         end;
     end;
@@ -382,27 +382,27 @@ begin
         sp48 := lshift(1, ord(xr31));
         sp40 := arg6;
         if basicint = 0 then begin
-            demit_rob_(zsw, xr31, arg0 + arg6, xr29, 0);
+            demit_rob_(zsw, xr31, arg0 + arg6, xr29, franone);
         end else begin
-            demit_rob_(zsd, xr31, arg0 + arg6, xr29, 0);
+            demit_rob_(zsd, xr31, arg0 + arg6, xr29, franone);
         end;
     end else if xr31 in saved_regs then begin
         sp48 := lshift(1, ord(xr31));
         if reversed_stack then begin
             if basicint = 0 then begin
                 var_s1 := var_s1 + 4;
-                demit_rob_(zsw, xr31, -var_s1, xr29, 0);
+                demit_rob_(zsw, xr31, -var_s1, xr29, franone);
             end else begin
                 var_s1 := var_s1 + 8;
-                demit_rob_(zsd, xr31, -var_s1, xr29, 0);
+                demit_rob_(zsd, xr31, -var_s1, xr29, franone);
             end;
         end else begin
             if basicint = 0 then begin
                 var_s1 := var_s1 - 4;
-                demit_rob_(zsw, xr31, var_s1, xr29, 0);
+                demit_rob_(zsw, xr31, var_s1, xr29, franone);
             end else begin
                 var_s1 := var_s1 - 8;
-                demit_rob_(zsd, xr31, var_s1, xr29, 0);
+                demit_rob_(zsd, xr31, var_s1, xr29, franone);
             end;
         end;
     end;
@@ -410,18 +410,18 @@ begin
         if reversed_stack then begin
             if basicint = 0 then begin
                 var_s1 := var_s1 + 4;
-                demit_rob_(zsw, xr30, -var_s1, xr29, 0);
+                demit_rob_(zsw, xr30, -var_s1, xr29, franone);
             end else begin
                 var_s1 := var_s1 + 8;
-                demit_rob_(zsd, xr30, -var_s1, xr29, 0);
+                demit_rob_(zsd, xr30, -var_s1, xr29, franone);
             end;
         end else begin
             if basicint = 0 then begin
                 var_s1 := var_s1 - 4;
-                demit_rob_(zsw, xr30, var_s1, xr29, 0);
+                demit_rob_(zsw, xr30, var_s1, xr29, franone);
             end else begin
                 var_s1 := var_s1 - 8;
-                demit_rob_(zsd, xr30, var_s1, xr29, 0);
+                demit_rob_(zsd, xr30, var_s1, xr29, franone);
             end;
         end;
         sp48 := bitor(sp48, lshift(1, ord(xr30)));
@@ -457,18 +457,18 @@ begin
             if reversed_stack then begin
                 if basicint = 0 then begin
                     var_s1 := var_s1 + 4;
-                    demit_rob_(zsw, var_s0, -var_s1, xr29, 0);
+                    demit_rob_(zsw, var_s0, -var_s1, xr29, franone);
                 end else begin
                     var_s1 := var_s1 + 8;
-                    demit_rob_(zsd, var_s0, -var_s1, xr29, 0);
+                    demit_rob_(zsd, var_s0, -var_s1, xr29, franone);
                 end;
             end else begin
                 if basicint = 0 then begin
                     var_s1 := var_s1 - 4;
-                    demit_rob_(zsw, var_s0, var_s1, xr29, 0);
+                    demit_rob_(zsw, var_s0, var_s1, xr29, franone);
                 end else begin
                     var_s1 := var_s1 - 8;
-                    demit_rob_(zsd, var_s0, var_s1, xr29, 0);
+                    demit_rob_(zsd, var_s0, var_s1, xr29, franone);
                 end;
             end;
         end;
@@ -488,14 +488,14 @@ begin
             sp44 := bitor(sp44, lshift(3, ord(var_s0)));
             if reversed_stack then begin
                 var_s1 := var_s1 + 8;
-                demit_rob_(fs_d, var_s0, -var_s1, xr29, 0);
+                demit_rob_(fs_d, var_s0, -var_s1, xr29, franone);
                 if sp3B then begin
                     sp3C := arg0 - var_s1;
                     sp3B := false;
                 end;
             end else begin
                 var_s1 := var_s1 - 8;
-                demit_rob_(fs_d, var_s0, var_s1, xr29, 0);
+                demit_rob_(fs_d, var_s0, var_s1, xr29, franone);
                 if sp3B then begin
                     sp3C := var_s1 - arg0;
                     sp3B := false;
