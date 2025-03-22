@@ -5,7 +5,7 @@
 #include "cmplrs/uoptions.h"
 #include "cmplrs/binasm.h"
 #include "emit.h"
-#include "emit_dw.h"
+#include "val.h"
 
 type
     SymbolInit = packed record
