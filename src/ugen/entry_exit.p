@@ -4,10 +4,10 @@
 #include "tree.h"
 #include "tree_utils.h"
 #include "emit.h"
-#include "emit_dw.h"
 #include "ibuffer.h"
 #include "reg_mgr.h"
 #include "symbol.h"
+#include "val_util.h"
 
 procedure home_parameters(arg0: cardinal; arg1: integer); forward;
 procedure gen_reg_save_restore(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: boolean; arg5: integer; arg6: integer); forward;
