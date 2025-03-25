@@ -739,12 +739,12 @@ int hash(char* name) {
 }
 
 int LookUp(char* name, sym** arg1) {
-    sym* var_s0;
+    sym* sym;
 
     *arg1 = NULL;
-    for (var_s0 = hashtable[hash(name)]; var_s0 != NULL; var_s0 = var_s0->next) {
-        if (strcmp(name, var_s0->name) == 0) {
-            *arg1 = var_s0;
+    for (sym = hashtable[hash(name)]; sym != NULL; sym = sym->next) {
+        if (strcmp(name, sym->name) == 0) {
+            *arg1 = sym;
             return FOUND;
         }
     }
@@ -1672,7 +1672,7 @@ static long long func_00412548(void) {
 }
 
 int GetExpr(void) {
-    int sp24 = 0;
+    int sp24 = FALSE;
 
     if ((Tokench == 'i') || (Tokench == 'd') || (Tokench == 'h') || (Tokench == '+') || (Tokench == '-') ||
         (Tokench == '~') || (Tokench == '(') || ((Tokench == '"'))) {
