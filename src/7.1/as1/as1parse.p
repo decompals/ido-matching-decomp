@@ -1,4 +1,4 @@
-#include "common.i"
+#include "common_p.h"
 
 #define WORD_1 16#FF000000
 #define WORD_2 16#00FF0000
@@ -76,19 +76,19 @@ begin
     PostError("macro instruction used $at", emptystring, ErrorLevel_2);
 end;
 
-function disp(arg0: boolean; arg1: cardinal): cardinal;
+function disp(high: boolean; offset: cardinal): cardinal;
 begin
-    if arg0 then begin
-        if (bitand(arg1, 16#8000) <> 0) then begin
-            disp := bitand(rshift(arg1, 16) + 1, 16#FFFF);
+    if high then begin
+        if (bitand(offset, 16#8000) <> 0) then begin
+            disp := bitand(rshift(offset, 16) + 1, 16#FFFF);
         end else begin
-            disp := bitand(rshift(arg1, 16), 16#FFFF);
+            disp := bitand(rshift(offset, 16), 16#FFFF);
         end;
     end else begin
-        if (bitand(arg1, 16#8000) <> 0) then begin
-            disp := bitand(arg1, 16#FFFF) - 16#10000;
+        if (bitand(offset, 16#8000) <> 0) then begin
+            disp := bitand(offset, 16#FFFF) - 16#10000;
         end else begin
-            disp := bitand(arg1, 16#FFFF);
+            disp := bitand(offset, 16#FFFF);
         end;
     end;
 end;
@@ -902,36 +902,33 @@ begin
 end;
 
 procedure parseaforrr(fasm: asmcodes);
-var
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    emitcoproc(asm2op[fasm], ba^.immediate);
+    with binasmfyle^ do begin
+        emitcoproc(asm2op[fasm], immediate);
+    end;
 end;
 
 procedure parseafr(fasm: asmcodes);
 var
-    reg1: registers;
-    ba: ^binasm;
+    reg: registers;
 begin
-    ba := binasmfyle;
-    
-    if ba^.form <> fr then begin
-        p_assertion_failed("form = fr\0", "as1parse.p", 1031);
-    end;
+    with binasmfyle^ do begin
+        if form <> fr then begin
+            p_assertion_failed("form = fr\0", "as1parse.p", 1031);
+        end;
 
-    reg1 := ba^.reg1;
-    emitreg2(asm2op[fasm], reg1, xnoreg);
-    pre_reorder_peepholes.unk_10 := bbindex;
+        reg := reg1;
+        emitreg2(asm2op[fasm], reg, xnoreg);
+        pre_reorder_peepholes.unk_10 := bbindex;
+    end;
 end;
 
 procedure parseafrrrr(fasm: asmcodes);
-var
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    fpop_src3 := ba^.reg4;
-    emitfpop(asm2op[fasm], ba^.reg1, ba^.reg2, ba^.reg3);
+    with binasmfyle^ do begin
+        fpop_src3 := reg4;
+        emitfpop(asm2op[fasm], reg1, reg2, reg3);
+    end;
 end;
 
 procedure parsealign;
@@ -1031,33 +1028,33 @@ procedure parsebyte;
 var
     count: integer;
     c: integer;
-    ba: ^binasm;
 begin
     remember_symbol_size(last_globl_symno, 1);
-    ba := binasmfyle;
-
-    if (currsegment = seg_text) or (currsegment = seg_15) then begin
-        fill_pseudo(16, ba^.replicate, ba^.expression, 0, nil, 0);
-        return;
-    end;
-
-    definealabel(currsegmentindex, 1, 0);
-
-    if not(currsegment in realsegments) then begin
-        p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1156);
-    end;
-
-    c := ba^.expression;
-    c := bitand(c, 16#FF);
     
-    count := ba^.replicate;
-    if count > 0 then begin
-        repeat
-            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
-            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(c);
-            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
-            count := count - 1;
-        until count = 0;
+    with binasmfyle^ do begin
+        if (currsegment = seg_text) or (currsegment = seg_15) then begin
+            fill_pseudo(16, replicate, expression, 0, nil, 0);
+            return;
+        end;
+
+        definealabel(currsegmentindex, 1, 0);
+
+        if not(currsegment in realsegments) then begin
+            p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1156);
+        end;
+
+        c := expression;
+        c := bitand(c, 16#FF);
+        
+        count := replicate;
+        if count > 0 then begin
+            repeat
+                ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+                ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(c);
+                ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+                count := count - 1;
+            until count = 0;
+        end;
     end;
 end;
 
@@ -1066,79 +1063,79 @@ var
     spC4: PUnkAlpha;
     spC0: integer;
     spBC: integer;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    spC0 := ba^.length;
-    spC4 := stp(ba^.symno);
-    spBC := ba^.rep; { ?? }
+    with binasmfyle^ do begin
+        spC0 := length;
+        spC4 := stp(symno);
+        spBC := rep; { ?? }
 
-    enter_symbol(spC4^.unk0C.f, ba^.length, spBC);
+        enter_symbol(spC4^.unk0C.f, length, spBC);
 
-    if (picflag <> 1) or not spC4^.unk3C then begin
-        if not(spC4^.unk34 in ['C', 'U', 'u']) then begin
-            PostError("redefinition of symbol", spC4^.unk0C, ErrorLevel_1);
-            return;
-        end;
+        if (picflag <> 1) or not spC4^.unk3C then begin
+            if not(spC4^.unk34 in ['C', 'U', 'u']) then begin
+                PostError("redefinition of symbol", spC4^.unk0C, ErrorLevel_1);
+                return;
+            end;
 
-        case which of
-            icomm:
-                begin
-                    spC4^.unk34 := 'C';
-                    spC4^.unk30 := 12;
-                    if spBC = 1 then begin
-                        spC4^.unk34 := 'E';
-                    end;
-                end;
-            ilcomm:
-                begin
-                    if spC4^.unk34 = 'u' then begin
-                        spC4^.unk34 := 'b';
-                    end else begin
-                        spC4^.unk34 := 'B';
-                    end;
-
-                    if (picflag > 0) and (spC4^.unk35 <> 0) then begin
-                        spC4^.unk30 := 4;
-                    end else if (spC0 <= gprelsize) and (spC0 > 0) then begin
-                        spC4^.unk30 := 3;
-                    end else if spBC = 1 then begin
-                        spC4^.unk30 := 3;
-                    end else begin
-                        spC4^.unk30 := 4;
-                    end;
-                end;
-            iextern:
-                begin
-                    if (spC0 <= gprelsize) and (spC0 > 0) then begin
-                        spC4^.unk30 := 13;
-                        spC4^.unk34 := 'V';
-                    end else if spBC = 1 then begin
-                        spC4^.unk30 := 13;
-                        spC4^.unk34 := 'V';
-                    end else begin
+            case which of
+                icomm:
+                    begin
+                        spC4^.unk34 := 'C';
                         spC4^.unk30 := 12;
-                        spC4^.unk34 := 'U';
+                        if spBC = 1 then begin
+                            spC4^.unk34 := 'E';
+                        end;
                     end;
-                end;
-            otherwise:
-                if which <> iextern then begin
-                    p_assertion_failed("which = iextern\0", "as1parse.p", 1242);
-                end;
+                ilcomm:
+                    begin
+                        if spC4^.unk34 = 'u' then begin
+                            spC4^.unk34 := 'b';
+                        end else begin
+                            spC4^.unk34 := 'B';
+                        end;
+
+                        if (picflag > 0) and (spC4^.unk35 <> 0) then begin
+                            spC4^.unk30 := 4;
+                        end else if (spC0 <= gprelsize) and (spC0 > 0) then begin
+                            spC4^.unk30 := 3;
+                        end else if spBC = 1 then begin
+                            spC4^.unk30 := 3;
+                        end else begin
+                            spC4^.unk30 := 4;
+                        end;
+                    end;
+                iextern:
+                    begin
+                        if (spC0 <= gprelsize) and (spC0 > 0) then begin
+                            spC4^.unk30 := 13;
+                            spC4^.unk34 := 'V';
+                        end else if spBC = 1 then begin
+                            spC4^.unk30 := 13;
+                            spC4^.unk34 := 'V';
+                        end else begin
+                            spC4^.unk30 := 12;
+                            spC4^.unk34 := 'U';
+                        end;
+                    end;
+                otherwise:
+                    if which <> iextern then begin
+                        p_assertion_failed("which = iextern\0", "as1parse.p", 1242);
+                    end;
+            end;
         end;
-    end;
 
-    if (which = icomm) or (which = iextern) then begin
-        spC4^.unk35 := 1;
-    end;
+        if (which = icomm) or (which = iextern) then begin
+            spC4^.unk35 := 1;
+        end;
 
-    if which = ilcomm then begin
-        spC4^.unk37 := true;
-    end;
+        if which = ilcomm then begin
+            spC4^.unk37 := true;
+        end;
 
-    spC4^.unk28 := spC0;
-    last_globl_symno := 0;
-    label_size := 0;
+        spC4^.unk28 := spC0;
+        last_globl_symno := 0;
+        label_size := 0;
+    end;
 end;
 
 procedure parseseg(seg: segments);
@@ -1220,10 +1217,7 @@ procedure create_function_table;
         s0: cardinal;
     begin
         if sexchange then begin
-            arg1 := bitand(lshift(arg1, 24), 16#FF000000) + 
-                    bitand(rshift(arg1, 24), 16#000000FF) +
-                    bitand(lshift(arg1,  8), 16#00FF0000) + 
-                    bitand(rshift(arg1,  8), 16#0000FF00);
+            arg1 := SWAP_WORD(arg1);
         end;
 
         s0 := ARRAY_AT(seg_ic, ord(seg_8));
@@ -1276,20 +1270,19 @@ begin
 end;
 
 procedure parseedata;
-var
-    ba: ^binasm;
 begin
     if excpt_opt then begin
-        ba := binasmfyle;
-        if ba^.flag = 0 then begin
-            parseseg(seg_7);
-        end else begin
-            enterstp(ba^.edata);
-            lastsymno := ba^.symno;
-            lastdata := ba^.edata;
-            lastinstr := iedata;
-            pendinginstr := true;
-            endofbasicb := true;
+        with binasmfyle^ do begin
+            if flag = 0 then begin
+                parseseg(seg_7);
+            end else begin
+                enterstp(edata);
+                lastsymno := symno;
+                lastdata := edata;
+                lastinstr := iedata;
+                pendinginstr := true;
+                endofbasicb := true;
+            end;
         end;
     end;
 end;
@@ -1297,14 +1290,14 @@ end;
 procedure parsealloc;
 var
     temp: integer;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    if not adjust_frame_by_ld then begin
-        p_assertion_failed("adjust_frame_by_ld\0", "as1parse.p", 1386);
+    with binasmfyle^ do begin
+        if not adjust_frame_by_ld then begin
+            p_assertion_failed("adjust_frame_by_ld\0", "as1parse.p", 1386);
+        end;
+        temp := st_add_deltasym(27, 0, symno);
+        enterstp(temp);
     end;
-    temp := st_add_deltasym(27, 0, ba^.symno);
-    enterstp(temp);
 end;
 
 procedure parseprologue;
@@ -1441,47 +1434,47 @@ end;
 procedure parseglobl;
 var
     sym: PUnkALpha;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    sym := stp(ba^.symno);
-    last_globl_symno := ba^.symno;
-    label_size := 0;
-    if sym^.unk34 = ' ' then begin
-        sym^.unk34 := 'U';
-    end else if sym^.unk34 = 'u' then begin
-        sym^.unk34 := 'U';
-    end else if sym^.unk34 = 'b' then begin
-        sym^.unk34 := 'B';
-    end else if sym^.unk34 = 'd' then begin
-        sym^.unk34 := 'D';
-    end else if sym^.unk34 = 't' then begin
-        sym^.unk34 := 'T';
+    with binasmfyle^ do begin
+        sym := stp(symno);
+        last_globl_symno := symno;
+        label_size := 0;
+        if sym^.unk34 = ' ' then begin
+            sym^.unk34 := 'U';
+        end else if sym^.unk34 = 'u' then begin
+            sym^.unk34 := 'U';
+        end else if sym^.unk34 = 'b' then begin
+            sym^.unk34 := 'B';
+        end else if sym^.unk34 = 'd' then begin
+            sym^.unk34 := 'D';
+        end else if sym^.unk34 = 't' then begin
+            sym^.unk34 := 'T';
+        end;
+        sym^.unk35 := 1;
     end;
-    sym^.unk35 := 1;
 end;
 
 procedure parseweakext;
 var
     sym: PUnkALpha;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    sym := stp(ba^.symno);
-    sym^.unk3C := true;
-    sym^.unk44 := ba^.lexlevel;
+    with binasmfyle^ do begin
+        sym := stp(symno);
+        sym^.unk3C := true;
+        sym^.unk44 := lexlevel;
+    end;
 end;
 
 procedure parseglobabs;
 var
     sym: PUnkALpha;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    sym := stp(ba^.symno);
-    sym^.unk34 := 'A';
-    sym^.unk10 := binasmfyle^.length;
-    sym^.unk35 := 1;
+    with binasmfyle^ do begin
+        sym := stp(symno);
+        sym^.unk34 := 'A';
+        sym^.unk10 := binasmfyle^.length;
+        sym^.unk35 := 1;
+    end;
 end;
 
 procedure parse_option;
@@ -1553,136 +1546,132 @@ begin
 end;
 
 procedure parseset(var arg0: boolean);
-var
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
-    case set_value(ba^.length) of
-        set_reorder:
-            begin
-                if not(reorderflag) and (bbindex <> 0) then begin
-                    endofbasicb := true;
-                    arg0 := true;
-                end else begin
-                    reorderflag := true;
-                    if not macroflag then begin
-                        PostError("reorder requires macro", emptystring, ErrorLevel_2);
+    with binasmfyle^ do begin
+        case set_value(length) of
+            set_reorder:
+                begin
+                    if not(reorderflag) and (bbindex <> 0) then begin
+                        endofbasicb := true;
+                        arg0 := true;
+                    end else begin
+                        reorderflag := true;
+                        if not macroflag then begin
+                            PostError("reorder requires macro", emptystring, ErrorLevel_2);
+                        end;
                     end;
                 end;
-            end;
-        set_noreorder:
-            begin
-                has_noreorder := true;
-                if non_reorg_flag = 0 then begin
-                    non_reorg_flag := 16#4000;
+            set_noreorder:
+                begin
+                    has_noreorder := true;
+                    if non_reorg_flag = 0 then begin
+                        non_reorg_flag := 16#4000;
+                    end;
+                    if reorderflag and (bbindex <> 0) then begin
+                        endofbasicb := true;
+                        arg0 := true;
+                    end else begin
+                        reorderflag := false;
+                    end;
                 end;
-                if reorderflag and (bbindex <> 0) then begin
+            set_transform:
+                if not(transform_flag) and (bbindex <> 0) then begin
                     endofbasicb := true;
                     arg0 := true;
                 end else begin
-                    reorderflag := false;
+                    transform_flag := true;
                 end;
-            end;
-        set_transform:
-            if not(transform_flag) and (bbindex <> 0) then begin
-                endofbasicb := true;
-                arg0 := true;
-            end else begin
-                transform_flag := true;
-            end;
-        set_notransform:
-            if transform_flag and (bbindex <> 0) then begin
-                endofbasicb := true;
-                arg0 := true;
-            end else begin
-                transform_flag := false;
-            end;
-        set_macro:
-            begin
-                macroflag := true;
-            end;
-        set_nomacro:
-            begin
-                macroflag := false;
-                if reorderflag then begin
-                    PostError("nomacro requires noreorder", emptystring, ErrorLevel_2);
+            set_notransform:
+                if transform_flag and (bbindex <> 0) then begin
+                    endofbasicb := true;
+                    arg0 := true;
+                end else begin
+                    transform_flag := false;
                 end;
-            end;
-        set_at:
-            begin
-                atflag := true;
-            end;
-        set_noat:
-            begin
-                atflag := false;
-            end;
-        set_volatile:
-            begin
-                if non_reorg_flag = 0 then begin
-                    non_reorg_flag := 16#4000;
+            set_macro:
+                begin
+                    macroflag := true;
                 end;
-                volatileflag := true;
-            end;
-        set_novolatile:
-            begin
-                volatileflag := false;
-            end;
-        set_move:
-            begin
-                movableflag := true;
-            end;
-        set_nomove:
-            begin
-                if non_reorg_flag = 0 then begin
-                    non_reorg_flag := 16#4000;
+            set_nomacro:
+                begin
+                    macroflag := false;
+                    if reorderflag then begin
+                        PostError("nomacro requires noreorder", emptystring, ErrorLevel_2);
+                    end;
                 end;
-                movableflag := false;
-                PostError(".set nomove is obsolete", emptystring, ErrorLevel_2);
-            end;
-        set_bopt:
-            begin
-                opts.unk_00[5] := true;
-            end;
-        set_nobopt:
-            begin
-                opts.unk_00[5] := false;
-            end;
-        set_reposition,
-        set_noreposition:
+            set_at:
+                begin
+                    atflag := true;
+                end;
+            set_noat:
+                begin
+                    atflag := false;
+                end;
+            set_volatile:
+                begin
+                    if non_reorg_flag = 0 then begin
+                        non_reorg_flag := 16#4000;
+                    end;
+                    volatileflag := true;
+                end;
+            set_novolatile:
+                begin
+                    volatileflag := false;
+                end;
+            set_move:
+                begin
+                    movableflag := true;
+                end;
+            set_nomove:
+                begin
+                    if non_reorg_flag = 0 then begin
+                        non_reorg_flag := 16#4000;
+                    end;
+                    movableflag := false;
+                    PostError(".set nomove is obsolete", emptystring, ErrorLevel_2);
+                end;
+            set_bopt:
+                begin
+                    opts.unk_00[5] := true;
+                end;
+            set_nobopt:
+                begin
+                    opts.unk_00[5] := false;
+                end;
+            set_reposition,
+            set_noreposition:
+        end;
     end;
 end;
 
-{ NON_MATCHING }
 procedure parsespace;
 var
     counter: integer;
-    ba: ^binasm;
 begin
-    ba := binasmfyle;
+    with binasmfyle^ do begin
+        if (currsegment = seg_text) or (currsegment = seg_15) then begin
+            fill_pseudo(13, length, 0, 0, nil, 0);
+            return;
+        end;
 
-    if (currsegment = seg_text) or (currsegment = seg_15) then begin
-        fill_pseudo(13, ba^.length, 0, 0, nil, 0);
-        return;
-    end;
+        definealabel(currsegmentindex, 1, 0);
+        if not(currsegment in realsegments) then begin
+            p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1813);
+        end;
 
-    definealabel(currsegmentindex, 1, 0);
-    if not(currsegment in realsegments) then begin
-        p_assertion_failed("CurrSegment in realsegments\0", "as1parse.p", 1813);
-    end;
-
-    if ba^.length > 0 then begin
-
-        counter := ba^.length;
-        repeat
-            ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
-            if ARRAY_AT(memory, currsegmentindex).unk_00.b.data = nil then begin
-                PostError("could not allocate enough memory for .space", emptystring, ErrorLevel_1);
-                halt(1);
-            end;
-            ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
-            ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
-            counter := counter - 1;
-        until counter = 0;
+        if length > 0 then begin
+            counter := length;
+            repeat
+                ARRAY_GROW(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex));
+                if ARRAY_AT(memory, currsegmentindex).unk_00.b.data = nil then begin
+                    PostError("could not allocate enough memory for .space", emptystring, ErrorLevel_1);
+                    halt(1);
+                end;
+                ARRAY_AT(ARRAY_AT(memory, currsegmentindex).unk_00.b, ARRAY_AT(seg_ic, currsegmentindex)) := chr(0);
+                ARRAY_AT(seg_ic, currsegmentindex) := ARRAY_AT(seg_ic, currsegmentindex) + 1;
+                counter := counter - 1;
+            until counter = 0;
+        end;
     end;
 end;
 
@@ -1706,10 +1695,7 @@ begin
         end;
     end else begin
         if sexchange then begin
-            arg2 := bitand(lshift(arg2, 24), 16#FF000000) + 
-                    bitand(rshift(arg2, 24), 16#000000FF) +
-                    bitand(lshift(arg2,  8), 16#00FF0000) + 
-                    bitand(rshift(arg2,  8), 16#0000FF00);
+            arg2 := SWAP_WORD(arg2);
         end;
         s0 := 2;
     end;
@@ -2067,7 +2053,6 @@ var
     spE4: binasm;
     spE3: boolean;
     spE2: boolean;
-    ba: ^binasm;
 begin
     endofbasicb := false;
     branchpending := false;
@@ -2101,299 +2086,300 @@ begin
     lastinstr := ilabel;
 
     while not eof(binasm_file) do begin
-        ba := binasmfyle;
-        spE4 := binasmfyle^;
+        with binasmfyle^ do begin
+            spE4 := binasmfyle^;
 
-        if (spE4.symno <> 0) and (ba^.instr <> iend) then begin
-            if in_cia_binasm then begin
-                spE4.symno := fixup_symno(spE4.symno);
-                binasmfyle^.symno := spE4.symno;
+            if (spE4.symno <> 0) and (instr <> iend) then begin
+                if in_cia_binasm then begin
+                    spE4.symno := fixup_symno(spE4.symno);
+                    binasmfyle^.symno := spE4.symno;
+                end;
+
+                enterstp(spE4.symno);
             end;
 
-            enterstp(spE4.symno);
-        end;
-
-        if ((currsegment = seg_text) or (currsegment = seg_15)) and (picflag > 0) and
-           (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
-        begin
-            PostError("Cannot use data generating directives in .text.  Use the .rdata section instead.", emptystring, ErrorLevel_1);
-        end;
-
-        if ((currsegment = seg_text) or (currsegment = seg_15)) and (bbindex > 0) and
-           (ba^.instr in [ialign, iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
-        begin
-            if ba^.instr = ialign then begin
-                fixup_preceding_labels(power2(ba^.length));
-            end else if (ba^.instr = idouble) or (ba^.instr = iextended) then begin
-                fixup_preceding_labels(8);
-            end;
-
-            spE3 := true;
-            last_bb[3] := 0;
-            endofbasicb := true;
-        end else begin
-            spE3 := false;
-
-            case ba^.instr of
-                ialign: parsealign();
-                iascii: parseascii(false);
-                iasciiz: parseascii(true);
-                ibyte: parsebyte();
-                icomm: parsecomm(icomm);
-                iextern: parsecomm(iextern);
-                idata: parseseg(seg_data);
-                isdata: parseseg(seg_sdata);
-                irdata: parseseg(seg_rdata);
-                iedata: parseedata();
-                ifloat,
-                idouble,
-                iextended:
-                    begin
-                        if ba^.instr = ifloat then begin
-                            remember_symbol_size(last_globl_symno, 4);
-                        end else begin
-                            remember_symbol_size(last_globl_symno, 8);
-                        end;
-                        parsefpconst(ba^.instr);
-                    end;
-                ifile: parsefile();
-                iglobal: parseglobl();
-                iweakext: parseweakext();
-                iglobabs: parseglobabs();
-                ihalf: parseword(2);
-                ilabel:
-                    begin
-                        label_size := 0;
-                        if ba^.symno <> last_globl_symno then begin
-                            last_globl_symno := 0;
-                        end;
-                        if cpalias_set then begin
-                            init_cpalias();
-                        end;
-
-                        if (bbindex > 0) and not((pinstruction^[bbindex].rfd = 16#7FFFFFFF) and (pseudo_type(bbindex) = 26)) then begin
-                            endofbasicb := true;
-                            return;
-                        end;
-
-                        last_bb[3] := 0;
-                        enterlabel(ba^.symno, spFC);
-                        if (currsegment = seg_text) or (currsegment = seg_15) then begin
-                            fill_pseudo(26, ba^.symno, currentline, debugflag, spFC, 0);
-                        end else begin
-                            defineasym(ba^.symno, spFC, currsegmentindex);
-                        end;
-                    end;
-                ilcomm: parsecomm(ilcomm);
-                ioption: parse_option();
-                ialias, inoalias: parse_alias(ba^.instr);
-                iloopno: fill_pseudo(21, binasmfyle^.loopnum, binasmfyle^.lflag, 0, nil, 0);
-                iset: parseset(spE3);
-                iasm0: fromas0 := true;
-                ispace: parsespace();
-                isym: entersym(ba^.symno, spFC);
-                itext: parseseg(seg_text);
-                imtag: parse_mtag(ba^.tagnumber, ba^.tagtype);
-                imalias: parse_malias(ba^.memtag1, ba^.memtag2);
-                iword, igpword: parseword(4);
-                idword: parseword(8);
-                ient,
-                iaent:
-                    begin
-                        adjust_frame_by_ld := false;
-                        known_framesize := -1;
-                        max_arg_build := -1;
-                        frame_ptr := xr29;
-                        init_multi_relocinst();
-
-                        if ba^.instr = ient then begin
-                            init_malias_table();
-                        end else if ba^.instr = iaent then begin
-                            ignore_frames := true;
-                            if ent_pending then begin
-                                bbindex := bbindex + 1;
-                                initbb(bbindex);
-                                bbindex := bbindex - 1;
-                            end;
-                        end;
-
-                        ent_pending := true;
-                        last_bb[3] := 0;
-                        parseend(ba^.instr);
-                    end;
-                iprologue: parseprologue();
-                iend, ibgnb, iendb, ilab: parseend(ba^.instr);
-                irep: parserepeat();
-                iendrep: parseendrep();
-                imask:
-                    if not ignore_frames then begin
-                        if not fromas0 then begin
-                            fill_pseudo(7, ba^.regmask, ba^.regoffset, debugflag, nil, 0);
-                        end else begin
-                            spFC := stp(currentent);
-                            if spFC = nil then begin
-                                PostError(".mask without .ent", emptystring, ErrorLevel_1);
-                            end else begin
-                                spFC^.unk3A := true;
-                                spFC^.unk4C := ba^.regmask;
-                                spFC^.unk50 := ba^.regoffset;
-                            end;
-                        end;
-                    end;
-                ifmask:
-                    if not ignore_frames then begin
-                        if not fromas0 then begin
-                            fill_pseudo(8, ba^.regmask, ba^.regoffset, debugflag, nil, 0);
-                        end else begin
-                            spFC := stp(currentent);
-                            if spFC = nil then begin
-                                PostError(".fmask without .ent", emptystring, ErrorLevel_1);
-                            end else begin
-                                spFC^.unk3B := true;
-                                spFC^.unk54 := ba^.regmask;
-                                spFC^.unk58 := ba^.regoffset;
-                            end;
-                        end;
-                    end;
-                ivreg:
-                    if debugflag > 0 then begin
-                        st_pseudo(6, ba^.symno, ba^.immediate, ba^.reg1, 0, debugflag, 0);
-                    end;
-                iloc: parseloc(spE3);
-                iverstamp:
-                    if ba^.majornumber <> 7 then begin
-                        PostError("version stamps wrong in binasm file", emptystring, ErrorLevel_2);
-                    end;
-                iframe:
-                    if not ignore_frames then begin
-                        if fromas0 then begin
-                            spFC := stp(currentent);
-                            if spFC = nil then begin
-                                PostError(".frame without .ent", emptystring, ErrorLevel_1);
-                            end else begin
-                                spFC^.unk39 := true;
-                                spFC^.unk48 := ba^.frameoffset;
-                                spFC^.unk3F := ba^.framereg;
-                                spFC^.unk40 := ba^.pcreg;
-                            end;
-                        end else begin
-                            if ba^.pcreg <> xnoreg then begin
-                                fill_pseudo(9, ord(ba^.framereg), ba^.frameoffset, debugflag, nil, ord(ba^.pcreg));
-                            end else begin
-                                fill_pseudo(9, ord(ba^.framereg), ba^.frameoffset, debugflag, nil, 0);
-                            end;
-                        end;
-
-                        framereg_for_cprestore := ba^.framereg;
-                    end;
-                icpload:
-                    begin
-                        if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
-                            PostError(".cpload can only be placed in text", emptystring, ErrorLevel_1);
-                        end;
-                        parsecpload();
-                    end;
-                icpadd: parsecpadd();
-                icprestore,
-                icpalias:
-                    begin
-                        if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
-                            PostError(".cprestore or .cpalias can only be placed in text", emptystring, ErrorLevel_1);
-                        end;
-                        parsecprestore();
-                    end;
-                igjaldef: gjaldef := [ar0..afr31] - ba^.gjmask;
-                igjallive: gjallive := ba^.gjmask;
-                igjrlive: gjrlive := ba^.gjmask;
-                ishift_addr: shftaddr := 1;
-                irestext: restext := true;
-                ilivereg:
-                    if reorderflag and (optflag > 0) then begin
-                        liveset := 1;
-                        binlive := ba^.gpmask;
-                        fltlive := ba^.fpmask;
-                    end;
-                ialloc: parsealloc();
-                iocode:
-                    begin
-                        if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
-                            PostError("Code can only be placed in text", emptystring, ErrorLevel_1);
-                        end;
-
-                        if ba^.op = zbad then begin
-                            PostError("Internal Error: Bad instruction opcode", emptystring, ErrorLevel_1);
-                            endofbasicb := true;
-                            get_binasm(binasmfyle);
-                            return;
-                        end;
-
-                        spF8 := bbindex;
-                        spE2 := branchpending;
-
-                        case asm2asmformat[ba^.op] of
-                            af: parseaf(ba^.op);
-                            afa: parseafa(ba^.op);
-                            afr: parseafr(ba^.op);
-                            afrr: parseafrr(ba^.op);
-                            afrrr: parseafrrr(ba^.op);
-                            afra: parseafra(ba^.op);
-                            afri: parseafri(ba^.op);
-                            afri_fp: parseafri_fp(ba^.op);
-                            afl: parseafl(ba^.op);
-                            afrl: parseafrl(ba^.op);
-                            afrrl: parseafrrl(ba^.op, false);
-                            aforrr: parseaforrr(ba^.op);
-                            dli_dla: parse_dli_dla();
-                            afrrrr: parseafrrrr(ba^.op);
-                            otherwise: p_assertion_failed("false\0", "as1parse.p", 2558);
-                        end;
-
-                        if spE2 then begin
-                            endofbasicb := true;
-                            pinstruction^[bbindex].unk22 := false;
-                            if bbindex <> spF8 + 1 then begin
-                                PostError("Macro instruction used in branch delay slot", emptystring, ErrorLevel_2);
-                            end;
-                        end else if not macroflag then begin
-                            if bbindex <> spF8 + 1 then begin
-                                PostError("Macro instruction used", emptystring, ErrorLevel_2);
-                            end;
-                        end;
-
-                        if branchpending and reorderflag then begin
-                            emitnop(1);
-                            endofbasicb := true;
-                            branchpending := false;
-                            if pinstruction^[bbindex - 1].unk24 in br_likely_ops then begin
-                                pinstruction^[bbindex].unk22 := false;
-                            end;
-                        end;
-
-                        if liveset = 2 then begin
-                            fill_pseudo(29, binlive, fltlive, 0, nil, 0);
-                            liveset := 0;
-                        end;
-                    end;
-                otherwise: p_assertion_failed("false\0", "as1parse.p", 2596);
-            end;
-
-            if ((currsegment = seg_sdata) or (currsegment = seg_data)) and
-                (ba^.instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, iword, iextended]) then
+            if ((currsegment = seg_text) or (currsegment = seg_15)) and (picflag > 0) and
+            (instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
             begin
-                prev_sdata[currsegment].unk04 := false;
+                PostError("Cannot use data generating directives in .text.  Use the .rdata section instead.", emptystring, ErrorLevel_1);
             end;
-        end;
 
-        if not spE3 then begin
-            get_binasm(binasmfyle);
-        end;
+            if ((currsegment = seg_text) or (currsegment = seg_15)) and (bbindex > 0) and
+            (instr in [ialign, iascii, iasciiz, ibyte, idouble, ifloat, ihalf, ispace, iword, iextended]) then
+            begin
+                if instr = ialign then begin
+                    fixup_preceding_labels(power2(length));
+                end else if (instr = idouble) or (instr = iextended) then begin
+                    fixup_preceding_labels(8);
+                end;
 
-        if bbindex > num_pseudo + 280 then begin
-            endofbasicb := true;
-        end;
+                spE3 := true;
+                last_bb[3] := 0;
+                endofbasicb := true;
+            end else begin
+                spE3 := false;
 
-        if endofbasicb then begin
-            return;
+                case instr of
+                    ialign: parsealign();
+                    iascii: parseascii(false);
+                    iasciiz: parseascii(true);
+                    ibyte: parsebyte();
+                    icomm: parsecomm(icomm);
+                    iextern: parsecomm(iextern);
+                    idata: parseseg(seg_data);
+                    isdata: parseseg(seg_sdata);
+                    irdata: parseseg(seg_rdata);
+                    iedata: parseedata();
+                    ifloat,
+                    idouble,
+                    iextended:
+                        begin
+                            if instr = ifloat then begin
+                                remember_symbol_size(last_globl_symno, 4);
+                            end else begin
+                                remember_symbol_size(last_globl_symno, 8);
+                            end;
+                            parsefpconst(instr);
+                        end;
+                    ifile: parsefile();
+                    iglobal: parseglobl();
+                    iweakext: parseweakext();
+                    iglobabs: parseglobabs();
+                    ihalf: parseword(2);
+                    ilabel:
+                        begin
+                            label_size := 0;
+                            if symno <> last_globl_symno then begin
+                                last_globl_symno := 0;
+                            end;
+                            if cpalias_set then begin
+                                init_cpalias();
+                            end;
+
+                            if (bbindex > 0) and not((pinstruction^[bbindex].rfd = 16#7FFFFFFF) and (pseudo_type(bbindex) = 26)) then begin
+                                endofbasicb := true;
+                                return;
+                            end;
+
+                            last_bb[3] := 0;
+                            enterlabel(symno, spFC);
+                            if (currsegment = seg_text) or (currsegment = seg_15) then begin
+                                fill_pseudo(26, symno, currentline, debugflag, spFC, 0);
+                            end else begin
+                                defineasym(symno, spFC, currsegmentindex);
+                            end;
+                        end;
+                    ilcomm: parsecomm(ilcomm);
+                    ioption: parse_option();
+                    ialias, inoalias: parse_alias(instr);
+                    iloopno: fill_pseudo(21, binasmfyle^.loopnum, binasmfyle^.lflag, 0, nil, 0);
+                    iset: parseset(spE3);
+                    iasm0: fromas0 := true;
+                    ispace: parsespace();
+                    isym: entersym(symno, spFC);
+                    itext: parseseg(seg_text);
+                    imtag: parse_mtag(tagnumber, tagtype);
+                    imalias: parse_malias(memtag1, memtag2);
+                    iword, igpword: parseword(4);
+                    idword: parseword(8);
+                    ient,
+                    iaent:
+                        begin
+                            adjust_frame_by_ld := false;
+                            known_framesize := -1;
+                            max_arg_build := -1;
+                            frame_ptr := xr29;
+                            init_multi_relocinst();
+
+                            if instr = ient then begin
+                                init_malias_table();
+                            end else if instr = iaent then begin
+                                ignore_frames := true;
+                                if ent_pending then begin
+                                    bbindex := bbindex + 1;
+                                    initbb(bbindex);
+                                    bbindex := bbindex - 1;
+                                end;
+                            end;
+
+                            ent_pending := true;
+                            last_bb[3] := 0;
+                            parseend(instr);
+                        end;
+                    iprologue: parseprologue();
+                    iend, ibgnb, iendb, ilab: parseend(instr);
+                    irep: parserepeat();
+                    iendrep: parseendrep();
+                    imask:
+                        if not ignore_frames then begin
+                            if not fromas0 then begin
+                                fill_pseudo(7, regmask, regoffset, debugflag, nil, 0);
+                            end else begin
+                                spFC := stp(currentent);
+                                if spFC = nil then begin
+                                    PostError(".mask without .ent", emptystring, ErrorLevel_1);
+                                end else begin
+                                    spFC^.unk3A := true;
+                                    spFC^.unk4C := regmask;
+                                    spFC^.unk50 := regoffset;
+                                end;
+                            end;
+                        end;
+                    ifmask:
+                        if not ignore_frames then begin
+                            if not fromas0 then begin
+                                fill_pseudo(8, regmask, regoffset, debugflag, nil, 0);
+                            end else begin
+                                spFC := stp(currentent);
+                                if spFC = nil then begin
+                                    PostError(".fmask without .ent", emptystring, ErrorLevel_1);
+                                end else begin
+                                    spFC^.unk3B := true;
+                                    spFC^.unk54 := regmask;
+                                    spFC^.unk58 := regoffset;
+                                end;
+                            end;
+                        end;
+                    ivreg:
+                        if debugflag > 0 then begin
+                            st_pseudo(6, symno, immediate, reg1, 0, debugflag, 0);
+                        end;
+                    iloc: parseloc(spE3);
+                    iverstamp:
+                        if majornumber <> 7 then begin
+                            PostError("version stamps wrong in binasm file", emptystring, ErrorLevel_2);
+                        end;
+                    iframe:
+                        if not ignore_frames then begin
+                            if fromas0 then begin
+                                spFC := stp(currentent);
+                                if spFC = nil then begin
+                                    PostError(".frame without .ent", emptystring, ErrorLevel_1);
+                                end else begin
+                                    spFC^.unk39 := true;
+                                    spFC^.unk48 := frameoffset;
+                                    spFC^.unk3F := framereg;
+                                    spFC^.unk40 := pcreg;
+                                end;
+                            end else begin
+                                if pcreg <> xnoreg then begin
+                                    fill_pseudo(9, ord(framereg), frameoffset, debugflag, nil, ord(pcreg));
+                                end else begin
+                                    fill_pseudo(9, ord(framereg), frameoffset, debugflag, nil, 0);
+                                end;
+                            end;
+
+                            framereg_for_cprestore := framereg;
+                        end;
+                    icpload:
+                        begin
+                            if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
+                                PostError(".cpload can only be placed in text", emptystring, ErrorLevel_1);
+                            end;
+                            parsecpload();
+                        end;
+                    icpadd: parsecpadd();
+                    icprestore,
+                    icpalias:
+                        begin
+                            if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
+                                PostError(".cprestore or .cpalias can only be placed in text", emptystring, ErrorLevel_1);
+                            end;
+                            parsecprestore();
+                        end;
+                    igjaldef: gjaldef := [ar0..afr31] - gjmask;
+                    igjallive: gjallive := gjmask;
+                    igjrlive: gjrlive := gjmask;
+                    ishift_addr: shftaddr := 1;
+                    irestext: restext := true;
+                    ilivereg:
+                        if reorderflag and (optflag > 0) then begin
+                            liveset := 1;
+                            binlive := gpmask;
+                            fltlive := fpmask;
+                        end;
+                    ialloc: parsealloc();
+                    iocode:
+                        begin
+                            if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
+                                PostError("Code can only be placed in text", emptystring, ErrorLevel_1);
+                            end;
+
+                            if op = zbad then begin
+                                PostError("Internal Error: Bad instruction opcode", emptystring, ErrorLevel_1);
+                                endofbasicb := true;
+                                get_binasm(binasmfyle);
+                                return;
+                            end;
+
+                            spF8 := bbindex;
+                            spE2 := branchpending;
+
+                            case asm2asmformat[op] of
+                                af: parseaf(op);
+                                afa: parseafa(op);
+                                afr: parseafr(op);
+                                afrr: parseafrr(op);
+                                afrrr: parseafrrr(op);
+                                afra: parseafra(op);
+                                afri: parseafri(op);
+                                afri_fp: parseafri_fp(op);
+                                afl: parseafl(op);
+                                afrl: parseafrl(op);
+                                afrrl: parseafrrl(op, false);
+                                aforrr: parseaforrr(op);
+                                dli_dla: parse_dli_dla();
+                                afrrrr: parseafrrrr(op);
+                                otherwise: p_assertion_failed("false\0", "as1parse.p", 2558);
+                            end;
+
+                            if spE2 then begin
+                                endofbasicb := true;
+                                pinstruction^[bbindex].unk22 := false;
+                                if bbindex <> spF8 + 1 then begin
+                                    PostError("Macro instruction used in branch delay slot", emptystring, ErrorLevel_2);
+                                end;
+                            end else if not macroflag then begin
+                                if bbindex <> spF8 + 1 then begin
+                                    PostError("Macro instruction used", emptystring, ErrorLevel_2);
+                                end;
+                            end;
+
+                            if branchpending and reorderflag then begin
+                                emitnop(1);
+                                endofbasicb := true;
+                                branchpending := false;
+                                if pinstruction^[bbindex - 1].unk24 in br_likely_ops then begin
+                                    pinstruction^[bbindex].unk22 := false;
+                                end;
+                            end;
+
+                            if liveset = 2 then begin
+                                fill_pseudo(29, binlive, fltlive, 0, nil, 0);
+                                liveset := 0;
+                            end;
+                        end;
+                    otherwise: p_assertion_failed("false\0", "as1parse.p", 2596);
+                end;
+
+                if ((currsegment = seg_sdata) or (currsegment = seg_data)) and
+                    (instr in [iascii, iasciiz, ibyte, idouble, ifloat, ihalf, iword, iextended]) then
+                begin
+                    prev_sdata[currsegment].unk04 := false;
+                end;
+            end;
+
+            if not spE3 then begin
+                get_binasm(binasmfyle);
+            end;
+
+            if bbindex > num_pseudo + 280 then begin
+                endofbasicb := true;
+            end;
+
+            if endofbasicb then begin
+                return;
+            end;
         end;
     end;
 end;

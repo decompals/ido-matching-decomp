@@ -1,4 +1,4 @@
-#include "common.i"
+#include "common_p.h"
 
 { global types }
 
