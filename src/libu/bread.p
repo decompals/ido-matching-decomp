@@ -141,7 +141,7 @@ begin
     end;
 end;
 
-procedure initur(arg0: Filename);
+procedure initur(var arg0: Filename);
 begin
     ugetinit(arg0);
     datachars := ['A', 'C', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'W', 'X', 'Z'];    

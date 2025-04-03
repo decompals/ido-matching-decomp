@@ -33,6 +33,8 @@
 				   compilation will involving generating
 				   the ascii assembler file and calling as0
 				   to translate it back to binary assembler */
+#define UCO_EXC_INFO    8	/* this option specifies the the option value is the
+				   block number of an exception_info variable */
 
 /* Option names for the OPTN UCO_SOURCE that specifies the source language */
 #define PASCAL_SOURCE		1
