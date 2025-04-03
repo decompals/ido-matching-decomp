@@ -75,10 +75,6 @@ procedure macro_error;
 begin
     PostError("macro instruction used $at", emptystring, ErrorLevel_2);
 end;
-{ required to match caseerror }
-{ #line 79 "as1parse.p" }
-
-{ this is FF symbol, required to match caserror page number }
 
 function disp(arg0: boolean; arg1: cardinal): cardinal;
 begin
@@ -2349,7 +2345,7 @@ begin
                             aforrr: parseaforrr(ba^.op);
                             dli_dla: parse_dli_dla();
                             afrrrr: parseafrrrr(ba^.op);
-                            otherwise: p_assertion_failed("false\0", "as1parse.p", 264);
+                            otherwise: p_assertion_failed("false\0", "as1parse.p", 2558);
                         end;
 
                         if spE2 then begin
@@ -2378,7 +2374,7 @@ begin
                             liveset := 0;
                         end;
                     end;
-                otherwise: p_assertion_failed("false\0", "as1parse.p", 264);
+                otherwise: p_assertion_failed("false\0", "as1parse.p", 2596);
             end;
 
             if ((currsegment = seg_sdata) or (currsegment = seg_data)) and
