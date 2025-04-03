@@ -1,25 +1,19 @@
 #include "common_p.h"
 
-#define WORD_1 16#FF000000
-#define WORD_2 16#00FF0000
-#define WORD_3 16#0000FF00
-#define WORD_4 16#000000FF
-#define SWAP_WORD(x) \
-    bitand(lshift(x, 24), WORD_1) + \
-    bitand(rshift(cardinal(x), 24), WORD_4) + \
-    bitand(lshift(x,  8), WORD_2) + \
-    bitand(rshift(cardinal(x),  8), WORD_3)
-
 var
     { .data }
+    which_ent: array [false..true] of integer := (1, 10);
+    ignore_frames: boolean := false;
+    framereg_for_cprestore: registers := xr29;
+    need_cprestore: boolean := false;
+    cpalias_set: boolean := false;
+    cpalias_pending: boolean := false;
+    gp_disp_sym: Identname := "_gp_disp\0";
+    saw_option_pic: boolean := false;
     last_globl_symno: integer := 0;
-    label_size: integer := 0;
-
-    need_cprestore: boolean;
-    cpalias_set: boolean;
-    cpalias_pending: boolean;
-    cprestore_offset: integer;
-    framereg_for_cprestore: registers;
+    label_size: integer := 0;    
+    { .bss }
+    cprestore_offset: integer;    
     cpalias_register: registers;
     branchpending: boolean;
     frame_ptr: registers;
@@ -31,10 +25,7 @@ var
     currfunc_prolog: integer;
     lastsymno: integer;
     lastdata: integer;
-    lexicallevel: integer;
-    ignore_frames: boolean;
-    saw_option_pic: boolean;
-    which_ent: array [false..true] of integer;
+    lexicallevel: integer;    
 
 procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PUnkALpha; arg5: integer); external; { TODO signature }
 procedure st_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: registers; arg4: integer; arg5: integer; arg6: integer); external; { TODO signature }

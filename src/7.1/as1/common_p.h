@@ -3,6 +3,16 @@
 #include "cmplrs/binasm.h"
 #include "array.h"
 
+#define WORD_1 16#FF000000
+#define WORD_2 16#00FF0000
+#define WORD_3 16#0000FF00
+#define WORD_4 16#000000FF
+#define SWAP_WORD(x) \
+    bitand(lshift(x, 24), WORD_1) + \
+    bitand(rshift(cardinal(x), 24), WORD_4) + \
+    bitand(lshift(x,  8), WORD_2) + \
+    bitand(rshift(cardinal(x),  8), WORD_3)
+
 type
     Byte = 0..16#FF;
     short = 0..16#FFFF;
@@ -311,7 +321,6 @@ var
     sixtyfour_bit: extern boolean;
     elf_flag: extern boolean;
     gp_disp_address: extern PUnkAlpha;
-    gp_disp_sym: extern st_string;
     profileflag: extern integer;
     binasm_file: extern FileOfBinasm;
     last_bb: extern array [1..3] of Byte;
@@ -337,7 +346,7 @@ function grow_array(var arg0: integer; arg1: cardinal; arg2: cardinal; arg3: poi
 function strlen(p : ^Filename): integer; external;
 procedure strcpy(dst: ^Filename; src: ^Filename); external;
 function xmalloc(size: integer): pointer; external;
-function l_addr(var value: st_string): pointer; external;
+function l_addr(var value: Identname): pointer; external;
 function enter_undef_sym(ptr: pointer): PUnkAlpha; external;
 function idn_for_data(): integer; external;
 procedure defineasym(arg0: integer; arg1: PUnkAlpha; arg2: integer); external;

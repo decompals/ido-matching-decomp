@@ -123,7 +123,7 @@ offset,vram,.rodata
 offset,vram,.data
 0AB4C0,1001B4C0,address_pair
 0AB4D0,1001B4D0,as1_0AB4D0
-0B0050,10020050,as1parse
+0B0010,10020010,as1parse
 0B0100,10020100,as1_0B0100
 
 offset,vram,.dummy
