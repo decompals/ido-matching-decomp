@@ -238,7 +238,7 @@ var
     r4300_mul: boolean;
     fp_hack_flag: 0..4; { TODO enum ? }
     mcount_address: PUnkALpha;
-    mcount_sym: st_string;
+    mcount_sym: IdentName;
     olimit_value: integer;
     gprmask: cardinal;
     fprmask: cardinal;
