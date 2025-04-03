@@ -1,7 +1,8 @@
+#include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
 
 var 
-Utab: array[first(Uopcode)..last(Uopcode)] of Utabrec;
+	Utab: array[first(Uopcode)..last(Uopcode)] of Utabrec;
 
 
 procedure Uini;
