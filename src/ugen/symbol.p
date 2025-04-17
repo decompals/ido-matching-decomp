@@ -612,7 +612,7 @@ var
     var_s0_2: integer; { current offset }
     var_s3: ^SymbolInit;
     temp_s6: integer; { length }
-    temp_s2: u8; { type enum }
+    vtype: ValType;
     var_a2: integer;
     var_s0_3: integer;
     var_a3: integer;
@@ -632,7 +632,7 @@ begin
     var_s3 := sym^.unk1C;
     while (var_s3 <> nil) do begin
         temp_s6 := var_s3^.u.Length;
-        temp_s2 := find_val_type(var_s3^.u.Dtype, temp_s6);
+        vtype := find_val_type(var_s3^.u.Dtype, temp_s6);
         var_a2 := var_s3^.u.Offset - var_s0_2;
         if (var_a2 <> 0) then begin
             if (var_a2 < 0) then begin
@@ -646,7 +646,7 @@ begin
             demit_dir1(ispace, 0, var_a2);
         end;
 
-        if (temp_s2 = 8) then begin
+        if (vtype = ValType_Label) then begin
             if (var_s3^.u.Lexlev <> 0) then begin
                 if (temp_s6 = 2) then begin
                     demit_dir1(ishift_addr, 0, var_s3^.u.Lexlev);
@@ -660,7 +660,7 @@ begin
                 var_s0_3 := ((var_s3^.u.Offset2 - var_s3^.u.Offset) div temp_s6) + 1;
                 if (var_s0_3 >= 16#10000) then begin
                     while (var_s0_3 >= 16#10000) do begin
-                        emit_val(0, temp_s2, var_s3^.u.Initval, 16#FFFF);
+                        emit_val(0, vtype, var_s3^.u.Initval, 16#FFFF);
                         var_s0_3 := var_s0_3 - 16#FFFF;
                     end;
                 end;
@@ -668,7 +668,7 @@ begin
             end else begin
                 var_a3 := 1;
             end;
-            emit_val(0, temp_s2, var_s3^.u.Initval, var_a3);
+            emit_val(0, vtype, var_s3^.u.Initval, var_a3);
         end;
         var_s0_2 := var_s3^.u.Offset2 + temp_s6;
         var_s3 := var_s3^.next;
