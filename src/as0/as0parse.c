@@ -407,7 +407,6 @@ static void func_004056DC(char* arg0) {
     int sp28;
     int sp24 = LookUp(arg0, &sp2C);
 
-    // If the sym is not in the hastable add it
     if (sp24 == FALSE) {
         sp28 = hash(arg0);
         sp2C = alloc_new_sym();
