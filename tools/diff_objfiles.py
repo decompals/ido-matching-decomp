@@ -28,7 +28,7 @@ def main():
     if sys.argv[1] == "5.3":
         programs = ("5.3/cfe", "5.3/cc", "5.3/ugen")
     elif sys.argv[1] == "7.1":
-        programs = ("7.1/as1", "7.1/cfe", "7.1/cc", "7.1/ugen", "7.1/as0")
+        programs = ("7.1/as1", "7.1/cfe", "7.1/cc", "7.1/ugen")
     else:
         print("Version unrecognized")
         sys.exit(1)
