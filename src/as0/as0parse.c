@@ -357,7 +357,7 @@ static void func_00405178(int arg0, int arg1, int arg2, int arg3, unsigned arg4,
 
         default:
             #ifdef IDO_71
-            assertion_failed("false", "as0pasre.c", 241);
+            assertion_failed("false", "as0parse.c", 241);
             #else
             assertion_failed("false", "as0parse.c", 237);
             #endif
@@ -2986,11 +2986,12 @@ void Parsestmt(void) {
     if (opLookUp(sp38, &cur_symbol) == 0) {
         if (strcmp(sp38, ".type") == 0) {
             parse_type();
-    } else {
-        posterror("undefined assembler operation", sp38, 1);
-        return;    
+        } else {
+            posterror("undefined assembler operation", sp38, 1);
+            return;    
         }
-    } else {
+        return;
+    }
 #else
     if (opLookUp(sp38, &cur_symbol) == 0) {
         posterror("undefined assembler operation", sp38, 1);
@@ -3256,7 +3257,4 @@ void Parsestmt(void) {
     } else {
         posterror("assembler op/directive expected", sp38, 1);
     }
-#ifdef IDO_71
-  }
-#endif
 }
