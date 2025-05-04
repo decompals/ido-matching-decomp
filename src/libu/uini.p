@@ -24,6 +24,8 @@ var
         Utab[op].Format[pos] := operand;
     end;
 begin
+
+    (* Opcode *)               (* Pushes *)
     add_record(Uabs,  "ABS "); add_operand(Sdtype); add_operand(Send);
     add_record(Uadd,  "ADD "); add_operand(Sdtype); add_operand(Send);
     add_record(Uadj,  "ADJ "); add_operand(Sdtype); add_operand(Soffset); add_operand(Slength); add_operand(Send);
