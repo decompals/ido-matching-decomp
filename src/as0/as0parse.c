@@ -171,15 +171,15 @@ static void func_0040D284(char* arg0);
 static void func_00404B80(int operand_index, int reg, int asm_index) {
     unsigned var_v0;
 
-    switch (operand_index) {                                 /* switch 1; irregular */
-    default:                                        /* switch 1 */
-    case 1:                                         /* switch 1 */
+    switch (operand_index) {
+    default:
+    case 1:
         var_v0 = asm_info[asm_index].unk4 << 0x11 >> 0x1B;
         break;
-    case 2:                                         /* switch 1 */
+    case 2:
         var_v0 = asm_info[asm_index].unk4 << 0x16 >> 0x1B;
         break;
-    case 3:                                         /* switch 1 */
+    case 3:
         var_v0 = asm_info[asm_index].unk4 & 0x1F;
         break;
     }
@@ -222,22 +222,22 @@ static void func_00404B80(int operand_index, int reg, int asm_index) {
         }
         break;
     case 5:
-        #ifdef IDO_71
+#ifdef IDO_71
         if ((reg < 0x20) || (reg >= 0x40)) {
             posterror("Should be floating point register", D_10000004[operand_index], 1);
         } else if ((isa < 3) && (reg & 1)) {
             posterror("Should be even floating point register", D_10000004[operand_index], 1);
         }
-        #else
+#else
         if (isa < ISA_MIPS3) {
             if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
                 posterror("Should be even floating point register", D_10000004[operand_index], 1);
             }
         }
-        #endif
+#endif
         break;
     case 6:
-        #ifdef IDO_71
+#ifdef IDO_71
         if ((reg < 0x20) || (reg >= 0x40)) {
             posterror("Should be floating point register",D_10000004[operand_index], 1);
         } else if ((isa >= ISA_MIPS3) && (reg & 1)) {
@@ -245,7 +245,7 @@ static void func_00404B80(int operand_index, int reg, int asm_index) {
         } else if ((isa < ISA_MIPS3) && (reg & 3)) {
             posterror("Should be multiple-of-4 floating point register",D_10000004[operand_index], 1);
         }
-        #else
+#else
         if (isa >= ISA_MIPS3) {
             if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
                 posterror("Should be even floating point register", D_10000004[operand_index], 1);

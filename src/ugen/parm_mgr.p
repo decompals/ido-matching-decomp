@@ -5,7 +5,7 @@ var
     n_fp_parm_regs: extern integer;
     first_pmt_offset: integer;
     n_parm_regs: extern integer;
-    basicint: extern boolean;
+    basicint: extern u8;
     pars: array [0..16] of integer;
     fix_amt: array [0..4] of boolean;
 
@@ -24,7 +24,7 @@ begin
         return ord(xnoreg);
     end;
 
-    if not (basicint) then begin
+    if (basicint = 0) then begin
         return arg0^.u.Constval.Ival div 4;
     end;
  
@@ -60,7 +60,7 @@ begin
         Assert(arg0^.u.Opc = Updef);
         var_v0 := abs(arg0^.u.Offset - first_pmt_offset);
 
-        if not (basicint) then begin
+        if (basicint = 0) then begin
             if (var_v0 < n_parm_regs * 4) then begin
                 arg0^.u.Constval.dwval_h := var_v0 + 16;
             end else begin
@@ -86,7 +86,7 @@ begin
   
     Assert(arg0^.u.Offset >= 0);
     temp := 4;
-    if not (basicint) then begin
+    if (basicint = 0) then begin
         if ((arg0^.u.Offset >= (n_parm_regs * 4)) or (arg0^.u.Offset >= (n_fp_parm_regs * 2 * temp))) then begin
             return -1;
         end;
@@ -109,7 +109,7 @@ begin
     arg0 := arg0;
     temp_val := 4; {Required to match}
     
-    if not (basicint) then begin
+    if (basicint = 0) then begin
         if (((arg0^.u.Opc = Ulod) and (arg0^.u.Mtype = Amt)) and ((arg0^.u.Offset < (n_parm_regs * 4)) 
             or (arg0^.u.Offset < (n_fp_parm_regs * 2 * temp_val)))) then begin
             pars[arg0^.u.Offset div 4] := -1;
@@ -126,8 +126,7 @@ begin
         check_amt_ref(arg0^.op1);
     end;
     if (arg0^.op2 <> nil) then begin
-        arg0 := arg0^.op2;
-        goto loop;
+	check_amt_ref(arg0^.op2);
     end;
     
 end;
@@ -170,7 +169,7 @@ begin
             temp_v0 := build_1op(Ustr, temp_v0);
             temp_v0^.u.Dtype := addr_dtype;
             temp_v0^.u.Mtype := Amt;
-            temp_v0^.u.Length := unitsperaddr;
+            temp_v0^.u.Length := i * unitsperaddr;
             temp_v0^.u.Offset := i;
             
             temp_v0^.u.Lexlev := 0;

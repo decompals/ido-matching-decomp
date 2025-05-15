@@ -15,7 +15,7 @@ begin
             end;
 
             if (p_Tree^.op2 <> nil) then begin
-                if (not (p_Tree^.u.Opc in [Uaent, Uclab, Uent, Ufjp, Ulab, Utjp, Uujp, Uxjp]) = 0) then begin
+                if (not (p_Tree^.u.Opc in [Uaent, Uclab, Uent, Ufjp, Ulab, Utjp, Uujp, Uxjp])) then begin
                     u_tree(p_Tree^.op2);
                 end;
             end;

@@ -408,7 +408,6 @@ function overlap(arg0: ^tree; arg1: ^tree): boolean;
 var
     var_v0: integer;
     var_v1: integer;
-    a2: boolean;
 begin
     if (arg0^.u.Opc = Ulda) then begin
         var_v0 := arg0^.u.Offset2;
