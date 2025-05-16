@@ -14,7 +14,7 @@ CC_CHECK_COMP ?= gcc
 ifeq ($(VERSION),7.1)
 	IDO_VERSION := IDO_71
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
-	IDO_TC      := cc cfe ugen as1 umerge
+	IDO_TC      := cc cfe ugen as1 umerge as0
 else ifeq ($(VERSION),5.3)
 	IDO_VERSION := IDO_53
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
@@ -135,6 +135,7 @@ $(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFL
 
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
+build/src/7.1/as0/%.o: OPTFLAGS := -O2
 build/src/7.1/as1/%.o: OPTFLAGS := -O2
 build/src/7.1/cfe/%.o: OPTFLAGS := -O2
 build/src/7.1/ugen/%.o: OPTFLAGS := -O2

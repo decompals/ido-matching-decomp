@@ -1,32 +1,32 @@
 #include "tree.h"
 #include "cmplrs/uwri.h"
 
-procedure u_tree(arg0: ^Tree);
+procedure u_tree(p_Tree: ^Tree);
 var
-    sp38: Bcrec;
+    u: Bcrec;
 begin
     repeat begin 
         {Do some safety checks}
-        if (arg0^.u.Opc <> Unop) then begin
-            if (arg0^.op1 <> nil) then begin
-                if ((arg0^.u.Opc in [Uaent, Uclab, Uent, Ulab]) = 0) then begin
-                    u_tree(arg0^.op1);
+        if (p_Tree^.u.Opc <> Unop) then begin
+            if (p_Tree^.op1 <> nil) then begin
+                if (not (p_Tree^.u.Opc in [Uaent, Uclab, Uent, Ulab])) then begin
+                    u_tree(p_Tree^.op1);
                 end;
             end;
 
-            if (arg0^.op2 <> nil) then begin
-                if ((arg0^.u.Opc in [Uaent, Uclab, Uent, Ufjp, Ulab, Utjp, Uujp, Uxjp]) = 0) then begin
-                    u_tree(arg0^.op2);
+            if (p_Tree^.op2 <> nil) then begin
+                if (not (p_Tree^.u.Opc in [Uaent, Uclab, Uent, Ufjp, Ulab, Utjp, Uujp, Uxjp])) then begin
+                    u_tree(p_Tree^.op2);
                 end;
             end;
 
-            uwrite(arg0^.u);
+            uwrite(p_Tree^.u);
 
-            if (arg0^.u.Opc = Uend) then begin
-                sp38.opc := Uret;
-                uwrite(sp38);
+            if (p_Tree^.u.Opc = Uend) then begin
+                u.Opc := Uret;
+                uwrite(u);
             end;
         end;
-        arg0 := arg0^.next;
-    end until (arg0 = nil);
+        p_Tree := p_Tree^.next;
+    end until (p_Tree = nil);
 end;
