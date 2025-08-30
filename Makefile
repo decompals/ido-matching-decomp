@@ -169,7 +169,7 @@ $(RECOMP):
 	curl -sL https://github.com/decompals/ido-static-recomp/releases/download/$(RECOMP_VERSION)/ido-7.1-recomp-$(DETECTED_OS).tar.gz | tar xz -C $@/7.1
 
 $(YACC):
-	gcc $(YACCDIR)/*.c -o $(YACC)
+	gcc -std=c99 $(YACCDIR)/*.c -o $(YACC)
 
 $(BUILD)/$(ASM)/$(VERSION)/%.elf: $(O_FILES)
 	$(LD) $(BUILD)/$(ASM)/$(VERSION)/$*/*.o $(LDFLAGS) --no-check-sections --accept-unknown-input-arch --allow-shlib-undefined -Map $(BUILD)/$(ASM)/$(VERSION)/$*.map -o $@ || (rm -f $@ && exit 1)

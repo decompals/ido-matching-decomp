@@ -876,7 +876,7 @@ static void func_00410270(char* arg0) {
         Tstringlength = 0x3FF;
         posterror("Truncating token", arg0, 1);
     }
-    arg0[Tstringlength] = 0;
+    arg0[Tstringlength] = '\0';
 }
 
 int dot_soon(int arg0) {
