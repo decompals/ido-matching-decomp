@@ -134,7 +134,7 @@ begin
     if (temp_v0 <> nil) then begin
         s0 := temp_v0;
         while (s0 <> nil) do begin
-            { If the item already exists return its id }
+            { If the item already exists just return its id }
             if (valu_equ(val, s0^.val)) then begin
                 return s0^.labelno;
             end;
