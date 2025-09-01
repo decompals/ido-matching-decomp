@@ -26,7 +26,7 @@ end;
 
 function is_constant(arg0: Ptree): boolean;
 begin
-    return (arg0^.u.Opc = Uldc) and (arg0^.u.Dtype in [Adt, Hdt, Idt, Jdt, Kdt, Ldt, Wdt]); {Maybe a special data type is missing...}
+    return (arg0^.u.Opc = Uldc) and (arg0^.u.Dtype in [Adt, Hdt, Idt, Jdt, Kdt, Ldt, Wdt]);
 end;
 
 function llconst(p_tree: Ptree; dtype: Datatype): integer64;
