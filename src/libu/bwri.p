@@ -17,7 +17,7 @@ procedure inituwrite(var fname: Filename);
 begin
     noerrorsyet := true;
     uputinit(fname);
-    
+
     dtyname[Cdt] := 'C';
     dtyname[Fdt] := 'F';
     dtyname[Gdt] := 'G';
@@ -69,14 +69,14 @@ var
     i: integer;
 begin
     i := 0;
-    
+
     while (i < 1024) do begin
         if (fname[i + 1] = ' ') then begin
             return i;
         end;
         i := i + 1;
     end;
-    
+
     return Filenamelen;
 end;
 
@@ -148,7 +148,7 @@ begin
     end;
 
     new(u.Constval.Chars);
-    
+
     { Skip end spaces }
     while ((u.Constval.Ival > 0) and (Tag[u.Constval.Ival] = ' ')) do begin  
         u.Constval.Ival := u.Constval.Ival - 1; 
@@ -175,7 +175,7 @@ begin
 
     new(u.Constval.Chars);
     u.Constval.Ival := fnamelen(fname);
-    
+
     if (u.Constval.Ival >= 1025) then begin
         u.Constval.Ival := 1024;
     end;

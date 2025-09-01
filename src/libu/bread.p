@@ -33,7 +33,7 @@ var
 
     procedure fix_infinity(var str: Stringtext; var len: integer); internal;
     begin
-    if 
+    if
         ((len = 8)
             and (str.ss[1] = 'I')
             and (str.ss[2] = 'n')
@@ -96,7 +96,7 @@ begin
         u.Intarray[2] := ugetint();
         urec := utab[u.Opc]; 
         instlength := urec.instlength;
-        
+
         i := 3;
         while i <> instlength + 1 do begin
             u.Intarray[i] := ugetint();
@@ -109,7 +109,7 @@ begin
             u.Intarray[instlength + 2] := ugetint();
 
             if ((u.Dtype in [Mdt, Qdt, Rdt, Sdt, Xdt]) or (u.Opc = Ucomm)) then begin
-            
+
                 strlength := (u.Intarray[instlength + 1] + 3) div 4;
 
                 if ((strlength & 1) <> 0) then begin
@@ -147,7 +147,7 @@ begin
     datachars := ['A', 'C', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'W', 'X', 'Z'];    
     memorychars := ['A', 'M', 'P', 'R', 'S', 'Z'];
     setconstantchars := ['0'..'9', 'A'..'F'];
-    
+
     dtytype['A'] := Adt;
     dtytype['C'] := Cdt;
     dtytype['F'] := Fdt;
@@ -181,7 +181,7 @@ begin
         u.Length := u.Length * 8;
         return;
     end;
-    
+
     if (u.Opc in [Uildv, Uilod, Uistr, Uistv, Urldc]) then begin
         u.I1 := u.I1 * 8;
         u.Length := u.Length * 8;
@@ -199,7 +199,7 @@ begin
         u.I1 := u.I1 * 8;
         return;
     end;
-    
+
     if (u.Opc in [Udef, Udif, Ufill, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Uinn, Uint, Ulca, 
     Uldc, Umov, Usdef, Usgs, Uuni]) then begin
         u.Length := u.Length * 8;
