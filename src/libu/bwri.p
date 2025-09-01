@@ -6,12 +6,6 @@ procedure uputint(i: integer); external;
 procedure uputkill(); external;
 procedure uputclose(); external;
 
-(* Also used in ugen *)
-#define SKIP_END_SPACES(len, line)  len := sizeof(line); \
-    while ((len > 0) and (line[len] = ' ')) do begin  \
-        len := len - 1; \
-    end; \
-
 var 
     dtyname: Array [first(Datatype)..last(Datatype)] of char;
     mtyname: Array [first(Memtype)..last(Memtype)] of char;
@@ -155,7 +149,10 @@ begin
 
     new(u.Constval.Chars);
     
-    SKIP_END_SPACES(u.Constval.Ival, Tag);
+    { Skip end spaces }
+    while ((u.Constval.Ival > 0) and (Tag[u.Constval.Ival] = ' ')) do begin  
+        u.Constval.Ival := u.Constval.Ival - 1; 
+    end;
 
     for i := 1 to u.Constval.Ival do begin 
         u.Constval.Chars^.ss[i] := Tag[i];
@@ -246,5 +243,5 @@ end;
 
 procedure set_u_indent(ident: integer);
 begin
-    {u_ident := ident} (* Guess *)
+    {u_ident := ident} (* Possible implementation of this 'useless' function *)
 end;
