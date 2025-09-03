@@ -15,7 +15,7 @@
 #define ARG_OPT(index, opt) (arg[index] = opt)
 #define IS_OPT(opt) streq(arg, opt)
 
-#define CONSUME_WHITESPACE(len, line)  len := sizeof(line); \
+#define SKIP_END_SPACES(len, line)  len := sizeof(line); \
     while ((len <> 0) and (line[len] = ' ')) do begin  \
         len := len - 1; \
     end; \
@@ -103,7 +103,7 @@ var
 #define ARG_OPT(index, opt) (arg[index] = opt)
 #define IS_OPT(opt) streq(arg, opt)
 
-#define CONSUME_WHITESPACE(len, line)  len := sizeof(line); \
+#define SKIP_END_SPACES(len, line)  len := sizeof(line); \
     while ((len <> 0) and (line[len] = ' ')) do begin  \
         len := len - 1; \
     end; \
@@ -680,7 +680,7 @@ begin
                             if ((xpg_env = true) and ARG_OPT(3, '-')) then begin
                                 argv(index, sp108);
 
-                                CONSUME_WHITESPACE(var_s1, sp108);
+                                SKIP_END_SPACES(var_s1, sp108);
 
                                 if (var_s1 <> 0) then begin
                                     sp108[var_s1+1] := chr(0);
@@ -701,7 +701,7 @@ begin
                 end else begin
                     argv(index, sp15C0);
                     
-                    CONSUME_WHITESPACE(var_s1, sp15C0);        
+                    SKIP_END_SPACES(var_s1, sp15C0);        
                 end;
             
                 index := index + 1;                
@@ -729,7 +729,7 @@ begin
         end;
 
         if (ascii_out) then begin
-            CONSUME_WHITESPACE(var_v0_3, spDC0);
+            SKIP_END_SPACES(var_v0_3, spDC0);
             spDC0[var_v0_3 + 1] := chr(0);
         
             rewrite(sp534, spDC0);
@@ -764,7 +764,7 @@ begin
             sp11C0[var_s1] := 'G'; {binasm extension}
             var_v0_3 := var_s1;
         end else begin 
-           CONSUME_WHITESPACE(var_v0_3, sp11C0);
+           SKIP_END_SPACES(var_v0_3, sp11C0);
         end;
 
         sp11C0[var_v0_3 + 1] := chr(0);
@@ -772,7 +772,7 @@ begin
         if (temp_fname[1] = chr(0)) then begin
             create_temp_file();
         end else begin 
-            CONSUME_WHITESPACE(var_v0_4, temp_fname);
+            SKIP_END_SPACES(var_v0_4, temp_fname);
             temp_fname[var_v0_4 + 1] := chr(0);
         end;
 
