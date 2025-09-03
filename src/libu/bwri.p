@@ -13,15 +13,10 @@ var
     u_indent: integer;
     Utab: extern array[first(Uopcode)..last(Uopcode)] of Utabrec;
 
-procedure inituwrite(var fname: Filename);
+procedure inituwrite(var arg0: Filename);
 begin
     noerrorsyet := true;
-    uputinit(fname);
-
-    dtyname[Cdt] := 'C';
-    dtyname[Fdt] := 'F';
-    dtyname[Gdt] := 'G';
-    dtyname[Hdt] := 'H';
+    uputinit(arg0);
 
     dtyname[Cdt] := 'C';
     dtyname[Fdt] := 'F';
@@ -54,11 +49,11 @@ end;
 
 function idlen(var id: Identname): integer;
 var 
-    i: integer;
+    len: integer;
 begin
-    for i := 32 downto 1 do begin 
-        if (id[i] <> ' ') then begin
-            return i;
+    for len := Identlength downto 1 do begin
+        if (id[len] <> ' ') then begin
+            return len;
         end;
     end;
     return 0;
@@ -66,15 +61,15 @@ end;
 
 function fnamelen(fname: Filename): integer;
 var
-    i: integer;
+    len: integer;
 begin
-    i := 0;
+    len := 0;
 
-    while (i < 1024) do begin
-        if (fname[i + 1] = ' ') then begin
-            return i;
+    while (len < Filenamelen) do begin
+        if (fname[len + 1] = ' ') then begin
+            return len;
         end;
-        i := i + 1;
+        len := len + 1;
     end;
 
     return Filenamelen;
@@ -93,7 +88,7 @@ begin
         i := 1;
         while (i <> (urec.instlength + 1)) do begin
             uputint(u.Intarray[i]);
-            uputint(u.Intarray[i +1]);
+            uputint(u.Intarray[i + 1]);
             i := i + 2;
         end;
 
@@ -118,7 +113,7 @@ begin
                 end;
 
                 i := 1;
-                while (i <> (strlength+1)) do begin
+                while (i <> (strlength + 1)) do begin
                     uputint(str^.ssarray[i]);
                     uputint(str^.ssarray[i + 1]);
                     i := i + 2;
@@ -176,8 +171,8 @@ begin
     new(u.Constval.Chars);
     u.Constval.Ival := fnamelen(fname);
 
-    if (u.Constval.Ival >= 1025) then begin
-        u.Constval.Ival := 1024;
+    if (u.Constval.Ival >= (Filenamelen + 1)) then begin
+        u.Constval.Ival := Filenamelen;
     end;
 
     for i := 1 to u.Constval.Ival do begin 
@@ -224,20 +219,13 @@ begin
 
     if (u.Opc in [Udef, Udif, Ufill, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Uinn, Uint, Ulca, Uldc, Umov, Umus, Usdef, Usgs, Uuni]) then begin
         u.Length := u.Length div 8;
-        return;
-    end;
-
-    if (u.Opc = Uinit) then begin
+    end else if (u.Opc = Uinit) then begin
         u.Offset := u.Offset div 8;
         u.Length := u.Length div 8;
         u.Offset2 := u.Offset2 div 8;
         u.Constval.dwval_l := u.Constval.dwval_l div 8;
-        return;
-    end;
-
-    if (u.Opc = Uoptn) and (u.I1 = 1) then begin
+    end else if (u.Opc = Uoptn) and (u.I1 = 1) then begin
         u.Length := u.Length div 8;
-        return;
     end;
 end;
 
