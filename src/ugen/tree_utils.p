@@ -46,7 +46,7 @@ begin
     p_Tree^.reg := xnoreg;
     p_Tree^.unk18 := 0;
     p_Tree^.unk16 := 0;
-    p_Tree^.unk17 := tree_mark;
+    p_Tree^.mark := tree_mark;
     p_Tree^.visited := false;
     
     p_Tree^.u.Opc := Unop;

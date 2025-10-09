@@ -7,6 +7,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "sys/inst.h"
 #include "sex.h"
 

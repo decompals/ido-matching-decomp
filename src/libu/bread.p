@@ -141,9 +141,9 @@ begin
     end;
 end;
 
-procedure initur(var arg0: Filename);
+procedure initur(var uname: Filename);
 begin
-    ugetinit(arg0);
+    ugetinit(uname);
     datachars := ['A', 'C', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'W', 'X', 'Z'];    
     memorychars := ['A', 'M', 'P', 'R', 'S', 'Z'];
     setconstantchars := ['0'..'9', 'A'..'F'];

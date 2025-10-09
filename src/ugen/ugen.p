@@ -39,7 +39,7 @@ procedure cat_files(var a1: Filename; var a2: Filename); external;
 procedure open_bin_file(var str: Filename); external;
 procedure set_domtag(arg0: boolean); external;
 
-procedure print_tree(pFile: ^Text; arg1: ^tree; arg2: cardinal; arg3: cardinal); external;
+procedure print_tree(var f: Text; arg1: ^tree; arg2: cardinal; arg3: cardinal); external;
 procedure labelopt(a0: ^Tree; a1: ^Text; debug: boolean; arg2: boolean); external;
 procedure initialize_tree(); external;
 procedure clear_sym_tab(); external;
@@ -264,13 +264,13 @@ var
         if (sp1DD0[1] <> chr(0)) then begin
             writeln(temp_file, "Tree dump after ", phase:0);
             writeln(temp_file);
-            print_tree(addr(temp_file), arg0, 16#7FFFFFFF, 16#7FFFFFFF);
+            print_tree(temp_file, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
             writeln(temp_file);
             flush(temp_file);
         end else begin
             writeln(err, "Tree dump after ", phase:0);
             writeln(err);
-            print_tree(addr(err), arg0, 16#7FFFFFFF, 16#7FFFFFFF);
+            print_tree(err, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
             writeln(err);
         end;
     end;
@@ -683,7 +683,7 @@ begin
                                 SKIP_END_SPACES(var_s1, sp108);
 
                                 if (var_s1 <> 0) then begin
-                                    sp108[var_s1+1] := chr(0);
+                                    sp108[var_s1 + 1] := chr(0);
                                 end else begin
                                     writeln(err, arg:0, " not understood");
                                 end;

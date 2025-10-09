@@ -117,9 +117,16 @@ extern int picflag;
 extern int fixup_count;
 extern char tracereorder;
 extern unsigned char isa;
+extern char bigendian;
+extern int debugflag;
+extern int gprelsize;
+extern char keepflag;
+extern int optflag;
+extern char verbose;
 
 UnkZeta* find_branch_target(UnkEpsilon*);
 void xfree(void*);
+void* xmalloc(size_t size);
 void postcerror(char*, int);
 void* allocate_check(int size);
 void appendtextword(unsigned int, UNK_TYPE, UNK_TYPE, UNK_TYPE, UNK_TYPE);
@@ -127,5 +134,7 @@ void* grow_array(size_t* capacity_count, size_t new_count, size_t width, void* p
 int eligible(union mips_instruction);
 int cannot_trap(union mips_instruction);
 void defuse(union mips_instruction, RegSet*, RegSet*);
+extern int idn_for_anon_symbol(void);
+extern int idn_for_extern_symbol(char* name);
 
 #endif

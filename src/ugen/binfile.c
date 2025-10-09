@@ -10,12 +10,12 @@ static FILE* binasm_file;
 static int unused;
 static char binasm_name[128];
 
-void open_bin_file(char* arg0) {
-    strcpy(binasm_name, arg0); // ! @bug: this can overflow binasm_name!
-    binasm_file = fopen(arg0, "w");
+void open_bin_file(char* fileName) {
+    strcpy(binasm_name, fileName); // ! @bug: this can overflow binasm_name!
+    binasm_file = fopen(fileName, "w");
     if (binasm_file == NULL) {
         fprintf(stderr, "ugen: internal error opening %s:  %s\n", 
-            arg0, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
+            fileName, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
         exit(EXIT_FAILURE);
     }
 }
