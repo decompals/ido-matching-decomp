@@ -123,6 +123,7 @@ extern int gprelsize;
 extern char keepflag;
 extern int optflag;
 extern char verbose;
+extern int binasm_count;
 
 UnkZeta* find_branch_target(UnkEpsilon*);
 void xfree(void*);
