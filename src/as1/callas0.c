@@ -1,9 +1,9 @@
 #include "common.h"
 
 typedef struct Sym_s {
-        int idn; // node id?
-        int parsedIdn; 
-        int count; // D
+        int idn; // Symbol idn
+        int parsedIdn;
+        int count;
         char* name; // Symbol name
         struct Sym_s* next; // Next in linked list
 } Sym;
@@ -26,8 +26,8 @@ static void stubbed_abort(void) {
 // The normal WEXITSTATUS macro doesn't seems to match here
 #define EXIT_STATUS(x) (unsigned int)(_W_INT(x) & 0xFF00) >> 8
 
-/* 
-* @brief Executes a given executable and waits until it's finished
+/*
+* @brief Executes an executable given its path on another proccess (cpid) and waits until it's finished
 * @param path Executable path
 * @param argv Arglist to pass to the program
 */
@@ -40,7 +40,7 @@ static unsigned int exec_and_wait(char* path, char** argv) {
     char** arg;
     wait_t status; // Child process status
 
-    // If verbose print the executable path and the specified arguments
+    // If verbose print the executable's path and arguments
     if (verbose) {
         fprintf(stderr, "%s ", path);
         for (arg = &argv[1]; *arg != NULL;) {
