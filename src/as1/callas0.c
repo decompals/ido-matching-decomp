@@ -192,7 +192,6 @@ static char* string_concatenate(char* str1, char* str2) {
     return strcat(newStr, str2);
 }
 
-// TODO: Improve this match
 static void parse_extsyms_file(char* path) {
     int ret;
     FILE* fp;
@@ -204,8 +203,10 @@ static void parse_extsyms_file(char* path) {
     fp = fopen(path, "r");
     if (fp != NULL) {
         if (!(fp->_flag & (_IOMYBUF | _IOWRT | _IONBF))) {
-loop:
-            if ((fscanf(fp, "%d %d", &binasmCount, &symIdn) == 2) || !(fp->_flag & (_IOMYBUF | _IOWRT | _IONBF))) {
+            do {
+                if ((fscanf(fp, "%d %d", &binasmCount, &symIdn) != 2) || !(fp->_flag & (_IOMYBUF | _IOWRT | _IONBF))) { 
+                    break;
+                }
                 sym = xmalloc(sizeof(Sym));
                 sym->count = binasmCount;
                 ret = fgetc(fp);
@@ -218,11 +219,8 @@ loop:
                     ret = fscanf(fp, "%s\n", symName);
                     sym->name = string_copy(symName);
                 }
-                if ((ret != -1) && !(fp->_flag & (_IOMYBUF | _IOWRT | _IONBF))) {
-                    goto loop;
-                }
-            }
-        }
+            } while ((ret != -1) && !(fp->_flag & (_IOMYBUF | _IOWRT | _IONBF)));
+        } 
         fclose(fp);
     }
 }
