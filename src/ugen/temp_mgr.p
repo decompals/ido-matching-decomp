@@ -19,7 +19,6 @@ type
     next: ^Temp_rec;
 end;
 
-
 var
     temps: ^Temp_rec;
     temps_offset: integer;
@@ -165,7 +164,7 @@ begin
     gen_store(reg, spill.temp^.offset, areaSize);
 end;
 
-procedure free_temp(index: u8); {Guess}
+procedure free_temp(index: u8);
 var
     temp: Ptemp;
 begin
