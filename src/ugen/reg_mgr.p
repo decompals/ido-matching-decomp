@@ -41,6 +41,8 @@ var
     isa: mips_isa;
     fp_regs_free: UsedRegs;
     fp_regs_used: UsedRegs;
+    ugen_fp_callee_saved: set of registers;
+    saved_regs: set of registers;
 
 
 procedure fill_reg(arg0: registers; arg1: ^tree; arg2: u16; reg_kind: RegKind);
@@ -96,7 +98,6 @@ begin
 end;
 
 function remove_direg(var arg0: UsedRegs): registers;
-label ret;
 var
     var_a1: registers;
     var_v1: registers;
@@ -121,12 +122,11 @@ begin
     if (var_v1 = arg0.unk1) then begin
         if (arg0.unk0 = xnoreg) then begin
             arg0.unk1 := xnoreg;
-            goto ret; { Required to match }
+        end else begin
+            arg0.unk1 := var_a1;
         end;
-        arg0.unk1 := var_a1;
     end;
 
-    ret:
     return var_v1;
 
 end;
@@ -306,4 +306,223 @@ begin
     end;
 
     get_one_reg(arg0, arg1, arg2, i_reg);
+end;
+
+procedure get_reg1(arg0: registers; arg1: ^tree; arg2: u16);
+var
+    temp_v0: registers;
+begin
+    if ((regs[arg0].unk7 <> xr0) and (remove_from_list(arg0, gp_regs_free))) then begin
+            append_to_list(arg0, gp_regs_used);
+            if (opcode_arch = 0) then begin
+                if (arg1^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+                    fill_reg(arg0, arg1, arg2, di_reg);
+                    return;
+                end;
+            end;
+            fill_reg(arg0, arg1, arg2, i_reg);
+        return;
+    end;
+    inc_usage(arg0, arg2);
+
+    if ((opcode_arch = 0) and (arg1^.u.Dtype in [Idt, Kdt, Wdt])) then begin
+        regs[arg0].reg_kind := di_reg;
+    end;
+
+    if ((arg1 <> nil) and (opcode_arch = 0) and  (arg1^.u.Dtype in [Idt, Kdt, Wdt])) then begin
+        temp_v0 := succ(arg0);
+        regs[arg0].unk9 := temp_v0;
+
+        if ((regs[temp_v0].unk7 <> xr0) and (remove_from_list(temp_v0, gp_regs_free))) then begin
+            append_to_list(temp_v0, gp_regs_used);
+            fill_reg(temp_v0, arg1, arg2, di_s_reg);
+            return;
+        end;
+
+        inc_usage(temp_v0, arg2);
+
+        if (opcode_arch = 0) then begin
+            if (arg1^.u.dtype in [Idt, Kdt, Wdt]) then begin
+                regs[temp_v0].reg_kind := di_s_reg;
+            end;
+        end;
+    end;
+end;
+
+procedure get_fp_reg(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16);
+begin
+    if (regs[arg0].unk7 = xr0) then begin
+        if (regs[arg0].unk4 <> 0) then begin
+            spill_reg(arg0, regs[arg0].reg_kind);
+        end;
+    end else begin
+
+    if not (remove_from_list(arg0, fp_regs_free)) then begin
+        if (remove_from_list(arg0, fp_regs_used)) then begin
+            spill_reg(arg0, regs[arg0].reg_kind);
+        end else begin
+            report_error(Internal, 678, "reg_mgr.p", "fp register not on used/free list");
+            return;
+        end;
+    end;
+    
+    append_to_list(arg0, fp_regs_used);
+    end;
+    
+    fill_reg(arg0, arg1, arg3, arg2);
+end;
+
+procedure get_fp_reg1(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16);
+begin
+    if ((regs[arg0].unk7 <> xr0) and (remove_from_list(arg0, fp_regs_free))) then begin
+        append_to_list(arg0, fp_regs_used);
+        fill_reg(arg0, arg1, arg3, arg2);
+    end else begin
+        inc_usage(arg0, arg3);
+    end;
+end;
+
+function free_reg_is_available(): boolean;
+begin
+    if (gp_regs_free.unk0 = xnoreg) then begin
+        return false;
+    end;
+    return true;
+end;
+
+function can_get_two_regs(arg0: UsedRegs): boolean;
+var
+    var_v0: registers;
+begin
+    if (arg0.unk0 = xnoreg) then begin
+        return false;
+    end;
+
+    var_v0 := arg0.unk0;
+    while (ord(var_v0) & 1 <> 0) do begin
+        var_v0 := regs[var_v0].unk6;
+    end;
+    if (var_v0 = xnoreg) then begin
+        return false;
+    end;
+    return true;
+end;
+
+function spill_two_regs(): registers;
+var
+    temp_v0: registers;
+    var_s0: registers;
+begin
+    temp_v0 := remove_direg(gp_regs_used);
+    
+    if (regs[temp_v0].reg_kind = di_reg) then begin
+        spill_to_temp(temp_v0, size_tab[di_reg]);
+        Assert(remove_from_list(succ(temp_v0), gp_regs_used));
+    end else begin
+        spill_to_temp(temp_v0, size_tab[i_reg]);
+        if (remove_from_list(succ(temp_v0), gp_regs_used)) then begin
+            spill_to_temp(succ(temp_v0), size_tab[i_reg]);
+        end else if not (remove_from_list(succ(temp_v0), gp_regs_free)) then begin
+            report_error(Internal, 773, "reg_mgr.p", "register not on used/free list");
+        end;
+    end;
+    regs[temp_v0].unk9 := succ(temp_v0);
+    return temp_v0;
+end;
+
+function get_two_free_regs(arg0: ^tree; arg1: u16): registers;
+var
+    temp_v0: registers;
+begin
+    Assert((arg0 <> nil) and (opcode_arch = 0) and (arg0^.u.dtype in [Idt, Kdt, Wdt]));
+
+    if (can_get_two_regs(gp_regs_free)) then begin
+        temp_v0 := remove_direg(gp_regs_free);
+        regs[temp_v0].unk9 :=  succ(temp_v0);
+        get_one_reg(regs[temp_v0].unk9, arg0, arg1, di_s_reg);
+    end else begin
+        temp_v0 := spill_two_regs();
+        append_to_list(regs[temp_v0].unk9, gp_regs_used);
+        fill_reg(regs[temp_v0].unk9, arg0, arg1, di_s_reg);
+    end;
+    append_to_list(temp_v0, gp_regs_used);
+    fill_reg(temp_v0, arg0, arg1, di_reg);
+    return temp_v0;
+end;
+
+function get_one_free_reg(arg0: ^tree; arg1: u16): registers;
+var
+    temp_v0: registers;
+    temp_v1: RegKind;
+    
+begin
+    if (list_is_empty(gp_regs_free.unk0)) then begin
+        temp_v0 := get_head(gp_regs_used);
+        temp_v1 := regs[temp_v0].reg_kind;
+        if ((temp_v1 = di_reg) or (temp_v1 = di_s_reg)) then begin
+            temp_v0 := spill_two_regs();
+            append_to_list(regs[temp_v0].unk9, gp_regs_free);
+            fill_reg(regs[temp_v0].unk9, nil, 0, i_reg);
+        end else begin
+            temp_v0 := remove_head(gp_regs_used);
+            if (opcode_arch = 1) then begin
+                spill_to_temp(temp_v0, size_tab2[i_reg]);
+            end else begin
+                spill_to_temp(temp_v0, size_tab[i_reg]);
+            end;
+        end;
+    end else begin
+        temp_v0 := remove_head(gp_regs_free);
+    end;
+
+    append_to_list(temp_v0, gp_regs_used);
+    fill_reg(temp_v0, arg0, arg1, i_reg);
+    return temp_v0;
+end;
+
+function get_free_reg(arg0: ^tree; arg1: registers): registers;
+begin
+    if ((arg0 <> nil) and not (opcode_arch)) then begin
+        if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+            return get_two_free_regs();
+        end;
+    end;
+    return get_one_free_reg();
+end;
+
+function get_free_fp_reg(arg0: ^tree; arg1: RegKind; arg2: u16): registers;
+var
+    var_s0: registers;
+begin
+    if (list_is_empty(fp_regs_free.unk0)) then begin
+        var_s0 := remove_head(fp_regs_used);
+
+        if (isa >= ISA_MIPS3) then begin
+            spill_to_temp(var_s0, size_tab2[regs[var_s0].reg_kind]);
+        end else begin
+            spill_to_temp(var_s0, size_tab[regs[var_s0].reg_kind]);
+        end;
+    end else begin
+        var_s0 := remove_head(fp_regs_free);
+
+        if (var_s0 in ugen_fp_callee_saved) then begin
+            saved_regs := saved_regs + [var_s0];
+        end;
+    end;
+    append_to_list(var_s0, fp_regs_used);
+    fill_reg(var_s0, arg0, arg2, arg1);
+    return var_s0;
+end;
+
+function content_of(arg0: registers): pointer;
+var
+    var_v0: ^tree;
+begin
+    var_v0 := regs[arg0].unk0;
+    if (var_v0 = nil) then begin
+        report_error(Internal, 867, "reg_mgr.p", "register content is empty");
+        return; 
+    end;
+
+    content_of := var_v0;
 end;
