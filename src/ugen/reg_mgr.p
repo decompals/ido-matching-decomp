@@ -31,6 +31,9 @@ type
     unk9: registers;
 end;
 
+type
+    regArray = array [registers] of integer;
+
 var
     regs: array [first(registers)..last(registers)] of Register;
     gp_regs_used: UsedRegs;
@@ -43,7 +46,68 @@ var
     fp_regs_used: UsedRegs;
     ugen_fp_callee_saved: set of registers;
     saved_regs: set of registers;
+    restricted_fp_regs: RegArray;
+    restricted_regs: RegArray;
+    kind_tab: array [registers] of registers;
+    mips_cg_regs: array [registers] of registers;
+    n_cg_regs: integer;
+    n_unsaved_regs: integer;
+    n_unsaved_fp_regs: integer;
+    n_parm_regs: integer;
+    n_fp_cg_regs: integer;
+    n_fp_parm_regs: integer;
+    n_saved_regs: integer;
 
+procedure inc_usage(arg0: registers; arg1: u16); forward;
+
+procedure clear_restricted_regs();
+var 
+    i: registers;
+begin
+    for i:= first(registers) to last(registers) do begin
+        restricted_regs[i] := 0;
+        restricted_fp_regs[i] := 0;
+    end;
+end;
+
+procedure restricted_reg(arg0: registers);
+begin
+    restricted_regs[arg0] := restricted_regs[arg0]  + 1;
+end;
+
+procedure restricted_fp_reg(arg0: registers);
+begin
+    restricted_fp_regs[arg0] := restricted_fp_regs[arg0]  + 1;
+end;
+
+function find_non_special_reg(arg0: regarray; var arg1: UsedRegs): registers;
+var
+    var_v1: registers;
+begin
+    var_v1 := arg1.unk0;
+
+    while (var_v1 <> arg1.unk1) do begin
+        if (arg0[var_v1] = 0) then begin
+            return var_v1;
+        end;
+        
+        var_v1 := regs[var_v1].unk6;
+    end;
+
+    report_error(Internal, 280, "reg_mgr.p", "Needed register: all permantently allocated: impossible ");
+end;
+
+function get_reg_kind(arg0: registers): registers;
+begin
+    return kind_tab[arg0];
+end;
+
+function kind_of_register(arg0: registers): RegKind;
+begin
+    return regs[arg0].reg_kind;
+end;
+
+GLOBAL_ASM("asm/7.1/functions/ugen/reg_mgr/init_regs.s")
 
 procedure fill_reg(arg0: registers; arg1: ^tree; arg2: u16; reg_kind: RegKind);
 begin
@@ -480,14 +544,14 @@ begin
     return temp_v0;
 end;
 
-function get_free_reg(arg0: ^tree; arg1: registers): registers;
+function get_free_reg(arg0: ^tree; arg1: u16): registers;
 begin
-    if ((arg0 <> nil) and not (opcode_arch)) then begin
+    if ((arg0 <> nil) and (opcode_arch = 0)) then begin
         if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) then begin
-            return get_two_free_regs();
+            return get_two_free_regs(arg0, arg1);
         end;
     end;
-    return get_one_free_reg();
+    return get_one_free_reg(arg0, arg1);
 end;
 
 function get_free_fp_reg(arg0: ^tree; arg1: RegKind; arg2: u16): registers;
@@ -525,4 +589,223 @@ begin
     end;
 
     content_of := var_v0;
+end;
+
+procedure inc_usage({arg0: registers; arg1: u16});
+begin
+    regs[arg0].unk4 := regs[arg0].unk4 + arg1;
+end;
+
+procedure dec_usage(arg0: registers);
+var
+    v0: registers;
+begin
+    if (regs[arg0].unk4 = 0) then begin
+        report_error(Internal, 884, "reg_mgr.p", "usage count is 0, cannot decrement");
+    end else begin
+        regs[arg0].unk4 := regs[arg0].unk4 - 1;
+    end;
+
+    if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
+        v0 := regs[arg0].unk9;
+        if (regs[v0].unk4 = 0) then begin
+            report_error(Internal, 891, "reg_mgr.p", "usage count is 0, cannot decrement");
+            return;
+        end;
+        regs[v0].unk4 := regs[v0].unk4 - 1;
+    end;
+end;
+
+procedure free_reg(arg0: registers);
+var
+    temp_a0: registers;
+begin
+    dec_usage(arg0);
+
+    if (regs[arg0].unk4 = 0) then begin
+        if (regs[arg0].unk7 <> xr0) then begin
+            if not (remove_from_list(arg0, gp_regs_used)) then begin
+                report_error(Internal, 907, "reg_mgr.p", "register to be removed not on used list");
+                return;
+            end;
+            append_to_list(arg0, gp_regs_free);
+        end;
+        if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
+            fill_reg(arg0, nil, 0, i_reg);
+            temp_a0 := regs[arg0].unk9;
+            if (regs[temp_a0].unk7 <> xr0) then begin
+                if not (remove_from_list(temp_a0, gp_regs_used)) then begin
+                    report_error(Internal, 917, "reg_mgr.p", "register to be removed not on free list");
+                    return;
+                end;
+                append_to_list(temp_a0, gp_regs_free);
+            end;
+            fill_reg(temp_a0, nil, 0, i_reg);
+            return;
+        end;
+        fill_reg(arg0, nil, 0, i_reg);
+    end;
+end;
+
+procedure free_fp_reg(arg0: registers; arg1: RegKind);
+begin
+    dec_usage(arg0);
+
+    if ((regs[arg0].unk4 = 0)) then begin
+        if ((regs[arg0].unk7 <> xr0)) then begin
+            if not (remove_from_list(arg0, fp_regs_used)) then begin
+                report_error(Internal, 937, "reg_mgr.p", "fp register to be removed not on free list");
+                return;
+            end;
+            append_to_list(arg0, fp_regs_free);
+        end;
+        fill_reg(arg0, nil, 0, arg1);
+    end;
+end;
+
+{ Weird control flow }
+procedure force_free_reg(arg0: registers);
+label fill;
+begin
+    if ((regs[arg0].unk7 <> xr0)) then begin
+        if (remove_from_list(arg0, gp_regs_used)) then begin 
+            append_to_list(arg0, gp_regs_free);
+            goto fill;
+        end;
+    end else begin
+        fill:
+        fill_reg(arg0, nil, 0, i_reg);
+    end;
+    
+end;
+
+procedure add_to_free_list(arg0: registers);
+begin
+    if (regs[arg0].unk4 <> 0) then begin
+        report_error(Internal, 967, "reg_mgr.p", "register not free");
+    end;
+    fill_reg(arg0, nil, 0, i_reg);
+    regs[arg0].unk7 := xr1;
+    append_to_list(arg0, gp_regs_free);
+end;
+
+procedure add_to_fp_free_list(arg0: registers; arg1: RegKind);
+begin
+    if (regs[arg0].unk4 <> 0) then begin
+        report_error(Internal, 977, "reg_mgr.p", "fp register not free");
+    end;
+    fill_reg(arg0, nil, 0, arg1);
+    regs[arg0].unk7 := xr1;
+    append_to_list(arg0, fp_regs_free);
+end;
+
+procedure remove_from_free_list(arg0: registers);
+var
+    temp_a0: registers;
+begin
+    if (regs[arg0].unk7 <> xr0) then begin
+        if not (remove_from_list(arg0, gp_regs_free)) then begin
+            report_error(Internal, 990, "reg_mgr.p", "register not free");
+            return;
+        end;
+        regs[arg0].unk7 := xr0;
+    end;
+    fill_reg(arg0, nil, 0, i_reg);
+
+    if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
+        temp_a0 := regs[arg0].unk9;
+        if (regs[temp_a0].unk7 <> xr0) then begin
+            if not (remove_from_list(temp_a0, gp_regs_free)) then begin
+                report_error(Internal, 1000, "reg_mgr.p", "register not free");
+                return;
+            end;
+            regs[temp_a0].unk7 := xr0;
+        end;
+        fill_reg(temp_a0, nil, 0, i_reg);
+    end;
+end;
+
+procedure remove_from_fp_free_list(arg0: registers; arg1: RegKind);
+begin
+    if (regs[arg0].unk7 <> xr0) then begin
+        if not (remove_from_list(arg0, fp_regs_free)) then begin
+            report_error(Internal, 1013, "reg_mgr.p", "fp register not free");
+            return;
+        end;
+        regs[arg0].unk7 := xr0;
+    end;
+    fill_reg(arg0, nil, 0, arg1);
+end;
+
+function is_available(arg0: registers): registers;
+begin
+    return regs[arg0].unk7;
+end;
+
+procedure check_no_used();
+begin
+    if not (list_is_empty(gp_regs_used.unk0)) then begin
+        print_regs(gp_regs_used);
+        report_error(Internal, 1031, "reg_mgr.p", "gp registers left in use at bb boundary");
+    end;
+
+    if not (list_is_empty(fp_regs_used.unk0)) then begin
+        report_error(Internal, 1034, "reg_mgr.p", "fp registers left in use at bb boundary");
+        print_regs(fp_regs_used); {@bug: Unreached code }
+    end;
+end;
+
+function usage_count(arg0: registers): u16;
+begin
+    return regs[arg0].unk4;
+end;
+
+procedure move_to_end_fp_list(arg0: registers);
+begin
+    if (remove_from_list(arg0, fp_regs_used)) then begin
+        append_to_list(arg0, fp_regs_used);
+    end;
+end;
+
+procedure move_to_end_gp_list(arg0: registers);
+begin
+    if (remove_from_list(arg0, gp_regs_used)) then begin
+        append_to_list(arg0, gp_regs_used);
+    end;
+end;
+
+function get_free_fp_reg_special(arg0: ^tree; arg1: RegKind; arg2: u16): registers;
+var
+    temp_s0: registers;
+begin
+    if not (list_is_empty(fp_regs_free.unk0)) then begin
+        return get_free_fp_reg(arg0, arg1, arg2);
+    end;
+    temp_s0 := find_non_special_reg(restricted_fp_regs, fp_regs_used);
+
+    if not (remove_from_list(temp_s0, fp_regs_used)) then begin
+        report_error(Internal, 1075, "reg_mgr.p", "could not remove register from fp_regs_used list!");
+    end;
+
+    spill_to_temp(temp_s0, size_tab[regs[temp_s0].reg_kind]);
+    append_to_list(temp_s0, fp_regs_used);
+    fill_reg(temp_s0, arg0, arg2, arg1); 
+    return temp_s0;
+end;
+
+function get_free_reg_special(arg0: ^tree; arg1: u16): registers;
+var
+    temp_s0: registers;
+begin
+    if not (list_is_empty(gp_regs_free.unk0)) then begin
+        return get_free_reg(arg0, arg1);
+    end;
+    temp_s0 := find_non_special_reg(restricted_regs, gp_regs_used);
+    if not (remove_from_list(temp_s0, gp_regs_used)) then begin
+        report_error(Internal, 1094, "reg_mgr.p", "could not remove register from regs_used list!");
+    end;
+    spill_to_temp(temp_s0, size_tab[regs[temp_s0].reg_kind]);
+    append_to_list(temp_s0, gp_regs_used);
+    fill_reg(temp_s0, arg0, arg1, i_reg);
+    return temp_s0;
 end;
