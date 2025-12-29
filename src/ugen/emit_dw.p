@@ -646,7 +646,7 @@ var
             emit_rri_(zsltiu, arg1, arg1, 1, franone);
         end else begin
             emit_rrr(zor, arg1, arg1, xr1);
-            emit_rrr(zsltu, arg1, xr0, arg1);
+            emit_rrr(zsltu, arg1, gpr_zero, arg1);
         end;
         emit_dir0(iset, ord(set_at));
     end;
@@ -940,7 +940,7 @@ var
             emit_rri_(zsltiu, arg1, arg1, 1, franone);
         end else begin
             emit_rrr(zor, arg1, arg1, xr1);
-            emit_rrr(zsltu, arg1, xr0, arg1);
+            emit_rrr(zsltu, arg1, gpr_zero, arg1);
         end;
         emit_dir0(iset, ord(set_at));
     end;
@@ -1066,13 +1066,13 @@ begin
                 if lsb_first then begin
                     emit_rri_(arg0, arg1, arg2, arg4, franone);
                     if arg3 = 0 then begin
-                        emit_rr(zmove, succ(arg1), xr0);
+                        emit_rr(zmove, succ(arg1), gpr_zero);
                     end else begin
                         emit_rri_(arg0, succ(arg1), succ(arg2), arg3, franone);
                     end;
                 end else begin
                     if arg3 = 0 then begin
-                        emit_rr(zmove, arg1, xr0);
+                        emit_rr(zmove, arg1, gpr_zero);
                     end else begin
                         emit_rri_(arg0, arg1, arg2, arg3, franone);
                     end;

@@ -24,9 +24,9 @@ end;
 type
     Register = Record;
     unk0: ^Tree;
-    unk4: u16;
+    usage_count: u16;
     unk6: registers;
-    unk7: registers;
+    reg_available: registers;
     reg_kind: RegKind;
     unk9: registers;
 end;
@@ -107,12 +107,99 @@ begin
     return regs[arg0].reg_kind;
 end;
 
+{ Regalloc }
+#ifdef NON_MATCHING
+procedure init_regs();
+var
+    i: registers;
+    j: cardinal;
+    j2: cardinal;
+begin
+    for j := 0 to n_registers do begin
+        regs[registers(j)].unk0 := nil;
+        regs[registers(j)].usage_count := 0;
+        regs[registers(j)].unk6 := xnoreg;
+        regs[registers(j)].reg_available := gpr_zero;
+        regs[registers(j)].reg_kind := no_reg;
+    end;
+    
+    gp_regs_free.unk0 := xnoreg;
+    gp_regs_free.unk1 := xnoreg;
+
+    for j2 := 1 to n_cg_regs do begin
+        i := mips_cg_regs[j2];
+        add_to_free_list(i);
+    end;
+
+    for i := gpr_t0 to registers(n_unsaved_regs + 7) do begin
+        add_to_free_list(i);
+    end;
+
+    fp_regs_free.unk0 := xnoreg;
+    fp_regs_free.unk1 := xnoreg;
+
+    i := xfr4;
+    for j := 1 to n_fp_cg_regs do begin
+        add_to_fp_free_list(i, no_reg);
+        i := succ(succ(i));
+    end;
+
+    i := xfr16;
+    for j := 1 to n_unsaved_fp_regs do begin
+        add_to_fp_free_list(i, no_reg);
+        i := succ(succ(i));
+    end;
+
+    if (fp32regs) then begin
+        i := xfr1;
+        for j := 1 to 16 do begin
+            add_to_fp_free_list(i, no_reg);
+            i := succ(succ(i));
+        end;
+    end;
+    for i := gpr_a0 to registers(ord(n_parm_regs) + 3) do begin
+        regs[i].reg_available := gpr_zero;
+        regs[i].usage_count := 0;
+    end;
+
+    i := xfr12;
+    while (i <= registers(cardinal((n_fp_parm_regs * 2) + 16#2A))) do begin
+        regs[i].reg_available := gpr_zero;
+        regs[i].usage_count := 0;
+        i := succ(succ(i));
+    end;
+
+    for i := gpr_s0 to registers(ord (n_saved_regs) + 15) do begin
+        regs[i].reg_available := gpr_zero;
+        regs[i].usage_count := 0;
+    end;
+
+    i := registers(16#34);
+    while (i <= registers(cardinal((n_saved_fp_regs * 2) + 16#32))) do begin
+        if ufsm then begin
+            add_to_fp_free_list(i, no_reg);
+        end else begin
+            regs[i].reg_available := gpr_zero;
+            regs[i].usage_count := 0;
+        end;
+        i := succ(succ(i));
+    end;
+
+
+    gp_regs_used.unk0 := xnoreg;
+    gp_regs_used.unk1 := xnoreg;
+    fp_regs_used.unk0 := xnoreg;
+    fp_regs_used.unk1 := xnoreg;
+
+end;
+#else
 GLOBAL_ASM("asm/7.1/functions/ugen/reg_mgr/init_regs.s")
+#endif
 
 procedure fill_reg(arg0: registers; arg1: ^tree; arg2: u16; reg_kind: RegKind);
 begin
     regs[arg0].unk0 := arg1;
-    regs[arg0].unk4 := arg2;
+    regs[arg0].usage_count := arg2;
     regs[arg0].reg_kind := reg_kind;
 end;
 
@@ -120,7 +207,7 @@ procedure copy_reg(arg0: asmcodes; arg1: registers; arg2: registers);
 begin
     emit_rr(arg0, arg2, arg1);
     regs[arg2].unk0 := regs[arg1].unk0;
-    regs[arg2].unk4 := regs[arg1].unk4;
+    regs[arg2].usage_count := regs[arg1].usage_count;
     regs[arg2].reg_kind := regs[arg1].reg_kind;
 end;
 
@@ -137,7 +224,7 @@ begin
 loop:
     write(output, "register ", arg0);
     write(output, ": kind  ", regs[arg0].reg_kind);
-    write(output, ", usage ", regs[arg0].unk4);
+    write(output, ", usage ", regs[arg0].usage_count);
     writeln(output);
     if (regs[arg0].reg_kind = di_reg) then begin
         arg0 := regs[arg0].unk9;
@@ -218,7 +305,7 @@ end;
 
 procedure append_to_list(arg0: registers; var arg1: UsedRegs);
 begin
-    Assert(regs[arg0].unk7 <> xr0);
+    Assert(regs[arg0].reg_available <> gpr_zero);
     regs[arg0].unk6 := xnoreg;
 
     if (list_is_empty(arg1.unk0)) then begin
@@ -330,8 +417,8 @@ procedure get_one_reg(arg0: registers; arg1: ^tree; arg2: u16; arg3: RegKind);
 label list_append;
 begin
 
-    if (regs[arg0].unk7 = xr0) then begin
-        if (regs[arg0].unk4 <> 0) then begin
+    if (regs[arg0].reg_available = gpr_zero) then begin
+        if (regs[arg0].usage_count <> 0) then begin
             spill_reg(arg0, arg3);
         end;
     end else if not (remove_from_list(arg0, gp_regs_free)) then begin
@@ -376,7 +463,7 @@ procedure get_reg1(arg0: registers; arg1: ^tree; arg2: u16);
 var
     temp_v0: registers;
 begin
-    if ((regs[arg0].unk7 <> xr0) and (remove_from_list(arg0, gp_regs_free))) then begin
+    if ((regs[arg0].reg_available <> gpr_zero) and (remove_from_list(arg0, gp_regs_free))) then begin
             append_to_list(arg0, gp_regs_used);
             if (opcode_arch = 0) then begin
                 if (arg1^.u.Dtype in [Idt, Kdt, Wdt]) then begin
@@ -397,7 +484,7 @@ begin
         temp_v0 := succ(arg0);
         regs[arg0].unk9 := temp_v0;
 
-        if ((regs[temp_v0].unk7 <> xr0) and (remove_from_list(temp_v0, gp_regs_free))) then begin
+        if ((regs[temp_v0].reg_available <> gpr_zero) and (remove_from_list(temp_v0, gp_regs_free))) then begin
             append_to_list(temp_v0, gp_regs_used);
             fill_reg(temp_v0, arg1, arg2, di_s_reg);
             return;
@@ -415,8 +502,8 @@ end;
 
 procedure get_fp_reg(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16);
 begin
-    if (regs[arg0].unk7 = xr0) then begin
-        if (regs[arg0].unk4 <> 0) then begin
+    if (regs[arg0].reg_available = gpr_zero) then begin
+        if (regs[arg0].usage_count <> 0) then begin
             spill_reg(arg0, regs[arg0].reg_kind);
         end;
     end else begin
@@ -438,7 +525,7 @@ end;
 
 procedure get_fp_reg1(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16);
 begin
-    if ((regs[arg0].unk7 <> xr0) and (remove_from_list(arg0, fp_regs_free))) then begin
+    if ((regs[arg0].reg_available <> gpr_zero) and (remove_from_list(arg0, fp_regs_free))) then begin
         append_to_list(arg0, fp_regs_used);
         fill_reg(arg0, arg1, arg3, arg2);
     end else begin
@@ -593,26 +680,26 @@ end;
 
 procedure inc_usage({arg0: registers; arg1: u16});
 begin
-    regs[arg0].unk4 := regs[arg0].unk4 + arg1;
+    regs[arg0].usage_count := regs[arg0].usage_count + arg1;
 end;
 
 procedure dec_usage(arg0: registers);
 var
     v0: registers;
 begin
-    if (regs[arg0].unk4 = 0) then begin
+    if (regs[arg0].usage_count = 0) then begin
         report_error(Internal, 884, "reg_mgr.p", "usage count is 0, cannot decrement");
     end else begin
-        regs[arg0].unk4 := regs[arg0].unk4 - 1;
+        regs[arg0].usage_count := regs[arg0].usage_count - 1;
     end;
 
     if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
         v0 := regs[arg0].unk9;
-        if (regs[v0].unk4 = 0) then begin
+        if (regs[v0].usage_count = 0) then begin
             report_error(Internal, 891, "reg_mgr.p", "usage count is 0, cannot decrement");
             return;
         end;
-        regs[v0].unk4 := regs[v0].unk4 - 1;
+        regs[v0].usage_count := regs[v0].usage_count - 1;
     end;
 end;
 
@@ -622,8 +709,8 @@ var
 begin
     dec_usage(arg0);
 
-    if (regs[arg0].unk4 = 0) then begin
-        if (regs[arg0].unk7 <> xr0) then begin
+    if (regs[arg0].usage_count = 0) then begin
+        if (regs[arg0].reg_available <> gpr_zero) then begin
             if not (remove_from_list(arg0, gp_regs_used)) then begin
                 report_error(Internal, 907, "reg_mgr.p", "register to be removed not on used list");
                 return;
@@ -633,7 +720,7 @@ begin
         if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
             fill_reg(arg0, nil, 0, i_reg);
             temp_a0 := regs[arg0].unk9;
-            if (regs[temp_a0].unk7 <> xr0) then begin
+            if (regs[temp_a0].reg_available <> gpr_zero) then begin
                 if not (remove_from_list(temp_a0, gp_regs_used)) then begin
                     report_error(Internal, 917, "reg_mgr.p", "register to be removed not on free list");
                     return;
@@ -651,8 +738,8 @@ procedure free_fp_reg(arg0: registers; arg1: RegKind);
 begin
     dec_usage(arg0);
 
-    if ((regs[arg0].unk4 = 0)) then begin
-        if ((regs[arg0].unk7 <> xr0)) then begin
+    if ((regs[arg0].usage_count = 0)) then begin
+        if ((regs[arg0].reg_available <> gpr_zero)) then begin
             if not (remove_from_list(arg0, fp_regs_used)) then begin
                 report_error(Internal, 937, "reg_mgr.p", "fp register to be removed not on free list");
                 return;
@@ -667,7 +754,7 @@ end;
 procedure force_free_reg(arg0: registers);
 label fill;
 begin
-    if ((regs[arg0].unk7 <> xr0)) then begin
+    if ((regs[arg0].reg_available <> gpr_zero)) then begin
         if (remove_from_list(arg0, gp_regs_used)) then begin 
             append_to_list(arg0, gp_regs_free);
             goto fill;
@@ -681,21 +768,21 @@ end;
 
 procedure add_to_free_list(arg0: registers);
 begin
-    if (regs[arg0].unk4 <> 0) then begin
+    if (regs[arg0].usage_count <> 0) then begin
         report_error(Internal, 967, "reg_mgr.p", "register not free");
     end;
     fill_reg(arg0, nil, 0, i_reg);
-    regs[arg0].unk7 := xr1;
+    regs[arg0].reg_available := gpr_at;
     append_to_list(arg0, gp_regs_free);
 end;
 
 procedure add_to_fp_free_list(arg0: registers; arg1: RegKind);
 begin
-    if (regs[arg0].unk4 <> 0) then begin
+    if (regs[arg0].usage_count <> 0) then begin
         report_error(Internal, 977, "reg_mgr.p", "fp register not free");
     end;
     fill_reg(arg0, nil, 0, arg1);
-    regs[arg0].unk7 := xr1;
+    regs[arg0].reg_available := gpr_at;
     append_to_list(arg0, fp_regs_free);
 end;
 
@@ -703,23 +790,23 @@ procedure remove_from_free_list(arg0: registers);
 var
     temp_a0: registers;
 begin
-    if (regs[arg0].unk7 <> xr0) then begin
+    if (regs[arg0].reg_available <> gpr_zero) then begin
         if not (remove_from_list(arg0, gp_regs_free)) then begin
             report_error(Internal, 990, "reg_mgr.p", "register not free");
             return;
         end;
-        regs[arg0].unk7 := xr0;
+        regs[arg0].reg_available := gpr_zero;
     end;
     fill_reg(arg0, nil, 0, i_reg);
 
     if ((opcode_arch = 0) and (regs[arg0].reg_kind = di_reg)) then begin
         temp_a0 := regs[arg0].unk9;
-        if (regs[temp_a0].unk7 <> xr0) then begin
+        if (regs[temp_a0].reg_available <> gpr_zero) then begin
             if not (remove_from_list(temp_a0, gp_regs_free)) then begin
                 report_error(Internal, 1000, "reg_mgr.p", "register not free");
                 return;
             end;
-            regs[temp_a0].unk7 := xr0;
+            regs[temp_a0].reg_available := gpr_zero;
         end;
         fill_reg(temp_a0, nil, 0, i_reg);
     end;
@@ -727,19 +814,19 @@ end;
 
 procedure remove_from_fp_free_list(arg0: registers; arg1: RegKind);
 begin
-    if (regs[arg0].unk7 <> xr0) then begin
+    if (regs[arg0].reg_available <> gpr_zero) then begin
         if not (remove_from_list(arg0, fp_regs_free)) then begin
             report_error(Internal, 1013, "reg_mgr.p", "fp register not free");
             return;
         end;
-        regs[arg0].unk7 := xr0;
+        regs[arg0].reg_available := gpr_zero;
     end;
     fill_reg(arg0, nil, 0, arg1);
 end;
 
 function is_available(arg0: registers): registers;
 begin
-    return regs[arg0].unk7;
+    return regs[arg0].reg_available;
 end;
 
 procedure check_no_used();
@@ -757,7 +844,7 @@ end;
 
 function usage_count(arg0: registers): u16;
 begin
-    return regs[arg0].unk4;
+    return regs[arg0].usage_count;
 end;
 
 procedure move_to_end_fp_list(arg0: registers);
