@@ -3,6 +3,7 @@
 #include "tree_utils.h"
 #include "emit.h"
 #include "reg_mgr.h"
+#include "ugen_regdef.h"
 
 var
     lsb_first: boolean;

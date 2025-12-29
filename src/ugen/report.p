@@ -29,7 +29,7 @@ err_tab : array [first(ugen_report)..last(ugen_report)] of ugen_err_string := (
       "internal"
       );
 
-errors: array [first(ugen_report)..ugen_report(20)] of integer; 
+errors: array [first(ugen_report)..last(ugen_report)] of integer; 
 
 (* ! Unused *)
 procedure reset_errors();
@@ -66,7 +66,7 @@ begin
         flush(err);
     end;
 
-    if ((addr(errors[Internal]) = addr(errors[error_kind])) and not (debug_ugen)) then begin
+    if ((error_kind = internal) and not (debug_ugen)) then begin
         halt(1);
     end;
 end;

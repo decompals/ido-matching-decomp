@@ -3,6 +3,7 @@
 #include "reg_mgr.h"
 #include "report.h"
 #include "frame_offset.h"
+#include "ugen_regdef.h"
 
 {Extern variables}
 var

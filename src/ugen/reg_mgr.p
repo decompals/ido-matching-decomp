@@ -3,6 +3,7 @@
 #include "tree.h"
 #include "temp_mgr.h"
 #include "emit.h"
+#include "ugen_regdef.h"
 
 type RegKind = (
     /* 0 */ no_reg,
@@ -64,7 +65,7 @@ procedure clear_restricted_regs();
 var 
     i: registers;
 begin
-    for i:= first(registers) to last(registers) do begin
+    for i := first(registers) to last(registers) do begin
         restricted_regs[i] := 0;
         restricted_fp_regs[i] := 0;
     end;
@@ -163,8 +164,8 @@ begin
     end;
 
     i := xfr12;
-    while (i <= registers(cardinal((n_fp_parm_regs * 2) + 16#2A))) do begin
         regs[i].reg_available := gpr_zero;
+    while (i <= registers(cardinal((n_fp_parm_regs * 2) + 16#2A))) do begin
         regs[i].usage_count := 0;
         i := succ(succ(i));
     end;
