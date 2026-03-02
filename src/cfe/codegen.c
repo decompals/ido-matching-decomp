@@ -135,11 +135,13 @@ void UW_CONST_l(int arg0) {
 }
 
 void UW_CONST_i(int arg0) {
-    int pad;
-    int sp20;
+    union {
+        long long l;
+        int i;
+    } sp20;
 
-    sp20 = arg0;
-    UWRITE(&sp20, 8U);
+    sp20.i = arg0;
+    UWRITE(&sp20, sizeof(sp20.l));
 }
 
 void UW_CONST_lli(long long arg0) {
