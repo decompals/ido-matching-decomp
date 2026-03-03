@@ -131,5 +131,5 @@ void hash_table_statistics(void);
 void Set_Small_Data_Upper_Limit(int);
 void set_def_member_pack(int);
 void cpp_symentry_setMaxMacroRecursionDepth(int);
-
+void *get_runtime_id(char *, TreeNode *, int); 
 #endif

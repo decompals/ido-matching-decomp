@@ -260,7 +260,7 @@ void error_flush(int arg0) {
     }
 }
 
-int error(int message, int level, int location, ...) {
+int error(int message, enum ErrorLevels level, int location, ...) {
     int real_level;
     ErrorStruct* ers;
     int print_immediately = imm_flag;

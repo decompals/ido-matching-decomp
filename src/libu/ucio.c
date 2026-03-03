@@ -2,32 +2,41 @@
 #include "stdlib.h"
 #include "fcntl.h"
 #include "unistd.h"
+#include "sys/stat.h"
+#include "cmplrs/usys.h"
 
-static int UgetBuf[4096];
+#define U_BUF_LEN 4096
+
+#define UPUT_FD_FLAGS (O_CREAT | O_TRUNC | O_WRONLY)
+#define UPUT_FD_MODE  0666
+
+static int UgetBuf[U_BUF_LEN];
 static int UgetPos;
-static int UputBuf[4096];
-static int UputPos;
-static char UgetPath[1024];
-static char UputPath[1024];
+static int UputBuf[U_BUF_LEN];
+static int UputBufLen;
+static char UgetPath[Filenamelen];
+static char UputPath[Filenamelen];
 static int* UgetBufptr = UgetBuf;
 static int UgetBufLen = -1;
 static int UgetFd = -1;
 static int UputFd = -1;
 
+ 
 void uputinit(char* path) {
     char* pos;
 
+    // Delete path spaces
     for (pos = UputPath; 
-        pos < UputPath + 1024 
-        && *path != '\0' 
-        && *path != ' '; 
+        pos < &UputPath[Filenamelen] 
+        && *pos != '\0' 
+        && *pos != ' '; 
         pos++, path++) {
         *pos = (signed)*path;
     }
     *pos = '\0';
     
     if (UputPath[0] != '\0') {
-        if ((UputFd = open(UputPath, 0x301, 0666)) < 0) {
+        if (UputFd = open(UputPath, UPUT_FD_FLAGS, UPUT_FD_MODE) < 0) {
             perror(UputPath);
             exit(EXIT_FAILURE);
         }
@@ -38,22 +47,20 @@ void uputinitfd(int fd) {
     UputFd = fd;
 }
 
-void uputint(int arg0) {
+void uputint(int val) {
     if (UputFd < 0) {
         fprintf(stderr, "uput: output file not initialized\n");
         fflush(stderr);
         exit(EXIT_FAILURE);
     }
-    if (UputPos >= 0x1000) {
-        if (write(UputFd, &UputBuf, 0x4000U) != 0x4000) {
+    if (UputBufLen >= U_BUF_LEN) {
+        if (write(UputFd, UputBuf, U_BUF_LEN * 4) != U_BUF_LEN * 4) {
             perror("writing out file");
             exit(EXIT_FAILURE);
         }
-        UputPos = 0;
-        UputPos = 0;
+        UputBufLen = 0;
     }
-    UputBuf[UputPos] = arg0;
-    UputPos++;
+    UputBuf[UputBufLen++] = val;
 }
 
 void uputflush(void) {
@@ -62,7 +69,7 @@ void uputflush(void) {
         fflush(stderr);
         exit(EXIT_FAILURE);
     }
-    if (write(UputFd, UputBuf, UputPos * 4) != (UputPos * 4)) {
+    if (write(UputFd, UputBuf, UputBufLen * 4) != (UputBufLen * 4)) {
         perror("writing out file");
         exit(EXIT_FAILURE);
     }
@@ -92,7 +99,7 @@ void ugetinit(char* path) {
     char* pos;
 
     for (pos = UgetPath; 
-        pos < UgetPath + 1024 
+        pos < &UgetPath[Filenamelen]
         && *path != '\0' 
         && *path != ' '; 
         pos++, path++) {
@@ -101,7 +108,7 @@ void ugetinit(char* path) {
     *pos = '\0';
     
     if (UgetPath[0] != '\0') {
-        if ((UgetFd = open(UgetPath, 0, 0)) < 0) {
+        if ((UgetFd = open(UgetPath, O_RDONLY, 0)) < 0) {
             perror(UgetPath);
             exit(EXIT_FAILURE);
         }
@@ -112,10 +119,10 @@ void ugetinitfd(int fd) {
     UgetFd = fd;
 }
 
-void ugetbufinit(int *buf, int len_bytes) {
+void ugetbufinit(int *buf, int lenBytes) {
     UgetFd = 0xFFFF;
     UgetBufptr = buf;
-    UgetBufLen = len_bytes / 4;
+    UgetBufLen = lenBytes / 4;
     UgetPos = 0;
 }
 
@@ -135,7 +142,7 @@ int ugetint(void) {
                 exit(EXIT_FAILURE);
             }
         } else {
-            UgetBufLen = read(UgetFd, UgetBufptr, 0x4000U);
+            UgetBufLen = read(UgetFd, UgetBufptr, U_BUF_LEN * 4);
             if (UgetBufLen < 0) {
                 perror("reading in file");
                 exit(EXIT_FAILURE);

@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 
     set_error_mode(error_mode);
 
-    switch(get_program_id(argv[0])) {
+    switch (get_program_id(argv[0])) {
         case 0:
             exit_code = 3;
             if (options[OPTION_LINT_FLAGS] & 1) {

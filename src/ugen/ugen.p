@@ -145,7 +145,7 @@ var
     warn_level: cardinal; {sp510}
     xpg_env: boolean; {sp50F}
     pad6: integer;
-    sp108: Filename; {sp108}
+    xpgEnvVar: Filename;
     index: cardinal;
     temp_v0_3: ^Tree;
 
@@ -191,7 +191,7 @@ var
             CASE_ARG('g')
             begin
                 if (arg1 < 4) then begin
-                    report_error(Internal, 16#8A, "ugen.p", "insufficient code generator registers");
+                    report_error(Internal, 138, "ugen.p", "insufficient code generator registers");
                     n_cg_regs := 4;
                 end else begin
                     n_cg_regs := arg1; 
@@ -329,10 +329,10 @@ var
 begin
     xpg_env := false;
 
-    sp108 := "_XPG";    
-    sp108[5] := chr(0);
+    xpgEnvVar := "_XPG";    
+    xpgEnvVar[5] := chr(0);
 
-    if (getenv(sp108) <> 0) then begin
+    if (getenv(xpgEnvVar) <> 0) then begin
         xpg_env := true;
     end;
 
@@ -678,18 +678,18 @@ begin
 
                         CASE_ARG('-')
                             if ((xpg_env = true) and ARG_OPT(3, '-')) then begin
-                                argv(index, sp108);
+                                argv(index, xpgEnvVar);
 
-                                SKIP_END_SPACES(var_s1, sp108);
+                                SKIP_END_SPACES(var_s1, xpgEnvVar);
 
                                 if (var_s1 <> 0) then begin
-                                    sp108[var_s1 + 1] := chr(0);
+                                    xpgEnvVar[var_s1 + 1] := chr(0);
                                 end else begin
                                     writeln(err, arg:0, " not understood");
                                 end;
 
                                 for var_a0 := 3 to var_s1 + 1 do begin
-                                    sp15C0[var_a0 - 2] := sp108[var_a0];
+                                    sp15C0[var_a0 - 2] := xpgEnvVar[var_a0];
                                 end;
 
                             end;

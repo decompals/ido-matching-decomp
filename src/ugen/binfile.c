@@ -24,9 +24,9 @@ void close_bin_file(void) {
     fclose(binasm_file);
 }
 
-void output_inst_bin(binasm* arg0, size_t arg1, binasm* arg2, size_t arg3) {
-    for (; arg3 != 0; arg3--, arg2--) {
-        if (fwrite(arg2, sizeof(binasm), 1, binasm_file) != 1) {
+void output_inst_bin(binasm* bin, size_t count, binasm* ibuffer, size_t ibufferSize) {
+    for (; ibufferSize > 0; ibufferSize--, ibuffer--) {
+        if (fwrite(ibuffer, sizeof(binasm), 1, binasm_file) != 1) {
             fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
             fprintf(stderr, "suggestion:  you may want to use TMPDIR to change where temporary files are written\n");
             fflush(stderr);
@@ -34,55 +34,61 @@ void output_inst_bin(binasm* arg0, size_t arg1, binasm* arg2, size_t arg3) {
         }
     }
 
-    if (fwrite(arg0, sizeof(binasm), arg1, binasm_file) != arg1) {
+    if (fwrite(bin, sizeof(binasm), count, binasm_file) != count) {
         fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
         fflush(stderr);
         exit(EXIT_FAILURE);
     }
 }
 
-void cat_files(char* arg0, char* arg1) {
+/*
+* @brief Appends the contents of a source file to a destination file.
+*
+* @param destPath Path to the destination file
+* @param sourcePath Path to the source file
+*/
+void cat_files(char* destPath, char* sourcePath) {
     char buf[0x2000];
-    int fd;
-    int sp50; 
-    int temp_v0_3;
-    int var_v0;
+    int destFd;
+    int sourceFd; 
+    int bytesWritten;
+    int bytesRead;
 
-    fd = open(arg0, 9);
-    if (fd < 0) {
-        fprintf(stderr, "ugen: internal: cannot open %s\n", arg0);
+    destFd = open(destPath, O_WRONLY | O_APPEND);
+    if (destFd < 0) {
+        fprintf(stderr, "ugen: internal: cannot open %s\n", destPath);
         fflush(stderr);
         exit(1);
     }
-    sp50 = open(arg1, 0);
-    if (sp50 < 0) {
-        fprintf(stderr, "ugen: internal: cannot open %s\n", arg1);
+    sourceFd = open(sourcePath, O_RDONLY);
+    if (sourceFd < 0) {
+        fprintf(stderr, "ugen: internal: cannot open %s\n", sourcePath);
         fflush(stderr);
         exit(1);
     }
-    if (lseek(fd, 0, 2) < 0) {
+    if (lseek(destFd, 0, SEEK_END) < 0) {
         fprintf(stderr, "ugen: internal: error in seek\n");
         fflush(stderr);
         exit(1);
     }
-    for (var_v0 = read(sp50, &buf, 0x2000U); var_v0 != 0; var_v0 = read(sp50, &buf, 0x2000U)) {
-            if (var_v0 < 0) {
-                fprintf(stderr, "ugen: internal error reading from %s:  %s\n", arg1, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
-                fflush(stderr);
-                exit(1);
-            }
-            temp_v0_3 = write(fd, &buf, (size_t) var_v0);
-            if (temp_v0_3 != var_v0) {
-                if (errno == 0) {
-                    write(fd, buf + temp_v0_3, var_v0 - temp_v0_3);
-                }
-                fprintf(stderr, "ugen: internal error writing to %s: ", arg0);
-
-                errno < sys_nerr ?  fprintf(stderr, "%s\n", sys_errlist[errno]) :  fprintf(stderr, "errno is %d\n", errno);
-                fflush(stderr);
-                exit(EXIT_FAILURE);
-            }
+    for (bytesRead = read(sourceFd, buf, 0x2000); bytesRead != 0; bytesRead = read(sourceFd, buf, 0x2000)) {
+        if (bytesRead < 0) {
+            fprintf(stderr, "ugen: internal error reading from %s:  %s\n", sourcePath, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
+            fflush(stderr);
+            exit(1);
         }
-    close(fd);
-    close(sp50);
+        bytesWritten = write(destFd, buf, (size_t) bytesRead);
+        if (bytesWritten != bytesRead) {
+            if (errno == 0) {
+                write(destFd, buf + bytesWritten, bytesRead - bytesWritten);
+            }
+            fprintf(stderr, "ugen: internal error writing to %s: ", destPath);
+
+            errno < sys_nerr ?  fprintf(stderr, "%s\n", sys_errlist[errno]) :  fprintf(stderr, "errno is %d\n", errno);
+            fflush(stderr);
+            exit(EXIT_FAILURE);
+        }
+    }
+    close(destFd);
+    close(sourceFd);
 }

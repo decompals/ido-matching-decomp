@@ -14,7 +14,7 @@ CC_CHECK_COMP ?= gcc
 ifeq ($(VERSION),7.1)
 	IDO_VERSION := IDO_71
 #	IDO_TC      := cc acpp as0 as1 cfe copt ugen ujoin uld umerge uopt upas usplit
-	IDO_TC      := cc cfe ugen as1 umerge as0
+	IDO_TC      := cc cfe ugen as1 umerge as0 uopt
 else ifeq ($(VERSION),5.3)
 	IDO_VERSION := IDO_53
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit

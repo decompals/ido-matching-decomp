@@ -19,6 +19,26 @@
 .macro endlabel label
 .endm
 
+# An alternative entry to a function.
+.macro alabel label, visibility=global
+    .\visibility \label
+    .type \label, @function
+    \label:
+.endm
+
+# End of a data symbol.
+.macro enddlabel label
+    .size \label, . - \label
+.endm
+
+.macro nonmatching label, size=1
+    .global \label\().NON_MATCHING
+    .type \label\().NON_MATCHING, @object
+    .size \label\().NON_MATCHING, \size
+    \label\().NON_MATCHING:
+.endm
+
+
 # Float register aliases (o32 ABI, odd ones are rarely used)
 
 .set $fv0,          $f0
