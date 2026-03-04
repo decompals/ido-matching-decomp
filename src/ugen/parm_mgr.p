@@ -145,7 +145,7 @@ begin
     end;
     
 done:
-    if ((arg0^.u.Opc = Ucup) and (IS_STACK_OVERFLOW_ATTR(arg0^.u.Offset))) then begin
+    if (arg0^.u.Opc = Ucup) and (IS_REALLOC_ARG_ATTR(arg0^.u.Extrnal)) then begin
         v0^.u.I1 := 1;
     end;
 end;
