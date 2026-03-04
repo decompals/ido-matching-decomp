@@ -51,7 +51,7 @@ begin
             var_s0 := pred(var_s0);
         end until (var_s0 = 0);
     end;
-    write(f, ' ':arg1&7);
+    write(f, ' ':arg1 & 7);
 end;
 
 procedure print_ucode(var f: Text; var u: Bcrec);
@@ -195,9 +195,8 @@ end;
 procedure print_tree(var f: Text; arg1: ^tree; arg2: cardinal; arg3: cardinal);
 var
     mark: integer;
-    sp20: cardinal; /* sp - 8*/
+    sp20: cardinal;
 
-    /* inner function */
     procedure func_00449D24(pTree: ^Tree; arg1: Cardinal);
     begin
         while (pTree <> nil) do begin
