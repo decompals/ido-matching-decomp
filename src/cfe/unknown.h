@@ -111,7 +111,7 @@ extern int minimize_indirection_entries;
 extern char* sc_names[];
 extern MemCtx* tree_handle;
 extern MemCtx* temp_handle;
-extern int builtins[];
+extern Symbol* builtins[];
 extern Symbol* anonymous;
 
 int real_file_line(int, char**, int*, int);
@@ -131,5 +131,7 @@ void hash_table_statistics(void);
 void Set_Small_Data_Upper_Limit(int);
 void set_def_member_pack(int);
 void cpp_symentry_setMaxMacroRecursionDepth(int);
-void *get_runtime_id(char *, TreeNode *, int); 
+void* get_runtime_id(char*, TreeNode*, int);
+void declarator(TreeNode* id, TreeNode* context, int sclass, int oclass, int attr, TreeNode* type);
+void enter_id(TreeNode* id);
 #endif
