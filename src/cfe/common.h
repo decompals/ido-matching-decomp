@@ -11,6 +11,8 @@
 #include <ctype.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <sys/fpu.h>
+#include <fp_class.h>
 
 typedef struct TokenIdentifier {
     int was_typedef;
