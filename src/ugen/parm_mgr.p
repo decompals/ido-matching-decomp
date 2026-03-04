@@ -217,7 +217,7 @@ begin
     end;
 
     var_s0 := arg0^.next;
-    while not ((var_s0^.u.Opc in [Ucia, Ucup, Uicuf, Urcuf]) ) do begin        
+    while not (var_s0^.u.Opc in [Ucia, Ucup, Uicuf, Urcuf]) do begin        
         if (var_s0^.u.Opc = Upar) then begin
             check_amt_ref(var_s0^.op1);
         end;
