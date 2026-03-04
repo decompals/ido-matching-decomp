@@ -50,11 +50,11 @@ var
     temp_a0_2: Datatype;
     temp_a0_3: Ptree;
 begin    
+    { Datatype conversion }
     if (arg0^.u.Opc = Ucvt) then begin
         if (IS_OVERFLOW_ATTR(arg0^.u.Lexlev)) then begin
             return arg0;
         end;
-        
         if (arg0^.u.Dtype in [Qdt, Rdt, Xdt]) then begin    
             return arg0;
         end;
