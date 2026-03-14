@@ -41,4 +41,41 @@
     const gpr_s8	  =  xr30;	/* calle saved */
     const gpr_ra	  =  xr31;	/* return address */
 
+{Float point registers }
+const fpr_fv0   = xfr0;   /* floating point return value */
+const fpr_fv0f  = xfr1;
+const fpr_fv1   = xfr2;   /* floating point return value */
+const fpr_fv1f  = xfr3;
+
+const fpr_ft0   = xfr4;   /* caller saved temporaries */
+const fpr_ft0f  = xfr5;
+const fpr_ft1   = xfr6;
+const fpr_ft1f  = xfr7;
+const fpr_ft2   = xfr8;
+const fpr_ft2f  = xfr9;
+const fpr_ft3   = xfr10;
+const fpr_ft3f  = xfr11;
+
+const fpr_fa0   = xfr12;  /* floating point arguments */
+const fpr_fa0f  = xfr13;
+const fpr_fa1   = xfr14;
+const fpr_fa1f  = xfr15;
+
+const fpr_ft4   = xfr16;  /* caller saved temporaries */
+const fpr_ft4f  = xfr17;
+const fpr_ft5   = xfr18;
+const fpr_ft5f  = xfr19;
+
+const fpr_fs0   = xfr20;  /* callee saved */
+const fpr_fs0f  = xfr21;
+const fpr_fs1   = xfr22;
+const fpr_fs1f  = xfr23;
+const fpr_fs2   = xfr24;
+const fpr_fs2f  = xfr25;
+const fpr_fs3   = xfr26;
+const fpr_fs3f  = xfr27;
+const fpr_fs4   = xfr28;
+const fpr_fs4f  = xfr29;
+const fpr_fs5   = xfr30;
+const fpr_fs5f  = xfr31;
 #endif /* UGEN_REGDEF_H */

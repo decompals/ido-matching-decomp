@@ -25,7 +25,7 @@ end;
 
 function translate(a0: pointer): pointer;  external;
 function set_rewrite(arg0: ^tree; arg1: integer; arg2: Uopcode): pointer; external;
-procedure check_reg(arg0: ^Tree); external;
+procedure check_reg(arg0: ^Tree); forward;
 procedure free_tree_and_cse(arg0: ^tree); forward;
 
 var
@@ -41,6 +41,8 @@ var
     exprs: array [1..5] of ^tree;
     load_count: 1..5;
     loads: array [1..5] of ^tree;
+    h: array [char] of char;
+    lsb_first: boolean;
 
 procedure force_casting(arg0: ^Tree; arg1: integer);
 var
@@ -101,7 +103,39 @@ begin
     end;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/get_set_const.s")
+
+function get_set_const(var arg0: Valu; arg1: integer; arg2: 0..100): cardinal;
+var
+    var_v0: integer;
+    var_t0: integer;
+    var_t1: integer;
+    temp_v1: integer;
+    i: cardinal;
+    var_a2: integer;
+    temp_a3 : integer;
+begin
+    var_v0 := arg0.Ival;
+    temp_v1 := arg1 + arg2;
+    
+    Assert(temp_v1 div 4 <= var_v0);
+
+    
+
+    var_t0 := 0;
+    if (UGEN_BIG_ENDIAN) then begin
+        var_a2 := arg1 div 4 + 1;
+        var_t1 := temp_v1 div 4;
+    end else begin
+        var_t1 := (var_v0 * 4 - arg1) div 4;
+        var_a2 := (var_v0 * 4 - temp_v1) div 4 + 1;
+    end;
+
+    for i := var_a2 to var_t1 do begin
+        var_t0 := var_t0 * 16 + ord(h[arg0.Chars^.ss[i]]);
+    end;
+    
+    return var_t0;
+end;
 
 procedure gen_set_str(arg0: ^tree);
 var
@@ -210,9 +244,259 @@ begin
     return arg0;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/set_rewrite.s")
+function set_rewrite(arg0: ^tree; arg1: integer; arg2: 0..31 { actual range is unknown } ): pointer;
+var
+    temp_v0: ^Tree; { spD8 }
+    spD4: ^Tree;
+    s0: ^Tree; { probably arg0 }
+    v012: ^Tree;
+    
+begin
+    case arg0^.u.Opc of
+        Uldc:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := ivalue(Ldt, 0, get_set_const(arg0^.u.Constval, arg1, arg2));
+            temp_v0^.u.Length := integer(arg2 + 7) div 8;
+        end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/set_rewrite_indexed.s")
+        Ulod:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := build_u(arg0^.u);
+            temp_v0^.u.Offset := temp_v0^.u.Offset + (arg1 div 8);
+            temp_v0^.u.Length := integer(arg2 + 7) div 8;
+            temp_v0^.u.Lexlev := 0;
+        end;
+
+        Uilod,
+        Uisld:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := build_u(arg0^.u);
+            temp_v0^.op1 := dup_tree(arg0^.op1);
+            temp_v0^.u.Offset := temp_v0^.u.Offset + (arg1 div 8);
+            temp_v0^.u.Length := integer(arg2 + 7) div 8;
+            temp_v0^.u.Lexlev := 0;
+        end;
+
+        Udif,
+        Uint,
+        Uuni:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := build_2op(arg0^.u.Opc, set_rewrite(arg0^.op1, arg1, arg2), set_rewrite(arg0^.op2, arg1, arg2));
+            temp_v0^.u.Length := integer(arg2 + 7) div 8;
+        end;
+
+        Uadj:
+        begin
+            if (arg1 < arg0^.u.Offset * 8) or (arg1 >= (arg0^.u.Offset + arg0^.op1^.u.Length) * 8) then begin
+                temp_v0 := ivalue(Ldt, 0, 0);
+            end else begin
+                temp_v0 := set_rewrite(arg0^.op1, arg1 - arg0^.u.Offset * 8, arg2);
+            end;            
+        end;
+
+        Usgs:
+        begin
+            if (arg0^.op1^.u.Opc = Uldc) then begin
+                if (arg0^.op1^.u.Offset2 < arg1) or (arg0^.op1^.u.Offset2 >= (arg1 + arg2)) then begin
+                    temp_v0 := ivalue(Ldt, 0, 0);
+                end else if lsb_first then begin
+                    temp_v0 := ivalue(Ldt, 0, lshift(1, (arg0^.op1^.u.Offset2 - arg1)));
+                end else begin
+                    temp_v0 := ivalue(Ldt, 0, rshift(cardinal(16#80000000), arg0^.op1^.u.Offset2 - arg1));
+                end;
+            end else begin
+                if (arg1 <> 0) then begin
+                    temp_v0 := build_2op(Uadd, dup_tree(arg0^.op1), ivalue(Jdt, 0, -arg1));
+                    temp_v0^.u.Lexlev := 0;
+                end else begin 
+                    temp_v0 := dup_tree(arg0^.op1);
+                end;
+                temp_v0 := build_2op(Ules, temp_v0, ivalue(Ldt, 0, arg2));
+                temp_v0^.u.Dtype := Ldt;
+                s0 := dup_tree(arg0^.op1);
+                if UGEN_BIG_ENDIAN then begin
+                    s0 := build_1op(Unot, s0);
+                end;
+                temp_v0 := build_2op(Ushl, temp_v0, s0);
+            end;
+        end;
+
+        Umus:
+        begin
+            spD4 := dup_tree(arg0^.op1);
+            s0 := dup_tree(arg0^.op2);
+            if (arg1 <> 0) then begin
+                spD4 := build_2op(Uadd, spD4, ivalue(Jdt, 0, -arg1));
+                spD4^.u.Lexlev := 0;
+            end;
+
+            if (arg1 <> -1) then begin
+                s0 := build_2op(Uadd, s0, ivalue(Jdt, 0, 1 - arg1));
+                s0^.u.Lexlev := 0;
+            end;
+
+            spD4 := build_2op(Umax, spD4, ivalue(Jdt, 0, 0));
+            v012 := build_2op(Usub, spD4, build_2op(Umin, s0, ivalue(Jdt, 0, arg2)));
+            v012^.u.Lexlev := 0;
+            temp_v0 := build_2op(Ushr, v012, ivalue(Ldt, 0, 31));
+            temp_v0^.u.Dtype := Jdt;
+
+            if UGEN_LITTLE_ENDIAN then begin
+                temp_v0 := build_2op(Ushr, temp_v0, dup_tree(v012));
+                temp_v0^.u.Dtype := Ldt;
+                temp_v0 := build_2op(Ushl, temp_v0, dup_tree(spD4));
+                temp_v0^.u.Dtype := Ldt;
+            end else begin
+                temp_v0 := build_2op(Ushl, temp_v0, dup_tree(v012));
+                temp_v0^.u.Dtype := Ldt;
+                temp_v0 := build_2op(Ushr, temp_v0, dup_tree(spD4));
+                temp_v0^.u.Dtype := Ldt;
+            end;
+        end;
+
+        Uchkh:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := set_rewrite(arg0^.op1, arg1, arg2);
+        end;
+
+        Uchkl:
+        begin
+            Assert(arg0^.u.Dtype = Sdt);
+            temp_v0 := set_rewrite(arg0^.op1, arg1, arg2);
+        end;
+        
+        otherwise:
+        begin
+            report_error(Internal, 560, "translate.p", "illegal u-code");
+            print_node(err, arg0);
+        end;
+    end;
+    return temp_v0;
+end;
+
+function set_rewrite_indexed(arg0: ^tree; arg1: ^tree; arg2: 0..31): pointer;
+var
+    temp_v0: ^tree;
+    temp2: ^tree;
+    var_s0: ^tree;
+    temp1: ^tree;
+begin
+
+    case arg0^.u.Opc of                             /* irregular */
+    Uldc,
+    Ulod:
+    begin
+        Assert(arg0^.u.Dtype = Sdt);
+        if (arg0^.u.Opc = Ulod) then begin
+            arg0^.u.Opc := Ulda;
+            arg0^.u.Dtype := addr_dtype;
+        end;
+        temp_v0 := build_2op(Uadd, arg0, dup_tree(arg1));
+        temp_v0^.u.Lexlev := 0;
+        temp_v0^.u.Dtype := addr_dtype;
+
+        temp_v0 := build_1op(Uilod, temp_v0);
+        temp_v0^.u.Dtype := Sdt;
+        temp_v0^.u.Length := integer(arg2 + 7) div 8;
+        temp_v0^.u.Offset := 0;
+        temp_v0^.u.Offset2 := 0;
+        temp_v0^.u.Lexlev := 0;
+    end;
+    Uilod,
+    Uisld:
+    begin
+        Assert(arg0^.u.Dtype = Sdt);
+        arg0^.op1 := build_2op(Uadd, arg0^.op1, dup_tree(arg1));
+        arg0^.op1^.u.Lexlev := 0;
+        arg0^.u.Lexlev := 0;
+        arg0^.u.Length := integer(arg2 + 7) div 8;
+
+        temp_v0 := arg0;
+    end;
+    Udif,
+    Uint,
+    Uuni:
+    begin
+        Assert(arg0^.u.Dtype = Sdt);
+        temp_v0 := build_2op(arg0^.u.Opc, set_rewrite_indexed(arg0^.op1, arg1, arg2), set_rewrite_indexed(arg0^.op2, arg1, arg2));
+        temp_v0^.u.Length := integer(arg2 + 7) div 8;
+    end;
+    Uadj:
+    begin
+        if (arg0^.op1^.u.Opc = Uldc) then begin
+            temp_v0 := dup_tree(arg0^.op1);
+            free_tree(arg0);
+        end else begin
+            temp_v0 := build_ucond0(arg1, arg0^.u.Length);
+            temp_v0^.op2 := set_rewrite_indexed(arg0^.op1, arg1, arg2);
+        end;
+    end;
+    Usgs:
+    begin
+        temp_v0 := build_2op(Umpy, dup_tree(arg1), ivalue(Ldt, 0, 8));
+        temp_v0^.u.Lexlev := 0;
+        temp2 := build_2op(Usub, arg0^.op1, temp_v0);
+        temp2^.u.Lexlev := 0;
+        var_s0 := dup_tree(temp2);
+        if NOT (lsb_first) then begin
+            var_s0 := build_1op(Unot, var_s0);
+        end;
+        temp_v0 := build_2op(Ules, temp2, ivalue(Ldt, 0, arg2));
+        temp_v0^.u.Dtype := Ldt;
+        temp_v0 := build_2op(Ushl, temp_v0, var_s0);
+    end;
+    Umus:
+    begin
+        temp1 := build_2op(Umpy, dup_tree(arg1), ivalue(Ldt, 0, 8));
+        temp1^.u.Lexlev := 0;
+        temp2 := build_2op(Usub, arg0^.op1, dup_tree(temp1));
+        temp2^.u.Lexlev := 0;
+        var_s0 := build_2op(Uadd, arg0^.op2, ivalue(Ldt, 0, 1));
+        var_s0^.u.Lexlev := 0;
+        var_s0 := build_2op(Usub, var_s0, temp1);
+        var_s0^.u.Lexlev := 0;
+        temp2 := build_2op(Umax, temp2, ivalue(Jdt, 0, 0));
+        temp1 := build_2op(Usub, temp2, build_2op(Umin, var_s0, ivalue(Jdt, 0, arg2)));
+        temp1^.u.Lexlev := 0;
+        temp_v0 := build_2op(Ushr, temp1, ivalue(Ldt, 0, 31));
+        temp_v0^.u.Dtype := Jdt;
+        if (lsb_first) then begin
+            temp_v0 := build_2op(Ushr, temp_v0, dup_tree(temp1));
+            temp_v0^.u.Dtype := Ldt;
+            temp_v0 := build_2op(Ushl, temp_v0, dup_tree(temp2));
+            temp_v0^.u.Dtype := Ldt;
+        end else begin
+            temp_v0 := build_2op(Ushl, temp_v0, dup_tree(temp1));
+            temp_v0^.u.Dtype := Ldt;
+            temp_v0 := build_2op(Ushr, temp_v0, dup_tree(temp2));
+            temp_v0^.u.Dtype := Ldt;
+        end;
+    end;
+    Uchkh:
+    begin
+        Assert(arg0^.u.Dtype = Sdt);
+        temp_v0 := set_rewrite_indexed(arg0^.op1, arg1, arg2);
+        set_rewrite_indexed := temp_v0;
+    end;
+    Uchkl:
+    begin
+        Assert(arg0^.u.Dtype = Sdt);
+        temp_v0 := set_rewrite_indexed(arg0^.op1, arg1, arg2);
+        set_rewrite_indexed := temp_v0;
+    end;
+    otherwise begin
+        report_error(Internal, 689, "translate.p", "illegal u-code");
+        print_node(err, arg0);
+    end;
+    end;
+    return temp_v0;
+end;
+
 
 function translate_tree(arg0: pointer): pointer;
 var
@@ -524,12 +808,204 @@ begin
     end;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/check_reg.s")
+procedure check_reg({arg0: ^tree});
+var
+    ret: integer;
+    check: boolean;
+begin
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/assign_vreg.s")
+    Assert(arg0^.u.mtype <> Tmt);
+    if (arg0^.u.mtype = Amt) then begin
+        ret := check_amt(arg0);
+        if (ret <> -1) then begin
+            arg0^.u.Offset := ret;
+            arg0^.u.Mtype := Rmt;
+        end;
+    end else if (arg0^.u.mtype in [Mmt, Pmt]) then begin
+        if not (ignore_vreg) then begin
+            check := check_vreg(arg0, false);
+            return;
+        end;
+        if (get_domtag() <> 0) then begin
+            find_vreg_mtag(arg0);
+        end;
+    end else if (arg0^.u.mtype = Smt) then begin
+        arg0^.u.Offset2 := get_mtag(arg0^.u.I1);
+    end;
+end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/load_cse.s")
+procedure assign_vreg(arg0: Ptree; arg1: boolean);
+var
+    temp_v1: cardinal;
+    v1: cardinal;
+begin
+    case arg0^.u.Dtype of
+    Qdt,
+    Rdt:
+    begin
+        if (fp_vreg_offset <  max_fp_vreg_offset) then begin
+            vregs[vreg_count] := arg0;
+            vreg_count := vreg_count + 1;
+            if ((arg1) and (arg0^.u.Mtype = Pmt)) then begin
+                temp_v1 := parm_reg(arg0) & 255;
+                if ((temp_v1 <> 72) and (temp_v1 >= 44) and (((n_fp_parm_regs * 2) + 42) >= temp_v1)) then begin
+                    arg0^.u.Offset2 := temp_v1 * 4;
+                    return;
+                end;
+                arg0^.u.Offset2 := fp_vreg_offset;
+                temp_v1 := fp_vreg_offset;
+            end else begin
+                Assert(arg0^.u.Offset2 = -1);
+                arg0^.u.Offset2 := fp_vreg_offset;
+                temp_v1 := fp_vreg_offset;
+            end;
+            fp_vreg_offset := temp_v1 + 8;
+        end;
+    end;
+    Adt,
+    Fdt,
+    Gdt,
+    Hdt,
+    Jdt,
+    Ldt,
+    Mdt,
+    Ndt,
+    Sdt:
+    begin
+        Assert(arg0^.u.Length < 5);
+        if (vreg_offset < max_vreg_offset) then begin
+            vregs[vreg_count] := arg0;
+            vreg_count := vreg_count + 1;
+            if (((arg1) or (has_entry)) and (arg0^.u.Mtype = Pmt)) then begin
+                temp_v1 := parm_reg(arg0) & 255;
+                if (temp_v1 = 72) then begin
+                    Assert(arg0^.u.Offset2 = -1);
+                    arg0^.u.Offset2 := vreg_offset;
+                    temp_v1 := vreg_offset;
+                end else begin
+                    Assert((arg0^.u.Offset2 = -1) or (arg0^.u.Offset2 = temp_v1 * 4));
+                    arg0^.u.Offset2 := temp_v1 * 4;
+                    return;
+                end;
+            end else begin
+                Assert(arg0^.u.Offset2 = -1);
+                arg0^.u.Offset2 := vreg_offset;
+                temp_v1 := vreg_offset;
+            end;
 
+            vreg_offset := temp_v1 + 4;
+            if (((use_real_fp_for_proc and arg1) or has_entry) and (vreg_offset * 1 = 52)) then begin
+                vreg_offset := vreg_offset * 1 + 4;
+                return;
+            end;
+        end;
+    end;
+    Xdt:
+        report_error(Internal, 2387, "translate.p", "extended float not yet supported");
+    Idt,
+    Kdt,
+    Wdt:
+    begin
+        if (opcode_arch = 1) then begin
+            Assert(arg0^.u.Length < 9);
+            if (vreg_offset < max_vreg_offset) then begin
+                vregs[vreg_count] := arg0;
+                vreg_count := vreg_count + 1;
+                if (((arg1) or (has_entry)) and (arg0^.u.Mtype = Pmt)) then begin
+                    temp_v1 := parm_reg(arg0) & 255;
+                    if (temp_v1 = 72) then begin
+                        Assert(arg0^.u.Offset2 = -1);
+                        arg0^.u.Offset2 := vreg_offset;
+                        temp_v1 := vreg_offset;
+                    end else begin
+                        Assert((arg0^.u.Offset2 = -1) or (arg0^.u.Offset2 = temp_v1 * 4));
+                        arg0^.u.Offset2 := temp_v1 * 4;
+                        return;
+                    end;
+                end else begin
+                    Assert(arg0^.u.Offset2 = -1);
+                    arg0^.u.Offset2 := vreg_offset;
+                temp_v1 := vreg_offset;
+                end;
+                vreg_offset := temp_v1 + 8;
+                return;
+            end;
+        end;
+        end;
+    otherwise
+    begin
+        report_error(Internal, 2417, "translate.p", "illegal vreg type");
+    end;
+    end;
+end;
+
+function load_cse(arg0: ^Tree) : pointer;
+var
+    temp_v0: ^tree;
+    temp_a1: ^tree;
+    
+    var_v0: ^tree;
+    i: 1..5;
+    
+begin
+    if (no_cse_flag > 0) then begin
+        return arg0;
+    end;
+
+    if (NOT (arg0^.u.Opc in [Uisld, Ulod]) or NOT (arg0^.u.Mtype in [Mmt, Pmt, Smt, Amt]) or IS_VOLATILE_ATTR(arg0^.u.Lexlev) or (((arg0^.u.Dtype <> Sdt) or (arg0^.u.Length >= 5)) and ((arg0^.u.Dtype = Sdt) or (arg0^.u.Length >= 9)))) then begin
+        return arg0;
+    end;
+
+    for i := load_count downto 1 do begin 
+        temp_a1 := loads[i];
+
+        {Length -> 0x28} 
+        {Offset -> 0x2C} 
+        if (temp_a1 <> nil) then begin
+            if ((temp_a1^.u.Dtype = arg0^.u.Dtype) and (temp_a1^.u.Mtype = arg0^.u.Mtype) and (temp_a1^.u.I1 = arg0^.u.I1)) then begin
+                if ((UGEN_LITTLE_ENDIAN and (temp_a1^.u.Offset = arg0^.u.Offset)) or 
+                    (UGEN_BIG_ENDIAN and (temp_a1^.u.Offset + temp_a1^.u.Length = arg0^.u.Offset + arg0^.u.Length))) then begin
+                    if (temp_a1^.u.Length = arg0^.u.Length) then begin
+                        
+                        if (temp_a1^.u.Opc = Ustr) then begin
+                            var_v0 := dup_tree(temp_a1^.op1);
+                        end else if (temp_a1^.u.Opc = Uisst) then begin
+                            var_v0 := dup_tree(temp_a1^.op2);
+                        end else if (arg0 = temp_a1) then begin
+                            return arg0;
+                        end else begin
+                            var_v0 := dup_tree(temp_a1);
+                        end;
+        
+                        if (((source_language = C_SOURCE) and (arg0^.u.Length < temp_a1^.u.Length)) or
+                            ((arg0^.u.Length < 4) and (temp_a1^.u.Opc in [Uisst, Ustr]))) then begin
+                            temp_v0 := build_1op(Ucvtl, var_v0);
+                            temp_v0^.u.Dtype := arg0^.u.Dtype;
+                            temp_v0^.u.I1 := arg0^.u.Length * 8;
+                            var_v0 := translate_cvtl(temp_v0);
+                        end;
+        
+                        if (var_v0^.u.Opc = Uldc) then begin
+                            if (var_v0^.u.Dtype <> arg0^.u.Dtype) then begin
+                                var_v0^.u.Dtype := arg0^.u.Dtype;
+                            end;
+                        end;
+        
+                        free_tree(arg0);
+                        return var_v0;
+                    end;
+                end;
+            end;
+        end;
+    end;
+
+    if (load_count < integer(10)) then begin
+        load_count := load_count + 1;
+        loads[load_count] := arg0;
+    end;
+    
+    return arg0;
+end;
 
 function uses(arg0: ^Tree; arg1: ^Tree; arg2: cardinal): boolean;
 label loop;
@@ -677,7 +1153,6 @@ begin
         if ((var_s3 <> nil) and (load_count < integer(10))) then begin
             load_count := load_count + 1;
             loads[load_count] := var_s3;
-
         end;
     end;
 

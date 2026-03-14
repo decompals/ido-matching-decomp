@@ -32,7 +32,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbgt, succ(arg0), succ(arg1), arg2);
             emit_rrll(zblt, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbgtu, arg0, arg1, arg2);
@@ -49,7 +49,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbgtu, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbltu, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbgtu, arg0, arg1, arg2);
@@ -66,7 +66,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zblt, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbgt, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbltu, arg0, arg1, arg2);
@@ -83,7 +83,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbltu, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbgtu, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbltu, arg0, arg1, arg2);
@@ -100,7 +100,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zblt, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbgt, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbleu, arg0, arg1, arg2);
@@ -117,7 +117,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbltu, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbgtu, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbleu, arg0, arg1, arg2);
@@ -134,7 +134,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbgt, succ(arg0), succ(arg1), arg2);
             emit_rrll(zblt, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbgeu, arg0, arg1, arg2);
@@ -151,7 +151,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrll(zbgtu, succ(arg0), succ(arg1), arg2);
             emit_rrll(zbltu, succ(arg0), succ(arg1), sp30);
             emit_rrll(zbgeu, arg0, arg1, arg2);
@@ -492,7 +492,7 @@ var
             var_s2 := arg3;
         end;
         emit_dir0(iset, ord(set_noat));
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zaddu, arg1, var_s3, var_s2);
             emit_rrr(zsltu, xr1, arg1, var_s2);
             emit_rrr(arg0, succ(arg1), xr1, succ(var_s3));
@@ -509,7 +509,7 @@ var
     procedure func_0041D39C(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     begin
         emit_dir0(iset, ord(set_noat));
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zsltu, xr1, arg2, arg3);
             emit_rrr(zsubu, arg1, arg2, arg3);
             emit_rrr(arg0, succ(arg1), succ(arg2), succ(arg3));
@@ -545,7 +545,7 @@ var
         sp33 := arg3;
         emit_rri_(zsll, sp43, arg3, 26, franone);
         emit_rll(zbgez, sp43, sp3C);
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zsll, succ(arg1), arg2, arg3);
             emit_ri_(zli, arg1, 0, franone);
             emit_ll(zb, sp34);
@@ -598,7 +598,7 @@ var
         sp33 := arg3;
         emit_rri_(zsll, sp43, arg3, 26, franone);
         emit_rll(zbgez, sp43, sp3C);
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(arg0, arg1, succ(arg2), arg3);
             if arg0 = zsra then begin
                 emit_rri_(zsra, succ(arg1), succ(arg2), 31, franone);
@@ -657,7 +657,7 @@ var
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zsgtu, arg1, succ(arg2), succ(arg3));
             emit_rrll(zbne, succ(arg2), succ(arg3), sp30);
             emit_rrr(arg0, arg1, arg2, arg3);
@@ -680,7 +680,7 @@ var
             sp36 := zsgtu;
         end;
         sp38 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zsgt, arg1, succ(arg2), succ(arg3));
             emit_rrll(zbne, succ(arg2), succ(arg3), sp38);
             emit_rrr(sp36, arg1, arg2, arg3);
@@ -697,7 +697,7 @@ var
         sp30: integer;
     begin
         sp30 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zsltu, arg1, succ(arg2), succ(arg3));
             emit_rrll(zbne, succ(arg2), succ(arg3), sp30);
             emit_rrr(arg0, arg1, arg2, arg3);
@@ -720,7 +720,7 @@ var
             sp36 := zsleu;
         end;
         sp38 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zslt, arg1, succ(arg2), succ(arg3));
             emit_rrll(zbne, succ(arg2), succ(arg3), sp38);
             emit_rrr(sp36, arg1, arg2, arg3);
@@ -791,7 +791,7 @@ var
         sp29: registers;
         sp28: registers;
     begin
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             sp2B := succ(arg1);
             sp2A := arg1;
             sp29 := succ(arg2);
@@ -826,7 +826,7 @@ var
         sp29: registers;
         sp28: registers;
     begin
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             sp2B := succ(arg1);
             sp2A := arg1;
             sp29 := succ(arg2);
@@ -861,7 +861,7 @@ var
             emit_ri_(zli, arg1, 0, franone);
             emit_ri_(zli, succ(arg1), 0, franone);
         end else if arg3 >= 32 then begin
-            if lsb_first then begin
+            if UGEN_LITTLE_ENDIAN then begin
                 emit_ri_(zli, arg1, 0, franone);
                 emit_rri_(arg0, succ(arg1), arg2, arg3 - 32, franone);
             end else begin
@@ -869,7 +869,7 @@ var
                 emit_rri_(arg0, arg1, succ(arg2), arg3 - 32, franone);
             end;
         end else begin
-            if lsb_first then begin
+            if UGEN_LITTLE_ENDIAN then begin
                 emit_rri_(arg0, succ(arg1), succ(arg2), arg3, franone);
                 emit_rri_(arg0, arg1, arg2, 32 - arg3, franone);
                 emit_rrr(zor, succ(arg1), succ(arg1), arg1);
@@ -893,7 +893,7 @@ var
             emit_ri_(zli, succ(arg1), 0, franone);
         end else if arg3 >= 32 then begin
             sp38 := gen_label_id();
-            if lsb_first then begin
+            if UGEN_LITTLE_ENDIAN then begin
                 emit_ri_(zli, succ(arg1), 0, franone);
                 emit_rll(zbgez, succ(arg2), sp38);
                 emit_ri_(zli, succ(arg1), -1, franone);
@@ -907,7 +907,7 @@ var
                 emit_rri_(arg0, succ(arg1), arg2, arg3 - 32, franone);
             end;
         end else begin
-            if lsb_first then begin
+            if UGEN_LITTLE_ENDIAN then begin
                 emit_rri_(zsrl, arg1, arg2, arg3, franone);
                 emit_rri_(zsll, succ(arg1), succ(arg2), 32 - arg3, franone);
                 emit_rrr(zor, arg1, arg1, succ(arg1));
@@ -924,14 +924,14 @@ var
     procedure func_0041F194(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     begin
         emit_ri_(zli, arg1, arg4, franone);
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zxor, arg1, arg1, arg2);
         end else begin
             emit_rrr(zxor, arg1, arg1, succ(arg2));
         end;
         emit_dir0(iset, ord(set_noat));
         emit_ri_(zli, xr1, arg3, franone);
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rrr(zxor, xr1, xr1, succ(arg2));
         end else begin
             emit_rrr(zxor, xr1, xr1, arg2);
@@ -951,7 +951,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zsgtu, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zbltu, succ(arg2), arg3, temp_s0);
@@ -970,7 +970,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zsgt, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zblt, succ(arg2), arg3, temp_s0);
@@ -989,7 +989,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zsgt, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zblt, succ(arg2), arg3, temp_s0);
@@ -1008,7 +1008,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zslt, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zbgt, succ(arg2), arg3, temp_s0);
@@ -1027,7 +1027,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zslt, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zbgt, succ(arg2), arg3, temp_s0);
@@ -1046,7 +1046,7 @@ var
         temp_s0: integer;
     begin
         temp_s0 := gen_label_id();
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zsltu, arg1, succ(arg2), arg3, franone);
             emit_rll(zbgtz, arg1, temp_s0);
             emit_rill(zbgtu, succ(arg2), arg3, temp_s0);
@@ -1064,7 +1064,7 @@ begin
     if (opcode_arch = 0) and (arg5^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zand: begin
-                if lsb_first then begin
+                if UGEN_LITTLE_ENDIAN then begin
                     emit_rri_(arg0, arg1, arg2, arg4, franone);
                     if arg3 = 0 then begin
                         emit_rr(zmove, succ(arg1), gpr_zero);
@@ -1081,7 +1081,7 @@ begin
                 end;
             end;
             zor, zxor: begin
-                if lsb_first then begin
+                if UGEN_LITTLE_ENDIAN then begin
                     emit_rri_(arg0, arg1, arg2, arg4, franone);
                     if arg3 = 0 then begin
                         emit_rr(zmove, succ(arg1), succ(arg2));
@@ -1098,7 +1098,7 @@ begin
                 end;
             end;
             znor: begin
-                if lsb_first then begin
+                if UGEN_LITTLE_ENDIAN then begin
                     emit_rri_(arg0, arg1, arg2, arg4, franone);
                     if arg3 = 0 then begin
                         emit_rr(znot, succ(arg1), succ(arg2));
@@ -1157,7 +1157,7 @@ procedure dw_emit_rr(arg0: asmcodes; arg1: registers; arg2: registers; arg3: ^tr
     procedure func_00420360(arg0: asmcodes; arg1: registers; arg2: registers);
     begin
         emit_dir0(iset, ord(set_noat));
-        if lsb_first then begin
+        if UGEN_LITTLE_ENDIAN then begin
             emit_rri_(zseq, xr1, arg2, 0, franone);
             emit_rr(znegu, arg1, arg2);
             emit_rr(znot, succ(arg1), succ(arg2));
