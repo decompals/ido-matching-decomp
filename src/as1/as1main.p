@@ -171,8 +171,8 @@ var
     knownregs: set of registers;
     multireloc_list: ARRAY_OF(integer);
     multirelocinstr_list: ARRAY_OF(MultiRelocRec);
-    sym_tab: ARRAY_OF(PUnkALpha);
-    neg_sym_tab: ARRAY_OF(PUnkALpha);
+    sym_tab: ARRAY_OF(PSymbol);
+    neg_sym_tab: ARRAY_OF(PSymbol);
     isa: mips_isa;
     s_pool_symbol: PSymbol;
     d_pool_symbol: PSymbol;
@@ -229,7 +229,7 @@ var
     dwopcode: boolean;
     r4300_mul: boolean;
     fp_hack_flag: 0..4; { TODO enum ? }
-    mcount_address: PUnkALpha;
+    mcount_address: PSymbol;
     mcount_sym: IdentName;
     olimit_value: integer;
     gprmask: cardinal;

@@ -27,7 +27,7 @@ var
     lastdata: integer;
     lexicallevel: integer;    
 
-procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PUnkALpha; arg5: integer); external; { TODO signature }
+procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PSymbol; arg5: integer); external; { TODO signature }
 procedure st_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: registers; arg4: integer; arg5: integer; arg6: integer); external; { TODO signature }
 procedure fill_ascii_pseudo(var str: st_string; size: integer; arg2: boolean); external;
 procedure get_binasm(var b: PBinasm); external;
@@ -1387,7 +1387,7 @@ end;
 procedure parseloc(var arg0: boolean);
 var
     tmp: boolean;
-    sym: PUnkALpha;
+    sym: PSymbol;
 begin
     if (currsegment = seg_text) or (currsegment = seg_15) then begin
         if (bbindex <> 0) and
@@ -1417,7 +1417,7 @@ end;
 
 procedure parseglobl;
 var
-    sym: PUnkALpha;
+    sym: PSymbol;
 begin
     with binasmfyle^ do begin
         sym := stp(symno);
@@ -1440,7 +1440,7 @@ end;
 
 procedure parseweakext;
 var
-    sym: PUnkALpha;
+    sym: PSymbol;
 begin
     with binasmfyle^ do begin
         sym := stp(symno);
@@ -1451,7 +1451,7 @@ end;
 
 procedure parseglobabs;
 var
-    sym: PUnkALpha;
+    sym: PSymbol;
 begin
     with binasmfyle^ do begin
         sym := stp(symno);
@@ -1659,7 +1659,7 @@ begin
     end;
 end;
 
-procedure doword(arg0: integer; arg1: integer; arg2: cardinal; arg3: PUnkALpha; arg4: integer; arg5: boolean);
+procedure doword(arg0: integer; arg1: integer; arg2: cardinal; arg3: PSymbol; arg4: integer; arg5: boolean);
 var
     s0: Alignment;
     spF3: boolean;
@@ -1757,7 +1757,7 @@ begin
     end;
 end;
 
-procedure dodword(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PUnkALpha; arg5: integer);
+procedure dodword(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PSymbol; arg5: integer);
 var
     spF3: boolean;
     tempval: cardinal;

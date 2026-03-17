@@ -22,6 +22,9 @@ var
     d_pool_symbol: extern PSymbol;
     knownregs: extern set of registers;
     gp_symbol: extern PSymbol;
+    float_li_flag: extern boolean;
+    dwopcode: extern boolean;
+    fp_pool_flag: extern boolean;
 
     { .data }
     gp_symbol_name : Identname := "_gp\0";
@@ -875,7 +878,7 @@ var
     spD4: PSymbol;
     spD3: Alignment;
     spD2: boolean;
-    a2: PUnkALpha;     
+    a2: PSymbol;     
     a0: integer;
 
     function func_0045FB50(arg0: registers; arg1: integer; arg2: PSymbol): Alignment;
@@ -902,7 +905,7 @@ var
         return Alignment(max(ord(opts.unk_1C), ord(addr_to_alignment[v1 mod 8])));
     end; 
 
-    procedure func_00460194(arg0: asmcodes; arg1: registers; arg2: PUnkALpha; arg3: integer; arg4: registers; arg5: registers; arg6: boolean);
+    procedure func_00460194(arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: integer; arg4: registers; arg5: registers; arg6: boolean);
     var
         spD0: integer;
         spCC: integer;
@@ -911,7 +914,7 @@ var
         spC8: registers;
         spC7: RldType;
 
-        procedure func_0045FD94(arg0: asmcodes; arg1: registers; arg2: PUnkALpha; arg3: RldType; arg4: integer; arg5: registers; arg6: registers; arg7: boolean);
+        procedure func_0045FD94(arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: RldType; arg4: integer; arg5: registers; arg6: registers; arg7: boolean);
         var
             spC8: integer;
             spC4: integer;
@@ -1204,7 +1207,7 @@ var
         end;
     end;
 
-    procedure func_00461230(arg0: asmcodes; arg1: registers; arg2: PUnkALpha; arg3: integer; arg4: registers; arg5: integer);
+    procedure func_00461230(arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: integer; arg4: registers; arg5: integer);
     var
         spC3: registers;
     begin

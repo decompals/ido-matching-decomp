@@ -430,9 +430,6 @@ var
     num_pseudo: extern integer;
     sp_addu_index: extern integer;
     current_mem_tag: extern 0..16383; { 14 bits }
-    dwopcode: extern boolean;
-    float_li_flag: extern boolean;
-    fp_pool_flag: extern boolean;
     
 procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
