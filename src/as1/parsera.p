@@ -1,8 +1,8 @@
 #include "common_p.h"
 
-function emit_dword_item(arg0: cardinal; arg1: cardinal; arg2: PUnkAlpha): PUnkAlpha; external;
+function emit_dword_item(arg0: cardinal; arg1: cardinal; arg2: PSymbol): PSymbol; external;
 procedure parse_dli_dla; external;
-function stp(symno: integer): PUnkAlpha; external;
+function stp(symno: integer): PSymbol; external;
 function emit_pool_const(arg0: UnkFPStruct; arg1: boolean; arg2: boolean; arg3: segments): integer; external;
 function get_fp_string(size: integer): PFilename; external;
 procedure string_to_fpoverlay(arg0: GString; arg1: UnknownEnum; var arg2: UnkFPStruct; var arg3: boolean; var arg4: boolean); external;
@@ -10,7 +10,7 @@ function short_s(arg0: integer): integer; external;
 function short_d(arg0: integer; arg1: integer): integer; external;
 procedure emitfli(op: opcodes; reg1: registers; arg2: integer); external;
 function generate_as_immediate(fasm: asmcodes; reg1: registers; arg2: integer; arg3: integer): boolean; external;
-function emit_fp_const(arg0: UnkFPStruct; arg1: boolean; arg2: boolean; arg3: UnknownEnum; var arg4: integer): PUnkAlpha; external;
+function emit_fp_const(arg0: UnkFPStruct; arg1: boolean; arg2: boolean; arg3: UnknownEnum; var arg4: integer): PSymbol; external;
 
 var
     { extern }
@@ -18,10 +18,10 @@ var
     multirelocinstr_list: extern ARRAY_OF(MultiRelocRec);
     nextmultirelocinstr: extern integer;
     storeops: extern set of opcodes;
-    s_pool_symbol: extern PUnkAlpha;
-    d_pool_symbol: extern PUnkAlpha;
+    s_pool_symbol: extern PSymbol;
+    d_pool_symbol: extern PSymbol;
     knownregs: extern set of registers;
-    gp_symbol: extern PUnkAlpha;
+    gp_symbol: extern PSymbol;
 
     { .data }
     gp_symbol_name : Identname := "_gp\0";
@@ -51,12 +51,12 @@ end;
 procedure setup_tempreg(arg0: integer;
                         arg1: registers;
                         arg2: registers;
-                        var arg3: PUnkAlpha;
+                        var arg3: PSymbol;
                         var arg4: integer;
                         var arg5: RldType;
                         arg6: boolean;
                         arg7: asmcodes);
-    function func_0045C2AC(arg0: boolean; arg1: registers; arg2: PUnkAlpha; arg3: integer): boolean;
+    function func_0045C2AC(arg0: boolean; arg1: registers; arg2: PSymbol; arg3: integer): boolean;
 
         function func_0045C154(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: segments): boolean;
         var
@@ -215,8 +215,8 @@ begin
     end;
 end;
 
-function check_if_gp_relative(arg0: PUnkAlpha; arg1: integer): boolean;
-    function func_0045CCDC(arg0: PUnkAlpha): boolean;
+function check_if_gp_relative(arg0: PSymbol; arg1: integer): boolean;
+    function func_0045CCDC(arg0: PSymbol): boolean;
     var
         i: integer;
     begin
@@ -283,7 +283,7 @@ begin
     return True;
 end;
 
-function is_gp_relative(arg0: PUnkAlpha; arg1: integer; arg2: registers; var arg3: registers): boolean;
+function is_gp_relative(arg0: PSymbol; arg1: integer; arg2: registers; var arg3: registers): boolean;
 begin
     if not check_if_gp_relative(arg0, arg1) then begin
         return False;
@@ -306,7 +306,7 @@ end;
 
 procedure genfpmultiple(arg0: asmcodes;
                         arg1: registers;
-                        arg2: PUnkAlpha;
+                        arg2: PSymbol;
                         arg3: integer;
                         arg4: registers;
                         words: integer;
@@ -540,7 +540,7 @@ begin
     end;
 end;
 
-procedure do_parseafra({arg0: asmcodes; arg1: registers; arg2: PUnkAlpha; arg3: integer; arg4: registers});
+procedure do_parseafra({arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: integer; arg4: registers});
 var
     sp77: registers;
     sp76: registers;
@@ -724,7 +724,7 @@ end;
 
 procedure gendouble(arg0: asmcodes;
                     arg1: registers;
-                    arg2: PUnkAlpha;
+                    arg2: PSymbol;
                     arg3: integer;
                     arg4: registers;
                     arg5: boolean);
@@ -872,13 +872,13 @@ var
     spDF: registers;
     spDE: registers;
     spD8: integer;
-    spD4: PUnkAlpha;
+    spD4: PSymbol;
     spD3: Alignment;
     spD2: boolean;
     a2: PUnkALpha;     
     a0: integer;
 
-    function func_0045FB50(arg0: registers; arg1: integer; arg2: PUnkAlpha): Alignment;
+    function func_0045FB50(arg0: registers; arg1: integer; arg2: PSymbol): Alignment;
     var
         v1: integer;
     begin
@@ -1255,7 +1255,7 @@ var
 
     procedure func_004616A4(arg0: asmcodes;
                             arg1: registers;
-                            arg2: PUnkAlpha;
+                            arg2: PSymbol;
                             arg3: integer;
                             arg4: registers);
     var
@@ -1624,7 +1624,7 @@ procedure parseafri_fp(fasm: asmcodes);
 var
     sp104: GString;
     unused: integer;
-    spFC: PUnkAlpha;
+    spFC: PSymbol;
     spEC: binasm;
     spD8: UnkFPStruct;
     spD4: integer;

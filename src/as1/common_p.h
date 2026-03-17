@@ -124,7 +124,7 @@ type
         next: ^UnkKappa;
     end;
 
-    UnkAlpha = record
+    Symbol = record
         { 0x00 } unk00: Byte;
         { 0x04 } unk04: integer;
         { 0x08 } unk08: integer;
@@ -161,12 +161,12 @@ type
         { 0x60 } currline: integer;
     end;
 
-    PUnkAlpha = ^UnkAlpha;
+    PSymbol = ^Symbol;
 
     RldRec = Record
         { 0x00 } unk00: integer;
         { 0x04 } unk04: integer;
-        { 0x08 } unk08: ^UnkAlpha;
+        { 0x08 } unk08: ^Symbol;
         { 0x0C } unk0C: integer;
         { 0x10 } unk10: byte;
         { 0x11 } unk11: registers;
@@ -177,7 +177,7 @@ type
 
     PreReorderPeepholesRec = record
         unk_00: integer;
-        unk_04: PUnkAlpha;
+        unk_04: PSymbol;
         unk_08: integer;
         unk_0C: registers;
         unk_0D: boolean;
@@ -250,8 +250,8 @@ type
         unk04: integer;
         unk08: integer;
         unk0C: integer;
-        unk10: PUnkAlpha;
-        unk14: PUnkAlpha;
+        unk10: PSymbol;
+        unk14: PSymbol;
     end;
 
     Alignment = (
@@ -384,7 +384,7 @@ var
     currfunc_hasedata: extern boolean;
     is_nonleaf: extern boolean;
     sexchange: extern boolean;
-    currfunc_sym: extern ^UnkAlpha;
+    currfunc_sym: extern ^Symbol;
     lastinstr: extern itype;
     pendinginstr: extern boolean;
     adjust_frame_by_ld: extern boolean;
@@ -411,7 +411,7 @@ var
     shftaddr: extern integer;
     sixtyfour_bit: extern boolean;
     elf_flag: extern boolean;
-    gp_disp_address: extern PUnkAlpha;
+    gp_disp_address: extern PSymbol;
     profileflag: extern integer;
     binasm_file: extern FileOfBinasm;
     last_bb: extern array [1..3] of Byte;
@@ -443,11 +443,11 @@ function strlen(p : ^Filename): integer; external;
 procedure strcpy(dst: ^Filename; src: ^Filename); external;
 function xmalloc(size: integer): pointer; external;
 function l_addr(var value: Identname): pointer; external;
-function enter_undef_sym(ptr: pointer): PUnkAlpha; external;
+function enter_undef_sym(ptr: pointer): PSymbol; external;
 function idn_for_data(): integer; external;
-procedure defineasym(arg0: integer; arg1: PUnkAlpha; arg2: integer); external;
+procedure defineasym(arg0: integer; arg1: PSymbol; arg2: integer); external;
 function ll_load_immed(arg0: integer; arg1: integer; arg2: registers): boolean; external;
-procedure do_parseafra(arg0: asmcodes; arg1: registers; arg2: PUnkAlpha; arg3: integer; arg4: registers); external;
+procedure do_parseafra(arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: integer; arg4: registers); external;
 function fixup_symno(symno: integer): integer; external;
 procedure fixup_preceding_labels(align: integer); external;
 procedure parsefpconst(which: itype); external;
@@ -462,15 +462,15 @@ function is_dso_static(arg0: integer): boolean; external;
 procedure macro_error; external;
 function disp(high: boolean; offset: cardinal): cardinal; external;
 procedure restore_gp(); external;
-function islocalsym(arg0: PUnkAlpha): boolean; external;
+function islocalsym(arg0: PSymbol): boolean; external;
 procedure emitloadstore(op: opcodes; reg1: registers; offset: integer; reg2: registers); external;
-procedure _setrld(sym: PUnkAlpha; arg1: RldType; arg2: integer); external;
+procedure _setrld(sym: PSymbol; arg1: RldType; arg2: integer); external;
 procedure emitalui(op: opcodes; reg1: registers; reg2: registers; imm: integer); external;
 procedure emitalu3(op: opcodes; reg1: registers; reg2: registers; reg3: registers); external;
 procedure emitnop(count: integer); external;
 procedure request_multi_relocinst(arg0: integer); external;
 function strcmp(arg0: pointer; arg1: pointer): integer; external;
-procedure loadimmed(arg0: integer; arg1: registers; arg2: PUnkAlpha); external;
+procedure loadimmed(arg0: integer; arg1: registers; arg2: PSymbol); external;
 procedure emitcache(op: opcodes; reg1: registers; arg2: integer; arg3: registers); external;
 procedure emitmvcoproc(op: opcodes; reg1: registers; reg2: registers); external;
 procedure emitshift(op: opcodes; reg1: registers; reg2: registers; imm: integer); external;

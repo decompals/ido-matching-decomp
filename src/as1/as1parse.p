@@ -31,15 +31,15 @@ procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer
 procedure st_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: registers; arg4: integer; arg5: integer; arg6: integer); external; { TODO signature }
 procedure fill_ascii_pseudo(var str: st_string; size: integer; arg2: boolean); external;
 procedure get_binasm(var b: PBinasm); external;
-function stp(symno: integer): PUnkAlpha; external;
+function stp(symno: integer): PSymbol; external;
 procedure enterstp(symno: integer); external;
-procedure enterlabel(symno: integer; var sym: PUnkAlpha); external;
-procedure entersym(symno: integer; var sym: PUnkAlpha); external;
+procedure enterlabel(symno: integer; var sym: PSymbol); external;
+procedure entersym(symno: integer; var sym: PSymbol); external;
 procedure emitreg2(op: opcodes; reg1: registers; reg2: registers); external;
 procedure emitfpop(op: opcodes; reg1: registers; reg2: registers; reg3: registers); external;
 procedure emitspec(op: opcodes; arg1: integer); external;
-procedure emitbene(op: opcodes; reg1: registers; reg2: registers; sym: PUnkAlpha; imm: integer); external;
-procedure emitbcond(op: opcodes; reg1: registers; sym: PUnkAlpha; imm: integer); external;
+procedure emitbene(op: opcodes; reg1: registers; reg2: registers; sym: PSymbol; imm: integer); external;
+procedure emitbcond(op: opcodes; reg1: registers; sym: PSymbol; imm: integer); external;
 procedure emitjump(op: opcodes; arg1: integer; arg2: integer); external;
 procedure emitcoproc(op: opcodes; arg1: integer); external;
 function call_as0(var arg0: Filename; var arg1: Filename; var arg2: Filename) : integer; external;
@@ -166,7 +166,7 @@ procedure parseafri(fasm: asmcodes);
 var
     reg: registers;
     immed: integer;
-    sym: PUnkAlpha;
+    sym: PSymbol;
 begin
     with binasmfyle^ do begin
         if fasm = zcia then begin
@@ -228,7 +228,7 @@ var
     reg2: registers;
     spCD: registers;
     spCC: registers;    
-    sym: PUnkAlpha;
+    sym: PSymbol;
     spC6: opcodes;
     spC5: boolean;
     spC0: integer;
@@ -680,7 +680,7 @@ procedure parseafa(fasm: asmcodes);
 var
     spCF: registers;
     spC8: integer;
-    spC4: PUnkAlpha;
+    spC4: PSymbol;
     spC3: boolean;
     ba: ^binasm;
 begin
@@ -806,7 +806,7 @@ end;
 procedure parseafrl(fasm: asmcodes);
 var
     spCF: registers;
-    spC8: PUnkAlpha;
+    spC8: PSymbol;
     spC4: integer;
     spC0: ^binasm;
 begin
@@ -852,7 +852,7 @@ end;
 
 procedure parseafl(fasm: asmcodes);
 var
-    spC8: PUnkAlpha;
+    spC8: PSymbol;
     spC4: integer;
     spC0: ^binasm;
 begin
@@ -999,7 +999,7 @@ end;
 
 procedure remember_symbol_size(symno: integer; size: integer);
 var
-    sym: PUnkAlpha;
+    sym: PSymbol;
 begin
     if symno <> 0 then begin
         sym := stp(symno);
@@ -1044,7 +1044,7 @@ end;
 
 procedure parsecomm(which: itype);
 var
-    spC4: PUnkAlpha;
+    spC4: PSymbol;
     spC0: integer;
     spBC: integer;
 begin
@@ -1294,7 +1294,7 @@ end;
 
 procedure parseend(which: itype);
 var
-    sp84: PUnkAlpha;
+    sp84: PSymbol;
     sp80: integer;
     ba: ^binasm;
     unused: integer;
@@ -1915,7 +1915,7 @@ end;
 
 procedure parseword(arg0: cardinal);
 var
-    sp3C: PUnkAlpha;
+    sp3C: PSymbol;
     sp2C: boolean;
     sp34: integer;  
 begin
@@ -1955,11 +1955,11 @@ begin
     end;
 end;
 
-function emit_dword_item(arg0: cardinal; arg1: cardinal; arg2: PUnkAlpha): PUnkAlpha;
+function emit_dword_item(arg0: cardinal; arg1: cardinal; arg2: PSymbol): PSymbol;
 var
     saved_segment: segments;
     saved_segment_index: integer;
-    sym: PUnkAlpha;
+    sym: PSymbol;
     symno: integer;    
 begin
     saved_segment := currsegment;
@@ -1983,7 +1983,7 @@ procedure parse_dli_dla;
 var
     spCC: integer;
     s0: integer;
-    spC4: PUnkAlpha;
+    spC4: PSymbol;
     spC3: registers;
     s1: registers;
 begin
@@ -2031,7 +2031,7 @@ end;
 
 procedure parsestmt;
 var
-    spFC: PUnkAlpha;
+    spFC: PSymbol;
     spF8: integer;
     spF4: integer;
     spE4: binasm;

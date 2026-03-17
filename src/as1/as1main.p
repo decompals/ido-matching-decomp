@@ -146,7 +146,7 @@ type
         option_r4300_mul
     );
 
-    ARRAY_DECLARE(PUnkAlpha);
+    ARRAY_DECLARE(PSymbol);
 
 { global variables }
 
@@ -174,8 +174,8 @@ var
     sym_tab: ARRAY_OF(PUnkALpha);
     neg_sym_tab: ARRAY_OF(PUnkALpha);
     isa: mips_isa;
-    s_pool_symbol: PUnkAlpha;
-    d_pool_symbol: PUnkAlpha;
+    s_pool_symbol: PSymbol;
+    d_pool_symbol: PSymbol;
     nopinserted: integer;
     new_hilo: boolean;
     fpstall_nop: boolean;
@@ -286,7 +286,7 @@ var
     index: integer;
     reorg: Reorg_Enum;
     arg: GString;
-    sym: ^UnkAlpha;
+    sym: ^Symbol;
     pad2: integer;
     spB8: record
             case integer of
@@ -347,10 +347,10 @@ var
         end;
     end;
     
-    procedure func_00440FA0(var arg0: PUnkAlpha; arg1: Byte);
+    procedure func_00440FA0(var arg0: PSymbol; arg1: Byte);
     begin
         new(arg0);
-        arg0 := memset(arg0, 0, sizeof(UnkAlpha));
+        arg0 := memset(arg0, 0, sizeof(Symbol));
         arg0^.unk30 := arg1;
         arg0^.unk37 := true;
     end;
@@ -1677,7 +1677,7 @@ end;
 procedure func_00449B98();
 var
     i: integer;
-    procedure func_004498E8(arg0: ^UnkAlpha; arg1: integer);
+    procedure func_004498E8(arg0: ^Symbol; arg1: integer);
     var
         v0: integer;
         s1: ^UnkKappa;
