@@ -34,14 +34,6 @@ type
         Reorg_Val_13
     );
 
-    mips_isa = (
-        ISA_UNSPEC,
-        ISA_MIPS1,
-        ISA_MIPS2,
-        ISA_MIPS3,
-        ISA_MIPS4
-    );
-
     options = (
         option__EB,
         option__EL,
@@ -178,7 +170,7 @@ var
     regnum: array [first(registers)..last(registers)] of integer;
     knownregs: set of registers;
     multireloc_list: ARRAY_OF(integer);
-    multirelocinstr_list: ARRAY_OF(integer);
+    multirelocinstr_list: ARRAY_OF(MultiRelocRec);
     sym_tab: ARRAY_OF(PUnkALpha);
     neg_sym_tab: ARRAY_OF(PUnkALpha);
     isa: mips_isa;
@@ -273,7 +265,6 @@ procedure init_binasm(); external;
 procedure dd_close(); external;
 procedure wrobj(); external;
 procedure parsestmt(); external;
-procedure restore_gp(); external;
 function filesize(var f: FileOfBinasm): integer; external;
 procedure traverse_bb(); external;
 procedure create_function_table(); external;
@@ -396,7 +387,7 @@ begin
         opts.unk_08[j] := 0;
         opts.unk_00[j] := true;            
     end;
-    opts.unk_1C := 3;
+    opts.unk_1C := ALIGNMENT_3;
     opts.unk_1D := false;
     opts.unk_1E := false;
     

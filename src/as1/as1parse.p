@@ -35,23 +35,14 @@ function stp(symno: integer): PUnkAlpha; external;
 procedure enterstp(symno: integer); external;
 procedure enterlabel(symno: integer; var sym: PUnkAlpha); external;
 procedure entersym(symno: integer; var sym: PUnkAlpha); external;
-procedure _setrld(sym: PUnkAlpha; arg1: integer; arg2: integer); external;
-procedure loadimmed(arg0: integer; arg1: registers; arg2: PUnkAlpha); external;
-procedure emitloadstore(op: opcodes; reg1: registers; offset: integer; reg2: registers); external;
-procedure emitalui(op: opcodes; reg1: registers; reg2: registers; imm: integer); external;
 procedure emitreg2(op: opcodes; reg1: registers; reg2: registers); external;
-procedure emitalu3(op: opcodes; reg1: registers; reg2: registers; reg3: registers); external;
 procedure emitfpop(op: opcodes; reg1: registers; reg2: registers; reg3: registers); external;
 procedure emitspec(op: opcodes; arg1: integer); external;
 procedure emitbene(op: opcodes; reg1: registers; reg2: registers; sym: PUnkAlpha; imm: integer); external;
 procedure emitbcond(op: opcodes; reg1: registers; sym: PUnkAlpha; imm: integer); external;
 procedure emitjump(op: opcodes; arg1: integer; arg2: integer); external;
-procedure emitnop(count: integer); external;
-procedure emitmvcoproc(op: opcodes; reg1: registers; reg2: registers); external;
 procedure emitcoproc(op: opcodes; arg1: integer); external;
 function call_as0(var arg0: Filename; var arg1: Filename; var arg2: Filename) : integer; external;
-function is_dso_static(arg0: integer): boolean; external;
-function islocalsym(arg0: PUnkAlpha): boolean; external;
 function power2(arg0: integer): integer; external;
 procedure enter_symbol(name: ^Filename; size: integer; arg2: integer); external;
 procedure reenter_symbol(name: ^Filename; size: integer); external;
@@ -61,13 +52,15 @@ function pseudo_type(arg0: cardinal): integer; external;
 procedure save_cur_proc_id(var arg0: Filename); external;
 procedure call_name_and_line(arg0: integer); external;
 procedure byte_at_a_time(segm: integer; arg1: integer; arg2: integer; arg3: integer); external;
+procedure parseafra(fasm: asmcodes); external;
+procedure parseafri_fp(fasm: asmcodes); external;
 
 procedure macro_error;
 begin
     PostError("macro instruction used $at", emptystring, ErrorLevel_2);
 end;
 
-function disp(high: boolean; offset: cardinal): cardinal;
+function disp{(high: boolean; offset: cardinal): cardinal};
 begin
     if high then begin
         if (bitand(offset, 16#8000) <> 0) then begin
@@ -206,7 +199,7 @@ begin
             end;
             emitalui(op_zlui, reg, xr0, disp(true, immed));
             if sym <> nil then begin
-                _setrld(sym, 13, bbindex + proc_instr_base);
+                _setrld(sym, RLD_TYPE_13, bbindex + proc_instr_base);
             end;
             ARRAY_AT(rld_list, cardinal(nextrld) - 1).unk14 := immed;
             ARRAY_AT(rld_list, cardinal(nextrld) - 1).unk11 := reg;
@@ -709,23 +702,23 @@ begin
 
             if islocalsym(spC4) then begin
                 emitloadstore(asm2op[zlw], xr25, disp(true, ba^.immediate), gpreg);
-                _setrld(spC4, 15, bbindex + proc_instr_base);
+                _setrld(spC4, RLD_TYPE_15, bbindex + proc_instr_base);
                 if not reorderflag then begin
                     emitnop(1);
                     pinstruction^[bbindex].unk22 := false;
                 end;
                 emitalui(op_zaddiu, xr25, xr25, disp(false, ba^.immediate));
-                _setrld(spC4, 3, bbindex + proc_instr_base);
+                _setrld(spC4, RLD_TYPE_3, bbindex + proc_instr_base);
             end else begin
                 if big_got then begin
                     emitalui(op_zlui, xr25, xr0, 0);
-                    _setrld(spC4, 24, bbindex + proc_instr_base);
+                    _setrld(spC4, RLD_TYPE_24, bbindex + proc_instr_base);
                     emitalu3(op_zaddu, xr25, xr25, gpreg);
                     emitloadstore(op_zlw, xr25, 0, xr25);
-                    _setrld(spC4, 25, bbindex + proc_instr_base);
+                    _setrld(spC4, RLD_TYPE_25, bbindex + proc_instr_base);
                 end else begin
                     emitloadstore(op_zlw, xr25, 0, gpreg);
-                    _setrld(spC4, 16, bbindex + proc_instr_base);
+                    _setrld(spC4, RLD_TYPE_16, bbindex + proc_instr_base);
                 end;
                 if not reorderflag then begin
                     emitnop(1);
@@ -801,7 +794,7 @@ begin
             emitjump(op_zjal, 0, spC8);
         end;
         if spC4 <> nil then begin
-            _setrld(spC4, 6, bbindex + proc_instr_base);
+            _setrld(spC4, RLD_TYPE_6, bbindex + proc_instr_base);
         end;
     end;
 
@@ -1668,14 +1661,14 @@ end;
 
 procedure doword(arg0: integer; arg1: integer; arg2: cardinal; arg3: PUnkALpha; arg4: integer; arg5: boolean);
 var
-    s0: Byte;
+    s0: Alignment;
     spF3: boolean;
     s2: cardinal;
 begin
     definealabel(arg4, arg0, 0);
 
     if arg0 = 2 then begin
-        s0 := 1;
+        s0 := ALIGNMENT_1;
         if shftaddr = 1 then begin
             arg2 := rshift(integer(arg2), 1);
         end;
@@ -1688,7 +1681,7 @@ begin
         if sexchange then begin
             arg2 := SWAP_WORD(arg2);
         end;
-        s0 := 2;
+        s0 := ALIGNMENT_2;
     end;
 
     if not(ARRAY_AT(memory, arg4).unk_08 in realsegments) then begin
@@ -1860,9 +1853,9 @@ begin
         reg := binasmfyle^.reg1;
 
         emitalui(op_zlui, xr28, xr0, disp(true, 0));
-        _setrld(gp_disp_address, 2, bbindex + proc_instr_base);
+        _setrld(gp_disp_address, RLD_TYPE_2, bbindex + proc_instr_base);
         emitalui(op_zaddiu, xr28, xr28, disp(false, 0));
-        _setrld(gp_disp_address, 3, bbindex + proc_instr_base);
+        _setrld(gp_disp_address, RLD_TYPE_3, bbindex + proc_instr_base);
         emitalu3(op_zaddu, xr28, xr28, reg);
 
         profileflag := saved_flag;
