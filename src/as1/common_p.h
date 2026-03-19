@@ -124,7 +124,7 @@ type
         next: ^UnkKappa;
     end;
 
-    UnkAlpha = record
+    Symbol = record
         { 0x00 } unk00: Byte;
         { 0x04 } unk04: integer;
         { 0x08 } unk08: integer;
@@ -161,12 +161,12 @@ type
         { 0x60 } currline: integer;
     end;
 
-    PUnkAlpha = ^UnkAlpha;
+    PSymbol = ^Symbol;
 
     RldRec = Record
         { 0x00 } unk00: integer;
         { 0x04 } unk04: integer;
-        { 0x08 } unk08: ^UnkAlpha;
+        { 0x08 } unk08: ^Symbol;
         { 0x0C } unk0C: integer;
         { 0x10 } unk10: byte;
         { 0x11 } unk11: registers;
@@ -177,9 +177,12 @@ type
 
     PreReorderPeepholesRec = record
         unk_00: integer;
-        unk_04: integer;
+        unk_04: PSymbol;
         unk_08: integer;
-        unk_0C: integer;
+        unk_0C: registers;
+        unk_0D: boolean;
+        unk_0E: boolean;
+        unk_0F: boolean;
         unk_10: integer;
         unk_14: packed array [1..32] of char;
     end;
@@ -206,6 +209,14 @@ type
         seg_18,
         seg_19,
         seg_20
+    );
+
+    mips_isa = (
+        ISA_UNSPEC,
+        ISA_MIPS1,
+        ISA_MIPS2,
+        ISA_MIPS3,
+        ISA_MIPS4
     );
 
     PrevSDataType = Record
@@ -239,17 +250,97 @@ type
         unk04: integer;
         unk08: integer;
         unk0C: integer;
-        unk10: PUnkAlpha;
-        unk14: PUnkAlpha;
+        unk10: PSymbol;
+        unk14: PSymbol;
     end;
+
+    Alignment = (
+          ALIGNMENT_0,  
+          ALIGNMENT_1,
+          ALIGNMENT_2,
+          ALIGNMENT_3,
+          ALIGNMENT_4,
+          ALIGNMENT_5,
+          ALIGNMENT_6,
+          ALIGNMENT_7
+    );
 
     OptRecord = record;
         unk_00: array[1..5] of boolean;
         unk_08: array[1..5] of integer;
-        unk_1C: Byte;
+        unk_1C: Alignment;
         unk_1D: boolean;
         unk_1E: boolean;
     end;
+
+    MultiRelocRec = Record
+        { 0x00 } unk_00: integer;
+        { 0x04 } unk_04: integer;
+        { 0x08 } unk_08: integer;
+        { 0x0C } unk_0C: integer;
+    end;
+
+    ARRAY_DECLARE(MultiRelocRec);
+
+    RldType = ( 
+        RLD_TYPE_0, 
+        RLD_TYPE_1,
+        RLD_TYPE_2,
+        RLD_TYPE_3,
+        RLD_TYPE_4,
+        RLD_TYPE_5,
+        RLD_TYPE_6,
+        RLD_TYPE_7,
+        RLD_TYPE_8,
+        RLD_TYPE_9,
+        RLD_TYPE_10,
+        RLD_TYPE_11,
+        RLD_TYPE_12,
+        RLD_TYPE_13,
+        RLD_TYPE_14,
+        RLD_TYPE_15,
+        RLD_TYPE_16,
+        RLD_TYPE_17,
+        RLD_TYPE_18,
+        RLD_TYPE_19,
+        RLD_TYPE_20,
+        RLD_TYPE_21,
+        RLD_TYPE_22,
+        RLD_TYPE_23,
+        RLD_TYPE_24,
+        RLD_TYPE_25
+    );
+
+    UnkFPStruct = record
+        case integer of
+            1: (unk_00: array [1..4] of integer);
+            2: (val64: integer64);
+        end;
+
+    UnknownEnum = (
+         UNK_ENUM_0,
+         UNK_ENUM_1,
+         UNK_ENUM_2,
+         UNK_ENUM_3,
+         UNK_ENUM_4,
+         UNK_ENUM_5,
+         UNK_ENUM_6,
+         UNK_ENUM_7,
+         UNK_ENUM_8,
+         UNK_ENUM_9,
+         UNK_ENUM_10,
+         UNK_ENUM_11,
+         UNK_ENUM_12,
+         UNK_ENUM_13,
+         UNK_ENUM_14,
+         UNK_ENUM_15,
+         UNK_ENUM_16,
+         UNK_ENUM_17,
+         UNK_ENUM_18,
+         UNK_ENUM_19
+    );
+     
+    PFileName = ^Filename;
 
 var
     emptystring: extern GString;
@@ -293,7 +384,7 @@ var
     currfunc_hasedata: extern boolean;
     is_nonleaf: extern boolean;
     sexchange: extern boolean;
-    currfunc_sym: extern ^UnkAlpha;
+    currfunc_sym: extern ^Symbol;
     lastinstr: extern itype;
     pendinginstr: extern boolean;
     adjust_frame_by_ld: extern boolean;
@@ -320,7 +411,7 @@ var
     shftaddr: extern integer;
     sixtyfour_bit: extern boolean;
     elf_flag: extern boolean;
-    gp_disp_address: extern PUnkAlpha;
+    gp_disp_address: extern PSymbol;
     profileflag: extern integer;
     binasm_file: extern FileOfBinasm;
     last_bb: extern array [1..3] of Byte;
@@ -337,6 +428,8 @@ var
     asm2asmformat: extern array [first(asmcodes)..last(asmcodes)] of asmformat;
     br_likely_ops: extern set of opcodes;
     num_pseudo: extern integer;
+    sp_addu_index: extern integer;
+    current_mem_tag: extern 0..16383; { 14 bits }
     
 procedure ltoa(arg0: integer; arg1: ^char); external;
 procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
@@ -347,11 +440,11 @@ function strlen(p : ^Filename): integer; external;
 procedure strcpy(dst: ^Filename; src: ^Filename); external;
 function xmalloc(size: integer): pointer; external;
 function l_addr(var value: Identname): pointer; external;
-function enter_undef_sym(ptr: pointer): PUnkAlpha; external;
+function enter_undef_sym(ptr: pointer): PSymbol; external;
 function idn_for_data(): integer; external;
-procedure defineasym(arg0: integer; arg1: PUnkAlpha; arg2: integer); external;
+procedure defineasym(arg0: integer; arg1: PSymbol; arg2: integer); external;
 function ll_load_immed(arg0: integer; arg1: integer; arg2: registers): boolean; external;
-procedure do_parseafra(arg0: asmcodes; arg1: registers; arg2: PUnkAlpha; arg3: integer; arg4: registers); external;
+procedure do_parseafra(arg0: asmcodes; arg1: registers; arg2: PSymbol; arg3: integer; arg4: registers); external;
 function fixup_symno(symno: integer): integer; external;
 procedure fixup_preceding_labels(align: integer); external;
 procedure parsefpconst(which: itype); external;
@@ -361,5 +454,20 @@ procedure init_multi_relocinst(); external;
 procedure init_malias_table(); external;
 procedure initbb(var index: integer); external;
 procedure parseafrrr(fasm: asmcodes); external;
-procedure parseafra(fasm: asmcodes); external;
-procedure parseafri_fp(fasm: asmcodes); external;
+function defined_in_between(arg0: registers; arg1: integer; arg2: integer): boolean; external;
+function is_dso_static(arg0: integer): boolean; external;
+procedure macro_error; external;
+function disp(high: boolean; offset: cardinal): cardinal; external;
+procedure restore_gp(); external;
+function islocalsym(arg0: PSymbol): boolean; external;
+procedure emitloadstore(op: opcodes; reg1: registers; offset: integer; reg2: registers); external;
+procedure _setrld(sym: PSymbol; arg1: RldType; arg2: integer); external;
+procedure emitalui(op: opcodes; reg1: registers; reg2: registers; imm: integer); external;
+procedure emitalu3(op: opcodes; reg1: registers; reg2: registers; reg3: registers); external;
+procedure emitnop(count: integer); external;
+procedure request_multi_relocinst(arg0: integer); external;
+function strcmp(arg0: pointer; arg1: pointer): integer; external;
+procedure loadimmed(arg0: integer; arg1: registers; arg2: PSymbol); external;
+procedure emitcache(op: opcodes; reg1: registers; arg2: integer; arg3: registers); external;
+procedure emitmvcoproc(op: opcodes; reg1: registers; reg2: registers); external;
+procedure emitshift(op: opcodes; reg1: registers; reg2: registers; imm: integer); external;

@@ -34,14 +34,6 @@ type
         Reorg_Val_13
     );
 
-    mips_isa = (
-        ISA_UNSPEC,
-        ISA_MIPS1,
-        ISA_MIPS2,
-        ISA_MIPS3,
-        ISA_MIPS4
-    );
-
     options = (
         option__EB,
         option__EL,
@@ -154,7 +146,7 @@ type
         option_r4300_mul
     );
 
-    ARRAY_DECLARE(PUnkAlpha);
+    ARRAY_DECLARE(PSymbol);
 
 { global variables }
 
@@ -178,12 +170,12 @@ var
     regnum: array [first(registers)..last(registers)] of integer;
     knownregs: set of registers;
     multireloc_list: ARRAY_OF(integer);
-    multirelocinstr_list: ARRAY_OF(integer);
-    sym_tab: ARRAY_OF(PUnkALpha);
-    neg_sym_tab: ARRAY_OF(PUnkALpha);
+    multirelocinstr_list: ARRAY_OF(MultiRelocRec);
+    sym_tab: ARRAY_OF(PSymbol);
+    neg_sym_tab: ARRAY_OF(PSymbol);
     isa: mips_isa;
-    s_pool_symbol: PUnkAlpha;
-    d_pool_symbol: PUnkAlpha;
+    s_pool_symbol: PSymbol;
+    d_pool_symbol: PSymbol;
     nopinserted: integer;
     new_hilo: boolean;
     fpstall_nop: boolean;
@@ -237,7 +229,7 @@ var
     dwopcode: boolean;
     r4300_mul: boolean;
     fp_hack_flag: 0..4; { TODO enum ? }
-    mcount_address: PUnkALpha;
+    mcount_address: PSymbol;
     mcount_sym: IdentName;
     olimit_value: integer;
     gprmask: cardinal;
@@ -273,7 +265,6 @@ procedure init_binasm(); external;
 procedure dd_close(); external;
 procedure wrobj(); external;
 procedure parsestmt(); external;
-procedure restore_gp(); external;
 function filesize(var f: FileOfBinasm): integer; external;
 procedure traverse_bb(); external;
 procedure create_function_table(); external;
@@ -295,7 +286,7 @@ var
     index: integer;
     reorg: Reorg_Enum;
     arg: GString;
-    sym: ^UnkAlpha;
+    sym: ^Symbol;
     pad2: integer;
     spB8: record
             case integer of
@@ -356,10 +347,10 @@ var
         end;
     end;
     
-    procedure func_00440FA0(var arg0: PUnkAlpha; arg1: Byte);
+    procedure func_00440FA0(var arg0: PSymbol; arg1: Byte);
     begin
         new(arg0);
-        arg0 := memset(arg0, 0, sizeof(UnkAlpha));
+        arg0 := memset(arg0, 0, sizeof(Symbol));
         arg0^.unk30 := arg1;
         arg0^.unk37 := true;
     end;
@@ -396,7 +387,7 @@ begin
         opts.unk_08[j] := 0;
         opts.unk_00[j] := true;            
     end;
-    opts.unk_1C := 3;
+    opts.unk_1C := ALIGNMENT_3;
     opts.unk_1D := false;
     opts.unk_1E := false;
     
@@ -1686,7 +1677,7 @@ end;
 procedure func_00449B98();
 var
     i: integer;
-    procedure func_004498E8(arg0: ^UnkAlpha; arg1: integer);
+    procedure func_004498E8(arg0: ^Symbol; arg1: integer);
     var
         v0: integer;
         s1: ^UnkKappa;
