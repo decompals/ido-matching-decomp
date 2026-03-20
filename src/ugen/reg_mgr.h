@@ -40,5 +40,14 @@ function is_available(arg0: registers): boolean; external;
 function free_reg_is_available(): boolean; external;
 procedure remove_from_fp_free_list(arg0: registers; arg1: RegKind); external;
 procedure remove_from_free_list(arg0: registers); external;
+procedure move_to_end_fp_list(arg0: registers); external;
+procedure move_to_end_gp_list(arg0: registers); external;
+procedure init_regs(); external;
+procedure check_no_used(); external;
+procedure add_to_free_list(arg0: registers); external;
+procedure inc_usage(arg0: registers; arg1: u16); external;
+procedure get_fp_reg1(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16); external;
+procedure get_reg1(arg0: registers; arg1: ^tree; arg2: u16); external;
+procedure fill_reg(reg: registers; contents: ^tree; usage_count: u16; reg_kind: RegKind); external;
 
 #endif /* REG_MGR_H */

@@ -138,7 +138,7 @@ build/src/7.1/mld/%.o: OPTFLAGS := -O2
 build/src/7.1/as0/%.o: OPTFLAGS := -O2
 build/src/7.1/as1/%.o: OPTFLAGS := -O2
 build/src/7.1/cfe/%.o: OPTFLAGS := -O2
-build/src/7.1/ugen/%.o: OPTFLAGS := -O2
+build/src/7.1/ugen/%.o: OPTFLAGS := -O2 -Olimit 1600
 build/src/7.1/libu/%.o: OPTFLAGS := -O2
 
 # Targets

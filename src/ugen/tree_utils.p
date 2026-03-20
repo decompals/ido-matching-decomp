@@ -299,7 +299,7 @@ begin
     return temp_v0;
 end;
 
-function rvalue(Dtype: Datatype; arg1: String): pointer;
+function rvalue(Dtype: Datatype; arg1: Identname): pointer;
 var
     p_tree: ^tree;
     temp_v0_2: stringtextptr;

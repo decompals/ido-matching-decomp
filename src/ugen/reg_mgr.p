@@ -43,8 +43,6 @@ var
     ufsm: boolean;
 
 procedure add_to_fp_free_list(arg0: registers; arg1: RegKind); forward;
-procedure add_to_free_list(arg0: registers); forward;
-procedure inc_usage(arg0: registers; arg1: u16); forward;
 
 procedure clear_restricted_regs();
 var 
@@ -174,7 +172,7 @@ begin
     fp_regs_used.unk1 := xnoreg;
 end;
 
-procedure fill_reg(reg: registers; contents: ^tree; usage_count: u16; reg_kind: RegKind);
+procedure fill_reg{(reg: registers; contents: ^tree; usage_count: u16; reg_kind: RegKind)};
 begin
     regs[reg].unk0 := contents;
     regs[reg].usage_count := usage_count;
@@ -437,7 +435,7 @@ begin
     get_one_reg(arg0, arg1, arg2, i_reg);
 end;
 
-procedure get_reg1(arg0: registers; arg1: ^tree; arg2: u16);
+procedure get_reg1{(arg0: registers; arg1: ^tree; arg2: u16)};
 var
     temp_v0: registers;
 begin
@@ -501,7 +499,7 @@ begin
     fill_reg(arg0, arg1, arg3, arg2);
 end;
 
-procedure get_fp_reg1(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16);
+procedure get_fp_reg1{(arg0: registers; arg1: ^tree; arg2: RegKind; arg3: u16)};
 begin
     if (regs[arg0].reg_available and (remove_from_list(arg0, fp_regs_free))) then begin
         append_to_list(arg0, fp_regs_used);
@@ -821,14 +819,14 @@ begin
     return regs[reg].usage_count;
 end;
 
-procedure move_to_end_fp_list(arg0: registers);
+procedure move_to_end_fp_list{(arg0: registers)};
 begin
     if (remove_from_list(arg0, fp_regs_used)) then begin
         append_to_list(arg0, fp_regs_used);
     end;
 end;
 
-procedure move_to_end_gp_list(arg0: registers);
+procedure move_to_end_gp_list{(arg0: registers)};
 begin
     if (remove_from_list(arg0, gp_regs_used)) then begin
         append_to_list(arg0, gp_regs_used);

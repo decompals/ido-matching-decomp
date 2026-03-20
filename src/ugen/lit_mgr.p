@@ -5,14 +5,7 @@
 #include "val_util.h"
 #include "emit.h"
 #include "report.h"
-
-type
-    PLiteral = ^Literal;
-    Literal = Record
-    labelno: integer;
-    val: Valu;
-    next: ^Literal;
-end;
+#include "lit_mgr.h"
 
 var
     doubles: PLiteral;
@@ -21,8 +14,6 @@ var
     sets: PLiteral;
     small_strings: PLiteral;
     sdata_max:  integer;
-
-procedure emit_list(list: ^Literal; vtype: ValType); forward;
 
 procedure reset_pool();
 begin
@@ -33,7 +24,7 @@ begin
     sets := nil;
 end;
 
-procedure select_data_section(dataSize: integer);
+procedure select_data_section{(dataSize: integer)};
 begin
     if (dataSize <= sdata_max)  then begin
         demit_dir0(isdata, 0);
@@ -82,7 +73,7 @@ begin
 
 end;
 
-function new_lit(var val: Valu; labelno: integer): pointer;
+function new_lit{(var val: Valu; labelno: integer): pointer};
 var
     newLit: ^Literal;
 begin
@@ -98,7 +89,7 @@ begin
     return newLit;
 end;
 
-procedure add_to_list_no_check(var lit: PLiteral; var val: Valu;  labelno: Integer);
+procedure add_to_list_no_check{(var lit: PLiteral; var val: Valu;  labelno: Integer)};
 var
     newLit: ^Literal;
 begin
@@ -107,7 +98,7 @@ begin
     lit := newLit;
 end;
 
-function valu_equ(var val1: Valu; var val2: Valu): boolean;
+function valu_equ{(var val1: Valu; var val2: Valu): boolean};
 var
     i: cardinal;
 begin
@@ -124,7 +115,7 @@ begin
     return true;
 end;
 
-function add_to_list(var lit: PLiteral; var val: Valu; labelno: integer): integer;
+function add_to_list{(var lit: PLiteral; var val: Valu; labelno: integer): integer};
 var
     temp_v0: ^Literal;
     s0: ^Literal;
@@ -150,7 +141,7 @@ begin
     return labelno;
 end;
 
-function add_to_pool(var u: Bcrec; labelno: integer): integer;
+function add_to_pool{(var u: Bcrec; labelno: integer): integer};
 begin
     Assert((u.Opc = Uldc) or (u.Opc = Ulca));
 
