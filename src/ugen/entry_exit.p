@@ -94,15 +94,15 @@ begin
         argE := 0;
     end;
     if init_dynmem and (arg3 <> 0) then begin
-        spC2 := get_free_reg(0, 1);
-        spC1 := get_free_reg(0, 1);
+        spC2 := get_free_reg(nil, 1);
+        spC1 := get_free_reg(nil, 1);
         demit_ri(zli, spC2, -16#5A5A6, franone);
         demit_rr(zmove, spC1, gpr_sp);
     end;
     if arg3 <> 0 then begin
         if max_stack <> -1 then begin
             if arg3 >= max_stack then begin
-                get_reg(gpr_t8, 0, 1);
+                get_reg(gpr_t8, nil, 1);
                 demit_rr(zmove, gpr_t9, gpr_ra);
                 demit_ri(zli, gpr_t8, arg3, franone);
                 demit_regmask(ilivereg, 16#C0, 0);
@@ -214,8 +214,8 @@ begin
         arg5 := 0;
     end;
     if init_dynmem and (arg2 <> 0) then begin
-        sp2B := get_free_reg(0, 1);
-        sp2A := get_free_reg(0, 1);
+        sp2B := get_free_reg(nil, 1);
+        sp2A := get_free_reg(nil, 1);
         emit_ri_(zli, sp2B, -16#5A5A6, franone);
         emit_rr(zmove, sp2A, gpr_sp);
     end;

@@ -83,7 +83,7 @@ var
     no_jal_use_jalr_only: boolean;
     non_local_mtag: integer;
     nooffsetopt: boolean;
-    opcode_arch: boolean;
+    opcode_arch: ( ARCH_32, ARCH_64 );
     opt_labels: u8;
     pic_level: integer;
     print_warnings: boolean;
@@ -392,7 +392,7 @@ begin
         first_ent := true;
         print_warnings := true;
         max_stack := -1;
-        opcode_arch := false;
+        opcode_arch := ARCH_32;
         basicint := false;
         addr_dtype := Adt;
         unitsperaddr := 4;
@@ -488,7 +488,7 @@ begin
                         begin
                             if (IS_OPT("-dwopcode")) then begin
                                 isa := ISA_MIPS3;
-                                opcode_arch := true;
+                                opcode_arch := ARCH_64;
                             end else if (IS_OPT("-domtag")) then begin
                                 set_domtag(true);
                             end else begin
@@ -592,7 +592,7 @@ begin
                                 isa := ISA_MIPS2;
                             end else if (IS_OPT("-mips3")) then begin
                                 isa := ISA_MIPS3;
-                                opcode_arch := true;
+                                opcode_arch := ARCH_64;
                             end else if (IS_OPT("-mscoff")) then begin
                                 mscoff := true;
                             end else goto default;
@@ -670,7 +670,7 @@ begin
                         CASE_ARG('6')
                             if (ARG_OPT(3, '4') and ARG_OPT(4, 'd') and ARG_OPT(5, 'a') and ARG_OPT(6, 't') and ARG_OPT(7, 'a') and ARG_OPT(8, ' ')) then begin
                                 isa := ISA_MIPS3;
-                                opcode_arch := true;
+                                opcode_arch := ARCH_64;
                                 basicint := true;
                                 addr_dtype := Wdt;
                                 unitsperaddr := 8;
