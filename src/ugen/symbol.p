@@ -583,6 +583,7 @@ begin
 end;
 
 { TODO: fake u16? might be fixed if data_area is an enum }
+#line 725
 procedure choose_area(data_area: u16; size: cardinal);
 var
     var_v0: u8;

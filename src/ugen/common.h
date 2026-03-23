@@ -20,5 +20,4 @@ mips_isa = (
     ISA_MIPS3
 );
 
-
 #endif /* COMMON_H */

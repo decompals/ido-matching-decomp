@@ -191,7 +191,7 @@ begin
     end;
 end;
 
-procedure emit_ra(op: asmcodes; reg1: registers; symno: integer; immediate: integer; mem_tag: integer);
+procedure emit_ra(op: asmcodes; reg1: registers; symno: cardinal; immediate: integer; mem_tag: integer);
 begin
     ibuffer^[i_ptr].instr := iocode;
     ibuffer^[i_ptr].op := op;

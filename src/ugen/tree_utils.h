@@ -15,7 +15,7 @@ function build_2op(Opc: Uopcode; op1: ^tree; op2: ^tree): pointer; external;
 function dup_tree(arg0 : ^tree): pointer; external;
 function next_mark(): integer; external;
 function dwvalue(Dtype: Datatype; arg1: integer64): pointer; external;
-function rvalue(Dtype: Datatype; arg1: String): pointer; external;
+function rvalue(Dtype: Datatype; arg1: Identname): pointer; external;
 function is_zero(arg0: ^Tree): boolean; external;
 function is_ivalue(arg0: ^tree; arg1: integer; arg2: integer): boolean; external;
 function result_type(arg0: ^Tree): Datatype; external;

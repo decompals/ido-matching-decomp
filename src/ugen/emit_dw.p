@@ -7,7 +7,7 @@
 
 var
     lsb_first: boolean;
-    opcode_arch: u8;
+    opcode_arch: ( ARCH_32, ARCH_64 );
 
 procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: ^tree);
 
@@ -164,7 +164,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
     end;
 
 begin
-    if (opcode_arch = 0) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zbne: func_0041AF70(arg1, arg2, arg3);
             zbeq: func_0041AFE4(arg1, arg2, arg3);
@@ -293,7 +293,7 @@ var
     end;
 
 begin
-    if (opcode_arch = 0) and (arg5^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg5^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zbne: func_0041BCC0(arg1, arg2, arg3, arg4);
             zbeq: func_0041BD30(arg1, arg2, arg3, arg4);
@@ -307,10 +307,10 @@ begin
             zbgeu: func_0041BFF0(arg1, arg2, arg3, arg4);
             otherwise emit_rill(arg0, arg1, arg3, arg4);
         end;
-    end else if (opcode_arch = 1) and (arg2 <> 0) then begin
+    end else if (opcode_arch = ARCH_64) and (arg2 <> 0) then begin
         sp30.dwval_h := arg2;
         sp30.dwval_l := arg3;
-        temp_s0 := get_free_reg(0, 1);
+        temp_s0 := get_free_reg(nil, 1);
         free_reg(temp_s0);
         emit_rii(zdli, temp_s0, sp30);
         emit_rrll(arg0, arg1, temp_s0, arg4);
@@ -382,7 +382,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
     end;
 
 begin
-    if (opcode_arch = 0) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             ztne: func_0041C694(arg1, arg2, arg3);
             zteq: func_0041C710(arg1, arg2, arg3);
@@ -460,7 +460,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
     end;
 
 begin
-    if (opcode_arch = 0) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             ztne: func_0041CC60(arg1, arg2, arg3);
             zteq: func_0041CCD0(arg1, arg2, arg3);
@@ -533,11 +533,11 @@ var
         sp34: integer;
         sp33: registers;
     begin
-        sp43 := get_free_reg(0, 1);
+        sp43 := get_free_reg(nil, 1);
         free_reg(sp43);
-        sp42 := get_free_reg(0, 1);
+        sp42 := get_free_reg(nil, 1);
         free_reg(sp42);
-        sp41 := get_free_reg(0, 1);
+        sp41 := get_free_reg(nil, 1);
         free_reg(sp41);
         sp3C := gen_label_id();
         sp38 := gen_label_id();
@@ -586,11 +586,11 @@ var
         sp34: integer;
         sp33: registers;
     begin
-        sp43 := get_free_reg(0, 1);
+        sp43 := get_free_reg(nil, 1);
         free_reg(sp43);
-        sp42 := get_free_reg(0, 1);
+        sp42 := get_free_reg(nil, 1);
         free_reg(sp42);
-        sp41 := get_free_reg(0, 1);
+        sp41 := get_free_reg(nil, 1);
         free_reg(sp41);
         sp3C := gen_label_id();
         sp38 := gen_label_id();
@@ -733,7 +733,8 @@ var
     end;
 
 begin
-    if (opcode_arch = 0) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+#line 883
+    if (opcode_arch = ARCH_32) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zand, znor, zor, zxor: begin
                 emit_rrr(arg0, arg1, arg2, arg3);
@@ -1061,7 +1062,7 @@ var
     end;
 
 begin
-    if (opcode_arch = 0) and (arg5^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg5^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zand: begin
                 if lsb_first then begin
@@ -1139,10 +1140,10 @@ begin
             otherwise
                 emit_rri_(arg0, arg1, arg2, arg4, franone);
         end;
-    end else if (opcode_arch = 1) and (arg3 <> 0) then begin
+    end else if (opcode_arch = ARCH_64) and (arg3 <> 0) then begin
         sp38.dwval_h := arg3;
         sp38.dwval_l := arg4;
-        sp37 := get_free_reg(0, 1);
+        sp37 := get_free_reg(nil, 1);
         free_reg(sp37);
         emit_rii(zdli, sp37, sp38);
         emit_rrr(arg0, arg1, arg2, sp37);
@@ -1203,7 +1204,7 @@ procedure dw_emit_rr(arg0: asmcodes; arg1: registers; arg2: registers; arg3: ^tr
     end;
 
 begin
-    if (opcode_arch = 0) and (arg3^.u.Dtype in [Idt, Kdt, Wdt]) then begin
+    if (opcode_arch = ARCH_32) and (arg3^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zneg, znegu: func_00420360(arg0, arg1, arg2);
             znot: func_00420524(arg0, arg1, arg2);

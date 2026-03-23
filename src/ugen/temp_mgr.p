@@ -1,5 +1,5 @@
 #include "common.h"
-#include "cmplrs/binasm.h"
+#include "tree.h"
 #include "reg_mgr.h"
 #include "report.h"
 #include "frame_offset.h"
@@ -7,7 +7,7 @@
 
 {Extern variables}
 var
-    opcode_arch: boolean;
+    opcode_arch: ( ARCH_32, ARCH_64 );
 
 type
     Ptemp = ^Temp_rec;
@@ -24,7 +24,7 @@ var
     temps: ^Temp_rec;
     temps_offset: integer;
     current_temp_index: u8;
-    frame_pointer: extern u8; {From frame_offset maybe?}
+    frame_pointer: registers;
     reversed_stack: extern boolean;
 
 
@@ -34,7 +34,7 @@ spill_rec = Record
     temp: Ptemp;
 end;
 
-procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: integer; arg4: integer); external;
+procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: registers; arg4: integer); external;
 
 procedure init_temps();
 begin
@@ -128,7 +128,7 @@ begin
     end;
 
     if (reversed_stack) then begin
-        if ((op = zsd) and not (opcode_arch)) then begin
+        if ((op = zsd) and (opcode_arch = ARCH_32)) then begin
             emit_rob(zsw, reg, frame_offset1(offset + (((areaSize + 3) div 4) * 4)), frame_pointer, 0);
             emit_rob(zsw, succ(reg), frame_offset1(offset + (((areaSize + 3) div 4) * 4)) + 4, frame_pointer, 0);
             return;
@@ -137,7 +137,7 @@ begin
         return;
     end;
 
-    if ((op = zsd) and not (opcode_arch)) then begin
+    if ((op = zsd) and (opcode_arch = ARCH_32)) then begin
         emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
         emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
     end else begin
@@ -149,7 +149,7 @@ procedure spill_to_temp(reg: registers; areaSize: integer);
 var
     spill: spill_rec;
 begin
-    if (not (opcode_arch) and (kind_of_register(reg) = 6)) then begin
+    if ((opcode_arch = ARCH_32) and (kind_of_register(reg) = di_reg)) then begin
         areaSize := 8;
     end;
     spill.temp :=  find_free_temp(areaSize);

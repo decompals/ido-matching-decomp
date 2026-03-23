@@ -234,11 +234,7 @@ begin
     func_00449D24(arg1, 0);
 end;
 
-#ifdef NON_MATCHING
 procedure debug_tree(arg0: ^tree);
 begin
     print_tree(output, arg0, 20, 0);
 end;
-#else
-GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/debug_tree.s")
-#endif

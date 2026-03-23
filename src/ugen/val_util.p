@@ -70,7 +70,7 @@ begin
     if arg0 <> 0 then begin
         demit_dir0(ilabel, arg0);
     end;
-
+#line 133
     case vtype of
         ValType_Null: report_error(Internal, 135, "val_util.p", "null value");
         ValType_Byte,

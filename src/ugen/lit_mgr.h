@@ -1,5 +1,14 @@
 #ifndef LIT_MGR_H
 #define LIT_MGR_H
+
+type
+    PLiteral = ^Literal;
+    Literal = Record
+    labelno: integer;
+    val: Valu;
+    next: ^Literal;
+end;
+
 procedure reset_pool(); external;
 procedure select_data_section(dataSize: integer); external;
 procedure emit_list(list: ^Literal; vtype: ValType); external;
