@@ -101,7 +101,7 @@ begin
     end;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/get_set_const.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/get_set_const.s")}
 
 procedure gen_set_str(arg0: ^tree);
 var
@@ -210,9 +210,9 @@ begin
     return arg0;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/set_rewrite.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/set_rewrite.s")}
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/set_rewrite_indexed.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/set_rewrite_indexed.s")}
 
 function translate_tree(arg0: pointer): pointer;
 var
@@ -232,7 +232,7 @@ begin
     return arg0;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/translate.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/translate.s")}
 
 function cse_equ(arg0: ^tree; arg1: ^tree): boolean;
 begin
@@ -524,11 +524,11 @@ begin
     end;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/check_reg.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/check_reg.s")}
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/assign_vreg.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/assign_vreg.s")}
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/load_cse.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/load_cse.s")}
 
 
 function uses(arg0: ^Tree; arg1: ^Tree; arg2: cardinal): boolean;
@@ -691,7 +691,7 @@ begin
     return arg0^.u.Dtype = Gdt;
 end;
 
-GLOBAL_ASM("asm/7.1/functions/ugen/translate/translate_cvtl.s")
+{GLOBAL_ASM("../../asm/7.1/functions/ugen/translate/translate_cvtl.s")}
 
 function need_check_hl(arg0: ^tree): boolean;
 var

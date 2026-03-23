@@ -1896,6 +1896,7 @@ begin
 
         spFF := get_free_reg(nil, 1);
         free_reg(spFF);
+#line 2500
         case var_s1 of
             1: begin
                 loadop := zlbu;
@@ -2072,6 +2073,7 @@ begin
             var_s3 := var_s3 + 4;
             var_s1 := var_s1 - 4;
         end;
+#line 2709
         case var_s1 of
             0: begin end;
             1: begin
@@ -2213,6 +2215,7 @@ begin
     emit_rrll(zbne, xr1, sp4E, sp40);
     emit_rrll(zbne, sp4D, sp4B, sp44);
     emit_dir0(iset, 5);
+#line 2881
     case arg0^.u.Opc of
         Uiequ: begin
             emit_ri_(zli, sp4B, 1, franone);
@@ -2821,7 +2824,7 @@ begin
             end;
             var_v0_2 := arg0^.next;
             frame_size := (integer((frame_size + 7)) div 8) * 8;
-            while var_v0_2^.u.Opc in [Uaent, Ubgn, Ubgnb, Uclab, Ucomm, Udef, Uendb, Uent, Ulex, Uloc, Unop, Uoptn, Updef, Uregs, Usgs, Uvreg] do begin
+            while var_v0_2^.u.Opc in [Uaent, Ubgn, Ubgnb, Uclab, Ucomm, Udef, Uendb, Uent, Ulex, Uloc, Unop, Uoptn, Updef, Uregs, Usdef, Uunal] do begin
                 var_v0_2 := var_v0_2^.next;
             end;
             sp15C := var_v0_2;
@@ -3852,7 +3855,7 @@ begin
                     emit_ra(zla, arg1, arg0^.u.I1, arg0^.u.Offset, 0);
                 end;
             otherwise
-                report_error(Internal, 5211, "eval.p", "unknown memory type in LDA");
+                report_error(Internal, 5211, "eval.p", "Unknown memory type in LDA");
             end;
         end;
         Ulca: begin
@@ -3923,7 +3926,7 @@ begin
         Uxor: begin
             var_s0 := arg0^.u.Dtype;
             if var_s0 in [Qdt, Rdt, Xdt] then begin
-                if arg0^.u.Opc in [Uendb, Ugeq, Ugrt, Uleq, Ules, Uneq] then begin
+                if arg0^.u.Opc in [Uequ, Ugeq, Ugrt, Uleq, Ules, Uneq] then begin
                     eval_fp_cond(arg0, arg1);
                 end else begin
                     eval2(fop(arg0^.u.Opc, var_s0), arg0, arg1);
@@ -3942,7 +3945,7 @@ begin
                     end;
                     var_s3 := reg(arg0^.op1);
                     arg1 := get_dest(arg0, arg1);
-                    if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (arg1 = var_s3) and not (arg0^.u.Opc in [Uchkh, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Umov, Umpmv, Upmov]) then begin
+                    if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (arg1 = var_s3) and not (arg0^.u.Opc in [Uadd, Usub]) then begin
                         temp_s2 := get_free_reg(arg0, 1);
                     end else begin
                         temp_s2 := arg1;
