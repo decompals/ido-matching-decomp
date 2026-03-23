@@ -186,7 +186,9 @@ $(BUILD)/src/$(VERSION)/%.o: src/%.c
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
 $(BUILD)/src/$(VERSION)/%.o: src/%.p
+ifneq ($(CC_NO_ASMPROC), @:)
 	(cd $(dir $<) && $(CC_NO_ASMPROC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $(abspath $@) $(notdir $<))
+endif
 
 %.c: %.y
 	$(YACC) $(YFLAGS) $<
