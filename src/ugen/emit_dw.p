@@ -733,6 +733,7 @@ var
     end;
 
 begin
+#line 883
     if (opcode_arch = ARCH_32) and (arg4^.u.Dtype in [Idt, Kdt, Wdt]) then begin
         case arg0 of
             zand, znor, zor, zxor: begin

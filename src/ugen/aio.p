@@ -8,30 +8,127 @@
 
 type
     hex_str = packed array [1..10] of char; /* :=  "0123456789ABCDEF" */
-    OpcodeTabString = packed array [1..10] of char;
-    Regname = packed array[1..5] of char;
+    hex_char = packed array [1..2] of char;
     BinasmFile = File of binasm;
-    itype_str = array [1..12] of char;
-    reg_str = array [1..5] of char;
     
 var
     source_language: integer;
-    hex_tab : array [0..15] of char;
-    in_file: BinasmFile;
-    current_filen: integer;
+    in_file: BinasmFile;    
     current_linen: integer;
     source_file: Text;
     source_file_name: Filename;
-    opcode_tab: array [first(asmcodes)..last(asmcodes)] of OpcodeTabString;
-    reg_name_tab: array [first(registers)..last(registers)] of Regname;
-    itype_tab: array [first(itype)..last(itype)] of itype_str;
-    iopt_tab: array [first(set_value)..last(set_value)] of itype_str;
-    ioption_type_tab: array [opt_compat_align] of array [1..15] of char;
-    second_dli: boolean;
     val64: Valu;
 
+    { .data }
+    reg_name_tab: array [registers] of array[1..5] of char := [
+        "$0",    "$1",    "$2",    "$3",    "$4",    "$5",    "$6",    "$7",
+        "$8",    "$9",    "$10",   "$11",   "$12",   "$13",   "$14",   "$15",
+        "$16",   "$17",   "$18",   "$19",   "$20",   "$21",   "$22",   "$23",
+        "$24",   "$25",   "$26",   "$27",   "$gp",   "$sp",   "$30",   "$31",
+        "$f0",   "$f1",   "$f2",   "$f3",   "$f4",   "$f5",   "$f6",   "$f7",
+        "$f8",   "$f9",   "$f10",  "$f11",  "$f12",  "$f13",  "$f14",  "$f15",
+        "$f16",  "$f17",  "$f18",  "$f19",  "$f20",  "$f21",  "$f22",  "$f23",
+        "$f24",  "$f25",  "$f26",  "$f27",  "$f28",  "$f29",  "$f30",  "$f31",
+        "$fcc0", "$fcc1", "$fcc2", "$fcc3", "$fcc4", "$fcc5", "$fcc6", "$fcc7",
+        "$0"
+    ];
+
+    itype_tab: array [itype] of array [1..12] of char := [
+        "label",     "sym",         ".globl",    ".cpload",
+        ".align",    ".ascii",      ".asciiz",   ".byte",
+        ".comm",     ".lcomm",      ".data",     ".double",
+        ".file",     ".float",      ".half",     ".cprestore",
+        ".gpword",   ".cpadd",      ".weakext",  ".loopno",
+        ".space",    ".text",       ".word",     "code",
+        ".end",      ".sdata",      ".rdata",    ".ent",
+        ".loc",      ".bgnb",       ".endb",     ".asm0",
+        ".set",      ".cpalias",    ".rep",      ".endrep",
+        ".lab",      ".vreg",       ".mask",     ".fmask",
+        ".err",      ".globabs",    ".verstamp", ".frame",
+        ".extended", ".extern",     ".aent",     ".option",
+        ".noalias",  ".alias",      ".mtag",     ".malias",
+        ".comm",     ".livereg",    ".gjaldef",  ".gjallive",
+        ".gjrlive",  ".shift_addr", ".restext",  ".dword",
+        ".prologue", ".edata",      ".comm"
+    ];
+
+    iopt_tab: array [set_value] of array [1..12] of char := [
+        "undefined",    "reorder",   "noreorder",   "macro",      
+        "nomacro",      "at",        "noat",        "move",
+        "nomove",       "bopt",      "nobopt",      "volatile",
+        "novolatile",   "transform", "notransform", "reposition",
+        "noreposition",
+    ];
+
+    ioption_type_tab: array [opt_compat_align] of array [1..15] of char := [
+        "undefined", "O", "pic", "exception_info"
+    ];
+
+    opcode_tab: array [asmcodes] of array [1..10] of char := [
+        "abs",        "add",        "addu",       "and",        "b",          "bc0f",       "bc0t",      "bc1f",
+        "bc1t",       "bc2f",       "bc2t",       "bad",        "bad",        "beq",        "bge",       "bgeu",
+        "bgez",       "bgt",        "bgtu",       "bgtz",       "ble",        "bleu",       "blez",      "blt",
+        "bltu",       "bltz",       "bne",        "break",      "c0",         "c1",         "c2",        "bad",
+        "div",        "divu",       "j",          "jal",        "la",         "lb",         "lbu",       "lh",
+        "lhu",        "li",         "lw",         "jr",         "lwc1",       "lwc2",       "bad",       "mfhi",
+        "mflo",       "move",       "jalr",       "swc1",       "swc2",       "bad",        "mthi",      "mtlo",
+        "mul",        "mulo",       "mulou",      "mult",       "multu",      "neg",        "nop",       "nor",
+        "or",         "rem",        "remu",       "rfe",        "rol",        "ror",        "sb",        "seq",
+        "sge",        "sgeu",       "sgt",        "sgtu",       "sh",         "sle",        "sleu",      "sll",
+        "slt",        "sltu",       "sne",        "sra",        "srl",        "sub",        "subu",      "sw",
+        "syscall",    "xor",        "not",        "lwl",        "lwr",        "swl",        "swr",       "vcall",
+        "mfc0",       "mfc1",       "mfc2",       "bad",        "mtc0",       "mtc1",       "mtc2",      "bad",
+        "tlbr",       "tlbwi",      "tlbwr",      "tlbp",       "ld",         "sd",         "z110",      "ldc1",
+        "ldc2",       "bad",        "tlbp1",      "sdc1",       "sds2",       "bad",        "l.s",       "l.d",
+        "l.e",        "s.s",        "s.d",        "s.e",        "add.s",      "add.d",      "add.e",     "sub.s",
+        "sub.d",      "sub.e",      "mul.s",      "mul.d",      "mul.e",      "div.s",      "div.d",     "div.e",
+        "sqrt.s",     "sqrt.d",     "sqrt.e",     "mov.s",      "mov.d",      "mov.e",      "abs.s",     "abs.d",
+        "abs.e",      "cvt.s.d",    "cvt.s.e",    "cvt.s.w",    "cvt.d.s",    "cvt.d.e",    "cvt.d.w",   "cvt.e.s",
+        "cvt.e.d",    "cvt.e.w",    "cvt.w.s",    "cvt.w.d",    "cvt.w.e",    "c.f.s",      "c.f.d",     "c.f.e",
+        "c.un.s",     "c.un.d",     "c.un.e",     "c.eq.s",     "c.eq.d",     "c.eq.e",     "c.ueq.s",   "c.ueq.d",
+        "c.ueq.e",    "c.olt.s",    "c.olt.d",    "c.olt.e",    "c.ult.s",    "c.ult.d",    "c.ult.e",   "c.ole.s",
+        "e.ole.d",    "c.ole.e",    "c.ule.s",    "c.ule.d",    "c.ule.e",    "c.sf.s",     "c.sf.d",    "c.sf.e",
+        "c.ngle.s",   "c.ngle.d",   "c.ngle.e",   "c.seq.s",    "c.seq.d",    "c.seq.e",    "c.ngl.s",   "c.ngl.d",
+        "c.ngl.e",    "c.lt.s",     "c.lt.d",     "c.lt.e",     "c.nge.s",    "c.nge.d",    "c.nge.e",   "c.le.s",
+        "c.le.d",     "c.le.e",     "c.ngt.s",    "c.ngt.d",    "c.ngt.d",    "lui",        "ulw",       "ulh",
+        "ulhu",       "usw",        "ush",        "addi",       "addiu",      "slti",       "sltiu",     "andi",
+        "ori",        "xori",       "z218",       "negu",       "beqz",       "bnez",       "neg.s",     "neg.d",
+        "neg.e",      "cfc1",       "ctc1",       "bal",        "bgezal",     "bltzal",     "mtc1.d",    "mfc1.d",
+        "trunc.w.s",  "trunc.w.d",  "trunc.w.e",  "round.w.s",  "round.w.d",  "round.w.e",  "addou",     "subou",
+        "truncu.w.s", "truncu.w.d", "truncu.w.e", "roundu.w.s", "roundu.w.d", "roundu.w.e", "cfc0",      "cfc2",
+        "bad",        "ctc0",       "ctc2",       "bad",        "li.s",       "li.d",       "li.e",      "tlt",
+        "tltu",       "tge",        "tgeu",       "teq",        "tne",        "ll",         "sc",        "ceil.w.s",
+        "ceil.w.d",   "ceil.w.e",   "ceilu.w.s",  "ceilu.w.d",  "ceilu.w.e",  "floor.w.s",  "floor.w.d", "floor.w.e",
+        "flooru.w.s", "flooru.w.d", "flooru.w.e", "beql",       "beqzl",      "bnel",       "bnezl",     "blel",
+        "bleul",      "blezl",      "zbgtl",      "bgtul",      "bgtzl",      "bltl",       "bltul",     "bltzl",
+        "bltzall",    "bgel",       "bgeul",      "bgezl",      "bgezall",    "bc0fl",      "bc0tl",     "bc1fl",
+        "bc1tl",      "bc2fl",      "bc2tl",      "bad",        "bad",        "ldl",        "ldr",       "lld",
+        "lwu",        "sdl",        "sdr",        "scd",        "daddi",      "daddiu",     "dadd",      "daddu",
+        "dsub",       "dsubu",      "dsll",       "dsrl",       "dsra",       "dsllv",      "dsrlv",     "dsrav",
+        "dmult",      "dmultu",     "ddiv",       "ddivu",      "lsc1",       "ssc1",       "dmtc1",     "dmfc1",
+        "dmtc0",      "dmfc0",      "dmtc2",      "dmfc2",      "dli",        "dla",        "eret",      "trunc.l.s",
+        "zround.l.s", "ceil.l.s",   "floor.l.s",  "trunc.l.d",  "zround.l.d", "ceil.l.d",   "floor.l.d", "trunc.l.e",
+        "round.l.e",  "ceil.l.e",   "floor.l.e",  "cvt.l.s",    "cvt.l.d",    "cvt.l.e",    "cvt.l.w",   "cvt.s.l",
+        "cvt.d.l",    "cvt.e.l",    "cvt.w.l",    "cache",      "cia",        "uld",        "usd",       "dabs",
+        "dneg",       "dnegu",      "dmul",       "dmulo",      "dmulou",     "drem",       "dremu",     "drol",
+        "dror",       "daddou",     "dsubou",     "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",        "bad",
+        "bad",        "bad",        "bad",        "bad",        "bad",        "bad"
+    ];
+
+    hex_tab : array [0..15] of char := [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    ];
+
+    current_filen: integer := -2;
+    second_dli: boolean := False;
+
 #define ST_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
-procedure put_string(var arg0: text; arg1: boolean); forward;
 
 procedure put_integer_ws(var pFile: text; val: integer);
 begin
@@ -95,7 +192,7 @@ begin
     write(arg0, sp26);
 end;
 
-procedure hex_2(digit: char; var str: hex_str);
+procedure hex_2(digit: char; var str: hex_char);
 begin
     str[1] := hex_tab[(rshift(digit, 4) & 255)];
     str[2] := hex_tab[ord(digit) -((rshift(digit, 4) & 255) * 16)];
@@ -103,7 +200,7 @@ end;
 
 procedure put_alpha(var arg0: text; arg1: char);
 var
-    sp26: hex_str;
+    sp26: hex_char;
 begin
     if not(arg1 in [' '..'~']) or (arg1 = '"') or (arg1 = '\') then begin
         hex_2(arg1, sp26);
@@ -113,6 +210,39 @@ begin
     end;
 end;
 
+procedure put_string(var arg0: text; arg1: boolean);
+label
+    loop_end;
+var
+    var_s2: u16;
+    var_s1: integer;
+    var_s0: cardinal;
+    var_s6: cardinal;
+begin
+    if arg1 then begin
+        write(arg0, '"');
+    end;
+
+    var_s2 := in_file^.length;
+    for var_s6 := 1 to integer(var_s2 - 1) div 16 + 1 do begin {Get align 16}
+        get(in_file);
+        for var_s0 := 1 to 16 do begin
+            var_s1 := lshift(var_s6, 4) - 16 + var_s0;
+            if (var_s1 <= var_s2) then begin
+                put_alpha(arg0, in_file^.data[var_s0]);
+            end else begin
+                goto loop_end;
+            end;
+        end;
+    end;
+
+loop_end:
+    if arg1 then begin
+        write(arg0, '"');
+    end;
+end;
+
+#line 786
 procedure write_instruction(var arg0: Text);
 label done;
 var
@@ -355,11 +485,11 @@ begin
     end;
 end;
 
+#line 1025
 procedure write_directive(var arg0: Text);
     var
         sp44: cardinal;
 begin
-    {temp_s2 := unk4;}
     with in_file^ do begin
     if instr <> isym then begin
         if instr = ilabel then begin
@@ -418,9 +548,9 @@ begin
 
             idword:
             begin
-                val64.dwval_l := expression;
+                val64.dwval_h := expression;
                 get(in_file);
-                val64.dwval_h := in_file^.expression;
+                val64.dwval_l := in_file^.expression;
                 write(arg0, val64.dwval:1);
                 write(arg0, ' ');
                 write(arg0, ':');
@@ -490,8 +620,7 @@ begin
             ifmask:
             begin
                 put_hex10(arg0, regmask);
-                { should be write_string instead of write_char here, using two spaces}
-                write(arg0, '  ');
+                write(arg0, ', ');
                 write(arg0, regoffset:1);
             end;
             ient,
@@ -596,38 +725,6 @@ begin
             end;
         end;
     end;
-    end;
-end;
-
-procedure put_string({var arg0: text; arg1: boolean});
-label
-    loop_end;
-var
-    var_s2: u16;
-    var_s1: integer;
-    var_s0: cardinal;
-    var_s6: cardinal;
-begin
-    if arg1 then begin
-        write(arg0, '"');
-    end;
-
-    var_s2 := in_file^.length;
-    for var_s6 := 1 to integer(var_s2 - 1) div 16 + 1 do begin {Get align 16}
-        get(in_file);
-        for var_s0 := 1 to 16 do begin
-            var_s1 := lshift(var_s6, 4) - 16 + var_s0;
-            if (var_s1 <= var_s2) then begin
-                put_alpha(arg0, in_file^.data[var_s0]);
-            end else begin
-                goto loop_end;
-            end;
-        end;
-    end;
-
-loop_end:
-    if arg1 then begin
-        write(arg0, '"');
     end;
 end;
 

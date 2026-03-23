@@ -15,12 +15,13 @@ end;
 type
     regArray = array [registers] of integer;
 
+    RegString = packed array [1..5] of char;
+
 var
     regs: array [first(registers)..last(registers)] of Register;
     gp_regs_used: UsedRegs;
     gp_regs_free: UsedRegs;
-    size_tab: array [first(RegKind)..last(RegKind)] of integer;
-    size_tab2: array [first(RegKind)..last(RegKind)] of integer;
+    
     opcode_arch: ( ARCH_32, ARCH_64 );
     isa: mips_isa;
     fp_regs_free: UsedRegs;
@@ -29,8 +30,6 @@ var
     saved_regs: set of registers;
     restricted_fp_regs: RegArray;
     restricted_regs: RegArray;
-    kind_tab: array [registers] of registers;
-    mips_cg_regs: array [1..100] of registers;
     n_cg_regs: integer;
     n_unsaved_regs: integer;
     n_unsaved_fp_regs: integer;
@@ -41,6 +40,31 @@ var
     fp32regs: boolean;
     n_saved_fp_regs: integer;
     ufsm: boolean;
+
+    { .data }
+    kind_tab: array [xr0..xr16] of RegKind := [
+        i_reg, no_reg, i_reg, i_reg,
+        i_reg, di_reg, i_reg, di_reg,
+        i_reg, no_reg, i_reg, no_reg,
+        d_reg, f_reg, i_reg, di_reg,
+        x_reg
+    ];
+
+    size_tab: array [RegKind] of integer := [0, 4, 4, 8, 16, 16, 8, 4];
+    size_tab2: array [RegKind] of integer := [0, 8, 4, 8, 16, 16, 8, 8];
+    mips_cg_regs: array [1..4] of registers := [gpr_t6, gpr_t7, gpr_t8, gpr_t9];
+    name_tab: array [registers] of RegString := [
+        "$0",    "$1",    "$2",    "$3",    "$4",    "$5",    "$6",    "$7",
+        "$8",    "$9",    "$10",   "$11",   "$12",   "$13",   "$14",   "$15",
+        "$16",   "$17",   "$18",   "$19",   "$20",   "$21",   "$22",   "$23",
+        "$24",   "$25",   "$26",   "$27",   "$gp",   "$sp",   "$30",   "$31",
+        "$f0",   "$f1",   "$f2",   "$f3",   "$f4",   "$f5",   "$f6",   "$f7",
+        "$f8",   "$f9",   "$f10",  "$f11",  "$f12",  "$f13",  "$f14",  "$f15",
+        "$f16",  "$f17",  "$f18",  "$f19",  "$f20",  "$f21",  "$f22",  "$f23",
+        "$f24",  "$f25",  "$f26",  "$f27",  "$f28",  "$f29",  "$f30",  "$f31",
+        "$fcc0", "$fcc1", "$fcc2", "$fcc3", "$fcc4", "$fcc5", "$fcc6", "$fcc7",
+        "none"
+    ];
 
 procedure add_to_fp_free_list(arg0: registers; arg1: RegKind); forward;
 
@@ -81,7 +105,7 @@ begin
     report_error(Internal, 280, "reg_mgr.p", "Needed register: all permantently allocated: impossible ");
 end;
 
-function get_reg_kind(arg0: registers): registers;
+function get_reg_kind(arg0: registers): RegKind;
 begin
     return kind_tab[arg0];
 end;
@@ -199,7 +223,7 @@ label loop;
 begin
 loop:
     write(output, "register ", reg);
-    write(output, ": kind  ", regs[reg].reg_kind);
+    write(output, ":  kind ", regs[reg].reg_kind);
     write(output, ", usage ", regs[reg].usage_count);
     writeln(output);
     if (regs[reg].reg_kind = di_reg) then begin
@@ -295,7 +319,6 @@ end;
 
 function remove_from_list(arg0: registers; var arg1: UsedRegs): boolean;
 var
-    temp_a3: registers;
     temp_v1: registers;
     var_a2: registers;
 begin
@@ -331,7 +354,6 @@ end;
 procedure spill(arg0: registers; arg1: integer; var arg2: UsedRegs; var arg3: UsedRegs; arg4: asmcodes);
 var
     temp_v0: registers;
-    temp_a0: ^Tree;
 begin
     if ((opcode_arch = ARCH_32) and (regs[arg0].reg_kind = di_reg)) then begin
         spill_to_temp(arg0, arg1);
@@ -345,7 +367,7 @@ begin
         temp_v0 := remove_head(arg2);
         copy_reg(arg4, arg0, temp_v0);
         if (regs[arg0].unk0 = nil) then begin
-            report_error(Internal, 545, "ugen.p", "register content is empty");
+            report_error(Internal, 545, "reg_mgr.p", "register content is empty");
         end else begin
             regs[arg0].unk0^.reg := temp_v0;
         end;
@@ -383,8 +405,8 @@ begin
 
         otherwise:
         begin
-            writeln(err, "reg = ", reg, "  register kind = ", reg_kind);
-            report_error(Internal, 576, "ugen.p", "illegal register type ");
+            writeln(err, "reg = ", reg, " register kind  = ", reg_kind);
+            report_error(Internal, 576, "reg_mgr.p", " illegal register type");
         end;
     end;
 end;
@@ -413,8 +435,6 @@ begin
 end;
 
 procedure get_two_regs(arg0: registers; arg1: ^tree; arg2: u16);
-var
-    temp_a0: registers;
 begin
     Assert(ord(arg0) & 1 = 0);
     get_one_reg(arg0, arg1, arg2, di_reg);
@@ -538,7 +558,6 @@ end;
 function spill_two_regs(): registers;
 var
     temp_v0: registers;
-    var_s0: registers;
 begin
     temp_v0 := remove_direg(gp_regs_used);
     
@@ -726,15 +745,16 @@ begin
     end;
 end;
 
-{ Weird control flow }
 procedure force_free_reg{(arg0: registers)};
 begin
     if regs[arg0].reg_available then begin
         if (remove_from_list(arg0, gp_regs_used)) then begin 
+            append_to_list(arg0, gp_regs_free);
+        end else begin
             return;
         end;
-        append_to_list(arg0, gp_regs_free);
     end;
+
     fill_reg(arg0, nil, 0, i_reg);
 end;
 

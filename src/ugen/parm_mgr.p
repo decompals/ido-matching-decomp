@@ -20,7 +20,7 @@ end;
 
 function parm_reg(arg0: ^Tree): registers;
 begin
-    Assert(arg0^.u.Opc in [Upar, Updef, Ushl, Uvreg]);
+    Assert(arg0^.u.Opc in [Upar, Updef, Urpar, Uvreg]);
 
     if (arg0^.u.Constval.Ival = -1) then begin
         return xnoreg;
