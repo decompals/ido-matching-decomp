@@ -24,7 +24,7 @@ procedure eval(arg0: ^tree; arg1: registers); forward;
 function reg(arg0: ^tree): registers; forward;
 function flt_reg(arg0: ^tree): registers; forward;
 procedure move_to_dest(arg0: registers; arg1: registers; arg2: Datatype); forward;
-procedure load_fp_literal(a0: ^tree; a1: registers); forward;
+procedure load_fp_literal(arg0: ^tree; arg1: registers); forward;
 procedure eval_flt_flt_cvt(arg0: ^tree; arg1: registers); forward;
 procedure eval_flt_int_cvt(arg0: ^tree; arg1: registers); forward;
 procedure eval_int_flt_cvt(arg0: ^tree; arg1: registers); forward;
@@ -2314,11 +2314,6 @@ begin
            (reg >= xfr12) and (reg <= registers(ord(xfr12) + 2 * (n_fp_parm_regs - 1)));
 end;
 
-{
-    Not matching
-    url: https://decomp.me/scratch/YSoAi
-}
-
 procedure gen_regs(arg0: ^tree);
 var
     v0: registers;
@@ -2359,7 +2354,7 @@ begin
                 if not in_parm_regs(s0) then begin
                     remove_from_fp_free_list(s0, d_reg);
                 end;
-                s0 := registers(ord(s0) + 2);
+                s0 := succ(succ(s0));
             end;
         end;
 
@@ -4441,22 +4436,336 @@ next_op:
     end;
 end;
 
-procedure load_fp_literal{(a0: ^tree; a1: registers)};
+procedure init_eval();
 begin
+    first_loc := true;
+    first_file_number := 0;
+    first_line_number := 0;
+    generate_again := false;
 end;
 
-procedure eval_flt_flt_cvt{(arg0: ^tree; arg1: registers)};
+procedure load_fp_literal{(arg0: ^tree; arg1: registers)};
 begin
-end;
-
-procedure eval_flt_int_cvt{(arg0: ^tree; arg1: registers)};
-begin
+    arg1 := get_dest(arg0, arg1);
+    emit_rfi(fasm(fli_s, arg0^.u.Dtype), arg1, arg0^.u.Constval);
 end;
 
 procedure eval_int_flt_cvt{(arg0: ^tree; arg1: registers)};
+var
+    sp66: asmcodes;
+    sp65: registers;
+    sp64: registers;
+    sp63: registers;
+    sp62: registers;
+    sp5C: ^tree;
+    sp58: integer;
+    var_a1: boolean;
+    sp56: Datatype;
 begin
+    eval(arg0^.op1, xnoreg);
+    sp66 := cvt_tab(arg0^.u.Dtype2, arg0^.u.Dtype);
+    sp65 := arg0^.op1^.reg;
+    assert(sp65 in [xr0..xr31]);
+    sp64 := flt_reg(arg0^.op1);
+    arg1 := get_dest(arg0, arg1);
+    if arg1 in [xfr0..xfr31] then begin
+        sp62 := arg1;
+    end else begin
+        sp62 := sp64;
+    end;
+    emit_rr(sp66, sp62, sp64);
+    if arg0^.u.Dtype2 in [Idt, Jdt] then begin
+        var_a1 := false;
+    end else begin
+        var_a1 := true;
+    end;
+    if arg0^.op1^.u.Opc = Uldc then begin
+        if arg0^.u.Dtype2 = Ldt then begin
+            if (arg0^.op1^.u.Constval.Ival > 0) and (arg0^.op1^.u.Constval.Ival < last(integer)) then begin
+                var_a1 := false;
+            end;
+        end;
+        if arg0^.u.Dtype2 = Kdt then begin
+            if (arg0^.op1^.u.Constval.dwval > 0) and (arg0^.op1^.u.Constval.dwval < last(integer)) then begin
+                var_a1 := false;
+            end;
+        end;
+    end;
+    if var_a1 then begin
+        sp63 := get_free_fp_reg(nil, reg_kind_tab[sp56], 1);
+        sp58 := gen_label_id();
+        emit_rrll(zbge, sp65, xr0, sp58);
+        sp56 := arg0^.u.Dtype;
+        sp5C := rvalue(sp56, '4294967296.0');
+        emit_rfi(fasm(fli_s, sp56), sp63, sp5C^.u.Constval);
+        free_tree(sp5C);
+        emit_rrr(fasm(fadd_s, sp56), sp62, sp62, sp63);
+        define_label(sp58);
+        free_fp_reg(sp63, reg_kind_tab[sp56]);
+    end;
+    move_to_dest(arg1, sp62, arg0^.u.Dtype);
+end;
+
+procedure eval_flt_int_cvt{(arg0: ^tree; arg1: registers)};
+var
+    sp5E: asmcodes;
+    sp5D: registers;
+    sp5C: registers;
+    sp5B: registers;
+    sp5A: registers;
+    temp_a0: registers;
+    sp54: integer;
+    sp50: integer;
+    sp4C: integer;
+    sp48: ^tree;
+    sp47: Datatype;
+begin
+    eval(arg0^.op1, xnoreg);
+    sp5E := cvt_tab(arg0^.u.Dtype2, arg0^.u.Dtype);
+    if arg0^.u.Opc = Urnd then begin
+        sp5E := rnd_tab(arg0^.u.Dtype2, arg0^.u.Dtype);
+    end;
+    sp5A := flt_reg(arg0^.op1);
+    if (arg0^.u.Opc = Ucvt) and not (arg0^.u.Dtype in [Idt, Jdt]) then begin
+        move_cvt_flag := -1;
+        sp47 := arg0^.u.Dtype2;
+        sp5B := get_free_fp_reg(nil, reg_kind_tab[sp47], 1);
+        sp5D := get_free_reg(nil, 1);
+        arg1 := get_dest(arg0, arg1);
+        sp4C := gen_label_id();
+        if (opcode_arch = ARCH_64) and (arg0^.u.Dtype = Ldt) then begin
+            emit_rr(ztrunc_l_s, sp5B, sp5A);
+            emit_rr(zdmfc1, arg1, sp5B);
+            emit_rri_(zdsrl, sp5D, arg1, 32, franone);
+            emit_branch_rill(zbeq, sp5D, 0, 0, sp4C, arg0);
+            emit_ri_(zli, arg1, -1, franone);
+            define_label(sp4C);
+        end else begin
+            sp54 := gen_label_id();
+            sp50 := gen_label_id();
+            emit_rr(zcfc1, sp5D, xr31);
+            emit_ri_(zli, arg1, 1, franone);
+            emit_rr(zctc1, arg1, xr31);
+            if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (opcode_arch = ARCH_64) then begin
+                emit_rr(fasm(fcvt_l_s, sp47), sp5B, sp5A);
+            end else begin
+                emit_rr(fasm(fcvt_w_s, sp47), sp5B, sp5A);
+            end;
+            emit_rr(zcfc1, arg1, xr31);
+            emit_dir0(iset, 6);
+            emit_rri_(zand, xr1, arg1, 4, franone);
+            emit_rri_(zand, arg1, arg1, 120, franone);
+            emit_dir0(iset, 5);
+            emit_branch_rill(zbeq, arg1, 0, 0, sp54, arg0);
+            if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (opcode_arch = ARCH_64) then begin
+                sp48 := rvalue(sp47, '9223372036854775808.0');
+            end else begin
+                sp48 := rvalue(sp47, '2147483648.0');
+            end;
+            emit_rfi(fasm(fli_s, sp47), sp5B, sp48^.u.Constval);
+            free_tree(sp48);
+            emit_rrr(fasm(fsub_s, sp47), sp5B, sp5A, sp5B);
+            emit_ri_(zli, arg1, 1, franone);
+            emit_rr(zctc1, arg1, xr31);
+            if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (opcode_arch = ARCH_64) then begin
+                emit_rr(fasm(fcvt_l_s, sp47), sp5B, sp5B);
+            end else begin
+                emit_rr(fasm(fcvt_w_s, sp47), sp5B, sp5B);
+            end;
+            emit_rr(zcfc1, arg1, xr31);
+            emit_dir0(iset, 6);
+            emit_rri_(zand, xr1, arg1, 4, franone);
+            emit_rri_(zand, arg1, arg1, 120, franone);
+            emit_dir0(iset, 5);
+            emit_branch_rill(zbne, arg1, 0, 0, sp50, arg0);
+            emit_dir0(iset, 6);
+            if opcode_arch = ARCH_64 then begin
+                emit_dir0(iset, 5);
+                emit_rr(zdmfc1, arg1, sp5B);
+                sp48 := dwvalue(arg0^.u.Dtype, 0);
+                sp48^.u.Constval.Ival := 16#80000000;
+                sp5C := get_free_reg(nil, 1);
+                emit_rii(zdli, sp5C, sp48^.u.Constval);
+                free_tree(sp48);
+                emit_rrr(zor, arg1, arg1, sp5C);
+                free_reg(sp5C);
+            end else begin
+                emit_rr(zmfc1, arg1, sp5B);
+                emit_ri_(zli, xr1, 16#80000000, franone);
+                emit_rrr(zor, arg1, arg1, xr1);
+                emit_dir0(iset, 5);
+            end;
+            emit_ll(zb, sp4C);
+            define_label(sp50);
+            if opcode_arch = ARCH_64 then begin
+                sp48 := dwvalue(arg0^.u.Dtype, -1);
+                emit_rii(zdli, arg1, sp48^.u.Constval);
+                free_tree(sp48);
+            end else begin
+                emit_ri_(zli, arg1, -1, franone);
+            end;
+            emit_ll(zb, sp4C);
+            define_label(sp54);
+            if opcode_arch = ARCH_64 then begin
+                emit_rr(zdmfc1, arg1, sp5B);
+            end else begin
+                emit_rr(zmfc1, arg1, sp5B);
+            end;
+            emit_branch_rill(zblt, arg1, 0, 0, sp50, arg0);
+            define_label(sp4C);
+            emit_rr(zctc1, sp5D, xr31);
+        end;
+        free_fp_reg(sp5B, reg_kind_tab[sp47]);
+        free_reg(sp5D);
+    end else begin
+        sp5D := get_free_reg(nil, 1);
+        sp5B := get_free_fp_reg(nil, reg_kind_tab[arg0^.u.Dtype2], 1);
+        emit_rrr(sp5E, sp5B, sp5A, sp5D);
+        free_reg(sp5D);
+        if move_cvt_flag <> arg0^.unk10 then begin
+            free_fp_reg(sp5B, reg_kind_tab[arg0^.u.Dtype2]);
+            temp_a0 := get_dest(arg0, arg1);
+            move_to_dest(temp_a0, sp5B, arg0^.u.Dtype);
+        end else begin
+            arg0^.reg := sp5B;
+        end;
+    end;
 end;
 
 procedure eval_int_int_cvt{(arg0: ^tree; arg1: registers)};
+
+    procedure func_004340D4(arg0: ^tree; arg1: registers);
+    var
+        temp_s1: registers;
+        temp_a0: registers;
+        sp34: integer;
+    begin
+        if opcode_arch = ARCH_64 then begin
+            if (arg0^.op1^.u.Opc = Ulod) and (ureg(arg0^.op1^.u) = xnoreg) then begin
+                arg0^.op1^.u.Dtype := arg0^.u.Dtype;
+            end;
+            eval(arg0^.op1, xnoreg);
+            temp_s1 := reg(arg0^.op1);
+            assert(temp_s1 in [xr0..xr31]);
+            if arg0^.u.Dtype <> arg0^.op1^.u.Dtype then begin
+                emit_rri_(zdsll, temp_s1, temp_s1, 32, franone);
+                if arg0^.u.Dtype in [Adt, Idt, Jdt, Wdt] then begin
+                    emit_rri_(zdsra, temp_s1, temp_s1, 32, franone);
+                end else begin
+                    emit_rri_(zdsrl, temp_s1, temp_s1, 32, franone);
+                end;
+            end;
+            temp_a0 := get_dest(arg0, arg1);
+            move_to_dest(temp_a0, temp_s1, arg0^.u.Dtype);
+        end else begin
+            assert((arg0^.u.Lexlev & 2) <> 0);
+            eval(arg0^.op1, xnoreg);
+            sp34 := gen_label_id();
+            temp_s1 := reg(arg0^.op1);
+            assert(temp_s1 in [xr0..xr31]);
+            emit_rrll(zbgeu, temp_s1, xr0, sp34);
+            emit_i(zbreak, 6);
+            define_label(sp34);
+            temp_a0 := get_dest(arg0, arg1);
+            move_to_dest(temp_a0, temp_s1, arg0^.u.Dtype);
+        end;
+    end;
+    
+    procedure func_00434500(arg0: ^tree; arg1: registers);
+    var
+        sp2B: registers;
+
+        procedure func_00434374(arg0: ^tree; arg1: registers);
+        begin
+            if lsb_first then begin
+                move_to_dest(arg1, sp2B, arg0^.u.Dtype);
+                emit_ri_(zli, succ(arg1), 0, franone);
+            end else begin
+                move_to_dest(succ(arg1), sp2B, arg0^.u.Dtype);
+                emit_ri_(zli, arg1, 0, franone);
+            end;
+        end;
+        
+        procedure func_00434430(arg0: ^tree; arg1: registers);
+        begin
+            if lsb_first then begin
+                move_to_dest(arg1, sp2B, arg0^.u.Dtype);
+                emit_rri_(zsra, succ(arg1), sp2B, 31, franone);
+            end else begin
+                move_to_dest(succ(arg1), sp2B, arg0^.u.Dtype);
+                emit_rri_(zsra, arg1, sp2B, 31, franone);
+            end;
+        end;
+
+    begin
+        eval(arg0^.op1, xnoreg);
+        sp2B := reg(arg0^.op1);
+        assert(sp2B in [xr0..xr31]);
+        arg1 := get_dest(arg0, arg1);
+        if opcode_arch = ARCH_32 then begin
+            if arg0^.u.Dtype2 = Ldt then begin
+                func_00434374(arg0, arg1);
+            end else begin
+                func_00434430(arg0, arg1);
+            end;
+        end else begin
+            move_to_dest(arg1, sp2B, arg0^.u.Dtype);
+        end;
+    end;
+    
+    procedure func_00434618(arg0: ^tree; arg1: registers);
+    var
+        sp33: registers;
+        temp_s0: registers;
+    begin
+        eval(arg0^.op1, xnoreg);
+        sp33 := reg(arg0^.op1);
+        assert(sp33 in [xr0..xr31]);
+        temp_s0 := get_dest(arg0, arg1);
+        if opcode_arch = ARCH_64 then begin
+            move_to_dest(temp_s0, sp33, arg0^.u.Dtype);
+            emit_rri_(zdsll, temp_s0, temp_s0, 32, franone);
+            if arg0^.u.Dtype in [Idt, Jdt] then begin
+                emit_rri_(zdsra, temp_s0, temp_s0, 32, franone);
+            end else begin
+                emit_rri_(zdsrl, temp_s0, temp_s0, 32, franone);
+            end;
+        end else begin
+            if lsb_first then begin
+                move_to_dest(temp_s0, sp33, arg0^.u.Dtype);
+            end else begin
+                move_to_dest(temp_s0, succ(sp33), arg0^.u.Dtype);
+            end;
+        end;
+    end;
+
 begin
+    if arg0^.u.Dtype in [Idt, Kdt, Wdt] then begin
+        func_00434500(arg0, arg1);
+    end else if arg0^.u.Dtype2 in [Idt, Kdt, Wdt] then begin
+        func_00434618(arg0, arg1);
+    end else begin
+        func_004340D4(arg0, arg1);
+    end;
+end;
+
+procedure eval_flt_flt_cvt{(arg0: ^tree; arg1: registers)};
+var
+    sp26: asmcodes;
+    sp25: registers;
+    sp24: registers;
+begin
+    eval(arg0^.op1, xnoreg);
+    sp26 := cvt_tab(arg0^.u.Dtype2, arg0^.u.Dtype);
+    sp24 := flt_reg(arg0^.op1);
+    arg1 := get_dest(arg0, arg1);
+    sp25 := arg1;
+    if not (arg1 in [xfr0..xfr31]) then begin
+        sp25 := get_free_fp_reg(nil, reg_kind_tab[arg0^.u.Dtype], 1);
+    end;
+    emit_rr(sp26, sp25, sp24);
+    if sp25 <> arg1 then begin
+        free_fp_reg(sp25, reg_kind_tab[arg0^.u.Dtype]);
+    end;
+    move_to_dest(arg1, sp25, arg0^.u.Dtype);
 end;
