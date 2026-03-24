@@ -28,7 +28,6 @@ var
         var_s0: ^Tree;
     begin
         var_s0 := arg0^.next;
-        /* TODO: Match with the proper set ! */
         while (not (var_s0^.u.Opc in [Uaent, Ubgn, Uclab, Uend, Uent, Ueof, Ulab, Ustp])) do begin
             if (not (var_s0^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulex, Uoptn, Usdef, Uunal])) then begin
                 delete_statement(var_s0);
@@ -468,7 +467,7 @@ loop:
             var_s0 := var_s0^.next;
         end; 
         
-    end; {End func_00436148 }
+    end;
     
 begin
     mark := next_mark();

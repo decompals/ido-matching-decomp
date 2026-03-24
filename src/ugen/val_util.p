@@ -108,7 +108,7 @@ begin
         ValType_Label: ; { emit nothing }
         ValType_Set: begin
             assert(value.Ival mod 2 = 0);
-            if not lsb_first then begin
+            if UGEN_BIG_ENDIAN then begin
                 for i := 1 to value.Ival div 2 do begin
                     inst.instr := val_dir_tab[vtype];
                     inst.expression := hi[value.Chars^.ss[2 * i - 1]] * 16 + hi[value.Chars^.ss[2 * i]];

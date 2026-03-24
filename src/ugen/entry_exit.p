@@ -294,7 +294,7 @@ begin
         var_s4 := var_s4 + 1;
         var_s2 := succ(var_s2);
     end;
-    var_s2 := xfr12;
+    var_s2 := fpr_fa0;
     var_s0 := 0;
     var_v1 := znop;
     var_s4 := 0;
@@ -331,18 +331,18 @@ begin
         if var_s0_2 <> 0 then begin
             if (arg1 & integer(16#FFFF)) = 0 then begin
                 if reversed_stack then begin
-                    demit_rob_(fs_s, xfr12, -(arg0 - var_s0_2) - 4, gpr_sp, franone);
-                    demit_rob_(fs_s, xfr13, -(arg0 - var_s0_2) - 8, gpr_sp, franone);
+                    demit_rob_(fs_s, fpr_fa0, -(arg0 - var_s0_2) - 4, gpr_sp, franone);
+                    demit_rob_(fs_s, fpr_fa0f, -(arg0 - var_s0_2) - 8, gpr_sp, franone);
                 end else begin
-                    demit_rob_(fs_d, xfr12, arg0 - var_s0_2, gpr_sp, franone);
+                    demit_rob_(fs_d, fpr_fa0, arg0 - var_s0_2, gpr_sp, franone);
                 end;
             end;
             var_s0_2 := var_s0_2 + 8;
             if reversed_stack then begin
-                demit_rob_(fs_s, xfr14, -(arg0 - var_s0_2) - 4, gpr_sp, franone);
-                demit_rob_(fs_s, xfr15, -(arg0 - var_s0_2) - 8, gpr_sp, franone);
+                demit_rob_(fs_s, fpr_fa1, -(arg0 - var_s0_2) - 4, gpr_sp, franone);
+                demit_rob_(fs_s, fpr_fa1f, -(arg0 - var_s0_2) - 8, gpr_sp, franone);
             end else begin
-                demit_rob_(fs_d, xfr14, arg0 - var_s0_2, gpr_sp, franone);
+                demit_rob_(fs_d, fpr_fa1, arg0 - var_s0_2, gpr_sp, franone);
             end;
         end;
     end;
@@ -477,7 +477,7 @@ begin
         var_s0 := pred(var_s0);
     end;
     i := 0;
-    var_s0 := registers(ord(xfr20) + (n_saved_fp_regs - i - 1) * 2);
+    var_s0 := registers(ord(fpr_fs0) + (n_saved_fp_regs - i - 1) * 2);
     sp3B := true;
     sp3A := false;
     if ((var_s1 div 4) & 1) <> 0 then begin
@@ -515,7 +515,7 @@ begin
         end;
     end;
     i := 0;
-    var_s0 := registers(ord(xfr20) + i * 2);
+    var_s0 := registers(ord(fpr_fs0) + i * 2);
     while i <> n_saved_fp_regs do begin
         if var_s0 in saved_regs then begin
             if reversed_stack then begin
@@ -735,7 +735,7 @@ begin
         var_s0 := pred(var_s0);
     end;
     i := 0;
-    var_s0 := registers(ord(xfr20) + (n_saved_fp_regs - i - 1) * 2);
+    var_s0 := registers(ord(fpr_fs0) + (n_saved_fp_regs - i - 1) * 2);
     if ((var_s1 div 4) & 1) <> 0 then begin
         var_s1 := var_s1 - 4;
     end;

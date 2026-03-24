@@ -117,7 +117,6 @@ begin
             report_error(Internal, 124, "temp_mgr.p", "illegal size temporary");
             return;
         end;
-
     end else if (areaSize <= 4) then begin
         op := fs_s;
     end else if (areaSize <= 8) then begin

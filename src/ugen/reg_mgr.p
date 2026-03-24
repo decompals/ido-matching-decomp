@@ -142,20 +142,20 @@ begin
     fp_regs_free.unk0 := xnoreg;
     fp_regs_free.unk1 := xnoreg;
 
-    i := xfr4;
+    i := fpr_ft0;
     for j := 1 to n_fp_cg_regs do begin
         add_to_fp_free_list(i, no_reg);
         i := succ(succ(i));
     end;
 
-    i := xfr16;
+    i := fpr_ft4;
     for j := 1 to n_unsaved_fp_regs do begin
         add_to_fp_free_list(i, no_reg);
         i := succ(succ(i));
     end;
 
     if (fp32regs) then begin
-        i := xfr1;
+        i := fpr_fv0f;
         for j := 1 to 16 do begin
             add_to_fp_free_list(i, no_reg);
             i := succ(succ(i));
@@ -166,7 +166,7 @@ begin
         regs[i].usage_count := 0;
     end;
 
-    i := xfr12;
+    i := fpr_fa0;
     while (i <= registers(cardinal((n_fp_parm_regs * 2) + 16#2A))) do begin
         regs[i].reg_available := false;
         regs[i].usage_count := 0;
