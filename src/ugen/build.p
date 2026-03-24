@@ -34,17 +34,54 @@ var
     resident_text: s8;
     reverse: extern array[Uopcode] of Uopcode;
     reversed_stack: boolean;
-    similar_data_types: array[Datatype] of set of Datatype;
-    similar_data_types_dw: array[Datatype] of set of Datatype;
+    similar_data_types: array[Datatype] of set of Datatype := [
+        Adt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Fdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Gdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Hdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Jdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt],
+        Ldt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt],
+        Ndt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Wdt: [Adt, Fdt, Gdt, Hdt, Idt, Kdt, Ndt, Wdt],
+
+        Idt: [Idt, Kdt, Wdt],
+        Kdt: [Idt, Kdt, Wdt],
+
+        Qdt: [Qdt],
+        Rdt: [Rdt],
+        Xdt: [Xdt],
+
+        otherwise []
+    ];
+    similar_data_types_dw: array[Datatype] of set of Datatype := [
+        Adt: [Adt, Fdt, Gdt, Hdt, Jdt, Ndt, Wdt],
+        Fdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Gdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Hdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Jdt: [Adt, Fdt, Gdt, Hdt, Jdt, Ndt],
+        Ldt: [Fdt, Gdt, Hdt, Ldt, Ndt],
+        Ndt: [Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Wdt],
+        Wdt: [Adt, Fdt, Gdt, Hdt, Idt, Kdt, Ndt, Wdt],
+
+        Idt: [Idt, Kdt, Wdt],
+        Kdt: [Idt, Kdt, Wdt],
+
+        Qdt: [Qdt],
+        Rdt: [Rdt],
+        Xdt: [Xdt],
+        
+        otherwise []
+    ];
     source_language: integer;
-    stack_limit_bn: integer;
-    syms: pointer;
+    stack_limit_bn: integer;    
     trap_to_compare: array[Utpeq..Utpne] of Uopcode := [Uneq, Ules, Uleq, Ugrt, Ugeq, Uequ];
+    
     unitsperaddr: integer;
     use_fp: s8;
     will_use_real_fp_for_proc: s8;
     strp: Stringtextptr;
 
+    syms: ^tree := nil;
 
 procedure set_domtag(arg0: boolean);
 begin

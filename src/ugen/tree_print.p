@@ -81,10 +81,9 @@ begin
         write(f, " mtype=", mtype_name[u.Mtype]);
     end;
 
-    { Uabs shouldn't be in this set, but removing it breaks both code and data a lot }
-    if (u.Opc in [Uabs, Uent, Uilod, Uistr, Ulab, Ulbdy, Ulex, Uloc, Ulod,
-                  Umov, Umpmv, Umst, Upmov, Uregs, Urlod, Urpar, Urstr,
-                  Ustr, Umtag, Ualia, Uirld, Uirst]) then begin
+    if (u.Opc in [Uaent, Ucia, Ucup, Uent, Uilod, Uistr, Ulab, Ulbdy,
+                  Ulex, Uloc, Ulod, Umov, Umpmv, Umst, Upmov, Uregs,
+                  Urlod, Urpar, Urstr, Ustr, Umtag, Ualia, Uirld, Uirst]) then begin
         write(f, " lexlev=", u.lexlev:1);
     end;
 

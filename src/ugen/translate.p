@@ -35,7 +35,7 @@ function need_check_hl(arg0: ^tree): boolean; forward;
 function build_ucond0(arg0: ^tree; arg1: integer): pointer; forward;
 function cse(arg0: ^tree): pointer; forward;
 function load_cse(arg0: ^Tree) : pointer; forward;
-function translate(a: ^tree): pointer;  forward;
+function translate(a: Ptree): pointer;  forward;
 function set_rewrite(arg0: ^tree; arg1: integer; arg2: 0..32): pointer; forward;
 procedure check_reg(arg0: ^Tree); forward;
 procedure free_tree_and_cse(arg0: ^tree); forward;
@@ -66,12 +66,12 @@ var
     leaf: boolean;
     has_entry: boolean;
     vreg_offset: cardinal;
-    max_vreg_offset: integer;
+    max_vreg_offset: cardinal;
     n_parm_regs: integer;
     n_unsaved_regs: integer;
-    n_fp_parm_regs: integer;
+    n_fp_parm_regs: cardinal;
     fp_vreg_offset: cardinal;
-    max_fp_vreg_offset: integer;
+    max_fp_vreg_offset: cardinal;
     n_unsaved_fp_regs: integer;
     pdefs: pointer;
     varargs: boolean;
@@ -168,6 +168,7 @@ var
 
     no_cse_flag: integer := 0;
 
+#line 267
 procedure force_casting(arg0: ^Tree; arg1: integer);
 var
     sp24: unk_cast_rec;
@@ -636,7 +637,7 @@ begin
     return arg0;
 end;
 
-function translate({a: ^Tree});
+function translate({a: Ptree});
 label restart;
 label lab1;
 var
@@ -2342,10 +2343,10 @@ end;
 
 function is_reg(arg0: ^tree): boolean;
 begin
-    if (arg0^.u.Dtype in [Fdt, Cdt, Idt, Jdt]) then begin
+    if (arg0^.u.Mtype in [Mmt, Pmt, Amt, Tmt]) then begin
         check_reg(arg0);
     end;
-    return arg0^.u.Dtype = Gdt;
+    return arg0^.u.Mtype = Rmt;
 end;
 
 
@@ -2446,7 +2447,7 @@ end;
 
 function build_ucond0({arg0: ^tree; arg1: integer});
 var
-    pad: array [0..2] of integer;
+    pad: array [0..1] of integer;
     sp20: pointer;
     p: ^tree;
 begin

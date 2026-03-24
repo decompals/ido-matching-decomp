@@ -106,7 +106,7 @@ offset,vram,.rodata
 
 offset,vram,.data
 070E60,10010E60,aio
-0724C0,100124C0,ugen_0724C0
+0724C0,100124C0,build
 072570,10012570,emit
 073640,10013640,eval
 076170,10016170,labelopt
