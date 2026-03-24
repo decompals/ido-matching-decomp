@@ -34,7 +34,7 @@ The following table specify if each binary has been matched or not, and if it ha
 | `cc`      | :x: | :x: | :heavy_check_mark: | :x: |
 | `cfe`     | :x: | :x: | :x: | :x: |
 | `uopt`    | :x: | :x: | :x: | :x: |
-| `ugen`    | :x: | :x: | :x: | :x: |
+| `ugen`    | :x: | :x: | :heavy_check_mark: | :x: |
 | `as1`     | :x: | :x: | :x: | :x: |
 | `as0`     | :heavy_check_mark: | :x: | :x: | :x: |
 | `ld`      | :x: | :x: | :x: | :x: |
