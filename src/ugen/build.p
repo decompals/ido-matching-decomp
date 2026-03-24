@@ -56,9 +56,46 @@ begin
     get_domtag := domtag;
 end;
 
+function search_label(index: cardinal): pointer;
+var
+    label_hash_iterator: ptree;
+begin
+{ To note:
+    Why does SGI Pascal generate this strange patern
+        if index mod 253 then
+            index := 253;   //then we have some cardinal vs integer issues
+    }
+    label_hash_iterator := label_hash_table[(index mod 253) & 255];
+    while (label_hash_iterator <> nil)  do begin
+        if (index = label_hash_iterator^.u.I1) then begin
+            break;
+        end;
+        label_hash_iterator := label_hash_iterator^.op1;
+    end;
+    return label_hash_iterator;
+end;
 
-{GLOBAL_ASM("asm/7.1/functions/ugen/build/search_label.s")}
-{GLOBAL_ASM("asm/7.1/functions/ugen/build/find_label.s")}
+function find_label(arg0: cardinal): pointer;
+var
+    temp_v0: ^tree;
+    var_v1: ^tree;
+begin
+
+    var_v1 := label_hash_table[(arg0 mod 253) & 255];
+    while (var_v1 <> nil) do begin
+        if (arg0 = var_v1^.u.I1) then begin
+            return var_v1;
+        end;
+        var_v1 := var_v1^.op1;
+    end;
+    temp_v0 := build_op(Ulab);
+    temp_v0^.u.Lexlev := 0;
+    temp_v0^.u.Length := 0;
+    temp_v0^.u.I1 := arg0;
+    temp_v0^.op1 := label_hash_table[(arg0 mod 253) & 255];
+    label_hash_table[(arg0 mod 253) & 255] := temp_v0;
+    return temp_v0;
+end;
 
 
 procedure init_build();
@@ -81,8 +118,7 @@ procedure gen_sym(var u: Bcrec); external;
 procedure add_init(var u: Bcrec); external;
 procedure set_size(arg0: integer; arg1: cardinal); external;
 procedure map_pdefs_to_regs(arg0: ^Tree; arg1: integer); external;
-function find_label(arg0: integer): pointer; external;
-function search_label(arg0: integer): pointer; external;
+{function find_label(arg0: integer): pointer; external;}
 function overlap(arg0: ^tree; arg1: ^tree): boolean; external;
 function parm_reg(arg0: ^Tree): integer; external;
 
