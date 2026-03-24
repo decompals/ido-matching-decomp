@@ -54,15 +54,11 @@ var
 var
     calls: integer;
     pseudo_leaf: boolean;
-    no_cse_flag: integer;
     expr_count: 0..5;
     exprs: array [1..5] of ^tree;
     load_count: 0..5;
     loads: array [1..5] of ^tree;
-    h: array [char] of char;
     lsb_first: boolean;
-        expression_opcs: array [Uopcode] of boolean;
-    reverse: array [Uopcode] of Uopcode;
     current_line: cardinal;
     opt_cse: u8;
     bb_size: integer;
@@ -93,6 +89,84 @@ var
     isa: mips_isa;
     opcode_arch: ( ARCH_32, ARCH_64 );
 
+    { .data }
+    expression_opcs: array [Uopcode] of boolean := [
+        Uabs: true,
+        Uadd: true,
+        Uand: true,
+        Uchkh: true,
+        Uchkl: true,
+        Uchkn: true,
+        Ucvt: true,
+        Ucvtl: true,
+        Udiv: true,
+        Uequ: true,
+        Ugeq: true,
+        Ugrt: true,
+        Uior: true,
+        Uleq: true,
+        Ules: true,
+        Ulnot: true,
+        Umax: true,
+        Umin: true,
+        Umod: true,
+        Umpy: true,
+        Uneg: true,
+        Uneq: true,
+        Unot: true,
+        Urem: true,
+        Urnd: true,
+        Ushl: true,
+        Ushr: true,
+        Usqr: true,
+        Usqrt: true,
+        Usub: true,
+        Utyp: true,
+        Uxor: true,
+
+        otherwise false
+    ];
+
+    h: array [char] of 0..15 := [
+        '0': 0,
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        'A': 10, 'a': 10,
+        'B': 11, 'b': 11,
+        'C': 12, 'c': 12,
+        'D': 13, 'd': 13,
+        'E': 14, 'e': 14,
+        'F': 15, 'f': 15,
+        otherwise 0
+    ];
+
+    reverse: array [Uopcode] of Uopcode := [
+        Uadd: Uadd,
+        Uand: Uand,
+        Uequ: Uequ,
+        Uior: Uior,
+        Umax: Umax,
+        Umin: Umin,
+        Umpy: Umpy,
+        Uneq: Uneq,
+        Uxor: Uxor,
+
+        Ugeq: Uleq,
+        Uleq: Ugeq,
+        Ugrt: Ules,
+        Ules: Ugrt,
+
+        otherwise Unop
+    ];
+
+    no_cse_flag: integer := 0;
 
 procedure force_casting(arg0: ^Tree; arg1: integer);
 var
@@ -178,7 +252,7 @@ begin
     end;
 
     for i := var_a2 to var_t1 do begin
-        var_t0 := var_t0 * 16 + ord(h[arg0.Chars^.ss[i]]);
+        var_t0 := var_t0 * 16 + h[arg0.Chars^.ss[i]];
     end;
     
     return var_t0;
@@ -265,7 +339,6 @@ var
     var_s0: cardinal;
     
 begin
-    {TO CHECK}
     Assert(arg0^.u.Opc in [Uequ, Uneq]);
     var_s4 := nil;
 
@@ -1833,8 +1906,7 @@ begin
     arg0^.ref_count := arg0^.ref_count - 1;
 
     if (arg0^.ref_count = 0) then begin
-        {TODO: Match set D_10016994}
-        if (arg0^.u.Opc in [Uendb..Uneq]) then begin
+        if (arg0^.u.Opc in [Uisld, Ulod]) then begin
             for var_v0 := load_count downto 1 do begin
                 if (arg0 = loads[var_v0]) then begin
                     loads[var_v0] := nil;
@@ -1849,15 +1921,13 @@ begin
         end;
 
         if (arg0^.op1 <> nil) then begin
-            {TODO: Match set D_10016984}
-            if not (arg0^.u.Opc in [Uabs..Upop]) then begin
+            if not (arg0^.u.Opc in [Uaent, Ucg2, Uclab, Uent, Ulab, Unop]) then begin
                 free_tree_and_cse(arg0^.op1);
             end;
         end;
     
         if (arg0^.op2 <> nil) then begin
-            {TODO: Match set D_10016970}
-            if not (arg0^.u.Opc in [Uabs..Uirst]) then begin
+            if not (arg0^.u.Opc in [Uaent, Ucg2, Uclab, Uent, Ulab, Unop, Uijp, Ufjp, Utjp, Uujp, Uxjp]) then begin
                 free_tree_and_cse(arg0^.op2);
             end;
         end;
@@ -2240,14 +2310,11 @@ begin
         ((s2^.u.Dtype <> Sdt) and (s2^.u.Length <= 8))) then begin
         var_s3 := s2;
 
-
-        {TODO: Match set D_100169B0}
         if (s2^.u.Opc = Ustr) and
-                (((s2^.op1^.u.Opc in [Uequ, Uneq]) and (s2^.op1^.u.Mtype = Rmt)) or
-                 ((s2^.op1^.op1 <> nil) and (s2^.op1^.op1^.u.Opc in [Uequ, Uneq]) and (s2^.op1^.op1^.u.Mtype = Rmt))) then begin
+                (((s2^.op1^.u.Opc in [Uilod, Ulod]) and (s2^.op1^.u.Mtype = Rmt)) or
+                 ((s2^.op1^.op1 <> nil) and (s2^.op1^.op1^.u.Opc in [Uilod, Ulod]) and (s2^.op1^.op1^.u.Mtype = Rmt))) then begin
             var_s3 := nil;
-        {TODO: Match set D_100169B0}
-        end else if (s2^.u.Opc = Uisst) and (s2^.op2^.u.Opc in [Uequ, Uneq]) and (s2^.op2^.u.Mtype = Rmt) then begin
+        end else if (s2^.u.Opc = Uisst) and (s2^.op2^.u.Opc in [Uilod, Ulod]) and (s2^.op2^.u.Mtype = Rmt) then begin
             var_s3 := nil;
         end;
 

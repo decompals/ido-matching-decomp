@@ -21,7 +21,7 @@ mips_isa = (
 );
 
 
-#define UGEN_LITTLE_ENDIAN lsb_first
-#define UGEN_BIG_ENDIAN not lsb_first
+#define UGEN_LITTLE_ENDIAN (lsb_first)
+#define UGEN_BIG_ENDIAN (not lsb_first)
 
 #endif /* COMMON_H */
