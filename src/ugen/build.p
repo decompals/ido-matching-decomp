@@ -677,7 +677,7 @@ begin
         case sp1C8.Opc of
 
             {Parse different Uopcodes}
-            CASE_OPC(Uesym):
+            CASE_OPC(Ufsym):
             begin
                 gen_sym(sp1C8);
                 if domtag then begin
@@ -689,6 +689,7 @@ begin
 
             CASE_OPC(Uasym),
             CASE_OPC(Ucsym),
+            CASE_OPC(Uesym),
             CASE_OPC(Uhsym),
             CASE_OPC(Ugsym),
             CASE_OPC(Ulsym),
