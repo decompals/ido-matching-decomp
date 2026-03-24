@@ -60,24 +60,26 @@ begin
     return p_Tree;
 end;
 
-procedure build_u(var u: Bcrec);
+function build_u(var u: Bcrec): pointer;
 var
     p_tree: ^tree;
 begin
     p_tree := new_tree();
     p_tree^.u := u;
+    return p_tree;
 end;
 
-procedure build_u1(var u: Bcrec; op1: ^Tree);
+function build_u1(var u: Bcrec; op1: ^Tree): pointer;
 var
     p_tree: ^tree;
 begin
     p_tree := new_tree();
     p_tree^.u := u;
     p_tree^.op1 := op1;
+    return p_tree;
 end;
 
-procedure build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree);
+function build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree): pointer;
 var
     p_tree: ^tree;
 begin
@@ -85,6 +87,7 @@ begin
     p_tree^.u := u;
     p_tree^.op1 := op1;
     p_tree^.op2 := op2;
+    return p_tree;
 end;
 
 function build_op(arg0: Uopcode): pointer;

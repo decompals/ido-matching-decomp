@@ -1,8 +1,8 @@
 #ifndef TREE_UTILS_H
 #define TREE_UTILS_H
-procedure build_u(var u: Bcrec); external;
-procedure build_u1(var u: Bcrec; op1: ^Tree); external;
-procedure build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree); external;
+function build_u(var u: Bcrec): pointer; external;
+function build_u1(var u: Bcrec; op1: ^Tree): pointer; external;
+function build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree): pointer; external;
 function build_op(arg0: Uopcode): pointer; external;
 procedure free_node(arg0: ^Tree); external;
 procedure free_tree(t: ^tree); external;

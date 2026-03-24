@@ -819,14 +819,14 @@ begin
     sym^.unk4 := -arg1;
 end;
 
-procedure set_mtag(arg0: integer; cur_mtag: ^integer);
+procedure set_mtag(arg0: integer; var cur_mtag: integer);
 var
     sym: ^Symbol;
 begin
     sym := lookup_sym(arg0);
     if ((sym <> nil) and (sym^.mtag = 0)) then begin
-        cur_mtag^ := cur_mtag^ + 1;
-        sym^.mtag := cur_mtag^;
+        cur_mtag := cur_mtag + 1;
+        sym^.mtag := cur_mtag;
     end;
 end;
 
