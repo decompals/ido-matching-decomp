@@ -11,7 +11,7 @@ var
     val_dir_tab: array [ValType_Byte..ValType_Set] of itype := (
         ibyte, ihalf, iword, idword, ifloat, idouble, iascii, iword, ibyte
     );
-    hi: array [char] of u8 := (
+    hi: array [char] of 0..15 := (
         '0': 0,
         '1': 1,
         '2': 2,
@@ -69,7 +69,7 @@ var
     inst: binasm;
     i: integer;
 begin
-    { emits a `.label` directive if required }
+    { emits a label if required }
     if labelno <> NO_LABEL then begin
         demit_dir0(ilabel, labelno);
     end;

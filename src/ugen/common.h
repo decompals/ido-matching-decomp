@@ -6,6 +6,7 @@
 
 const
     NO_LABEL = 0;
+    NO_SYM = 0;
 
 type
     u16 = 0..65535 ;
@@ -30,5 +31,6 @@ type
 
 var
     lsb_first: boolean;
+    sdata_max: integer;
 
 #endif /* COMMON_H */
