@@ -3,7 +3,6 @@
 #include "common.h"
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
-#include "cmplrs/binasm.h"
 type
   Ptree = ^tree;
   tree = packed record

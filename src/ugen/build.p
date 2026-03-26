@@ -22,13 +22,9 @@ var
     has_cia_in_file: s8;
     ignore_vreg: s8;
     ls_stamp: integer;
-    lsb_first: boolean;
     ms_stamp: integer;
-    n_fp_parm_regs: integer;
-    n_parm_regs: integer;
     non_local_mtag: integer;
     nooffsetopt: boolean;
-    opcode_arch: u8;
     opt_parms: u8;
     pseudo_leaf: u8;
     resident_text: s8;
@@ -1634,7 +1630,7 @@ begin
         begin
             if not (sp1C8.Dtype in similar_data_types[sp1C8.Dtype2]) or
                 (IS_OVERFLOW_ATTR(sp1C8.Lexlev) and ((sp1C8.Dtype in [Idt, Jdt]) <> (sp1C8.Dtype2 in [Idt, Jdt])) or
-                ((opcode_arch = 1) and not (sp1C8.Dtype in similar_data_types_dw[sp1C8.Dtype2]))) then begin
+                ((opcode_arch = ARCH_64) and not (sp1C8.Dtype in similar_data_types_dw[sp1C8.Dtype2]))) then begin
                 func_0040E2AC(sp1648);
                 sp1004[sp1648] := build_u1(sp1C8, sp1004[sp1648]);
             end;

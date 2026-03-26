@@ -3,9 +3,7 @@
 #include "report.h"
 
 var
-    n_fp_parm_regs: extern integer;
     first_pmt_offset: integer;
-    n_parm_regs: extern integer;
     basicint: extern u8;
     pars: array [0..16] of integer;
     fix_amt: array [0..4] of boolean;

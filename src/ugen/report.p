@@ -4,7 +4,6 @@ var
 	print_warnings: boolean;
 	current_line: cardinal;
 	debug_ugen: boolean;
-	opcode_arch: ( ARCH_32, ARCH_64 );
 	glevel: u8;
 	ignore_vreg: u8;
 	olevel: u8;

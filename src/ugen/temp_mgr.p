@@ -5,10 +5,6 @@
 #include "frame_offset.h"
 #include "ugen_regdef.h"
 
-{Extern variables}
-var
-    opcode_arch: ( ARCH_32, ARCH_64 );
-
 type
     Ptemp = ^Temp_rec;
     Temp_rec = Record;
@@ -27,12 +23,11 @@ var
     frame_pointer: registers;
     reversed_stack: extern boolean;
 
-
 type
-spill_rec = Record
-    unk: ^unk_rgmr_rec;
-    temp: Ptemp;
-end;
+    spill_rec = Record
+        unk: PTree;
+        temp: Ptemp;
+    end;
 
 procedure emit_rob(reg: asmcodes; offset: registers; a2: integer; arg3: registers; arg4: integer); external;
 
@@ -157,7 +152,7 @@ begin
     end;
 
     spill.unk := content_of(reg);
-    spill.unk^.temp_index := spill.temp^.index;
+    spill.unk^.unk18 := spill.temp^.index;
 
     spill.temp^.usage_count := usage_count(reg);
     spill.temp^.area_size := areaSize;

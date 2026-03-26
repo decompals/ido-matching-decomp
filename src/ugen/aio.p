@@ -2,7 +2,6 @@
 #include "report.h"
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
-#include "cmplrs/binasm.h"
 #include "cmplrs/uoptions.h"
 #include "cmplrs/stinfc.h"
 

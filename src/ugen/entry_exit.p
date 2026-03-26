@@ -27,18 +27,12 @@ var
     home_vararg_reg: boolean;
     i_ptrs_for_gp_offset: array[1..20] of integer;
     init_dynmem: boolean;
-    isa: mips_isa;
     max_stack: integer;
     mscoff: boolean;
-    n_fp_parm_regs: integer;
-    n_parm_regs: integer;
-    n_saved_fp_regs: integer;
-    n_saved_regs: integer;
     num_i_ptr_indexes: integer;
     olevel: u8;
     pic_level: integer;
     reversed_stack: boolean;
-    saved_regs: set of registers;
     stack_limit_bn: integer;
     use_cpalias: boolean;
     uses_gp: boolean;

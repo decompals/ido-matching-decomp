@@ -42,14 +42,6 @@ type
     end;
 
 var
-    lsb_first: boolean;
-    opcode_arch: ( ARCH_32, ARCH_64 );
-    regs: array [registers] of Register;
-    n_saved_regs: integer;
-    n_saved_fp_regs: integer;
-    n_parm_regs: integer;
-    n_fp_parm_regs: integer;
-    isa: mips_isa;
     reversed_stack: boolean;
     frame_pointer: registers;
     basicint: u8;
@@ -58,15 +50,12 @@ var
     align16: boolean;
     align32: boolean;
     align64: boolean;
-    saved_regs: set of registers;
     pdefs: ^tree;
     source_language: integer;
-    ugen_fp_callee_saved: set of registers;
     ignore_vreg: boolean;
     pseudo_leaf: boolean;
     use_real_fp_for_proc: boolean;
     ufsa: boolean;
-    ufsm: boolean;
     cpalias_ok: boolean;
     use_cpalias: boolean;
     pmov_regs: set of registers;
@@ -661,7 +650,7 @@ begin
         end;
     end;
     if (opcode_arch = ARCH_64) and (arg0 in [xr4, xr6]) then begin
-        regs[arg0].unk9 := succ(arg0);
+        regs[arg0].dw_link := succ(arg0);
     end;
 end;
 
@@ -958,7 +947,7 @@ function is_saved_reg(reg: registers): boolean;
 begin
     return (reg >= gpr_s0) and (reg <= registers(ord(gpr_s0) + n_saved_regs - 1)) or
            (reg in [gpr_s8, gpr_ra]) or
-           (reg >= xfr20) and (reg <= registers(ord(xfr20) + 2 * (n_saved_fp_regs - 1)));
+           (reg >= fpr_fs0) and (reg <= registers(ord(fpr_fs0) + 2 * (n_saved_fp_regs - 1)));
 end;
 
 function is_parm_reg(reg: registers): boolean;
@@ -1661,7 +1650,7 @@ var
             func_00427FB8();
         end else if ((arg1^.u.Offset mod 8) <> 0) or ((sp24 mod 8) <> 0) then begin
             func_004280C4();
-        end else if (arg1^.u.Dtype in [Idt, Kdt, Qdt, Wdt]) and (arg0 in [zld, zsd]) and ((opcode_arch = ARCH_32) or (regs[arg2].unk9 = succ(arg2))) then begin
+        end else if (arg1^.u.Dtype in [Idt, Kdt, Qdt, Wdt]) and (arg0 in [zld, zsd]) and ((opcode_arch = ARCH_32) or (regs[arg2].dw_link = succ(arg2))) then begin
             arg0 := double_to_singles[arg0];
             if is_fp_reg(arg2) or (arg1^.u.Dtype in [Qdt, Rdt, Xdt]) then begin
                 loadstore_for_two_fp_words(arg0, arg1, arg2);
@@ -2789,7 +2778,7 @@ begin
                 frame_pointer := xr29;
             end;
             if ufsa or ufsm then begin
-                for var_s0_2 := xfr20 to registers(ord(xfr20) + ((n_saved_fp_regs - 1) * 2)) do begin
+                for var_s0_2 := fpr_fs0 to registers(ord(fpr_fs0) + ((n_saved_fp_regs - 1) * 2)) do begin
                     ugen_fp_callee_saved := ugen_fp_callee_saved + [var_s0_2];
                 end;
             end else begin
@@ -3043,8 +3032,8 @@ begin
                 end;
                 if (opcode_arch = ARCH_64) and (basicint = 0) and setting_int64_return and (arg1 = xr2) then begin
                     case arg0^.op1^.u.Opc of
-                        Uldc: regs[arg1].unk9 := succ(arg1);
-                        Ulod: regs[arg1].unk9 := succ(arg1);
+                        Uldc: regs[arg1].dw_link := succ(arg1);
+                        Ulod: regs[arg1].dw_link := succ(arg1);
                         otherwise: ;
                     end;
                 end;
@@ -3053,7 +3042,7 @@ begin
                 if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (basicint = 0) and ((processing_args and (arg1 in [xr4, xr6])) or (setting_int64_return and (arg1 = xr2))) then begin
                     if opcode_arch = ARCH_32 then begin
                         move_two_regs(arg1, temp_s2);
-                    end else if (temp_s2 <> arg1) or (regs[temp_s2].unk9 <> succ(temp_s2)) then begin
+                    end else if (temp_s2 <> arg1) or (regs[temp_s2].dw_link <> succ(temp_s2)) then begin
                         move_dreg_to_regs(arg1, temp_s2);
                     end;
                 end else begin
@@ -3111,7 +3100,7 @@ begin
             if setting_int64_return then begin
                 setting_int64_return := false;
                 if opcode_arch = ARCH_64 then begin
-                    regs[xr2].unk9 := xnoreg;
+                    regs[xr2].dw_link := xnoreg;
                 end;
             end;
         end;
@@ -3178,8 +3167,8 @@ begin
             if arg1 <> xnoreg then begin
                 if (opcode_arch = ARCH_64) and (basicint = 0) then begin
                     case arg0^.op1^.u.Opc of
-                        Uldc: regs[arg1].unk9 := succ(arg1);
-                        Ulod: regs[arg1].unk9 := succ(arg1);
+                        Uldc: regs[arg1].dw_link := succ(arg1);
+                        Ulod: regs[arg1].dw_link := succ(arg1);
                         otherwise: ;
                     end;
                 end;
@@ -3188,7 +3177,7 @@ begin
                     temp_s2 := reg(arg0^.op1);
                     if opcode_arch = ARCH_32 then begin
                         move_two_regs(arg1, temp_s2);
-                    end else if (temp_s2 <> arg1) or (regs[temp_s2].unk9 <> succ(temp_s2)) then begin
+                    end else if (temp_s2 <> arg1) or (regs[temp_s2].dw_link <> succ(temp_s2)) then begin
                         move_dreg_to_regs(arg1, temp_s2);
                     end;
                 end else begin
@@ -3294,8 +3283,8 @@ begin
                 end;
             end;
             if opcode_arch = ARCH_64 then begin
-                regs[xr4].unk9 := xnoreg;
-                regs[xr6].unk9 := xnoreg;
+                regs[xr4].dw_link := xnoreg;
+                regs[xr6].dw_link := xnoreg;
             end;
             processing_args := false;
             if arg0^.u.Dtype in [Idt, Kdt, Wdt] then begin
@@ -3322,11 +3311,11 @@ begin
                 emit_r(zjal, var_s3);
             end;
             if (opcode_arch = ARCH_64) and (basicint = 0) then begin
-                if regs[xr4].unk9 = succ(xr4) then begin
-                    regs[xr4].unk9 := xnoreg;
+                if regs[xr4].dw_link = succ(xr4) then begin
+                    regs[xr4].dw_link := xnoreg;
                 end;
-                if regs[xr6].unk9 = succ(xr6) then begin
-                    regs[xr6].unk9 := xnoreg;
+                if regs[xr6].dw_link = succ(xr6) then begin
+                    regs[xr6].dw_link := xnoreg;
                 end;
             end;
             processing_args := false;
@@ -3479,7 +3468,7 @@ begin
             end else begin
                 arg1 := get_dest(arg0, arg1);
                 if arg0^.u.Dtype in [Idt, Kdt, Wdt] then begin
-                    if (opcode_arch = ARCH_32) or (regs[arg1].unk9 = succ(arg1)) then begin
+                    if (opcode_arch = ARCH_32) or (regs[arg1].dw_link = succ(arg1)) then begin
                         emit_ri_(zli, arg1, arg0^.u.Constval.dwval_h, franone);
                         emit_ri_(zli, succ(arg1), arg0^.u.Constval.dwval_l, franone);
                     end else begin

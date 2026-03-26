@@ -58,7 +58,6 @@ var
     exprs: array [1..5] of ^tree;
     load_count: 0..5;
     loads: array [1..5] of ^tree;
-    lsb_first: boolean;
     current_line: cardinal;
     opt_cse: u8;
     bb_size: integer;
@@ -67,12 +66,8 @@ var
     has_entry: boolean;
     vreg_offset: cardinal;
     max_vreg_offset: cardinal;
-    n_parm_regs: integer;
-    n_unsaved_regs: integer;
-    n_fp_parm_regs: cardinal;
     fp_vreg_offset: cardinal;
     max_fp_vreg_offset: cardinal;
-    n_unsaved_fp_regs: integer;
     pdefs: pointer;
     varargs: boolean;
     use_real_fp_for_proc: boolean;
@@ -83,11 +78,7 @@ var
     ignore_vreg: boolean;
     nooffsetopt: boolean;
     source_language: integer;
-    n_saved_regs: integer;
-    n_saved_fp_regs: integer;
     addr_dtype: Datatype;
-    isa: mips_isa;
-    opcode_arch: ( ARCH_32, ARCH_64 );
 
     { .data }
     expression_opcs: array [Uopcode] of boolean := [
@@ -2036,7 +2027,7 @@ begin
             vreg_count := vreg_count + 1;
             if ((arg1) and (arg0^.u.Mtype = Pmt)) then begin
                 temp_v1 := parm_reg(arg0) & 255;
-                if ((temp_v1 <> 72) and (temp_v1 >= 44) and (((n_fp_parm_regs * 2) + 42) >= temp_v1)) then begin
+                if ((temp_v1 <> 72) and (temp_v1 >= 44) and ((cardinal(n_fp_parm_regs * 2) + 42) >= temp_v1)) then begin
                     arg0^.u.Offset2 := temp_v1 * 4;
                     return;
                 end;

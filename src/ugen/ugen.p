@@ -1,3 +1,4 @@
+#include "common.h"
 #include "report.h"
 #include "tree.h"
 #include "tree_utils.h"
@@ -65,36 +66,22 @@ var
     debug_ugen: boolean;
     excpt: boolean;
     first_ent: boolean;
-    fp32regs: boolean;
     fp_initialized: s8;
     init_dynmem: boolean;
-    isa: mips_isa;
-    lsb_first: boolean;
     max_stack: integer;
     mscoff: boolean;
-    n_cg_regs: integer;
-    n_fp_cg_regs: integer;
-    n_fp_parm_regs: integer;
-    n_parm_regs: integer;
-    n_saved_fp_regs: integer;
-    n_saved_regs: integer;
-    n_unsaved_fp_regs: integer;
-    n_unsaved_regs: integer;
     no_jal_use_jalr_only: boolean;
     non_local_mtag: integer;
     nooffsetopt: boolean;
-    opcode_arch: ( ARCH_32, ARCH_64 );
     opt_labels: u8;
     pic_level: integer;
     print_warnings: boolean;
     saw_cap_g: boolean;
-    sdata_max: integer;
     sgi_unsigned_conv: boolean;
     tail_call_opt: boolean;
     tree_heap: pointer;
     tree_heap_mark: integer;
     ufsa: boolean;
-    ufsm: boolean;
     unitsperaddr: integer;
     use_real_fp_for_all: boolean;
 

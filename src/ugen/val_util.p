@@ -1,6 +1,5 @@
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
-#include "cmplrs/binasm.h"
 #include "common.h"
 #include "val_util.h"
 #include "report.h"

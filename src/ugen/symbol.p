@@ -3,7 +3,6 @@
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
 #include "cmplrs/uoptions.h"
-#include "cmplrs/binasm.h"
 #include "emit.h"
 #include "val_util.h"
 
@@ -45,7 +44,6 @@ var
 var
     sym_hash_tab: array[0..255] of ^Symbol;
     non_local_mtag: integer;
-    sdata_max: integer;
     apc: u8;
     excpt: u8;
     source_language: integer; { see cmplrs/uoptions.h for values }

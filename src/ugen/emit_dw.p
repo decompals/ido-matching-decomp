@@ -5,10 +5,6 @@
 #include "reg_mgr.h"
 #include "ugen_regdef.h"
 
-var
-    lsb_first: boolean;
-    opcode_arch: ( ARCH_32, ARCH_64 );
-
 procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: ^tree);
 
     procedure func_0041AF70(arg0: registers; arg1: registers; arg2: integer);
