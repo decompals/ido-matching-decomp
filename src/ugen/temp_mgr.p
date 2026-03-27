@@ -1,3 +1,10 @@
+{*****************************************************}
+{ Manages the stack spill area for registers.         }
+{ Allocates spill slots and stores registers to the   }
+{ stack, but does not restore them.                   }
+{ Spill slots may be reused.                          }
+{*****************************************************}
+
 #include "common.h"
 #include "tree.h"
 #include "reg_mgr.h"
@@ -7,51 +14,56 @@
 #include "emit.h"
 
 type
-    Ptemp = ^Temp_rec;
-    Temp_rec = Record;
+    PSpillSlot = ^SpillSlot;
+    SpillSlot = Record;
         index: u8;
         usage_count: u16;
-        free: boolean;
+        is_free: boolean;
         size: integer;
         offset: integer;
-        next: Ptemp;
+        next: PSpillSlot;
     end;
 
 var
-    temps: Ptemp;
+    temps: PSpillSlot;
     temps_offset: integer;
     current_temp_index: u8;
 
+{ Resets the spill slot allocator state }
 procedure init_temps();
 begin
     temps := nil;
     current_temp_index := 1;
 end;
 
-function lookup_temp(index: u8): Ptemp;
+{ Returns an active spill slot by index, or nil if not found }
+function lookup_temp(index: u8): PSpillSlot;
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    temp := temps;
 
-    while temp <> nil do begin
-        if (index = temp^.index) and not (temp^.free) then begin
-            return temp;
+    slot := temps;
+    while slot <> nil do begin
+        if (index = slot^.index) and not slot^.is_free then begin
+            return slot;
         end;
-        temp := temp^.next;
+        slot := slot^.next;
     end;
+
     return nil;
 end;
 
-function make_new_temp(size: integer): Ptemp;
+{ Allocates a new spill slot of the given size.
+  The slot is placed at the end of the spill area. }
+function make_new_temp(size: integer): PSpillSlot;
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    new(temp);
+    new(slot);
 
-    if temp = nil then begin
+    if slot = nil then begin
         report_error(Internal, 76, "temp_mgr.p", "Insufficiant memory");
-        return temp;
+        return slot;
     end;
 
     if size > 4 then begin
@@ -60,36 +72,40 @@ begin
         end;
     end;
 
-    temp^.free := false;
-    temp^.offset := temps_offset;
-    temp^.size := size;
+    slot^.is_free := false;
+    slot^.offset := temps_offset;
+    slot^.size := size;
 
-    temp^.index := current_temp_index;
+    slot^.index := current_temp_index;
     current_temp_index := current_temp_index + 1;
 
     temps_offset := temps_offset + size;
-    temp^.next := temps;
 
-    temps := temp;
+    { Insert into list }
+    slot^.next := temps;
+    temps := slot;
 
-    return temp;
+    return slot;
 end;
 
-function find_free_temp(size: integer): Ptemp;
+{ Finds a free spill slot of the exact size, or returns nil }
+function find_free_temp(size: integer): PSpillSlot;
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    temp := temps;
-    while temp <> nil do begin
-        if (temp^.free) and (size = temp^.size) then begin
-            temp^.free := false;
-            return temp;
+    slot := temps;
+    while slot <> nil do begin
+        if slot^.is_free and (size = slot^.size) then begin
+            slot^.is_free := false;
+            return slot;
         end;
-        temp := temp^.next;
+        slot := slot^.next;
     end;
+
     return nil;
 end;
 
+{ Emits instructions to store a register into a spill slot }
 procedure gen_store(reg: registers; offset: integer; size: integer);
 var
     op: asmcodes;
@@ -122,7 +138,10 @@ begin
             emit_rob(op, reg, frame_offset1(offset + ALIGN_UP(size, 4)), frame_pointer, 0);
         end;
     end else begin
+        { Converts offset relative to the frame base into an address
+          relative to the actual frame_pointer register (which is SP) }
         if (op = zsd) and (opcode_arch = ARCH_32) then begin
+            { Store both registers forming a 64-bit value }
             emit_rob(zsw, reg, frame_offset1(offset), frame_pointer, 0);
             emit_rob(zsw, succ(reg), frame_offset1(offset) + 4, frame_pointer, 0);
         end else begin
@@ -131,80 +150,89 @@ begin
     end;
 end;
 
+{ Spills a register to a spill slot.
+  Reuses a free slot if possible, otherwise allocates a new one.
+  For 64-bit values on 32-bit targets, the register pair is stored
+  as a single 8-byte slot. }
 procedure spill_to_temp(reg: registers; size: integer);
 var
-    temp: Ptemp;
-    unk: PTree;    
+    slot: PSpillSlot;
+    node: PTree;    
 begin
     if (opcode_arch = ARCH_32) and (kind_of_register(reg) = di_reg) then begin
         size := 8;
     end;
-    temp :=  find_free_temp(size);
-    if (temp = nil) then begin
-        temp := make_new_temp(size);
+
+    slot :=  find_free_temp(size);
+    if slot = nil then begin
+        slot := make_new_temp(size);
     end;
 
-    unk := content_of(reg);
-    unk^.temp_id := temp^.index;
+    node := content_of(reg);
+    node^.temp_id := slot^.index;
 
-    temp^.usage_count := usage_count(reg);
-    temp^.size := size;
-    gen_store(reg, temp^.offset, size);
+    slot^.usage_count := usage_count(reg);
+    slot^.size := size;
+    gen_store(reg, slot^.offset, size);
 end;
 
+{ Marks the spill slot with the given index as free }
 procedure free_temp(index: u8);
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    temp := lookup_temp(index);
-    if (temp = nil) then begin
+    slot := lookup_temp(index);
+    if (slot = nil) then begin
         report_error(Internal, 192, "temp_mgr.p", "temporary not found");
         return;
     end;
-    temp^.free := true;
+    slot^.is_free := true;
 end;
 
+{ Returns the spill slot offset relative to the frame base (not SP) }
 function temp_offset(index: u8): integer;
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    temp := lookup_temp(index);
-    if (temp = nil) then begin
+    slot := lookup_temp(index);
+    if (slot = nil) then begin
         report_error(Internal, 204, "temp_mgr.p", "temporary not found");
     end else begin
-        return temp^.offset;
+        return slot^.offset;
     end;
 end;
 
+{ Returns the usage count stored in the spill slot }
 function temp_usage_count(index: u8): u16;
 var
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
-    temp := lookup_temp(index);
-    if (temp = nil) then begin
+    slot := lookup_temp(index);
+    if (slot = nil) then begin
         report_error(Internal, 216, "temp_mgr.p", "temporary not found");
     end else begin
-        return temp^.usage_count;
+        return slot^.usage_count;
     end;
 end;
 
+{ Returns total size of the spill area (currently unused) }
 function get_temp_size(): integer;
 var
     size: integer;
-    temp: Ptemp;
+    slot: PSpillSlot;
 begin
     size := 0;
 
-    temp := temps;
-
-    while (temp <> nil) do begin
-        size := size + temp^.size;
-        temp := temp^.next;
+    slot := temps;
+    while (slot <> nil) do begin
+        size := size + slot^.size;
+        slot := slot^.next;
     end;
 
     return size;
 end;
 
+{ Sets the base offset of the spill area relative to the frame base }
 procedure set_temps_offset(offset: integer);
 begin
     temps_offset := offset;
