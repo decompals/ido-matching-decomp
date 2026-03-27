@@ -3,8 +3,13 @@
 
 #include "cmplrs/binasm.h"
 
+#define ALIGN_UP(x, v) ((((x) + (v) - 1) div (v)) * (v))
+
 #define UGEN_LITTLE_ENDIAN (lsb_first)
 #define UGEN_BIG_ENDIAN (not lsb_first)
+
+#define IS_GPR(reg) ((reg) in [xr0..xr31])
+#define IS_FPR(reg) ((reg) in [xfr0..xfr31])
 
 const
     NO_LABEL = 0;
@@ -42,5 +47,7 @@ var
     fp32regs: boolean;
     n_saved_fp_regs: integer;
     ufsm: boolean;
+    frame_pointer: registers;
+    reversed_stack: boolean;
 
 #endif /* COMMON_H */

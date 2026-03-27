@@ -44,7 +44,7 @@ begin
     p_Tree^.ref_count := 1;
     p_Tree^.ref_count2 := 0;
     p_Tree^.reg := xnoreg;
-    p_Tree^.unk18 := 0;
+    p_Tree^.temp_id := 0;
     p_Tree^.unk16 := 0;
     p_Tree^.mark := tree_mark;
     p_Tree^.visited := false;
