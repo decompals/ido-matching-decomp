@@ -6,6 +6,7 @@ procedure spill_to_temp(arg0: registers; size: integer); external;
 procedure free_temp(index: u8); external;
 function temp_offset(index: u8): integer; external;
 function temp_usage_count(index: u8): u16; external;
+function get_temp_area_size(): integer; external;
 procedure set_temps_offset(offset: integer); external;
 
 #endif /* TMP_MGR_H */

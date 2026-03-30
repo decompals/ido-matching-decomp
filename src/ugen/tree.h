@@ -18,7 +18,7 @@ type
     { 0x16 } unk16: u8;
     { 0x17 } mark: u8;
     { 0x18 } temp_id: u8;
-    { 0x19[1..7] } reg: first(registers)..last(registers);
+    { 0x19[1..7] } reg: registers;
     { 0x19[0] } visited: boolean;
     { 0x1A } ref_count2: u8;
     { 0x20 } u: Bcrec;

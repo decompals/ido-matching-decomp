@@ -30,10 +30,8 @@ var
     mscoff: boolean;
     num_i_ptr_indexes: integer;
     olevel: u8;
-    pic_level: integer;
     stack_limit_bn: integer;
     use_cpalias: boolean;
-    uses_gp: boolean;
 
 procedure gen_entry_exit(
     arg0: integer; { symbol number for function? }

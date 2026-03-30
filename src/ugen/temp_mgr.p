@@ -215,8 +215,8 @@ begin
     end;
 end;
 
-{ Returns total size of the spill area (currently unused) }
-function get_temp_size(): integer;
+{ Returns total size of the spill area }
+function get_temp_area_size(): integer;
 var
     size: integer;
     slot: PSpillSlot;

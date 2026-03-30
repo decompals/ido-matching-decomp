@@ -77,7 +77,6 @@ var
     tail_call_opt: boolean;
     ignore_vreg: boolean;
     nooffsetopt: boolean;
-    source_language: integer;
     addr_dtype: Datatype;
 
     { .data }

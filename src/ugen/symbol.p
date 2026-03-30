@@ -46,7 +46,6 @@ var
     non_local_mtag: integer;
     apc: u8;
     excpt: u8;
-    source_language: integer; { see cmplrs/uoptions.h for values }
 
 function sym_hash(arg0: integer): integer;
 begin

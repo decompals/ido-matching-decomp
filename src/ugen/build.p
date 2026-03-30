@@ -67,7 +67,6 @@ var
         
         otherwise []
     ];
-    source_language: integer;
     stack_limit_bn: integer;    
     trap_to_compare: array[Utpeq..Utpne] of Uopcode := [Uneq, Ules, Uleq, Ugrt, Ugeq, Uequ];
     

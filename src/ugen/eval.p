@@ -43,13 +43,11 @@ type
 
 var
     basicint: u8;
-    pic_level: integer;
     align8: boolean;
     align16: boolean;
     align32: boolean;
     align64: boolean;
     pdefs: ^tree;
-    source_language: integer;
     ignore_vreg: boolean;
     pseudo_leaf: boolean;
     use_real_fp_for_proc: boolean;
@@ -71,13 +69,10 @@ var
     home_vararg_reg: boolean;
     generate_again: boolean;
     saved_regs_size: cardinal;
-    frame_size: cardinal;
     local_var_size: integer;
     max_arg_build: integer;
     reloc_arg_build: integer;
     temp_size: integer;
-    has_calls: boolean;
-    uses_gp: boolean;
     num_i_ptr_indexes: cardinal;
     curlev: integer;
     entry_point_index: integer;
@@ -86,7 +81,6 @@ var
     current_text_sec: Valu;
     first_ent: boolean;
     resident_text: boolean;
-    debug_ugen: boolean;
     glevel: u8;
     has_cia_in_file: boolean;
     i_ptrs_for_gp_offset: array[1..20] of integer;
@@ -4318,7 +4312,7 @@ begin
         Ucia: begin
             check_no_used();
             if arg0^.u.Lexlev <> 0 then begin
-                saved_regs := saved_regs + [xr31];
+                saved_regs := saved_regs + [gpr_ra];
             end;
             emit_rfi(zcia, xnoreg, arg0^.u.Constval);
         end;

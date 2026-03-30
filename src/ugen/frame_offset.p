@@ -7,9 +7,6 @@ unk_frame_offset_record = Record
     unk2C: integer;
 end;
 
-var
-frame_size: integer;
-
 function frame_offset(node: Ptree): integer;
 begin
     if frame_size = 0 then begin

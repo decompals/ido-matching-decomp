@@ -49,5 +49,15 @@ var
     ufsm: boolean;
     frame_pointer: registers;
     reversed_stack: boolean;
+    frame_size: integer;
+    debug_ugen: boolean;
+    has_calls: boolean;
+    uses_gp: boolean;
+    pic_level: integer;
+    source_language: integer; { see cmplrs/uoptions.h for values }
+
+{ external functions }
+
+procedure memset(p: pointer; value: integer; size: cardinal); external;
 
 #endif /* COMMON_H */
