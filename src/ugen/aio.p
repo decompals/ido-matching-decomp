@@ -5,7 +5,7 @@
 #include "cmplrs/uoptions.h"
 #include "cmplrs/stinfc.h"
 
-#define ST_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
+#define ST_STRING_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
 #define TAB chr(9)
 
 type
@@ -129,9 +129,7 @@ var
     current_filen: integer := -2;
     second_dli: boolean := False;
 
-#define ST_STRING_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
-
-procedure put_integer_ws(var pFile: text; val: integer);
+procedure put_integer_ws(var f: Text; val: integer);
 begin
     if val = 0 then return;
         if val > 0 then begin
@@ -164,7 +162,7 @@ begin
                 { Symbol not found in the symbol table; prints its number with $$ prefix anyway, e.g., $$23 }
                 write(f, "$$", idn:1);
             end else begin
-                ST_STRING_COPY(sp40.ss, str);
+                ST_STRING_COPY(sym_name.ss, st_str);
             end;
 
             { Prints the symbol’s string representation }
@@ -508,7 +506,7 @@ begin
         for len := 1 to FileNameLen do begin
             source_file_name[len] := ' ';
         end;
-        ST_STRING_COPY(source_file_name, str);
+        ST_STRING_COPY(source_file_name, file_name);
         if (source_file_name[1] = ' ') then begin
             report_error(Internal, 977, "aio.p", "file name is null");
             return;
