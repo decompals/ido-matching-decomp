@@ -42,14 +42,14 @@ procedure open_bin_file(var str: Filename); external;
 procedure set_domtag(arg0: boolean); external;
 
 procedure print_tree(var f: Text; arg1: ^tree; arg2: cardinal; arg3: cardinal); external;
-procedure labelopt(a0: ^Tree; a1: ^Text; debug: boolean; arg2: boolean); external;
+procedure labelopt(a0: ^Tree; var a1: Text; debugTree: boolean; arg2: boolean); external;
 procedure initialize_tree(); external;
 procedure clear_sym_tab(); external;
 procedure init_build(); external;
 function build_tree(verbose: boolean): pointer; external; 
 function translate_tree(a: ^Tree): pointer; external;
 procedure init_eval(); external;
-procedure eval(arg0: ^Tree; arg1: u8); external;
+procedure eval(arg0: ^Tree; arg1: registers); external;
 procedure close_bin_file(); external;
 procedure output_decls(); external;
 
@@ -76,7 +76,7 @@ var
     print_warnings: boolean;
     saw_cap_g: boolean;
     sgi_unsigned_conv: boolean;
-    tail_call_opt: boolean;
+    tail_call_opt: boolean; { Tail call optimization flag }
     tree_heap: pointer;
     tree_heap_mark: integer;
     ufsa: boolean;
@@ -102,18 +102,18 @@ program ugen;
 
 label default;
 var    
-    sp1DD0: Filename; {sp1DD0}
-    temp_file: Text; {sp1DC8}
+    treeDumpFileName: Filename; {Name of the file where the different tree phases are dumped/logged}
+    treeDumpFile: Text; {File where the different tree phases are dumped/logged}
 var
-    temp_fname: Filename; {sp19C8}
+    ugenTempFileName: Filename; {sp19C8}
     temp_fd: integer; {sp19C4}
     pad1: integer;
     sp15C0: Filename; {sp15C0}
-    sp11C0: Filename; {sp11C0}
+    outputFileName: Filename;
     spDC0: Filename; {spD40}
     sp9C0: Filename; {sp9C0}
-    sp940: st_string; {sp940}
-    debug: boolean; {sp93F}
+    stFileName: st_string; {Symbol table file name}
+    debugTree: boolean; {sp93F}
     verbose: boolean; {sp93E}
     arg: Filename; {sp53E}
     sp534: Text; {sp534}
@@ -125,14 +125,14 @@ var
     sp51C: debug_levels; {sp51C}
     sp518: opt_levels; {sp518}
     var_s0: char;
-    sp516: boolean; {sp516}
-    temp_opt: boolean; {sp515}
-    warn_level: cardinal; {sp510}
+    debugLabelOptPhase: boolean; {debugLabelOptPhase}
+    useTempFile: boolean; {sp515}
+    warnLevel: cardinal; {sp510}
     xpg_env: boolean; {sp50F}
     pad6: integer;
     xpgEnvVar: Filename;
     index: cardinal;
-    temp_v0_3: ^Tree;
+    pTree: ^Tree;
 
     { Inner functions.. }
 
@@ -158,7 +158,7 @@ var
     begin
         var_s0 := arg0;
         while (var_s0 <> nil) do begin
-            if (((var_s0^.u.Opc = Ulab) and (var_s0^.u.Lexlev <> 1)) or (var_s0^.u.Opc = Uclab)) then begin
+            if (((var_s0^.u.Opc = Ulab) and (var_s0^.u.Lexlev <> GOOB_TARGET)) or (var_s0^.u.Opc = Uclab)) then begin
                 var_s0^.u.I1 := gen_label_id();
             end;
             var_s0 := var_s0^.next;
@@ -202,29 +202,29 @@ var
     end;
 
     
-    procedure func_0044B640(opt: char; arg1: integer);
+    procedure func_0044B640(opt: char; regs: integer);
     begin
         case (opt) of
             CASE_ARG('a')
                 begin
-                    n_fp_parm_regs := arg1;
+                    n_fp_parm_regs := regs;
                 end;
             CASE_ARG('g')
                 begin
-                    if (arg1 < 2) then begin
+                    if (regs < 2) then begin
                         report_error(Internal, 166, "ugen.p", "insufficient code generator fp registers");
                         n_fp_cg_regs := 2;
                     return;
                 end;
-                n_fp_cg_regs := arg1;
+                n_fp_cg_regs := regs;
             end;
             CASE_ARG('r')
                 begin
-                    n_unsaved_fp_regs := arg1;
+                    n_unsaved_fp_regs := regs;
                 end;
             CASE_ARG('e')
                 begin
-                    n_saved_fp_regs := arg1;
+                    n_saved_fp_regs := regs;
                 end;
             CASE_ARG(' ')
                 begin
@@ -232,30 +232,30 @@ var
                     n_unsaved_fp_regs := 0;
                     n_saved_fp_regs := 0;
                     
-                    if (arg1 < 2) then begin
+                    if (regs < 2) then begin
                         report_error(Internal, 182, "ugen.p", "insufficient code generator fp registers ");
                         n_fp_cg_regs := 2;
                         return;
                     end;
-                    n_fp_cg_regs := arg1 - 1;
+                    n_fp_cg_regs := regs - 1;
                 end;
             otherwise:
                 report_error(Internal, 193, "ugen.p", "illegal register type");
         end;
     end;
 
-    procedure dump_tree(arg0: ^Tree; phase: ugen_str); 
+    procedure dump_tree(t: ^Tree; phase: ugen_str); 
     begin
-        if (sp1DD0[1] <> chr(0)) then begin
-            writeln(temp_file, "Tree dump after ", phase:0);
-            writeln(temp_file);
-            print_tree(temp_file, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
-            writeln(temp_file);
-            flush(temp_file);
+        if (treeDumpFileName[1] <> chr(0)) then begin
+            writeln(treeDumpFile, "Tree dump after ", phase:0);
+            writeln(treeDumpFile);
+            print_tree(treeDumpFile, t, 16#7FFFFFFF, 16#7FFFFFFF);
+            writeln(treeDumpFile);
+            flush(treeDumpFile);
         end else begin
             writeln(err, "Tree dump after ", phase:0);
             writeln(err);
-            print_tree(err, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
+            print_tree(err, t, 16#7FFFFFFF, 16#7FFFFFFF);
             writeln(err);
         end;
     end;
@@ -281,10 +281,10 @@ var
     var
         fd: integer;
     begin
-        copy_filename(temp_fname, "/tmp/ugentmpXXXXXX");
+        copy_filename(ugenTempFileName, "/tmp/ugentmpXXXXXX");
 
-        temp_fname[19] := chr(0);
-        fd := mktemp(temp_fname);
+        ugenTempFileName[19] := chr(0);
+        fd := mktemp(ugenTempFileName);
         temp_fd := fd;
         
         if (temp_fd = 0) then begin
@@ -294,7 +294,7 @@ var
 
     procedure unlink_temp_file();
     begin
-        unlink(temp_fname);
+        unlink(ugenTempFileName);
     end;
 
     
@@ -330,29 +330,29 @@ begin
 
         {Null terminate the strings?}
         
-        sp11C0[1] := chr(0);
+        outputFileName[1] := chr(0);
         spDC0[1] := chr(0);
         lsb_first := false;
         sp9C0[1] := chr(0);
-        sp940[1] := chr(0);
+        stFileName[1] := chr(0);
         fp_initialized := 0;
-        temp_fname[1] := chr(0);
-        sp1DD0[1] := chr(0);
+        ugenTempFileName[1] := chr(0);
+        treeDumpFileName[1] := chr(0);
         ascii_out := false;
-        temp_opt := false;
-        debug := false;
+        useTempFile := false;
+        debugTree := false;
         saw_cap_g := false;
         set_domtag(false);
         excpt := false;
         non_local_mtag := 0;
         verbose := false;
         init_dynmem := false;
-        sp516 := false;
+        debugLabelOptPhase := false;
         use_real_fp_for_all := false;
         sp51C := 0;
         sp518 := 1;
         debug_ugen := false;
-        warn_level := ord(Fix);
+        warnLevel := ord(Fix);
         index := 1;
         pic_level := 0;
         cpalias_ok := false;
@@ -402,7 +402,7 @@ begin
                                     halt(1);
                                 end;
                                 index := index + 1; {Stop immediately}
-                                argv(index, sp11C0);
+                                argv(index, outputFileName);
                             end else goto default;
 
                         CASE_ARG('u')
@@ -441,8 +441,8 @@ begin
                                 end;
 
                                 index := index + 1;
-                                argv(index, temp_fname);
-                                temp_opt := true;
+                                argv(index, ugenTempFileName);
+                                useTempFile := true;
                                 
                             end else if ((ARG_OPT(3, 'r')) and (ARG_OPT(4, 'a')) and (ARG_OPT(5, 'p')) and (ARG_OPT(6, 'u')) and (ARG_OPT(7, 'v'))) then begin
                                 init_dynmem := true;
@@ -452,7 +452,7 @@ begin
                                     halt(1);
                                 end;
                                 index := index +1;
-                                argv(index, sp940);
+                                argv(index, stFileName);
                             end else goto default;
 
                         CASE_ARG('e')
@@ -463,8 +463,8 @@ begin
                                 end;
                                 
                                 index := index + 1;
-                                argv(index, sp1DD0);
-                                debug := true;
+                                argv(index, treeDumpFileName);
+                                debugTree := true;
                             end else if (ARG_OPT(3,  'x') and (ARG_OPT(4, 'c')) and (ARG_OPT(5, 'p')) and (ARG_OPT(6, 't')) and (ARG_OPT(7, ' '))) then begin
                                 excpt := true;
                             end else goto default;
@@ -478,7 +478,7 @@ begin
                                 set_domtag(true);
                             end else begin
                                 debug_ugen := true;
-                                debug := true;
+                                debugTree := true;
                             end;
                         end;
 
@@ -544,7 +544,7 @@ begin
 
                         CASE_ARG('L')
                             if (ARG_OPT(3, ' ')) then begin
-                                sp516 := true;
+                                debugLabelOptPhase := true;
                             end else goto default;
 
                         CASE_ARG('F')
@@ -618,18 +618,18 @@ begin
                             case arg[3] of 
                                 CASE_ARG('1')
                                 begin
-                                    warn_level := ord(Info);
+                                    warnLevel := ord(Info);
                                     print_warnings := false;
                                 end;
 
                                 CASE_ARG('2')
                                 begin
-                                    warn_level := ord(Warn);
+                                    warnLevel := ord(Warn);
                                 end;
 
                                 CASE_ARG('3')
                                 begin
-                                    warn_level := ord(Error);
+                                    warnLevel := ord(Error);
                                     print_warnings := false;
                                 end;
 
@@ -719,21 +719,21 @@ begin
         
             rewrite(sp534, spDC0);
 
-            if (sp940[1] = chr(0)) then begin
+            if (stFileName[1] = chr(0)) then begin
                 for index := 1 to var_s1 - 1 do begin    
-                    sp940[index] := sp15C0[index];
+                    stFileName[index] := sp15C0[index];
                 end;
                 var_v0_3 := var_s1;
-                sp940[var_v0_3] := 'T';
+                stFileName[var_v0_3] := 'T';
             end else begin
-                var_v0_3 := sizeof(sp940) - 1;
-                while ((var_v0_3 <> 0) and (sp940[var_v0_3] = ' ')) do begin
+                var_v0_3 := sizeof(stFileName) - 1;
+                while ((var_v0_3 <> 0) and (stFileName[var_v0_3] = ' ')) do begin
                     var_v0_3 := var_v0_3 - 1;
                 end;
             end;
 
-            sp940[var_v0_3 + 1] := chr(0);
-            if (st_readbinary(sp940, 'r') < 0) then begin
+            stFileName[var_v0_3 + 1] := chr(0);
+            if (st_readbinary(stFileName, 'r') < 0) then begin
                 writeln(err, "Cannot read symbol table file");
                 halt(1);
             end;
@@ -744,28 +744,26 @@ begin
         uini();
         initur(sp15C0);
 
-        if (sp11C0[1] = chr(0)) then begin
-            sp11C0 := sp15C0;
-            sp11C0[var_s1] := 'G'; {binasm extension}
+        if (outputFileName[1] = chr(0)) then begin
+            outputFileName := sp15C0;
+            outputFileName[var_s1] := 'G'; {binasm extension}
             var_v0_3 := var_s1;
         end else begin 
-           SKIP_END_SPACES(var_v0_3, sp11C0);
+           SKIP_END_SPACES(var_v0_3, outputFileName);
         end;
 
-        sp11C0[var_v0_3 + 1] := chr(0);
+        outputFileName[var_v0_3 + 1] := chr(0);
 
-        if (temp_fname[1] = chr(0)) then begin
+        if (ugenTempFileName[1] = chr(0)) then begin
             create_temp_file();
         end else begin 
-            SKIP_END_SPACES(var_v0_4, temp_fname);
-            temp_fname[var_v0_4 + 1] := chr(0);
+            SKIP_END_SPACES(var_v0_4, ugenTempFileName);
+            ugenTempFileName[var_v0_4 + 1] := chr(0);
         end;
 
-
-        if (sp1DD0[1] <> chr(0)) then begin
-            rewrite(temp_file, sp1DD0);
+        if (treeDumpFileName[1] <> chr(0)) then begin
+            rewrite(treeDumpFile, treeDumpFileName);
         end;
-    
 
         set_opts(sp518, sp51C);
 
@@ -774,46 +772,45 @@ begin
         end;
 
         clear_sym_tab();
-        open_bin_file(temp_fname);
+        open_bin_file(ugenTempFileName);
         init_build();
 
         while (true) do begin
             clear_ibuffer();
             tree_heap_mark := alloc_mark(tree_heap);
-            temp_v0_3 := build_tree(verbose);
+            pTree := build_tree(verbose);
 
-            if (temp_v0_3 = nil) then break;
+            if (pTree = nil) then begin
+                break;
+            end; 
 
-            if (debug) then begin
-                dump_tree(temp_v0_3, "Build");
+            if (debugTree) then begin
+                dump_tree(pTree, "Build");
             end;
 
-            temp_v0_3 := translate_tree(temp_v0_3);
+            pTree := translate_tree(pTree);
 
-            if (debug) then begin
-                dump_tree(temp_v0_3, "Translate");
+            if (debugTree) then begin
+                dump_tree(pTree, "Translate");
             end;
 
             if (opt_labels <> 0) then begin
-            
-                if (sp1DD0[1] <> chr(0)) then begin
-                    labelopt(temp_v0_3, addr(temp_file), debug, sp516);
+                if (treeDumpFileName[1] <> chr(0)) then begin
+                    labelopt(pTree, treeDumpFile, debugTree, debugLabelOptPhase);
                 end else begin
-                    labelopt(temp_v0_3, addr(err), debug, sp516);
-                    
+                    labelopt(pTree, err, debugTree, debugLabelOptPhase);
                 end;
-                
             end;
 
-            func_0044B2EC(temp_v0_3);
+            func_0044B2EC(pTree);
 
             if (sp9C0[1] <> chr(0)) then begin
                 inituwrite(sp9C0);
-                u_tree(temp_v0_3);
+                u_tree(pTree);
             end;
 
             init_eval();
-            eval(temp_v0_3, 16#48);
+            eval(pTree, xnoreg);
             output_inst_bin(ibuffer^[1], pred(i_ptr), ibuffer^[ibuffer_size], ibuffer_size - d_ptr);
             alloc_release(tree_heap, tree_heap_mark);
         end;
@@ -823,25 +820,25 @@ begin
         emit_vers();
         emit_pic(pic_level);
         output_decls();
-        open_bin_file(sp11C0);
+        open_bin_file(outputFileName);
         output_inst_bin(ibuffer^[1], pred(i_ptr), ibuffer^[ibuffer_size], ibuffer_size - d_ptr);
         close_bin_file();
-        cat_files(sp11C0, temp_fname);
+        cat_files(outputFileName, ugenTempFileName);
         
-        if (not temp_opt) then begin
+        if not (useTempFile) then begin
             unlink_temp_file();
         end;
 
         if (ascii_out) then begin
-            sp11C0[var_v0_3 + 1] := ' ';
-            output_inst_ascii(sp11C0, sp534);
+            outputFileName[var_v0_3 + 1] := ' ';
+            output_inst_ascii(outputFileName, sp534);
         end;
 
         if (verbose) then begin
             writeln(err);
         end;
 
-        if (has_errors(warn_level)) then begin
+        if (has_errors(warnLevel)) then begin
             halt(1);
         end;
         

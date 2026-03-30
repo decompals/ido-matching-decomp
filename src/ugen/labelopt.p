@@ -18,7 +18,7 @@ type
 
 
 { From loop_header.p }
-procedure labelopt(arg0: ^Tree; var pFile: Text; arg2: boolean; cross_jumping_opt: boolean);
+procedure labelopt(arg0: ^Tree; var pFile: Text; debugPhases: boolean; cross_jumping_opt: boolean);
 var
     mark: integer;
     mark1: integer;
@@ -287,13 +287,13 @@ loop:
     var
         var_s1: ^tree;
     begin
-        write(pFile, 'L', arg0^.unk10:1);
+        write(pFile, 'L', arg0^.node_id:1);
         write(pFile, " IN:");
 
         var_s1 := arg0^.op2;
 
         while (var_s1 <> nil) do begin
-            write(pFile, " L", var_s1^.op1^.unk10:1);
+            write(pFile, " L", var_s1^.op1^.node_id:1);
             var_s1 := var_s1^.next;
         end;
 
@@ -301,7 +301,7 @@ loop:
 
         var_s1 := arg0^.op1;
         while (var_s1 <> nil) do begin
-            write(pFile, " L", var_s1^.op2^.unk10:1);
+            write(pFile, " L", var_s1^.op2^.node_id:1);
             var_s1 := var_s1^.prior;
         end;
 
@@ -446,7 +446,7 @@ loop:
                     func_00435DE8(var_s0);
                 end;
                 
-                if (arg2) then begin
+                if (debugPhases) then begin
                     func_00435C44(var_s0);
                 end;
 
@@ -477,7 +477,7 @@ begin
     func_0043595C(arg0);
     func_00435FA4(arg0);
 
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st localopt:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);
@@ -485,7 +485,7 @@ begin
     end;
 
     func_00436148(arg0);
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st label phase:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);
@@ -494,7 +494,7 @@ begin
 
     if (cross_jumping_opt) then begin
         cross_jump(arg0);
-        if (arg2) then begin
+        if (debugPhases) then begin
             writeln(pFile, "Tree dump after cross jumping");
             print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
             writeln(pFile);
@@ -509,7 +509,7 @@ begin
     func_0043595C(arg0);
     func_00436148(arg0);
 
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 2nd label phase:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);

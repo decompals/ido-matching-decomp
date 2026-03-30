@@ -692,16 +692,15 @@ begin
     stack_pos := 0;
 
     while (true) do begin
-        readuinstr(u, sp1C4);
-
-        case u.Opc of
+        readuinstr(ucode, sp1C4);
+        case ucode.Opc of
 
             {Parse different Uopcodes}
             CASE_OPC(Ufsym):
             begin
-                gen_sym(u);
+                gen_sym(ucode);
                 if domtag then begin
-                    tree_s3 := build_u(u);
+                    tree_s3 := build_u(ucode);
                     tree_s3^.next := syms;
                     syms := tree_s3;
                 end;
@@ -716,47 +715,47 @@ begin
             CASE_OPC(Uksym),
             CASE_OPC(Uosym):
             begin
-                gen_sym(u);
+                gen_sym(ucode);
             end;
 
             CASE_OPC(Umsym):
             begin
-                gen_sym(u);
-                append_statement(build_u(u));
+                gen_sym(ucode);
+                func_0040E238(build_u(ucode));
                 framesz_relocatable := 1;
             end;
 
             CASE_OPC(Ussym):
             begin
-                u.constval.chars := sp1C4;
-                if (u.constval.Ival >= 9) then begin
-                    u.constval.Ival := 8;
-                    u.constval.chars^.ss[9] := char(0);
+                ucode.constval.chars := sp1C4;
+                if (ucode.constval.Ival >= 9) then begin
+                    ucode.constval.Ival := 8;
+                    ucode.constval.chars^.ss[9] := char(0);
                 end;
                 new(sp1C4);
-                tree_s3 := build_u(u);
+                tree_s3 := build_u(ucode);
                 tree_s3^.u.Dtype := Mdt;
                 append_statement(tree_s3);
             end;
 
             CASE_OPC(Uinit):
             begin
-                if u.Dtype in [Mdt, Qdt, Rdt, Sdt, Xdt] then begin
-                    u.Initval.Chars := sp1C4;
+                if ucode.Dtype in [Mdt, Qdt, Rdt, Sdt, Xdt] then begin
+                    ucode.Initval.Chars := sp1C4;
                     new(sp1C4, 1);
                 end;
-                add_init(u);
+                add_init(ucode);
             end;
 
             CASE_OPC(Usdef):
             begin
-                set_size(u.I1, u.Length);
+                set_size(ucode.I1, ucode.Length);
             end;
 
             CASE_OPC(Ubgn):
             begin
-                ms_stamp := u.Length;
-                ls_stamp := u.Offset;
+                ms_stamp := ucode.Length;
+                ls_stamp := ucode.Offset;
                 first_pmt_offset := 0;
                 reversed_stack := false;
                 resident_text := 0;
@@ -777,34 +776,34 @@ begin
 
             CASE_OPC(Ubgnb):
             begin
-                append_statement(build_u(u));
+                func_0040E238(build_u(ucode));
             end;
 
             CASE_OPC(Uendb):
             begin
-                append_statement(build_u(u));
+                func_0040E238(build_u(ucode));
             end;
 
             CASE_OPC(Ucomm),
             CASE_OPC(Uloc),
             CASE_OPC(Uregs):
             begin
-                tree_s3 := build_u(u);
-                if (statement_list = nil) then begin
-                    statement_list := tree_s3;
+                tree_s3 := build_u(ucode);
+                if (sp1F4 = nil) then begin
+                    sp1F4 := tree_s3;
                     build_tree := tree_s3;
                 end else begin
                     append_statement(tree_s3);
                 end;
 
-                if (u.Opc = Uloc) then begin
-                    current_line := u.I1;
-                end else if (u.Opc = Ucomm) then begin
-                    u.Constval.Chars := sp1C4;
+                if (ucode.Opc = Uloc) then begin
+                    current_line := ucode.I1;
+                end else if (ucode.Opc = Ucomm) then begin
+                    ucode.Constval.Chars := sp1C4;
                     if (verbose) then begin
                         if ((statement_list^.prior <> nil) and (statement_list^.prior^.u.Opc = Uent)) then begin
                             sp181 := ' ';
-                            var_s0 := u.Constval.Ival;
+                            var_s0 := ucode.Constval.Ival;
                             while (sp1C4^.ss[var_s0] = sp181) do var_s0 := var_s0 - 1;
                             write(err, sp181, sp1C4^.ss:var_s0);
                         end;
@@ -818,20 +817,20 @@ begin
 
             CASE_OPC(Uoptn):
             begin
-                tree_s3 := build_u(u);
+                tree_s3 := build_u(ucode);
                 tree_s3^.next := sp1AC;
                 sp1AC := tree_s3;
 
-                if (u.I1 = UCO_VARARGS) then begin
-                    sp17C := u.Length;
+                if (ucode.I1 = UCO_VARARGS) then begin
+                    sp17C := ucode.Length;
                 end else if (sp1AC^.u.I1 = UCO_STACK_REVERSED) then begin
                     reversed_stack := true;
                     first_pmt_offset := -4;
                 end else if (sp1AC^.u.I1 = UCO_RSTEXT) then begin
                     resident_text := 1;
                 end else if (sp1AC^.u.I1 = UCO_SOURCE) then begin
-                    source_language := u.Length;
-                    if ((u.Length = ADA_SOURCE) and (glevel <> 0) and (glevel < 3)) then begin
+                    source_language := ucode.Length;
+                    if ((ucode.Length = ADA_SOURCE) and (glevel <> 0) and (glevel < 3)) then begin
                         opt_parms := 0;
                     end;
                 end else if (sp1AC^.u.I1 = UCO_USE_AS0) then begin
@@ -857,7 +856,7 @@ begin
                 sp1A8 := nil;
                 sp182 := false;
                 sp17B := 0;
-                sp1C0 := build_u(u);
+                sp1C0 := build_u(ucode);
                 sp17C := -1;
                 sp166 := false;
                 sp165 := false;
@@ -888,20 +887,20 @@ begin
                 framesz_relocatable := 0;
                 use_fp := 0;
                 will_use_real_fp_for_proc := 0;
-                gen_sym(u);
-                sp167 := IS_PRESERVE_STACK_ATTR(u.Extrnal);
+                gen_sym(ucode);
+                sp167 := IS_PRESERVE_STACK_ATTR(ucode.Extrnal);
             end;
 
         CASE_OPC(Uaent):
         begin
             sp182 := true;
-            append_statement(build_u(u));
+            func_0040E238(build_u(ucode));
         end;
 
         CASE_OPC(Uend):
         begin
-            append_statement(sp1A4);
-            append_statement(build_u(u));
+            func_0040E238(sp1A4);
+            func_0040E238(build_u(ucode));
 
 
             if (sp1F0 <> 0) then begin
@@ -972,7 +971,7 @@ begin
 
         CASE_OPC(Updef):
         begin
-            tree_s3 := build_u(u);
+            tree_s3 := build_u(ucode);
             func_0040F0B8(tree_s3);
             if tree_s3^.u.Lexlev <> 1 then sp17B := 1;
         end;
@@ -980,26 +979,26 @@ begin
         CASE_OPC(Udef):
         begin
             if reversed_stack then begin
-                assert((u.Mtype <> Mmt) or (u.Length >= sp184));
+                assert((ucode.Mtype <> Mmt) or (ucode.Length >= sp184));
             end else begin
-                assert((u.Mtype <> Mmt) or (u.Length >= -sp188));
+                assert((ucode.Mtype <> Mmt) or (ucode.Length >= -sp188));
                 
             end;
-            tree_s3 := build_u(u);
-            if (u.Mtype = Pmt) then tree_s3^.op1 := sp1B8;
+            tree_s3 := build_u(ucode);
+            if (ucode.Mtype = Pmt) then tree_s3^.op1 := sp1B8;
             tree_s3^.next := sp1B0;
             sp1B0 := tree_s3;
         end;
 
         CASE_OPC(Uvreg):
         begin
-            u.Constval.Ival := -1;
-            func_0040EC54(build_u(u));
+            ucode.Constval.Ival := -1;
+            func_0040EC54(build_u(ucode));
         end;
 
         CASE_OPC(Uunal):
         begin
-            append_statement(build_u(u));
+            func_0040E238(build_u(ucode));
         end;
 
         CASE_OPC(Uret):
@@ -1012,6 +1011,10 @@ begin
 
         CASE_OPC(Uujp):
         begin
+            assert(sp1648 = 0);
+            tree_s3 := build_u(ucode);
+            tree_s3^.op2 := find_label(ucode.I1);
+            func_0040E238(tree_s3);
             assert(stack_pos = 0);
             tree_s3 := build_u(u);
             tree_s3^.op2 := find_label(u.I1);
@@ -1020,6 +1023,11 @@ begin
 
         CASE_OPC(Uijp):
         begin
+            func_0040E2AC(sp1648);
+            tree_s3 := build_u1(ucode, sp1004[sp1648]);
+            sp1648 := sp1648 - 1;
+            assert(sp1648 = 0);
+            func_0040E238(tree_s3);
             func_0040E2AC(stack_pos);
             tree_s3 := build_u1(u, node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
@@ -1153,7 +1161,7 @@ begin
                 end;
             end else begin
             end;
-            for var_s1 := 1 to u.Length do begin
+            for var_s1 := 1 to ucode.Length do begin
                 tree_s0 := new_tree();
                 readuinstr(tree_s0^.u, nil);
                 if tree_s0^.u.Opc <> Uujp then begin
@@ -1319,8 +1327,12 @@ begin
             if (u.Opc = Ustr) and (u.Mtype = Rmt) then u.Offset := u.Offset * 4;
             if (u.Opc = Ustr) and (u.Mtype = Pmt) and (u.I1 = 0) then begin
                 sp1EC := max(sp1EC, abs(u.Offset - first_pmt_offset) + u.Length);
+            if ucode.Opc = Ustr then ucode.Constval.Ival := 0;
+            if (ucode.Opc = Ustr) and (ucode.Mtype = Rmt) then ucode.Offset := ucode.Offset * 4;
+            if (ucode.Opc = Ustr) and (ucode.Mtype = Pmt) and (ucode.I1 = 0) then begin
+                sp1EC := max(sp1EC, abs(ucode.Offset - first_pmt_offset) + ucode.Length);
             end;
-            if (u.Opc = Uaos) or (u.Opc = Ustsp) then begin
+            if (ucode.Opc = Uaos) or (ucode.Opc = Ustsp) then begin
                 use_fp := 1;
             end;
             func_0040E2AC(stack_pos);

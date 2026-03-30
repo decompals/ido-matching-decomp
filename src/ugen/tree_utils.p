@@ -35,7 +35,7 @@ begin
     
     tree_counter := tree_counter + 1;    
     
-    p_Tree^.unk10 := tree_counter;
+    p_Tree^.node_id := tree_counter;
     p_Tree^.next := nil;
     p_Tree^.prior := nil;
     p_Tree^.op1 := nil;
@@ -53,7 +53,7 @@ begin
     p_Tree^.u.LexLev := 0;
     p_Tree^.u.Offset2 := 0;
 
-    if (p_Tree^.unk10 = tree_break) then begin
+    if (p_Tree^.node_id = tree_break) then begin
         writeln(err, "BPT here");
     end;
 

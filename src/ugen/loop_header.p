@@ -4,7 +4,7 @@
 #include "tree_utils.h"
 
 var
-    pay: extern cardinal;
+    pay: cardinal;
     current_line: extern integer;
 
     {.data}

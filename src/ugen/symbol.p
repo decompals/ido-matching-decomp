@@ -7,6 +7,14 @@
 #include "val_util.h"
 
 type
+    DataArea = (
+        Default,
+        ReadOnly, {.rodata}
+        Small, {.sdata}
+        Large, {.data}
+        Text, {.text}
+        Exception
+    );
     SymbolInit = packed record
         { 0x00 } u: Bcrec;
         { 0x20 } next: ^SymbolInit;
@@ -27,7 +35,7 @@ type
         { 0x0E } unkE: u8; { alignment? }
         { 0x10 } size: cardinal;
         { 0x14 } mtag: integer;
-        { 0x18 } data_area: u8; { TODO: enum }
+        { 0x18 } data_area: DataArea; { TODO: enum }
         { 0x1C } unk1C: ^SymbolInit; { inits head? }
         { 0x20 } unk20: ^SymbolInit; { inits tail? }
         { 0x24 } unk24: ^Symbol; { next in inordered_inits }
@@ -44,32 +52,32 @@ var
 var
     sym_hash_tab: array[0..255] of ^Symbol;
     non_local_mtag: integer;
-    apc: u8;
+    apc: boolean;
     excpt: u8;
 
 function sym_hash(arg0: integer): integer;
 begin
-    return arg0 & 16#FF;
+    return arg0 & 255;
 end;
 
-function get_data_area(var u: Bcrec): u8;
+function get_data_area(var u: Bcrec): DataArea;
 var
     data_area: integer;
 begin
     data_area := GET_DATA_AREA(u.Lexlev);
 
     if (data_area = DEFAULT_DATA_AREA) then begin
-        return 0;
+        return Default;
     end else if (data_area = READONLY_DATA_AREA) then begin
-        return 1;
+        return ReadOnly;
     end else if (data_area = SMALL_DATA_AREA) then begin
-        return 2;
+        return Small;
     end else if (data_area = LARGE_DATA_AREA) then begin
-        return 3;
+        return Large;
     end else if (data_area = TEXT_AREA) then begin
-        return 4;
+        return Text;
     end else if (data_area = EXCEPTION_DATA_AREA) then begin
-        return 5;
+        return Exception;
     end else begin
         report_error(Internal, 136, "symbol.p", "illegal data area specified for symbol");
         { @bug: missing return }
@@ -117,7 +125,7 @@ begin
     return 0;
 end;
 
-function make_new_sym(arg0: integer; kind: u8; data_area: u8): pointer;
+function make_new_sym(arg0: integer; kind: u8; data_area: DataArea): pointer;
 var
     sym: ^Symbol;
     idx: integer;
@@ -129,7 +137,7 @@ begin
         return sym;
     end;
 
-    idx := sym_hash(arg0) & 16#FF;
+    idx := sym_hash(arg0) & 255;
 
     sym^.lexlev := 0;
     sym^.unkE := 0;
@@ -145,6 +153,7 @@ begin
     sym_hash_tab[idx] := sym;
 
     sym^.kind := kind;
+
     sym^.unk0 := arg0;
     sym^.data_area := data_area;
 
@@ -163,7 +172,9 @@ var
 begin
     sym := sym_hash_tab[sym_hash(arg0) & 16#FF];
     while (sym <> nil) do begin
-        if (sym^.unk0 = arg0) then return sym;
+        if (sym^.unk0 = arg0) then begin 
+            return sym;
+        end;
         sym := sym^.next;
     end;
     return sym;
@@ -181,13 +192,13 @@ var
     sym: ^Symbol;
     pad: integer;
     kind: u8;
-    data_area: u8;
+    data_area: DataArea;
     temp_v0_6: ^SymbolAlias;
 begin
     case (u^.Opc) of
         Uent: begin
             if (IS_NOSIDEEFFECT_ATTR(u^.Extrnal)) then kind := 10 else kind := 9;
-            sym := make_new_sym(u^.I1, kind, 0);
+            sym := make_new_sym(u^.I1, kind, Default);
         end;
 
         Uasym: begin
@@ -219,7 +230,7 @@ begin
             kind := get_sym_type(u^);
             if (sym = nil) then begin
                 data_area := get_data_area(u^);
-                if ((kind <> 1) or (data_area <> 1)) then begin
+                if ((kind <> 1) or (data_area <> ReadOnly)) then begin
                     sym := make_new_sym(u^.I1, kind, data_area);
                     if ((u^.Opc = Ulsym) or (u^.Opc = Ufsym) or (u^.Opc = Ugsym)) then begin
                         sym^.unkE := max(u^.lexlev & ~DATA_AREA_MASK, 2);
@@ -239,7 +250,7 @@ begin
             sym := lookup_sym(u^.I1);
             kind := get_sym_type(u^);
             if (sym = nil) then begin
-                sym := make_new_sym(u^.I1, kind, 0);
+                sym := make_new_sym(u^.I1, kind, Default);
             end else begin
                 sym^.kind := change_sym_type(kind, sym^.kind);
             end;
@@ -552,7 +563,7 @@ begin
                 var_v0^.next := temp_a0;
                 var_s0^.next := var_v0;
                 return;
-            end else if ((temp_a1 = temp_a0^.u.Offset) and (((source_language = PASCAL_SOURCE) and (apc <> 0)) or (source_language = FORTRAN_SOURCE))) then begin
+            end else if ((temp_a1 = temp_a0^.u.Offset) and (((source_language = PASCAL_SOURCE) and (apc)) or (source_language = FORTRAN_SOURCE))) then begin
                 if (temp_t1 = temp_a0) then begin
                     var_s0^.next := var_v0;
                     sym^.unk20 := var_v0;
@@ -581,18 +592,18 @@ end;
 
 { TODO: fake u16? might be fixed if data_area is an enum }
 #line 725
-procedure choose_area(data_area: u16; size: cardinal);
+procedure choose_area(data_area: DataArea; size: cardinal);
 var
-    var_v0: u8;
+    area: DataArea;
 begin
-    var_v0 := data_area;
-    case (var_v0) of
-        0: if (size > sdata_max) then demit_dir0(idata, 0) else demit_dir0(isdata, 0);
-        1: demit_dir0(irdata, 0);
-        2: demit_dir0(isdata, 0);
-        3: demit_dir0(idata, 0);
-        4: demit_dir0(itext, 0);
-        5: if (excpt <> 0) then demit_edata(0, 0, 0);
+    area := data_area;
+    case (area) of
+        Default: if (size > sdata_max) then demit_dir0(idata, 0) else demit_dir0(isdata, 0);
+        ReadOnly: demit_dir0(irdata, 0);
+        Small: demit_dir0(isdata, 0);
+        Large: demit_dir0(idata, 0);
+        Text: demit_dir0(itext, 0);
+        Exception: if (excpt <> 0) then demit_edata(0, 0, 0);
     end;
 end;
 
@@ -693,7 +704,7 @@ begin
     case (sym^.kind) of
         1: begin
             if (sym^.size <> 0) then begin
-                if (sym^.data_area = 2) then begin
+                if (sym^.data_area = Small) then begin
                     demit_dir2(iextern, sym^.unk0, sym^.size, 1);
                 end else begin
                     demit_dir2(iextern, sym^.unk0, sym^.size, 0);
@@ -707,7 +718,7 @@ begin
             end;
             if (sym^.size <> 0) then begin
                 if (sym^.unk1C = nil) then begin
-                    if (sym^.data_area = 2) then begin
+                    if (sym^.data_area = Small) then begin
                         demit_dir2(ilcomm, sym^.unk0, sym^.size, 1);
                     end else begin
                         demit_dir2(ilcomm, sym^.unk0, sym^.size, 0);
@@ -723,7 +734,7 @@ begin
         7: begin
             if (sym^.unk1C = nil) then begin
                 if (sym^.size <> 0) then begin
-                    if (sym^.data_area = 2) then begin
+                    if (sym^.data_area = Small) then begin
                         demit_dir2(icomm, sym^.unk0, sym^.size, 1);
                     end else begin
                         demit_dir2(icomm, sym^.unk0, sym^.size, 0);

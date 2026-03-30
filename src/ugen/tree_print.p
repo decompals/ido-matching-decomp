@@ -147,7 +147,7 @@ end;
 
 procedure print_node_1(var f: Text; arg1: ^Tree; arg2: cardinal);
 begin
-    write(f, arg1^.unk10:6, chr(9));
+    write(f, arg1^.node_id:6, chr(9));
     indent_tree(f, arg2 * 2);
     print_ucode(f, arg1^.u);
 
@@ -168,19 +168,19 @@ begin
     end;
 
     if (arg1^.op1 <> nil) then begin
-        write(f, " op1=", arg1^.op1^.unk10:1);
+        write(f, " op1=", arg1^.op1^.node_id:1);
     end;
 
     if (arg1^.op2 <> nil) then begin
-        write(f, " op2=", arg1^.op2^.unk10:1);
+        write(f, " op2=", arg1^.op2^.node_id:1);
     end;
 
     if (arg1^.next <> nil) then begin
-        write(f, " next=", arg1^.next^.unk10:1);
+        write(f, " next=", arg1^.next^.node_id:1);
     end;
 
     if (arg1^.prior <> nil) then begin
-        write(f, " prior=", arg1^.prior^.unk10:1);
+        write(f, " prior=", arg1^.prior^.node_id:1);
     end;
 
     writeln(f);        
