@@ -92,7 +92,7 @@ begin
     end;
 
     if (u.Opc = Ugsym) then begin
-        return 2;
+        return 2; {Globlal symbol}
     end;
 
     if (u.Opc = Uksym) then begin
@@ -120,7 +120,7 @@ begin
     end;
 
     if (u.Opc = Uent) then begin
-        return 9;
+        return 9; {Procedure entry}
     end;
 
     return 0;

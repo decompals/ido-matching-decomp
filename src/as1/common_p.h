@@ -339,6 +339,10 @@ type
          UNK_ENUM_18,
          UNK_ENUM_19
     );
+
+    u16 = 0..65535 ;
+    u8 =  0..255 of char;
+    s8 = -128..127;
      
     PFileName = ^Filename;
 
