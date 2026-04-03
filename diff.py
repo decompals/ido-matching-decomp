@@ -1146,7 +1146,7 @@ def search_map_file(
             + re.escape(config.diff_section)
             + r"\))? \t"
             # object name
-            + "(\S+)",
+            + r"(\S+)",
             contents,
         )
         if len(find) > 1:
@@ -2842,7 +2842,7 @@ def do_diff(lines1: List[Line], lines2: List[Line], config: Config) -> Diff:
             for source_line in line2.source_lines:
                 line_format = BasicFormat.SOURCE_OTHER
                 if config.source_old_binutils:
-                    if source_line and re.fullmatch(".*\.c(?:pp)?:\d+", source_line):
+                    if source_line and re.fullmatch(r".*\.c(?:pp)?:\d+", source_line):
                         line_format = BasicFormat.SOURCE_FILENAME
                     elif source_line and source_line.endswith("():"):
                         line_format = BasicFormat.SOURCE_FUNCTION

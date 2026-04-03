@@ -35,7 +35,7 @@ begin
     
     tree_counter := tree_counter + 1;    
     
-    p_Tree^.unk10 := tree_counter;
+    p_Tree^.node_id := tree_counter;
     p_Tree^.next := nil;
     p_Tree^.prior := nil;
     p_Tree^.op1 := nil;
@@ -44,7 +44,7 @@ begin
     p_Tree^.ref_count := 1;
     p_Tree^.ref_count2 := 0;
     p_Tree^.reg := xnoreg;
-    p_Tree^.unk18 := 0;
+    p_Tree^.temp_id := 0;
     p_Tree^.unk16 := 0;
     p_Tree^.mark := tree_mark;
     p_Tree^.visited := false;
@@ -53,31 +53,33 @@ begin
     p_Tree^.u.LexLev := 0;
     p_Tree^.u.Offset2 := 0;
 
-    if (p_Tree^.unk10 = tree_break) then begin
+    if (p_Tree^.node_id = tree_break) then begin
         writeln(err, "BPT here");
     end;
 
     return p_Tree;
 end;
 
-procedure build_u(var u: Bcrec);
+function build_u(var u: Bcrec): pointer;
 var
     p_tree: ^tree;
 begin
     p_tree := new_tree();
     p_tree^.u := u;
+    return p_tree;
 end;
 
-procedure build_u1(var u: Bcrec; op1: ^Tree);
+function build_u1(var u: Bcrec; op1: ^Tree): pointer;
 var
     p_tree: ^tree;
 begin
     p_tree := new_tree();
     p_tree^.u := u;
     p_tree^.op1 := op1;
+    return p_tree;
 end;
 
-procedure build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree);
+function build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree): pointer;
 var
     p_tree: ^tree;
 begin
@@ -85,6 +87,7 @@ begin
     p_tree^.u := u;
     p_tree^.op1 := op1;
     p_tree^.op2 := op2;
+    return p_tree;
 end;
 
 function build_op(arg0: Uopcode): pointer;
@@ -299,7 +302,7 @@ begin
     return temp_v0;
 end;
 
-function rvalue(Dtype: Datatype; arg1: String): pointer;
+function rvalue(Dtype: Datatype; arg1: Identname): pointer;
 var
     p_tree: ^tree;
     temp_v0_2: stringtextptr;

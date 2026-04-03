@@ -4,11 +4,11 @@ type
     BinasmArray = array[1..1] of binasm;
 
 var
-    d_ptr: extern cardinal;
-    old_d_ptr: extern cardinal;
-    i_ptr: extern cardinal;
-    old_i_ptr: extern cardinal;
-    ibuffer: extern ^BinasmArray;
-    ibuffer_size: extern cardinal;
+    d_ptr: cardinal;
+    old_d_ptr: cardinal;
+    i_ptr: cardinal;
+    old_i_ptr: cardinal;
+    ibuffer: ^BinasmArray;
+    ibuffer_size: cardinal;
 
 #endif /* IBUFFER_H */

@@ -3,8 +3,6 @@
 var
     print_warnings: boolean;
     current_line: cardinal;
-    debug_ugen: boolean;
-    opcode_arch: boolean;
     glevel: u8;
     ignore_vreg: u8;
     olevel: u8;

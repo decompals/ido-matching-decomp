@@ -39,8 +39,10 @@ else
   $(error Unsupported OS: $(UNAME_S))
 endif
 
+ROOTDIR := $(CURDIR)
+
 RECOMP_VERSION := v1.2
-RECOMP         := tools/ido_recomp
+RECOMP         := $(ROOTDIR)/tools/ido_recomp
 
 BUILD   := build
 ASM     := asm
@@ -63,12 +65,12 @@ MIPS_GCC   := $(MIPS_BINUTILS_PREFIX)gcc
 
 DISASSEMBLER  := python3 -m spimdisasm.elfObjDisasm
 DISASSEMBLER_FLAGS += --no-emit-cpload --Mreg-names o32 --no-use-fpccsr --rodata-string-guesser 4 --pascal-rodata-string-guesser 4 --print-new-file-boundaries --asm-jtbl-label jlabel --asm-data-label dlabel
-ASM_PROCESSOR := python3 tools/asm-processor/build.py
+ASM_PROCESSOR := python3 $(ROOTDIR)/tools/asm-processor/build.py
 YACC := $(YACCDIR)/yacc
 YFLAGS := -p $(YACCDIR)/yaccpar -t
 
 
-IINC       := -Iinclude -Iinclude/indy -Isrc
+IINC       := -I$(ROOTDIR)/include -I$(ROOTDIR)/include/indy -I$(ROOTDIR)/src
 
 # Check code syntax with host compiler
 CHECK_WARNINGS := -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-variable -Wno-char-subscripts -Wno-unused-label -Wno-parentheses -Wno-unused-parameter -Wno-pointer-sign
@@ -131,14 +133,15 @@ DEP_FILES := $(O_FILES:.o=.d) \
 # create build directories
 $(shell mkdir -p $(SRC_DIRS:src/%=$(BUILD)/src/$(VERSION)/%) $(ASM_DIRS:asm/$(VERSION)/%=$(BUILD)/asm/$(VERSION)/%))
 
-$(BUILD)/src/%.o: CC := $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+$(BUILD)/src/%.o: CC_NO_ASMPROC := $(CC)
+$(BUILD)/src/%.o: CC = $(ASM_PROCESSOR) $(ASM_PROC_FLAGS) $(CC_NO_ASMPROC) -- $(AS) $(ASFLAGS) --
 
 
 build/src/7.1/mld/%.o: OPTFLAGS := -O2
 build/src/7.1/as0/%.o: OPTFLAGS := -O2
 build/src/7.1/as1/%.o: OPTFLAGS := -O2
 build/src/7.1/cfe/%.o: OPTFLAGS := -O2
-build/src/7.1/ugen/%.o: OPTFLAGS := -O2
+build/src/7.1/ugen/%.o: OPTFLAGS := -O2 -Olimit 1600
 build/src/7.1/libu/%.o: OPTFLAGS := -O2
 
 # Targets
@@ -183,7 +186,9 @@ $(BUILD)/src/$(VERSION)/%.o: src/%.c
 	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
 
 $(BUILD)/src/$(VERSION)/%.o: src/%.p
-	$(CC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $@ $<
+	@if [ "$(CC)" != "@:" ]; then \
+		(cd $(dir $<) && $(CC_NO_ASMPROC) -c $(CFLAGS) $(MIPS_VERSION) $(OPTFLAGS) -o $(abspath $@) $(notdir $<)); \
+	fi
 
 %.c: %.y
 	$(YACC) $(YFLAGS) $<

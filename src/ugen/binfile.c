@@ -24,9 +24,9 @@ void close_bin_file(void) {
     fclose(binasm_file);
 }
 
-void output_inst_bin(binasm* bin, size_t count, binasm* ibuffer, size_t ibufferSize) {
-    for (; ibufferSize > 0; ibufferSize--, ibuffer--) {
-        if (fwrite(ibuffer, sizeof(binasm), 1, binasm_file) != 1) {
+void output_inst_bin(binasm* code, size_t codeSize, binasm* data, size_t dataSize) {
+    for (; dataSize > 0; dataSize--, data--) {
+        if (fwrite(data, sizeof(binasm), 1, binasm_file) != 1) {
             fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
             fprintf(stderr, "suggestion:  you may want to use TMPDIR to change where temporary files are written\n");
             fflush(stderr);
@@ -34,7 +34,7 @@ void output_inst_bin(binasm* bin, size_t count, binasm* ibuffer, size_t ibufferS
         }
     }
 
-    if (fwrite(bin, sizeof(binasm), count, binasm_file) != count) {
+    if (fwrite(code, sizeof(binasm), codeSize, binasm_file) != codeSize) {
         fprintf(stderr, "ugen: internal error writing binasm to %s:  %s\n", binasm_name, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
         fflush(stderr);
         exit(EXIT_FAILURE);

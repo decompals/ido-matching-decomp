@@ -18,7 +18,7 @@ type
 
 
 { From loop_header.p }
-procedure labelopt(arg0: ^Tree; var pFile: Text; arg2: boolean; cross_jumping_opt: boolean);
+procedure labelopt(arg0: ^Tree; var pFile: Text; debugPhases: boolean; cross_jumping_opt: boolean);
 var
     mark: integer;
     mark1: integer;
@@ -28,7 +28,6 @@ var
         var_s0: ^Tree;
     begin
         var_s0 := arg0^.next;
-        /* TODO: Match with the proper set ! */
         while (not (var_s0^.u.Opc in [Uaent, Ubgn, Uclab, Uend, Uent, Ueof, Ulab, Ustp])) do begin
             if (not (var_s0^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulex, Uoptn, Usdef, Uunal])) then begin
                 delete_statement(var_s0);
@@ -75,7 +74,6 @@ var
 loop:
                 var_a1 := false;
                 var_s0 := var_s2^.op2^.next;
-                { TODO: match with set D_10016194 }
                 while var_s0^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef, Uunal]
  do begin
                     if (var_s0^.u.Opc = Ulab) then begin
@@ -91,7 +89,6 @@ loop:
                 end;
                 var_s0 := var_s2^.op2;
                 var_s1 := var_s2^.next;
-                { TODO: match with set D_10016194 }
                 while var_s1^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef, Uunal]
  do begin
                     if (var_s1^.u.Opc = Ulab) and (var_s1^.u.Lexlev <> 0) then begin
@@ -107,7 +104,6 @@ loop:
                 if not var_a1 and (var_s2^.u.Opc <> Uujp) and (var_s1^.u.Opc = Uujp) then begin
                     func_004351C0(var_s1);
                     var_v0_2 := var_s1^.next;
-                    { TODO: match with set D_10016194 }
                     while var_v0_2^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef, Uunal]
  do begin
                         if var_s0 = var_v0_2 then begin
@@ -138,7 +134,6 @@ loop:
                     repeat begin
                         var_s2 := var_s2^.next;
                         var_s0 := var_s2^.op2^.next;
-                        { TODO: match with set D_10016194 }
                         while var_s0^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef, Uunal]
  do begin
                             if (var_s0^.u.Opc = Ulab) and (var_s0^.u.Lexlev <> 0) then begin
@@ -292,13 +287,13 @@ loop:
     var
         var_s1: ^tree;
     begin
-        write(pFile, 'L', arg0^.unk10:1);
-        write(pFile, "IN: ");
+        write(pFile, 'L', arg0^.node_id:1);
+        write(pFile, " IN:");
 
         var_s1 := arg0^.op2;
 
         while (var_s1 <> nil) do begin
-            write(pFile, " L", var_s1^.op1^.unk10:1);
+            write(pFile, " L", var_s1^.op1^.node_id:1);
             var_s1 := var_s1^.next;
         end;
 
@@ -306,7 +301,7 @@ loop:
 
         var_s1 := arg0^.op1;
         while (var_s1 <> nil) do begin
-            write(pFile, " L", var_s1^.op2^.unk10:1);
+            write(pFile, " L", var_s1^.op2^.node_id:1);
             var_s1 := var_s1^.prior;
         end;
 
@@ -366,7 +361,6 @@ loop:
         loop:
         var_v1 := var_v1^.prior;
         if (var_v1 <> nil) then begin
-            {TODO: Match with the proper set D_100161B4}
             if not (var_v1^.u.Opc in [Uaent, Uent, Ulab]) then begin
                 goto loop;
             end;
@@ -452,7 +446,7 @@ loop:
                     func_00435DE8(var_s0);
                 end;
                 
-                if (arg2) then begin
+                if (debugPhases) then begin
                     func_00435C44(var_s0);
                 end;
 
@@ -465,7 +459,6 @@ loop:
                 
 
             if (var_s2) then begin
-                {TODO: Match with the proper set D_100161D4}
                 if not (var_s0^.u.Opc in [Ubgnb, Udef, Uend, Uendb, Ulex, Uoptn, Ustp]) then begin
                     delete_statement(var_s0);
                 end;
@@ -474,7 +467,7 @@ loop:
             var_s0 := var_s0^.next;
         end; 
         
-    end; {End func_00436148 }
+    end;
     
 begin
     mark := next_mark();
@@ -484,7 +477,7 @@ begin
     func_0043595C(arg0);
     func_00435FA4(arg0);
 
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st localopt:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);
@@ -492,7 +485,7 @@ begin
     end;
 
     func_00436148(arg0);
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st label phase:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);
@@ -501,7 +494,7 @@ begin
 
     if (cross_jumping_opt) then begin
         cross_jump(arg0);
-        if (arg2) then begin
+        if (debugPhases) then begin
             writeln(pFile, "Tree dump after cross jumping");
             print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
             writeln(pFile);
@@ -516,7 +509,7 @@ begin
     func_0043595C(arg0);
     func_00436148(arg0);
 
-    if (arg2) then begin
+    if (debugPhases) then begin
         writeln(pFile, "Tree dump after 2nd label phase:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
         writeln(pFile);

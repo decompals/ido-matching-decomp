@@ -51,7 +51,7 @@ begin
             var_s0 := pred(var_s0);
         end until (var_s0 = 0);
     end;
-    write(f, ' ':arg1&7);
+    write(f, ' ':arg1 & 7);
 end;
 
 procedure print_ucode(var f: Text; var u: Bcrec);
@@ -81,10 +81,9 @@ begin
         write(f, " mtype=", mtype_name[u.Mtype]);
     end;
 
-    { Uabs shouldn't be in this set, but removing it breaks both code and data a lot }
-    if (u.Opc in [Uabs, Uent, Uilod, Uistr, Ulab, Ulbdy, Ulex, Uloc, Ulod,
-                  Umov, Umpmv, Umst, Upmov, Uregs, Urlod, Urpar, Urstr,
-                  Ustr, Umtag, Ualia, Uirld, Uirst]) then begin
+    if (u.Opc in [Uaent, Ucia, Ucup, Uent, Uilod, Uistr, Ulab, Ulbdy,
+                  Ulex, Uloc, Ulod, Umov, Umpmv, Umst, Upmov, Uregs,
+                  Urlod, Urpar, Urstr, Ustr, Umtag, Ualia, Uirld, Uirst]) then begin
         write(f, " lexlev=", u.lexlev:1);
     end;
 
@@ -148,7 +147,7 @@ end;
 
 procedure print_node_1(var f: Text; arg1: ^Tree; arg2: cardinal);
 begin
-    write(f, arg1^.unk10:6, chr(9));
+    write(f, arg1^.node_id:6, chr(9));
     indent_tree(f, arg2 * 2);
     print_ucode(f, arg1^.u);
 
@@ -169,19 +168,19 @@ begin
     end;
 
     if (arg1^.op1 <> nil) then begin
-        write(f, " op1=", arg1^.op1^.unk10:1);
+        write(f, " op1=", arg1^.op1^.node_id:1);
     end;
 
     if (arg1^.op2 <> nil) then begin
-        write(f, " op2=", arg1^.op2^.unk10:1);
+        write(f, " op2=", arg1^.op2^.node_id:1);
     end;
 
     if (arg1^.next <> nil) then begin
-        write(f, " next=", arg1^.next^.unk10:1);
+        write(f, " next=", arg1^.next^.node_id:1);
     end;
 
     if (arg1^.prior <> nil) then begin
-        write(f, " prior=", arg1^.prior^.unk10:1);
+        write(f, " prior=", arg1^.prior^.node_id:1);
     end;
 
     writeln(f);        
@@ -195,9 +194,8 @@ end;
 procedure print_tree(var f: Text; arg1: ^tree; arg2: cardinal; arg3: cardinal);
 var
     mark: integer;
-    sp20: cardinal; /* sp - 8*/
+    sp20: cardinal;
 
-    /* inner function */
     procedure func_00449D24(pTree: ^Tree; arg1: Cardinal);
     begin
         while (pTree <> nil) do begin
@@ -234,11 +232,7 @@ begin
     func_00449D24(arg1, 0);
 end;
 
-#ifdef NON_MATCHING
 procedure debug_tree(arg0: ^tree);
 begin
     print_tree(output, arg0, 20, 0);
 end;
-#else
-GLOBAL_ASM("asm/7.1/functions/ugen/tree_print/debug_tree.s")
-#endif

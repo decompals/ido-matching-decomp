@@ -1,6 +1,5 @@
 #include "cmplrs/usys.h"
 #include "cmplrs/ucode.h"
-#include "cmplrs/binasm.h"
 #include "common.h"
 #include "val_util.h"
 #include "report.h"
@@ -11,7 +10,7 @@ var
     val_dir_tab: array [ValType_Byte..ValType_Set] of itype := (
         ibyte, ihalf, iword, idword, ifloat, idouble, iascii, iword, ibyte
     );
-    hi: array [first(char)..last(char)] of u8 := (
+    hi: array [char] of 0..15 := (
         '0': 0,
         '1': 1,
         '2': 2,
@@ -27,11 +26,13 @@ var
         'C': 12, 'c': 12,
         'D': 13, 'd': 13,
         'E': 14, 'e': 14,
-        'F': 15, 'f': 15
+        'F': 15, 'f': 15,
+        otherwise 0
     );
-    { .bss }
-    lsb_first: boolean;
 
+{ A composite value is simply an ASCII string. Since only binasm instructions can be emitted,
+  we generate enough instructions to hold the entire string, filling them completely with its bytes.
+  In essence, the string is copied directly into the data section. }
 procedure emit_composite_val(var value: Valu);
 var
     num_records: cardinal;
@@ -39,14 +40,13 @@ var
     i: cardinal;
     j: cardinal;
     inst: binasm;
-    offset: cardinal;
 begin
-    num_records := value.Ival div 16;
-    remainder := value.Ival mod 16;
+    num_records := value.Ival div bin_rec_len;
+    remainder := value.Ival mod bin_rec_len;
+
     for i := 1 to num_records do begin
-        offset := lshift(i, 4) - 16;
-        for j := 1 to 16 do begin
-            inst.data[j] := value.Chars^.ss[offset + j];
+        for j := 1 to bin_rec_len do begin
+            inst.data[j] := value.Chars^.ss[(i - 1) * bin_rec_len + j];
         end;
 
         append_d(inst);
@@ -55,24 +55,29 @@ begin
     if remainder <> 0 then begin
         inst.data := "";
         for i := 1 to remainder do begin
-            inst.data[i] := value.Chars^.ss[lshift(num_records, 4) + i];
+            inst.data[i] := value.Chars^.ss[num_records * bin_rec_len + i];
         end;
 
         append_d(inst);
     end;
 end;
 
-procedure emit_val{(arg0: integer; vtype: ValType; var value: Valu; rep: cardinal)};
+{ Emits a value in binasm form according to its type. }
+procedure emit_val{(labelno: integer; vtype: ValType; var value: Valu; rep: cardinal)};
 var
     inst: binasm;
     i: integer;
 begin
-    if arg0 <> 0 then begin
-        demit_dir0(ilabel, arg0);
+    { emits a label if required }
+    if labelno <> NO_LABEL then begin
+        demit_dir0(ilabel, labelno);
     end;
 
+#line 133
     case vtype of
         ValType_Null: report_error(Internal, 135, "val_util.p", "null value");
+
+        { emits a single binasm instruction }
         ValType_Byte,
         ValType_Half,
         ValType_Word: begin
@@ -82,6 +87,8 @@ begin
             inst.symno := 0;
             append_d(inst);
         end;
+
+        { emits two binasm instructions, since double words (64-bit values) do not fit in a single instruction }
         ValType_Dword: begin
             inst.instr := val_dir_tab[vtype];
             inst.expression := value.dwval_h;
@@ -95,20 +102,29 @@ begin
             inst.symno := 0;
             append_d(inst);
         end;
+
+        { floats and doubles, as well as ascii strings, are emitted as composite values, which means
+          the first instruction contains the type, size and replicate count, followed by the textual
+          representation of the data }
         ValType_Float,
         ValType_Double,
         ValType_Ascii: begin
             inst.instr := val_dir_tab[vtype];
-            inst.expression := value.Ival;
+            inst.length := value.Ival;
             inst.symno := 0;
-            inst.replicate := rep;            
+            inst.rep := rep;            
             append_d(inst);
             emit_composite_val(value);
         end;
-        ValType_Label: ; { emit nothing }
+
+        { the label has already been emitted; nothing to do }
+        ValType_Label: ;
+
+        { sets are emitted as a sequence of `.byte` instructions; this requires conversion from a hex string
+          (which is how sets are stored internally in ugen) to a byte array }
         ValType_Set: begin
             assert(value.Ival mod 2 = 0);
-            if not lsb_first then begin
+            if UGEN_BIG_ENDIAN then begin
                 for i := 1 to value.Ival div 2 do begin
                     inst.instr := val_dir_tab[vtype];
                     inst.expression := hi[value.Chars^.ss[2 * i - 1]] * 16 + hi[value.Chars^.ss[2 * i]];
@@ -129,7 +145,9 @@ begin
     end;
 end;
 
-procedure emit_label_val{(arg0: integer; symno: integer; value: integer; size: cardinal)};
+{ Emits an instruction of the form `.word symbol+offset`, i.e., a pointer to a symbol with an offset.
+  If the size is 2, emits `.half symbol+offset` instead. }
+procedure emit_label_val{(arg0: integer; symno: integer; offset: integer; size: cardinal)};
 var
     inst: binasm;
 begin
@@ -138,13 +156,14 @@ begin
     end else begin
         inst.instr := val_dir_tab[ValType_Label];
     end;
-    inst.expression := value;
+    inst.expression := offset;
     inst.replicate := 1;
     inst.symno := symno;
 
     append_d(inst);
 end;
 
+{ Returns an appropriate ValType for the given data type and size. }
 function find_val_type{(dtype: Datatype; size: integer): ValType};
 begin
     case dtype of

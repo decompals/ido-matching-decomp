@@ -3,9 +3,7 @@
 #include "report.h"
 
 var
-    n_fp_parm_regs: extern integer;
     first_pmt_offset: integer;
-    n_parm_regs: extern integer;
     basicint: extern u8;
     pars: array [0..16] of integer;
     fix_amt: array [0..4] of boolean;
@@ -18,19 +16,19 @@ begin
     return (arg0^.u.Constval.Ival + 1) <> 0;
 end;
 
-function parm_reg(arg0: ^Tree): integer;
+function parm_reg(arg0: ^Tree): registers;
 begin
     Assert(arg0^.u.Opc in [Upar, Updef, Urpar, Uvreg]);
 
     if (arg0^.u.Constval.Ival = -1) then begin
-        return ord(xnoreg);
+        return xnoreg;
     end;
 
     if (basicint = 0) then begin
-        return arg0^.u.Constval.Ival div 4;
+        return registers(arg0^.u.Constval.Ival div 4);
+    end else begin
+        return registers(arg0^.u.Constval.Ival div 8);
     end;
- 
-    return arg0^.u.Constval.Ival div 8;
 end;
 
 

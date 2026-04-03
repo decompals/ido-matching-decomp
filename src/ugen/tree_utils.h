@@ -1,8 +1,8 @@
 #ifndef TREE_UTILS_H
 #define TREE_UTILS_H
-procedure build_u(var u: Bcrec); external;
-procedure build_u1(var u: Bcrec; op1: ^Tree); external;
-procedure build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree); external;
+function build_u(var u: Bcrec): pointer; external;
+function build_u1(var u: Bcrec; op1: ^Tree): pointer; external;
+function build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree): pointer; external;
 function build_op(arg0: Uopcode): pointer; external;
 procedure free_node(arg0: ^Tree); external;
 procedure free_tree(t: ^tree); external;
@@ -15,7 +15,7 @@ function build_2op(Opc: Uopcode; op1: ^tree; op2: ^tree): pointer; external;
 function dup_tree(arg0 : ^tree): pointer; external;
 function next_mark(): integer; external;
 function dwvalue(Dtype: Datatype; arg1: integer64): pointer; external;
-function rvalue(Dtype: Datatype; arg1: String): pointer; external;
+function rvalue(Dtype: Datatype; arg1: Identname): pointer; external;
 function is_zero(arg0: ^Tree): boolean; external;
 function is_ivalue(arg0: ^tree; arg1: integer; arg2: integer): boolean; external;
 function result_type(arg0: ^Tree): Datatype; external;

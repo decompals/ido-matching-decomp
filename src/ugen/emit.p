@@ -1,21 +1,12 @@
 #include "cmplrs/usys.h"
 #include "cmplrs/allocator.h"
-#include "cmplrs/binasm.h"
 #include "cmplrs/ucode.h"
 #include "common.h"
 #include "ibuffer.h"
 #include "report.h"
 
-procedure memset(p: pointer; value: integer; size: cardinal); external;
-
 procedure append_i(var inst: binasm); forward;
 procedure append_d(var inst: binasm); forward;
-
-var
-    debug_ugen: boolean;
-    has_calls: boolean;
-    uses_gp: boolean;
-    pic_level: integer;
 
 procedure save_i_ptrs();
 begin
@@ -191,7 +182,7 @@ begin
     end;
 end;
 
-procedure emit_ra(op: asmcodes; reg1: registers; symno: integer; immediate: integer; mem_tag: integer);
+procedure emit_ra(op: asmcodes; reg1: registers; symno: cardinal; immediate: integer; mem_tag: integer);
 begin
     ibuffer^[i_ptr].instr := iocode;
     ibuffer^[i_ptr].op := op;
