@@ -9,7 +9,7 @@
 #include "common.h"
 
 // .data
-static int last_node_id = 0;
+static unsigned int last_node_id = 0;
 static int is_making_constant = FALSE;
 
 char* type_name[] = {

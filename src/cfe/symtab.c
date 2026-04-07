@@ -28,7 +28,7 @@ static void func_0041894C(TreeNode* t);
 
 static TreeNode* func_00417880(TreeNode* type) {
     unsigned int level;
-    int s0;
+    unsigned int s0;
     unsigned int i;
 
     switch (TREE_CODE(type)) {
@@ -88,7 +88,7 @@ static TreeNode* func_00417880(TreeNode* type) {
     return type;
 }
 
-static void func_00417BD8(int level) {
+static void func_00417BD8(unsigned int level) {
     unsigned int i;
     TreeNode* type;
     TreeNode** s0;

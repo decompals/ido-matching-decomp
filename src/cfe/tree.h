@@ -221,7 +221,7 @@ struct AttrDesc {
 };
 
 typedef struct TreeNode {
-    int id;
+    unsigned int id;
     enum TreeCodes code;
     struct TreeNode* type;
     int attr;
