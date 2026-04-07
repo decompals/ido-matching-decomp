@@ -222,7 +222,7 @@ struct AttrDesc {
 
 typedef struct TreeNode {
     int id;
-    int code;
+    enum TreeCodes code;
     struct TreeNode* type;
     int attr;
     struct TreeNode* link;
@@ -236,36 +236,36 @@ typedef struct TreeNode_Basic_type {
 } TreeNode_Basic_type;
 
 typedef struct TreeNode_Array_type {
-    TreeNode t;
-    int size;
-    int align;
-    TreeNode* index_type;
-    int unk_24;
-    int unk_28;
-    int unk_2C;
-    int unk_30;
-    int unk_34;
-    int unk_38;
-    int unk_3C;
+    /* 0x00 */ TreeNode t;
+    /* 0x18 */ int size;
+    /* 0x1C */ int align;
+    /* 0x20 */ TreeNode* index_type;
+    /* 0x24 */ int unk_24;
+    /* 0x28 */ int unk_28;
+    /* 0x2C */ int unk_2C;
+    /* 0x30 */ int unk_30;
+    /* 0x34 */ int unk_34;
+    /* 0x38 */ int unk_38;
+    /* 0x3C */ int unk_3C;
 } TreeNode_Array_type;
 
 typedef struct TreeNode_Struct_type {
-    TreeNode t;
-    int size;
-    int align;
-    TreeNode* sname;
-    TreeNode* members;
-    int info;
-    TreeNode* baselist;
-    int unk_30;
-    int unk_34;
-    int unk_38;
-    int unk_3C;
-    int unk_40;
-    int unk_44;
-    int unk_48;
-    int unk_4C;
-} TreeNode_Struct_type;
+    /* 0x00 */ TreeNode t;
+    /* 0x18 */ int size;
+    /* 0x1C */ int align;
+    /* 0x20 */ TreeNode* sname;
+    /* 0x24 */ TreeNode* members;
+    /* 0x28 */ int info;
+    /* 0x2C */ TreeNode* baselist;
+    /* 0x30 */ int unk_30;
+    /* 0x34 */ int unk_34;
+    /* 0x38 */ int unk_38;
+    /* 0x3C */ int unk_3C;
+    /* 0x40 */ int unk_40;
+    /* 0x44 */ int unk_44;
+    /* 0x48 */ int unk_48;
+    /* 0x4C */ int unk_4C;
+} TreeNode_Struct_type; // size = 0x50
 
 typedef struct TreeNode_Enum_type {
     TreeNode t;
@@ -285,23 +285,23 @@ typedef struct TreeNode_Enum_type {
 } TreeNode_Enum_type;
 
 typedef struct TreeNode_Func_type {
-    TreeNode t;
-    int size;
-    int align;
-    TreeNode* fname;
-    TreeNode* params;
-    TreeNode* decls;
-    int psize;
-    int end_blkno;
-    TreeNode* handlers;
-    int unk_38;
-    int unk_3C;
-    int unk_40;
-    int unk_44;
-    int unk_48;
-    int unk_4C;
-    int unk_50;
-    int unk_54;
+    /* 0x00 */ TreeNode t;
+    /* 0x18 */ int size;
+    /* 0x1C */ int align;
+    /* 0x20 */ TreeNode* fname;
+    /* 0x24 */ TreeNode* params;
+    /* 0x28 */ TreeNode* decls;
+    /* 0x2C */ int psize;
+    /* 0x30 */ int end_blkno;
+    /* 0x34 */ TreeNode* handlers;
+    /* 0x38 */ int unk_38;
+    /* 0x3C */ int unk_3C;
+    /* 0x40 */ int unk_40;
+    /* 0x44 */ int unk_44;
+    /* 0x48 */ int unk_48;
+    /* 0x4C */ int unk_4C;
+    /* 0x50 */ int unk_50;
+    /* 0x54 */ int unk_54;
 } TreeNode_Func_type;
 
 typedef struct TreeNode_Pointer_type {
@@ -339,37 +339,37 @@ typedef struct TreeNode_Field_decl {
 } TreeNode_Field_decl;
 
 typedef struct TreeNode_Id_decl {
-    TreeNode t;
-    struct Symbol* id;
-    TreeNode* init_value;
-    TreeNode* qualifiers;
-    int offset;
-    unsigned short level;
-    unsigned short alevel;
-    int sclass;
-    TreeNode* hidden;
-    TreeNode* st_list;
-    TreeNode* context;
-    int blkno;
-    short flags;
-    TreeNode* overloads;
-    int oclass;
-    int lastused;
-    int unk_50;
-    int unk_54;
-    int unk_58;
-    int unk_5C;
-    int unk_60;
-    int unk_64;
-    int unk_68;
-    int unk_6C;
-    int unk_70;
-    int unk_74;
-    int unk_78;
-    int unk_7C;
-    int unk_80;
-    int unk_84;
-} TreeNode_Id_decl;
+    /* 0x00 */ TreeNode t;
+    /* 0x18 */ struct Symbol* id;
+    /* 0x1C */ TreeNode* init_value;
+    /* 0x20 */ TreeNode* qualifiers;
+    /* 0x24 */ int offset;
+    /* 0x28 */ unsigned short level;
+    /* 0x2A */ unsigned short alevel;
+    /* 0x2C */ int sclass;
+    /* 0x30 */ TreeNode* hidden;
+    /* 0x34 */ TreeNode* st_list;
+    /* 0x38 */ TreeNode* context;
+    /* 0x3C */ int blkno;
+    /* 0x40 */ short flags;
+    /* 0x44 */ TreeNode* overloads;
+    /* 0x48 */ int oclass;
+    /* 0x4C */ int lastused;
+    /* 0x50 */ int unk_50;
+    /* 0x54 */ int unk_54;
+    /* 0x58 */ int unk_58;
+    /* 0x5C */ int unk_5C;
+    /* 0x60 */ int unk_60;
+    /* 0x64 */ int unk_64;
+    /* 0x68 */ int unk_68;
+    /* 0x6C */ int unk_6C;
+    /* 0x70 */ int unk_70;
+    /* 0x74 */ int unk_74;
+    /* 0x78 */ int unk_78;
+    /* 0x7C */ int unk_7C;
+    /* 0x80 */ int unk_80;
+    /* 0x84 */ int unk_84;
+} TreeNode_Id_decl; // size = 0x88
 
 typedef struct TreeNode_Declare_decl {
     TreeNode t;

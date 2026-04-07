@@ -358,7 +358,6 @@ int error(int message, enum ErrorLevels level, int location, ...) {
         if (v1 != 0 && v1 < 8) {
             B_10022F38[v1 - 1]++;
         } else {
-
             ((!v1) ? (void)0 : __assert("!i", "error.c", 471));
         }
     }

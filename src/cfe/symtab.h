@@ -3,7 +3,7 @@
 
 #include "tree.h"
 
-#define FUNCTION_SCOPE() (function_scope == NULL ? -1U : function_scope->unk_04)
+#define FUNCTION_SCOPE() (function_scope == NULL ? -1U : function_scope->level)
 
 typedef struct ParseSymbol {
     LinkedListEntry link;

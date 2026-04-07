@@ -41,14 +41,14 @@ typedef struct FmtArr {
 } FmtArr;
 
 typedef struct Scope {
-    TreeNode* unk_00;
-    int unk_04;
-    struct Scope* unk_08;
-    int unk_0C;
-    int unk_10;
-    int unk_14;
-    TreeNode* unk_18;
-} Scope;
+    /* 0x00 */ TreeNode* unk_00;
+    /* 0x04 */ unsigned int level;
+    /* 0x08 */ struct Scope* parent;
+    /* 0x0C */ struct Scope* child;
+    /* 0x10 */ int unk_10;
+    /* 0x14 */ int unk_14;
+    /* 0x18 */ TreeNode* unk_18;
+} Scope; // size = 0x1C
 
 extern short act_to_imp[];
 extern short imp_to_act[];
@@ -125,6 +125,7 @@ extern Symbol* anonymous;
 extern Scope* function_scope;
 extern Scope* current_scope;
 extern Scope* file_scope;
+extern void* current_function;
 
 int real_file_line(int, char**, int*, int);
 void __assert(char*, char*, int);
@@ -145,4 +146,9 @@ void cpp_symentry_setMaxMacroRecursionDepth(int);
 void* get_runtime_id(char*, TreeNode*, int);
 void declarator(TreeNode* id, TreeNode* context, int sclass, int oclass, int attr, TreeNode* type);
 void mips_st(TreeNode*);
+void mips_st_extundefined(TreeNode*);
+void lint_setref(TreeNode*, int, int);
+void lint_checks(TreeNode*);
+int type_compatible(TreeNode* arg0, TreeNode* arg1, int arg2);
+
 #endif

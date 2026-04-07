@@ -1,7 +1,9 @@
 #ifndef MODES_H
 #define MODES_H
 
-#define IS_ANSI ((options[OPTION_CPLUSPLUS] && (options[OPTION_ANSI_MODE] & 1) || !options[OPTION_CPLUSPLUS] && (options[OPTION_ANSI_MODE] & 1)))
+#define IS_ANSI                                                       \
+    ((options[OPTION_CPLUSPLUS] && (options[OPTION_ANSI_MODE] & 1) || \
+      !options[OPTION_CPLUSPLUS] && (options[OPTION_ANSI_MODE] & 1)))
 #define IS_STRICT_ANSI (IS_ANSI && (options[OPTION_ANSI_MODE] & 5) == 5)
 #define IS_RELAXED_ANSI (IS_ANSI && (options[OPTION_ANSI_MODE] & 3) == 3)
 
