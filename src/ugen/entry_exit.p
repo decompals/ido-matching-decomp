@@ -22,7 +22,6 @@ var
     ascii_out: boolean;
     basicint: u8;
     excpt: boolean;
-    frame_pointer: registers;
     framesz_relocatable: boolean;
     home_vararg_reg: boolean;
     i_ptrs_for_gp_offset: array[1..20] of integer;
@@ -31,11 +30,8 @@ var
     mscoff: boolean;
     num_i_ptr_indexes: integer;
     olevel: u8;
-    pic_level: integer;
-    reversed_stack: boolean;
     stack_limit_bn: integer;
     use_cpalias: boolean;
-    uses_gp: boolean;
 
 procedure gen_entry_exit(
     arg0: integer; { symbol number for function? }

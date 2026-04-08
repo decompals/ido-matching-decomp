@@ -103,6 +103,7 @@ offset,vram,.rodata
 070CC0,10010CC0,ugen_070CC0
 070D10,10010D10,ugen_070D10
 070D80,10010D80,ugen_070D80
+070E00,10010E00,release_id
 
 offset,vram,.data
 070E60,10010E60,aio

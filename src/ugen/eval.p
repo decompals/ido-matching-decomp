@@ -42,16 +42,12 @@ type
     end;
 
 var
-    reversed_stack: boolean;
-    frame_pointer: registers;
     basicint: u8;
-    pic_level: integer;
     align8: boolean;
     align16: boolean;
     align32: boolean;
     align64: boolean;
     pdefs: ^tree;
-    source_language: integer;
     ignore_vreg: boolean;
     pseudo_leaf: boolean;
     use_real_fp_for_proc: boolean;
@@ -73,13 +69,10 @@ var
     home_vararg_reg: boolean;
     generate_again: boolean;
     saved_regs_size: cardinal;
-    frame_size: cardinal;
     local_var_size: integer;
     max_arg_build: integer;
     reloc_arg_build: integer;
     temp_size: integer;
-    has_calls: boolean;
-    uses_gp: boolean;
     num_i_ptr_indexes: cardinal;
     curlev: integer;
     entry_point_index: integer;
@@ -88,7 +81,6 @@ var
     current_text_sec: Valu;
     first_ent: boolean;
     resident_text: boolean;
-    debug_ugen: boolean;
     glevel: u8;
     has_cia_in_file: boolean;
     i_ptrs_for_gp_offset: array[1..20] of integer;
@@ -608,19 +600,17 @@ var
 function is_end_return(arg0: ^tree): boolean;
 var
     var_v0: ^tree;
-    var_v1: Uopcode;
 begin
     if arg0^.u.Opc = Uujp then begin
         var_v0 := arg0^.op2^.next;
     end else begin
         var_v0 := arg0;
     end;
-    var_v1 := var_v0^.u.Opc;
-    while var_v1 in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef] do begin
+
+    while var_v0^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef] do begin
         var_v0 := var_v0^.next;
-        var_v1 := var_v0^.u.Opc;
     end;
-    return var_v1 = Uend;
+    return var_v0^.u.Opc = Uend;
 end;
 
 procedure move_dreg_to_regs(arg0: registers; arg1: registers);
@@ -649,7 +639,7 @@ begin
             emit_rri_(zdsra, succ(arg0), succ(arg0), 32, franone);
         end;
     end;
-    if (opcode_arch = ARCH_64) and (arg0 in [xr4, xr6]) then begin
+    if (opcode_arch = ARCH_64) and (arg0 in [gpr_a0, gpr_a2]) then begin
         regs[arg0].dw_link := succ(arg0);
     end;
 end;
@@ -975,7 +965,7 @@ begin
     end;
     case spC7 of
         Rdt, Qdt: begin
-            arg0^.reg := get_free_fp_reg(arg0, reg_kind_tab[spC7], temp_usage_count(arg0^.unk18));
+            arg0^.reg := get_free_fp_reg(arg0, reg_kind_tab[spC7], temp_usage_count(arg0^.temp_id));
             if spC7 = Qdt then begin
                 spC0 := 8;
             end;
@@ -983,11 +973,11 @@ begin
         Xdt:
             report_error(Internal, 1323,  'eval.p', 'extended floating point type not yet supported');
         Adt, Fdt, Gdt, Hdt, Jdt, Ldt, Ndt, Sdt: begin
-            arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.unk18));
+            arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.temp_id));
         end;
         Idt, Kdt, Wdt: begin
             spC0 := 8;
-            arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.unk18));
+            arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.temp_id));
         end;
         otherwise
             report_error(Internal, 1345, 'eval.p', 'unknown temporary type');
@@ -995,21 +985,21 @@ begin
     spBE := load_op_tab[spC7];
     if reversed_stack then begin
         if (spBE = zld) and (opcode_arch = ARCH_32) then begin
-            emit_rob(zlw, arg0^.reg, frame_offset1(temp_offset(arg0^.unk18) + spC0), frame_pointer, 0);
-            emit_rob(zlw, succ(arg0^.reg), frame_offset1(temp_offset(arg0^.unk18) + spC0) + 4, frame_pointer, 0);
+            emit_rob(zlw, arg0^.reg, frame_offset1(temp_offset(arg0^.temp_id) + spC0), frame_pointer, 0);
+            emit_rob(zlw, succ(arg0^.reg), frame_offset1(temp_offset(arg0^.temp_id) + spC0) + 4, frame_pointer, 0);
         end else begin
-            emit_rob(spBE, arg0^.reg, frame_offset1(temp_offset(arg0^.unk18) + spC0), frame_pointer, 0);
+            emit_rob(spBE, arg0^.reg, frame_offset1(temp_offset(arg0^.temp_id) + spC0), frame_pointer, 0);
         end;
     end else begin
         if (spBE = zld) and (opcode_arch = ARCH_32) then begin
-            emit_rob(zlw, arg0^.reg, frame_offset1(temp_offset(arg0^.unk18)), frame_pointer, 0);
-            emit_rob(zlw, succ(arg0^.reg), frame_offset1(temp_offset(arg0^.unk18)) + 4, frame_pointer, 0);
+            emit_rob(zlw, arg0^.reg, frame_offset1(temp_offset(arg0^.temp_id)), frame_pointer, 0);
+            emit_rob(zlw, succ(arg0^.reg), frame_offset1(temp_offset(arg0^.temp_id)) + 4, frame_pointer, 0);
         end else begin
-            emit_rob(spBE, arg0^.reg, frame_offset1(temp_offset(arg0^.unk18)), frame_pointer, 0);
+            emit_rob(spBE, arg0^.reg, frame_offset1(temp_offset(arg0^.temp_id)), frame_pointer, 0);
         end;
     end;
-    free_temp(arg0^.unk18);
-    arg0^.unk18 := 0;
+    free_temp(arg0^.temp_id);
+    arg0^.temp_id := 0;
 end;
 
 function reg{(arg0: ^tree): registers};
@@ -1019,7 +1009,7 @@ begin
         return xnoreg;
     end;
 
-    if arg0^.unk18 <> 0 then begin
+    if arg0^.temp_id <> 0 then begin
         restore_from_temp(arg0);
     end;
 
@@ -1038,7 +1028,7 @@ begin
         report_error(Internal, 1408, 'eval.p', 'tree node not evaluated');
     end;
 
-    if arg0^.unk18 <> 0 then begin
+    if arg0^.temp_id <> 0 then begin
         restore_from_temp(arg0);
     end;
 
@@ -1046,7 +1036,7 @@ begin
         report_error(Internal, 1416, 'eval.p', 'tree node not evaluated');
     end;
 
-    if arg1^.unk18 <> 0 then begin
+    if arg1^.temp_id <> 0 then begin
         restore_from_temp(arg1);
     end;
 
@@ -1931,7 +1921,7 @@ begin
             end;
         end;
         if sp110 = nil then begin
-            emit_rob(storeop, spFF, var_s3 + arg0^.u.Offset, xr29, 0);
+            emit_rob(storeop, spFF, var_s3 + arg0^.u.Offset, gpr_sp, 0);
         end else begin
             case sp110^.u.Mtype of
                 Mmt, Pmt: begin
@@ -1962,7 +1952,7 @@ begin
         end;
         eval(sp10C, xnoreg);
         if sp110 = nil then begin
-            spFB := xr29;
+            spFB := gpr_sp;
             var_s3 := var_s3 + arg0^.u.Offset;
         end else begin
             spFB := reg(sp110);
@@ -2510,7 +2500,7 @@ end;
 procedure clean_tree(arg0: ^tree);
 begin
     repeat
-        arg0^.unk18 := 0;
+        arg0^.temp_id := 0;
         arg0^.reg := xnoreg;
         
         if (arg0^.op1 <> nil) and not(arg0^.u.Opc in [Uent, Uaent, Ulab, Uclab, Ucg2]) then begin
@@ -2651,7 +2641,7 @@ var
     var_s2_3: integer;
     temp_s3_4: integer;
     var_s5: asmcodes;
-    sp15C: ^tree;
+    sp15C: PTree;
     var_a0_2: itype;
     sp154: integer; { varargs option }
     sp150: cardinal;
@@ -2678,7 +2668,7 @@ var
     temp_a3: integer;
 begin
     if arg0^.reg <> xnoreg then begin
-        if arg0^.unk18 <> 0 then begin
+        if arg0^.temp_id <> 0 then begin
             restore_from_temp(arg0);
         end;
         if arg0^.reg in [xfr0..xfr31] then begin
@@ -2772,10 +2762,10 @@ begin
                 sp12C.asint := -1;
             end;
             if use_real_fp_for_proc then begin
-                frame_pointer := xr13;
-                remove_from_free_list(xr13);
+                frame_pointer := gpr_t5;
+                remove_from_free_list(gpr_t5);
             end else begin
-                frame_pointer := xr29;
+                frame_pointer := gpr_sp;
             end;
             if ufsa or ufsm then begin
                 for var_s0_2 := fpr_fs0 to registers(ord(fpr_fs0) + ((n_saved_fp_regs - 1) * 2)) do begin
@@ -2809,7 +2799,7 @@ begin
                 if not generate_again then begin
                     frame_size := frame_size + 4;
                 end;
-                saved_regs := saved_regs + [xr23];
+                saved_regs := saved_regs + [gpr_s7];
             end;
             var_v0_2 := arg0^.next;
             frame_size := (integer((frame_size + 7)) div 8) * 8;
@@ -2847,7 +2837,7 @@ begin
                 if get_temp_area_size() <> 0 then begin
                     generate_again := true;
                     restore_i_ptrs();
-                    temp_size := ((get_temp_area_size() + 7) div 8) * 8;
+                    temp_size := ALIGN_UP(get_temp_area_size(), 8);
                     frame_size := frame_size + temp_size;
                     set_temps_offset(-((frame_size - max_arg_build) - saved_regs_size));
                     clean_tree(sp15C);
@@ -2951,17 +2941,17 @@ begin
             Tmt: begin
                 if use_real_fp_for_proc then begin
                     add_to_free_list(frame_pointer);
-                    frame_pointer := xr30;
+                    frame_pointer := gpr_fp;
                     saved_regs := saved_regs + [frame_pointer];
                     frame_size := frame_size + 8;
                     saved_regs_size := saved_regs_size + 8;
                 end;
                 if pic_level > 0 then begin
-                    use_cpalias := use_cpalias and (frame_pointer <> xr30);
+                    use_cpalias := use_cpalias and (frame_pointer <> gpr_fp);
                     if use_cpalias then begin
-                        saved_regs := saved_regs + [xr30];
+                        saved_regs := saved_regs + [gpr_fp];
                     end else begin
-                        saved_regs := saved_regs + [xr28];
+                        saved_regs := saved_regs + [gpr_gp];
                     end;
                 end;
                 max_arg_build := ((arg0^.u.Length + 7) div 8) * 8;
@@ -3021,7 +3011,7 @@ begin
                 num_i_ptr_indexes := num_i_ptr_indexes + 1;
                 assert(num_i_ptr_indexes <= 20);
                 i_ptrs_for_gp_offset[num_i_ptr_indexes] := i_ptr;
-                emit_rob(zlw, xr28, 0, xr29, 0);
+                emit_rob(zlw, gpr_gp, 0, gpr_sp, 0);
             end;
         end;
         Ustr: begin
@@ -3030,7 +3020,7 @@ begin
                 if is_end_return(arg0^.next) and (sp127 in [Idt, Kdt, Wdt]) then begin
                     setting_int64_return := true;
                 end;
-                if (opcode_arch = ARCH_64) and (basicint = 0) and setting_int64_return and (arg1 = xr2) then begin
+                if (opcode_arch = ARCH_64) and (basicint = 0) and setting_int64_return and (arg1 = gpr_v0) then begin
                     case arg0^.op1^.u.Opc of
                         Uldc: regs[arg1].dw_link := succ(arg1);
                         Ulod: regs[arg1].dw_link := succ(arg1);
@@ -3039,7 +3029,7 @@ begin
                 end;
                 eval(arg0^.op1, arg1);
                 temp_s2 := reg(arg0^.op1);
-                if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (basicint = 0) and ((processing_args and (arg1 in [xr4, xr6])) or (setting_int64_return and (arg1 = xr2))) then begin
+                if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (basicint = 0) and ((processing_args and (arg1 in [gpr_a0, gpr_a2])) or (setting_int64_return and (arg1 = gpr_v0))) then begin
                     if opcode_arch = ARCH_32 then begin
                         move_two_regs(arg1, temp_s2);
                     end else if (temp_s2 <> arg1) or (regs[temp_s2].dw_link <> succ(temp_s2)) then begin
@@ -3074,10 +3064,10 @@ begin
                         end;
                     end;
                     if (opcode_arch = ARCH_32) and (var_s5 = zsd) then begin
-                        emit_rob(zsw, var_s3, arg0^.u.Offset, xr29, 0);
-                        emit_rob(zsw, succ(var_s3), arg0^.u.Offset + 4, xr29, 0);
+                        emit_rob(zsw, var_s3, arg0^.u.Offset, gpr_sp, 0);
+                        emit_rob(zsw, succ(var_s3), arg0^.u.Offset + 4, gpr_sp, 0);
                     end else begin
-                        emit_rob(var_s5, var_s3, arg0^.u.Offset, xr29, 0);
+                        emit_rob(var_s5, var_s3, arg0^.u.Offset, gpr_sp, 0);
                     end;
                 end else begin
                     if move_cvt_flag = arg0^.op1^.node_id then begin
@@ -3100,7 +3090,7 @@ begin
             if setting_int64_return then begin
                 setting_int64_return := false;
                 if opcode_arch = ARCH_64 then begin
-                    regs[xr2].dw_link := xnoreg;
+                    regs[gpr_v0].dw_link := xnoreg;
                 end;
             end;
         end;
@@ -3110,7 +3100,7 @@ begin
             processing_args := true;
             clear_pmov_regs();
             if arg0^.u.I1 <> 0 then begin
-                emit_ri_(zsubu, xr29, max_arg_build, franone);
+                emit_ri_(zsubu, gpr_sp, max_arg_build, franone);
             end;
             var_s2_2 := arg0^.next;
             while (var_s2_2^.u.Opc <> Ucup) and (var_s2_2^.u.Opc <> Urcuf) and (var_s2_2^.u.Opc <> Uicuf) and (var_s2_2^.u.Opc <> Ucia) do begin
@@ -3212,10 +3202,10 @@ begin
                 end;
                 if (opcode_arch = ARCH_32) and (var_s5 = zsd) then begin
                     var_s5 := double_to_singles[var_s5];
-                    emit_rob(var_s5, var_s3, arg0^.u.Offset, xr29, 0);
-                    emit_rob(var_s5, succ(var_s3), arg0^.u.Offset + 4, xr29, 0);
+                    emit_rob(var_s5, var_s3, arg0^.u.Offset, gpr_sp, 0);
+                    emit_rob(var_s5, succ(var_s3), arg0^.u.Offset + 4, gpr_sp, 0);
                 end else begin
-                    emit_rob(var_s5, var_s3, arg0^.u.Offset, xr29, 0);
+                    emit_rob(var_s5, var_s3, arg0^.u.Offset, gpr_sp, 0);
                 end;
             end;
         end;
@@ -3223,7 +3213,7 @@ begin
             if olevel >= 2 then begin
                 if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (basicint = 0) and (opcode_arch = ARCH_64) then begin
                     arg1 := parm_reg(arg0);
-                    if (arg1 <> xnoreg) and (arg1 in [xr4, xr6]) then begin
+                    if (arg1 <> xnoreg) and (arg1 in [gpr_a0, gpr_a2]) then begin
                         move_dreg_to_regs(arg1, arg1);
                     end;
                 end;
@@ -3260,7 +3250,7 @@ begin
                     arg0^.u.Offset := 0;
                     arg0^.u.Offset2 := 0;
 
-                    loadstore(zla, arg0, xr8, 0);
+                    loadstore(zla, arg0, gpr_t0, 0);
 
                     arg0^.u.Offset := temp_s3_4;
                     arg0^.u.Offset2 := temp_s4;
@@ -3270,9 +3260,9 @@ begin
                     check_no_used();
                     load_pmov_regs();
                     if (arg0^.u.Extrnal & 128) <> 0 then begin
-                        emit_r(zj, xr8);
+                        emit_r(zj, gpr_t0);
                     end else begin
-                        emit_r(zjal, xr8);
+                        emit_r(zjal, gpr_t0);
                     end;
                 end else begin
                     if (arg0^.u.Extrnal & 128) <> 0 then begin
@@ -3283,8 +3273,8 @@ begin
                 end;
             end;
             if opcode_arch = ARCH_64 then begin
-                regs[xr4].dw_link := xnoreg;
-                regs[xr6].dw_link := xnoreg;
+                regs[gpr_a0].dw_link := xnoreg;
+                regs[gpr_a2].dw_link := xnoreg;
             end;
             processing_args := false;
             if arg0^.u.Dtype in [Idt, Kdt, Wdt] then begin
@@ -3295,13 +3285,13 @@ begin
             sp13C := sp13C ! 16#0000000E;
             sp138 := sp138 ! 16#00000000;
             if pic_level > 0 then begin
-                sp13C := sp13C ! rshift(cardinal(16#80000000), ord(xr25));
+                sp13C := sp13C ! rshift(cardinal(16#80000000), ord(gpr_jp));
             end;
             emit_regmask(ilivereg, sp13C, sp138);
-            eval(arg0^.op1, xr25);
+            eval(arg0^.op1, gpr_jp);
             var_s3 := reg(arg0^.op1);
-            if (pic_level > 0) and (var_s3 <> xr25) then begin
-                emit_rr(zmove, xr25, var_s3);
+            if (pic_level > 0) and (var_s3 <> gpr_jp) then begin
+                emit_rr(zmove, gpr_jp, var_s3);
             end;
             check_no_used();
             load_pmov_regs();
@@ -3311,11 +3301,11 @@ begin
                 emit_r(zjal, var_s3);
             end;
             if (opcode_arch = ARCH_64) and (basicint = 0) then begin
-                if regs[xr4].dw_link = succ(xr4) then begin
-                    regs[xr4].dw_link := xnoreg;
+                if regs[gpr_a0].dw_link = succ(gpr_a0) then begin
+                    regs[gpr_a0].dw_link := xnoreg;
                 end;
-                if regs[xr6].dw_link = succ(xr6) then begin
-                    regs[xr6].dw_link := xnoreg;
+                if regs[gpr_a2].dw_link = succ(gpr_a2) then begin
+                    regs[gpr_a2].dw_link := xnoreg;
                 end;
             end;
             processing_args := false;
@@ -3397,7 +3387,7 @@ begin
             jump(arg0^.op1, true, arg0^.op2^.u.I1);
         end;
         Uujp: begin
-            if is_end_return(arg0) and (frame_size = 0) and not load_stack_limit and is_empty_saved_regs() and (frame_pointer = xr29) then begin
+            if is_end_return(arg0) and (frame_size = 0) and not load_stack_limit and is_empty_saved_regs() and (frame_pointer = gpr_sp) then begin
                 if sp127 <> Pdt then begin
                     if sp127 in [Qdt, Rdt, Xdt] then begin
                         sp13C := 0;
@@ -3435,7 +3425,7 @@ begin
                 sp13C := sp13C ! 16#0000FF0E;
                 sp138 := sp138 ! 16#00000FFF;
                 emit_regmask(ilivereg, sp13C, sp138);
-                emit_r(zj, xr31);
+                emit_r(zj, gpr_ra);
             end else begin
                 emit_ll(zb, arg0^.op2^.u.I1);
             end;
@@ -3496,7 +3486,7 @@ begin
                     get_fp_reg1(var_s3, arg0, reg_kind_tab[arg0^.u.Dtype], arg0^.ref_count);
                 end else begin
                     get_reg1(var_s3, arg0, arg0^.ref_count);
-                    if processing_int64_return and (var_s3 = xr2) then begin
+                    if processing_int64_return and (var_s3 = gpr_v0) then begin
                         processing_int64_return := false;
                         if (arg0^.u.Dtype in [Idt, Kdt, Wdt]) and (opcode_arch = ARCH_64) and (basicint = 0) then begin
                             emit_rri_(zdsll, var_s3, var_s3, 32, franone);
@@ -4213,10 +4203,10 @@ begin
                 var_s3 := reg(arg0^.op2);
                 if arg1 <> var_s3 then begin
                     move_to_dest(arg1, var_s3, arg0^.u.Dtype);
-                    if arg0^.unk18 <> 0 then begin
-                        arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.unk18));
-                        free_temp(arg0^.unk18);
-                        arg0^.unk18 := 0;
+                    if arg0^.temp_id <> 0 then begin
+                        arg0^.reg := get_free_reg(arg0, temp_usage_count(arg0^.temp_id));
+                        free_temp(arg0^.temp_id);
+                        arg0^.temp_id := 0;
                     end;
                 end;
                 define_label(temp_s7_2);
@@ -4229,25 +4219,25 @@ begin
                         saved_regs := saved_regs + [xr31];
                         frame_size := frame_size + 8;
                     end;
-                    get_reg(xr24, nil, 1);
-                    emit_ri_(zli, xr24, arg0^.op1^.u.Constval.Ival, franone);
-                    free_reg(xr24);
+                    get_reg(gpr_t8, nil, 1);
+                    emit_ri_(zli, gpr_t8, arg0^.op1^.u.Constval.Ival, franone);
+                    free_reg(gpr_t8);
                     emit_regmask(ilivereg, 16#000000C0, 0);
                     emit_a(zjal, stack_limit_bn, 0, franone);
                 end;
                 if reversed_stack then begin
-                    emit_rri_(zaddu, xr29, xr29, arg0^.op1^.u.Offset2, franone);
+                    emit_rri_(zaddu, gpr_sp, gpr_sp, arg0^.op1^.u.Offset2, franone);
                 end else begin
-                    emit_rri_(zsubu, xr29, xr29, arg0^.op1^.u.Offset2, franone);
+                    emit_rri_(zsubu, gpr_sp, gpr_sp, arg0^.op1^.u.Offset2, franone);
                 end;
                 if (max_stack <> -1) and (arg0^.op1^.u.Offset2 < max_stack - 8) then begin
-                    emit_rob(zsw, xr0, 0, xr29, 0);
+                    emit_rob(zsw, xr0, 0, gpr_sp, 0);
                 end;
             end else begin
                 if max_stack <> -1 then begin
-                    eval(arg0^.op1, xr24);
-                    var_s3 := xr24;
-                    move_to_dest(xr24, reg(arg0^.op1), arg0^.u.Dtype);
+                    eval(arg0^.op1, gpr_t8);
+                    var_s3 := gpr_t8;
+                    move_to_dest(gpr_t8, reg(arg0^.op1), arg0^.u.Dtype);
                     if not (xr31 in saved_regs) then begin
                         saved_regs := saved_regs + [xr31];
                         frame_size := frame_size + 8;
@@ -4259,17 +4249,17 @@ begin
                     var_s3 := reg(arg0^.op1);
                 end;
                 if reversed_stack then begin
-                    emit_rrr(zaddu, xr29, xr29, var_s3);
+                    emit_rrr(zaddu, gpr_sp, gpr_sp, var_s3);
                 end else begin
-                    emit_rrr(zsubu, xr29, xr29, var_s3);
+                    emit_rrr(zsubu, gpr_sp, gpr_sp, var_s3);
                 end;
             end;
             if sp144 then begin
                 if isa = ISA_MIPS2 then begin
-                    emit_rri_(ztltu, xr29, xr23, 9, franone);
+                    emit_rri_(ztltu, gpr_sp, gpr_s7, 9, franone);
                 end else begin
                     temp_s7_2 := gen_label_id();
-                    emit_rrll(zbgeu, xr29, xr23, temp_s7_2);
+                    emit_rrll(zbgeu, gpr_sp, gpr_s7, temp_s7_2);
                     emit_i(zbreak, 9);
                     define_label(temp_s7_2);
                 end;
@@ -4278,18 +4268,18 @@ begin
         Uldsp: begin
             arg1 := get_dest(arg0, arg1);
             if framesz_relocatable then begin
-                emit_rri_(zaddu, arg1, xr29, reloc_arg_build, franone);
+                emit_rri_(zaddu, arg1, gpr_sp, reloc_arg_build, franone);
             end else begin
-                emit_rri_(zaddu, arg1, xr29, max_arg_build, franone);
+                emit_rri_(zaddu, arg1, gpr_sp, max_arg_build, franone);
             end;
         end;
         Ustsp: begin
             eval(arg0^.op1, xnoreg);
             var_s3 := reg(arg0^.op1);
             if framesz_relocatable then begin
-                emit_rri_(zsubu, xr29, var_s3, reloc_arg_build, franone);
+                emit_rri_(zsubu, gpr_sp, var_s3, reloc_arg_build, franone);
             end else begin
-                emit_rri_(zsubu, xr29, var_s3, max_arg_build, franone);
+                emit_rri_(zsubu, gpr_sp, var_s3, max_arg_build, franone);
             end;
         end;
         Utpeq,
@@ -4322,7 +4312,7 @@ begin
         Ucia: begin
             check_no_used();
             if arg0^.u.Lexlev <> 0 then begin
-                saved_regs := saved_regs + [xr31];
+                saved_regs := saved_regs + [gpr_ra];
             end;
             emit_rfi(zcia, xnoreg, arg0^.u.Constval);
         end;

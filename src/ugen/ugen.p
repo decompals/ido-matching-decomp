@@ -5,6 +5,7 @@
 #include "u_tree.h"
 #include "ibuffer.h"
 #include "emit.h"
+#include "aio.h"
 #include "cmplrs/allocator.h"
 #include "cmplrs/uini.h"
 #include "cmplrs/uread.h"
@@ -51,8 +52,6 @@ procedure init_eval(); external;
 procedure eval(arg0: ^Tree; arg1: registers); external;
 procedure close_bin_file(); external;
 procedure output_decls(); external;
-procedure output_inst_ascii(var f: Filename; var pFile: Text); external;
-procedure debug_tree(arg0: ^tree); external;
 
 var
     addr_dtype: Datatype;
@@ -64,7 +63,6 @@ var
     ascii_out: boolean;
     basicint: boolean;
     cpalias_ok: boolean;
-    debug_ugen: boolean;
     excpt: boolean;
     first_ent: boolean;
     fp_initialized: s8;
@@ -75,7 +73,6 @@ var
     non_local_mtag: integer;
     nooffsetopt: boolean;
     opt_labels: u8;
-    pic_level: integer;
     print_warnings: boolean;
     saw_cap_g: boolean;
     sgi_unsigned_conv: boolean;
@@ -814,7 +811,6 @@ begin
 
             init_eval();
             eval(pTree, xnoreg);
-            dump_tree(pTree, "Translate");
             output_inst_bin(ibuffer^[1], pred(i_ptr), ibuffer^[ibuffer_size], ibuffer_size - d_ptr);
             alloc_release(tree_heap, tree_heap_mark);
         end;

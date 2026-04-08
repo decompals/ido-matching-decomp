@@ -1,4 +1,5 @@
 #include "common.h"
+#include "tree.h"
 
 type
 unk_frame_offset_record = Record
@@ -6,28 +7,28 @@ unk_frame_offset_record = Record
     unk2C: integer;
 end;
 
-var
-frame_size: integer;
-reversed_stack: extern boolean;
-
-function frame_offset(arg0: ^unk_frame_offset_record): integer;
+function frame_offset(node: Ptree): integer;
 begin
-    if (frame_size = 0) then begin
-        return arg0^.unk2C;
+    if frame_size = 0 then begin
+        return node^.u.Offset;
     end;
-    if (reversed_stack) then begin
-        return -(frame_size - arg0^.unk2C);
-    end;
-    return arg0^.unk2C + frame_size;
+    
+    if reversed_stack then begin
+        return -(frame_size - node^.u.Offset);
+    end else begin
+        return node^.u.Offset + frame_size;
+    end
 end;
 
-function frame_offset1(arg0: integer): integer;
+function frame_offset1(offset: integer): integer;
 begin
-    if (frame_size = 0) then begin
-        return arg0;
+    if frame_size = 0 then begin
+        return offset;
     end;
-    if (reversed_stack) then begin
-        return -(frame_size - arg0);
+
+    if reversed_stack then begin
+        return -(frame_size - offset);
+    end else begin
+        return offset + frame_size;
     end;
-    return arg0 + frame_size;
 end;

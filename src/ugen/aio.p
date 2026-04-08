@@ -5,18 +5,20 @@
 #include "cmplrs/uoptions.h"
 #include "cmplrs/stinfc.h"
 
+#define ST_STRING_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
+#define TAB chr(9)
+
 type
-    hex_str = packed array [1..10] of char; /* :=  "0123456789ABCDEF" */
-    hex_char = packed array [1..2] of char;
-    BinasmFile = File of binasm;
+    hex10 = packed array [1..10] of char; /* :=  "0123456789ABCDEF" */
+    hex2 = packed array [1..2] of char;
     
 var
-    source_language: integer;
-    in_file: BinasmFile;    
+    { .bss }
     current_linen: integer;
+    in_file: File of binasm;
     source_file: Text;
-    source_file_name: Filename;
     val64: Valu;
+    source_file_name: Filename;    
 
     { .data }
     reg_name_tab: array [registers] of array[1..5] of char := [
@@ -127,46 +129,51 @@ var
     current_filen: integer := -2;
     second_dli: boolean := False;
 
-#define ST_STRING_COPY(ustr, st) len := 1; while (st^[len] <> chr(0)) do begin ustr[len] := st^[len]; len := len + 1 end;
-
-procedure put_integer_ws(var pFile: text; val: integer);
+procedure put_integer_ws(var f: Text; val: integer);
 begin
     if val = 0 then return;
         if val > 0 then begin
-            write(pFile, '+');
+            write(f, '+');
         end;
-    write(pFile, val:1:10);
+    write(f, val:1);
 end;
 
-procedure put_sym(var pFile: Text; idn: integer);
+{ Prints the symbol’s name, or just its number with $ or $$ prefix.
+  The symbol is looked up by its idn (dense number) in the symbol table. }
+procedure put_sym(var f: Text; idn: integer);
 var
-    sp40: Stringtext;
-    str: pst_string;
+    sym_name: Stringtext;
+    st_str: pst_string;
     len: integer;
 
 begin
     if (idn <> 0) then begin
         if (idn < 0) then begin
-            write(pFile, '$', abs(idn):1);
-        end else if ((st_fglobal_idn(idn) <> 1) and (source_language <> C_SOURCE)) then begin
-            write(pFile, "$$", idn:1);
+            { Negative number indicates a local label; prints as a simple number with a $ prefix, e.g., $23 }
+            write(f, '$', abs(idn):1);
+        end else if (st_fglobal_idn(idn) <> 1) and (source_language <> C_SOURCE) then begin
+            { Static symbol not from C source; prints number with $$ prefix, e.g., $$23 }
+            write(f, "$$", idn:1);
         end else begin
-            sp40.ss := "";
-            str := st_str_idn(idn);
+            sym_name.ss := "";
+            st_str := st_str_idn(idn);
 
-            if (str = pointer(-1)) then begin
-                write(pFile, "$$", idn:1);
+            if (st_str = pointer(-1)) then begin
+                { Symbol not found in the symbol table; prints its number with $$ prefix anyway, e.g., $$23 }
+                write(f, "$$", idn:1);
             end else begin
-                ST_STRING_COPY(sp40.ss, str);
+                ST_STRING_COPY(sym_name.ss, st_str);
             end;
 
-            write(pFile, sp40.ss:0);
+            { Prints the symbol’s string representation }
+            write(f, sym_name.ss:0);
         end;
         
     end;
 end;
 
-procedure hex8(number: integer; var str: hex_str);
+{ Converts a number to a hexadecimal string in the format 0x0123ABCD }
+procedure hex8(number: integer; var str: hex10);
 var
     i: integer;
     digit: 0..15;
@@ -175,7 +182,7 @@ begin
      str[2] := 'x';
 
     for i := 3 to 10 do begin
-        digit := rshift(number, 32 - (i - 2) * 4) & 15;
+        digit := rshift(number, 32 - (i - 2) * 4) & 16#F;
         str[i] := hex_tab[digit];
     end;
     
@@ -183,52 +190,54 @@ begin
      str[2] := 'x';
 end;    
 
-procedure put_hex10(var arg0: Text; arg1: integer);
+{ Prints a number in hexadecimal form, e.g., 0x0123ABCD }
+procedure put_hex10(var f: Text; number: integer);
 var
-    sp26: hex_str;
+    hex_str: hex10;
 begin
-    hex8(arg1, sp26);
-    write(arg0, sp26);
+    hex8(number, hex_str);
+    write(f, hex_str);
 end;
 
-procedure hex_2(digit: char; var str: hex_char);
+{ Converts a character to its hexadecimal representation, e.g., 'A' → "41" }
+procedure hex_2(digit: char; var str: hex2);
 begin
     str[1] := hex_tab[(rshift(digit, 4) & 255)];
     str[2] := hex_tab[ord(digit) -((rshift(digit, 4) & 255) * 16)];
 end; 
 
-procedure put_alpha(var arg0: text; arg1: char);
+{ Prints a character as-is, or in hexadecimal code if non-printable, e.g., '\x1A'}
+procedure put_alpha(var f: Text; c: char);
 var
-    sp26: hex_char;
+    hex_str: hex2;
 begin
-    if not(arg1 in [' '..'~']) or (arg1 = '"') or (arg1 = '\') then begin
-        hex_2(arg1, sp26);
-        write(arg0, "\\X", sp26);
+    if not(c in [' '..'~']) or (c = '"') or (c = '\') then begin
+        hex_2(c, hex_str);
+        write(f, "\\X", hex_str);
     end else begin
-        write(arg0, arg1);
+        write(f, c);
     end;
 end;
 
-procedure put_string(var arg0: text; arg1: boolean);
+{ Prints a string read from the input file }
+procedure put_string(var f: Text; quoted: boolean);
 label
     loop_end;
 var
-    var_s2: u16;
-    var_s1: integer;
-    var_s0: cardinal;
-    var_s6: cardinal;
+    length: u16;
+    j: cardinal;
+    i: cardinal;
 begin
-    if arg1 then begin
-        write(arg0, '"');
+    if quoted then begin
+        write(f, '"');
     end;
 
-    var_s2 := in_file^.length;
-    for var_s6 := 1 to integer(var_s2 - 1) div 16 + 1 do begin {Get align 16}
+    length := in_file^.length;
+    for i := 1 to integer(length - 1) div bin_rec_len + 1 do begin
         get(in_file);
-        for var_s0 := 1 to 16 do begin
-            var_s1 := lshift(var_s6, 4) - 16 + var_s0;
-            if (var_s1 <= var_s2) then begin
-                put_alpha(arg0, in_file^.data[var_s0]);
+        for j := 1 to bin_rec_len do begin
+            if (i - 1) * bin_rec_len + j <= length then begin
+                put_alpha(f, in_file^.data[j]);
             end else begin
                 goto loop_end;
             end;
@@ -236,228 +245,290 @@ begin
     end;
 
 loop_end:
-    if arg1 then begin
-        write(arg0, '"');
+    if quoted then begin
+        write(f, '"');
     end;
 end;
 
-#line 786
-procedure write_instruction(var arg0: Text);
+#line 783
+{ Prints an instruction. May need to read multiple binasm records from the input file. }
+procedure write_instruction(var f: Text);
 label done;
 var
-    var_s7: cardinal;
-    var_s2: integer;
-    var_s0: cardinal;
-    
+    str_length: integer;
+    j: cardinal;
+    i: cardinal;
 begin
-    write(arg0, chr(9));
+    { Always starts with a tab character }
+    write(f, TAB);
 
-    if ((in_file^.op <> zcia) and (in_file^.op <> zdli)) then begin
-        write(arg0, opcode_tab[in_file^.op]:0, chr(9));
+    { Writes the opcode string, except for cia and dli, which are handled separately }
+    if (in_file^.op <> zcia) and (in_file^.op <> zdli) then begin
+        write(f, opcode_tab[in_file^.op]:0, TAB);
     end;
+
     with in_file^ do begin
-    case in_file^.form of 
-        frob:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
+        case form of 
+            { Prints an instruction in the format:
+                opcode  $dest, symbol+offset($src), mem_tag
+              or
+                opcode  $dest, offset($src), mem_tag
+              mem_tag is optional }
+            frob:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
 
-            if (symno <> 0) then begin
-                put_sym(arg0, symno);
-                put_integer_ws(arg0, regoffset);
-            end else begin
-                write(arg0, regoffset:1);
-            end;
-        
-            write(arg0, '(');
-            write(arg0, reg_name_tab[reg2]:0);
-            write(arg0, ')');
-            if (mem_tag <> 0) then begin
-                write(arg0, ", ");
-                write(arg0, mem_tag:1);
-            end;
-        end;
-
-        fra:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            put_sym(arg0, symno);
-            put_integer_ws(arg0, immediate);
-            if (mem_tag <> 0) then begin
-                write(arg0, ", ");
-                write(arg0, mem_tag:1);
-            end;
-        end;
-
-        fri:
-        begin
-            if (op <> znop) then begin
-                if ((op = fli_s) or (op = fli_d)) then begin
-                    write(arg0, reg_name_tab[reg1]:0);
-                    write(arg0,  ", ");
-                    var_s2 := in_file^.immediate;
-                    for var_s7 := 1 to integer(var_s2 - 1) div 16 + 1 do begin {Get align 16}
-                        get(in_file);
-                        for var_s0 := 1 to 16 do begin
-                            if (lshift(var_s7, 4) - 16 + var_s0 <= var_s2) then begin
-                                put_alpha(arg0, in_file^.data[var_s0]);
-                            end else begin
-                                goto done;
-                            end;
-                        end;
-                    end;
-                end else if (op = zcia) then begin
-                    var_s2 := in_file^.immediate;
-                    for var_s7 := 1 to integer(var_s2 - 1) div 16 + 1 do begin {Get align 16}
-                        get(in_file);
-                        for var_s0 := 1 to 16 do begin
-                            if (lshift(var_s7, 4) - 16 + var_s0 <= var_s2) then begin
-                                write(arg0, in_file^.data[var_s0]);
-                            end else begin
-                                goto done;
-                            end;
-                        end;
-                    end;
-                end else if (op = zdli) then begin
-                    if (second_dli) then begin
-                        write(arg0, opcode_tab[in_file^.op]:0, chr(9));
-                        write(arg0, reg_name_tab[reg1]:0);
-                        write(arg0, ", ");
-                        val64.dwval_l := immediate;
-                        write(arg0, val64.dwval:1);
-                        second_dli := false;
-                    end else begin
-                        val64.dwval_h := immediate; 
-                        second_dli := true;
-                    end;
+                if symno <> 0 then begin
+                    put_sym(f, symno);
+                    put_integer_ws(f, immediate);
                 end else begin
-                    write(arg0, reg_name_tab[reg1]:0);
-                    write(arg0, ", ");
-                    write(arg0, immediate:1);
+                    write(f, immediate:1);
+                end;
+            
+                write(f, '(');
+                write(f, reg_name_tab[reg2]:0);
+                write(f, ')');
+                if (mem_tag <> 0) then begin
+                    write(f, ", ");
+                    write(f, mem_tag:1);
                 end;
             end;
-        end;
 
-        frrr:
-        begin
-            if (reg1 <> xnoreg) then begin
-                write(arg0, reg_name_tab[reg1]:0);
-                write(arg0, ", ");
+            { Prints an instruction in the format:
+                opcode  $dest, symbol+offset, mem_tag
+              mem_tag is optional }
+            fra:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                put_sym(f, symno);
+                put_integer_ws(f, immediate);
+                if (mem_tag <> 0) then begin
+                    write(f, ", ");
+                    write(f, mem_tag:1);
+                end;
             end;
-            write(arg0, reg_name_tab[reg2]:0);
-            write(arg0, ", ");
-            write(arg0, reg_name_tab[reg3]:0); 
-        end;
 
-        frri:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            write(arg0, reg_name_tab[reg2]:0);
-            write(arg0, ", ");
-            write(arg0, immediate:1);   
-        end;
+            { Prints an instruction in the format:
+                opcode  $dest, imm
+              Special cases:
+               * For nop, only the opcode is printed.
+              Some instructions may have variable length, requiring reading the appropriate number of bytes from the input file.
+               * For fli_s and fli_d:
+                    opcode $dest, 1.2345e7
+               * For cia:
+                    cia any inline assembly code
+               * For dli, two entries are read to obtain a 64-bit value:
+                    dli $dest, 1234567887654321
+               }
+            fri:
+            begin
+                if op <> znop then begin
+                    if (op = fli_s) or (op = fli_d) then begin
+                        write(f, reg_name_tab[reg1]:0);
+                        write(f,  ", ");
+                        str_length := in_file^.immediate;
+                        for i := 1 to integer(str_length - 1) div bin_rec_len + 1 do begin
+                            get(in_file);
+                            for j := 1 to bin_rec_len do begin
+                                if (i - 1) * bin_rec_len + j <= str_length then begin
+                                    put_alpha(f, in_file^.data[j]);
+                                end else begin
+                                    goto done;
+                                end;
+                            end;
+                        end;
+                    end else if (op = zcia) then begin
+                        str_length := in_file^.immediate;
+                        for i := 1 to integer(str_length - 1) div bin_rec_len + 1 do begin
+                            get(in_file);
+                            for j := 1 to bin_rec_len do begin
+                                if (i - 1) * bin_rec_len + j <= str_length then begin
+                                    write(f, in_file^.data[j]);
+                                end else begin
+                                    goto done;
+                                end;
+                            end;
+                        end;
+                    end else if (op = zdli) then begin
+                        if second_dli then begin
+                            write(f, opcode_tab[in_file^.op]:0, TAB);
+                            write(f, reg_name_tab[reg1]:0);
+                            write(f, ", ");
+                            val64.dwval_l := immediate;
+                            write(f, val64.dwval:1);
+                            second_dli := false;
+                        end else begin
+                            val64.dwval_h := immediate; 
+                            second_dli := true;
+                        end;
+                    end else begin
+                        write(f, reg_name_tab[reg1]:0);
+                        write(f, ", ");
+                        write(f, immediate:1);
+                    end;
+                end;
+            end;
 
-        frr:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            write(arg0, reg_name_tab[reg2]:0);   
-        end;
+            { Prints an instruction in the format:
+                opcode  $dest, $src1, $src2
+            }
+            frrr:
+            begin
+                if (reg1 <> xnoreg) then begin
+                    write(f, reg_name_tab[reg1]:0);
+                    write(f, ", ");
+                end;
+                write(f, reg_name_tab[reg2]:0);
+                write(f, ", ");
+                write(f, reg_name_tab[reg3]:0); 
+            end;
 
-        fa:
-        begin
-            put_sym(arg0, symno);
-            put_integer_ws(arg0, immediate);
-        end;
+            { Prints an instruction in the format:
+                opcode  $dest, $src, imm
+            }
+            frri:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                write(f, reg_name_tab[reg2]:0);
+                write(f, ", ");
+                write(f, immediate:1);   
+            end;
 
-        fr:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-        end;
-        
-        fi:
-        begin
-            write(arg0, immediate:1);
-        end;
-        
-        frrl:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            write(arg0, reg_name_tab[reg2]:0);
-            write(arg0, ", ");
-            put_sym(arg0, symno);
-        end;
-        
-        frl:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            put_sym(arg0, symno);
-        end;
+            { Prints an instruction in the format:
+                opcode  $dest, $src
+            }
+            frr:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                write(f, reg_name_tab[reg2]:0);   
+            end;
 
-        fl:
-        begin
-            put_sym(arg0, symno);
+            { Prints an instruction in the format:
+                opcode  symbol+offset
+            }
+            fa:
+            begin
+                put_sym(f, symno);
+                put_integer_ws(f, immediate);
+            end;
+
+            { Prints an instruction in the format:
+                opcode  $dest
+            }
+            fr:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+            end;
             
-        end;
+            { Prints an instruction in the format:
+                opcode  imm
+            }
+            fi:
+            begin
+                write(f, immediate:1);
+            end;
+            
+            { Prints an instruction in the format:
+                opcode  $src1, $src2, label
+            }
+            frrl:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                write(f, reg_name_tab[reg2]:0);
+                write(f, ", ");
+                put_sym(f, symno);
+            end;
+            
+            { Prints an instruction in the format:
+                opcode  $src, label
+            }
+            frl:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                put_sym(f, symno);
+            end;
 
-        forrr:
-        begin
-            report_error(Internal, 939, "aio.p", "orrr type instruction");
-        end;
+            { Prints an instruction in the format:
+                opcode  $src, label
+            }
+            fl:
+            begin
+                put_sym(f, symno);
+                
+            end;
 
-        fril:
-        begin
-            write(arg0, reg_name_tab[reg1]:0);
-            write(arg0, ", ");
-            write(arg0, immediate:1);
-            write(arg0, ", ");   
-            put_sym(arg0, symno);
+            forrr:
+            begin
+                report_error(Internal, 939, "aio.p", "orrr type instruction");
+            end;
+
+            { Prints an instruction in the format:
+                opcode  $src, imm, label
+            }
+            fril:
+            begin
+                write(f, reg_name_tab[reg1]:0);
+                write(f, ", ");
+                write(f, immediate:1);
+                write(f, ", ");   
+                put_sym(f, symno);
+            end;
         end;
-    end;
     end;
 
 done:
-    writeln(arg0);
+    writeln(f);
 end;
 
-procedure print_source(var arg0: Text; idn: integer; arg2: integer);
+{ Prints one or more lines of source code read from the file corresponding to `fileno` }
+procedure print_source(var f: Text; fileno: integer; lineno: integer);
 var
-    str: pst_string;
+    file_name: pst_string;
     len: integer;
 begin
-    if (idn <> current_filen) then begin
-        current_filen := idn;
-        if (idn = 0) then begin
-            idn := 2;
+    if fileno <> current_filen then begin
+        current_filen := fileno;
+
+        { @INVESTIGATE: meaning of these file numbers is unclear }
+        if fileno = 0 then begin
+            fileno := 2;
         end;
 
-        str := st_str_idn(idn);
+        { file number is an `idn` into the string table }
+        file_name := st_str_idn(fileno);
+
         for len := 1 to FileNameLen do begin
             source_file_name[len] := ' ';
         end;
-        ST_STRING_COPY(source_file_name, str);
+        ST_STRING_COPY(source_file_name, file_name);
         if (source_file_name[1] = ' ') then begin
             report_error(Internal, 977, "aio.p", "file name is null");
             return;
         end;
-        current_linen := 16#7FFFFFFF;
+
+        { force line reset to trigger file reload logic }
+        current_linen := last(integer);
     end;
 
-    if (arg2 < (current_linen - 1)) then begin
+    { if line number goes backwards, assume file restart }
+    if lineno < current_linen - 1 then begin
         reset(source_file, source_file_name);
-        if (eof(source_file)) then begin
+        if eof(source_file) then begin
             return;
         end;
         current_linen := 1;
     end;
 
-    if (((arg2 - current_linen) >= 6)) then begin
+    { skip lines, keeping at most 5 lines of look-back }
+    if lineno - current_linen > 5 then begin
         repeat begin
-            if (eof(source_file)) then begin
+            if eof(source_file) then begin
                 return;
             end;
         
@@ -467,277 +538,288 @@ begin
 
             get(source_file);
             current_linen := current_linen + 1;
-        end until not ((current_linen < arg2));
+        end until (current_linen >= lineno);
     end;
 
-    while (current_linen <= arg2) do begin
-        write(arg0, " #", current_linen:4, chr(9));
+    { print lines as comments }
+    while current_linen <= lineno do begin
+        write(f, " #", current_linen:4, TAB);
 
-        while not (eoln(source_file)) do begin
-            write(arg0, source_file^);
+        while not eoln(source_file) do begin
+            write(f, source_file^);
             get(source_file);
         end;
 
-        writeln(arg0);
+        writeln(f);
         get(source_file);
         current_linen := current_linen + 1;
     end;
 end;
 
-#line 1025
-procedure write_directive(var arg0: Text);
-    var
-        sp44: cardinal;
+#line 1022
+{ Prints an assembler directive with its parameters. Skips `isym`. For `iloc`, also prints corresponding source lines. }
+procedure write_directive(var f: Text);
+var
+    f_rep: cardinal;
 begin
     with in_file^ do begin
-    if instr <> isym then begin
-        if instr = ilabel then begin
-            put_sym(arg0, symno);
-            write(arg0, ':');
-            writeln(arg0);
-        end else begin
-            write(arg0, chr(9));
-            write(arg0, itype_tab[instr]:0, chr(9));
-            case instr of
-            ialign,
-            ispace,
-            ishift_addr:
-            begin
-                write(arg0, length:1);
-            end;
+        if instr <> isym then begin
+            if instr = ilabel then begin
+                { print label as "symbol:" }
+                put_sym(f, symno);
+                write(f, ':');
+                writeln(f);
+            end else begin
+                write(f, TAB);
+                write(f, itype_tab[instr]:0, TAB);
 
-            idouble,
-            ifloat:
-            begin
-                sp44 := rep;
-                put_string(arg0, false);
-                write(arg0, ':');
-                write(arg0, sp44:1);
-            end;
+                case instr of
+                    ialign,
+                    ispace,
+                    ishift_addr:
+                    begin
+                        write(f, length:1);
+                    end;
 
-            iascii,
-            iasciiz:
-            begin
-                put_string(arg0, true);
-            end;
+                    idouble,
+                    ifloat:
+                    begin
+                        f_rep := rep;
+                        put_string(f, false);
+                        write(f, ':');
+                        write(f, f_rep:1);
+                    end;
 
-            ifile:
-            begin
-                write(arg0, symno:1);
-                write(arg0, ' ');
-                put_string(arg0, true);
-            end;
+                    iascii,
+                    iasciiz:
+                    begin
+                        put_string(f, true);
+                    end;
 
-            ibyte,
-            ihalf,
-            igpword,
-            iword:
-            begin
-                if symno = 0 then begin
-                    write(arg0, expression:1);
-                    write(arg0, ' ');
-                    write(arg0, ':');
-                    write(arg0, ' ');
-                    write(arg0, replicate:1);
-                end else begin
-                    put_sym(arg0, symno);
-                    put_integer_ws(arg0, expression);
+                    ifile:
+                    begin
+                        write(f, symno:1);
+                        write(f, ' ');
+                        put_string(f, true);
+                    end;
+
+                    { data directive: either raw expression or symbol+offset }
+                    ibyte,
+                    ihalf,
+                    igpword,
+                    iword:
+                    begin
+                        if symno = 0 then begin
+                            write(f, expression:1);
+                            write(f, ' ');
+                            write(f, ':');
+                            write(f, ' ');
+                            write(f, replicate:1);
+                        end else begin
+                            put_sym(f, symno);
+                            put_integer_ws(f, expression);
+                        end;
+                    end;
+
+                    idword:
+                    begin
+                        val64.dwval_h := expression;
+                        get(in_file);
+                        val64.dwval_l := in_file^.expression;
+                        write(f, val64.dwval:1);
+                        write(f, ' ');
+                        write(f, ':');
+                        write(f, ' ');
+                        write(f, rep:1);
+                    end;
+                    
+                    { @INVESTIGATE: if `rep` is non-zero, an additional 'S' flag is printed (purpose unclear) }
+                    icomm,
+                    ilcomm,
+                    iextern:
+                    begin
+                        put_sym(f, symno);
+                        write(f, ' ');
+                        write(f, length:1);
+                        if rep <> 0 then begin
+                            write(f, ' ');
+                            write(f, 'S');
+                        end;
+                    end;
+
+                    iweakext:
+                    begin
+                        put_sym(f, symno);
+                        if lexlevel <> 0 then begin
+                            write(f, ',');
+                            put_sym(f, lexlevel);
+                        end;
+                    end;
+
+                    iglobal,
+                    iend,
+                    ilab:
+                    begin
+                        put_sym(f, symno);
+                    end;
+
+                    iframe:
+                    begin
+                        write(f, reg_name_tab[framereg]:0);
+                        write(f, ', ');
+                        write(f, frameoffset:1);
+                        write(f, ', ');
+                        write(f, reg_name_tab[pcreg]:0);
+                    end;
+
+                    ivreg:
+                    begin
+                        write(f, reg_name_tab[reg1]:0);
+                        write(f, ', ');
+                        write(f, immediate:1);
+                        write(f, ', ');
+                        write(f, symno:1);
+                    end;
+
+                    iverstamp:
+                    begin
+                        write(f, majornumber:1);
+                        write(f, ' ');
+                        write(f, minornumber:1);
+                    end;
+
+                    iloc:
+                    begin
+                        write(f, filenumber:1);
+                        write(f, ' ');
+                        write(f, linenumber:1);
+                    end;
+
+                    imask,
+                    ifmask:
+                    begin
+                        put_hex10(f, regmask);
+                        write(f, ', ');
+                        write(f, regoffset:1);
+                    end;
+
+                    ient,
+                    iaent:
+                    begin
+                        put_sym(f, symno);
+                        write(f, ' ');
+                        write(f, lexlevel:1);
+                    end;
+                    ibgnb,
+                    iendb:
+                    begin
+                        write(f, symno:1);
+                    end;
+                    
+                    icprestore:
+                    begin
+                        write(f, length:1);
+                    end;
+
+                    iset:
+                    begin
+                        write(f, ' ');
+                        write(f, iopt_tab[set_value(length)]:0);
+                    end;
+
+                    ioption:
+                    begin
+                        write(f, ioption_type_tab[option]:0);
+                        if option = o_exception_info then begin
+                            write(f, ' ');
+                        end;
+                        write(f, opt_len:1);
+                    end;
+
+                    inoalias,
+                    ialias:
+                    begin
+                        write(f, reg_name_tab[basereg1]:0);
+                        write(f, ',');
+                        write(f, reg_name_tab[basereg2]:0);
+                    end;
+
+                    ilivereg,
+                    igjaldef,
+                    igjallive,
+                    igjrlive:
+                    begin
+                        put_hex10(f, gpmask);
+                        write(f, ',');
+                        put_hex10(f, fpmask);
+                    end;
+
+                    icpload,
+                    icpadd,
+                    icpalias:
+                    begin
+                        write(f, reg_name_tab[reg1]:0);
+                    end;
+
+                    iedata:
+                    begin
+                        write(f, flag:1);
+                        write(f, ' ');
+                        put_sym(f, symno);
+                        write(f, ' ');
+                        put_sym(f, edata);
+                    end;
+
+                    { optional segment name for .text directive }
+                    itext:
+                    begin
+                        if in_file^.length <> 0 then begin
+                            put_string(f, false);
+                        end;
+                    end;
+
+                    iloopno:
+                    begin
+                        write(f, loopnum:1);
+                        write(f, ' ');
+                        write(f, lflag:1);
+                    end;
+
+                    iprologue:
+                    begin
+                        write(f, lexlevel:1);
+                    end;
+
+                    imtag:
+                    begin
+                        write(f, tagnumber:1);
+                        write(f, ',');
+                        write(f, tagtype:1);
+                    end;
+
+                    idata, isdata, irdata, irestext:
                 end;
-            end;
-
-            idword:
-            begin
-                val64.dwval_h := expression;
-                get(in_file);
-                val64.dwval_l := in_file^.expression;
-                write(arg0, val64.dwval:1);
-                write(arg0, ' ');
-                write(arg0, ':');
-                write(arg0, ' ');
-                write(arg0, rep:1);
-            end;
-            
-            icomm,
-            ilcomm,
-            iextern:
-            begin
-                put_sym(arg0, symno);
-                write(arg0, ' ');
-                write(arg0, length:1);
-                if rep <> 0 then begin
-                    write(arg0, ' ');
-                    write(arg0, 'S');
+                writeln(f);
+                
+                if (instr = iloc) then begin
+                    print_source(f, filenumber, linenumber);
                 end;
-            end;
-            iweakext:
-            begin
-                put_sym(arg0, symno);
-                if lexlevel <> 0 then begin
-                    write(arg0, ',');
-                    put_sym(arg0, lexlevel);
-                end;
-            end;
-
-            iglobal,
-            iend,
-            ilab:
-            begin
-                put_sym(arg0, symno);
-            end;
-
-            iframe:
-            begin
-                write(arg0, reg_name_tab[framereg]:0);
-                write(arg0, ', ');
-                write(arg0, frameoffset:1);
-                write(arg0, ', ');
-                write(arg0, reg_name_tab[pcreg]:0);
-            end;
-
-            ivreg:
-            begin
-                write(arg0, reg_name_tab[reg1]:0);
-                write(arg0, ', ');
-                write(arg0, immediate:1);
-                write(arg0, ', ');
-                write(arg0, symno:1);
-            end;
-            iverstamp:
-            begin
-                write(arg0, majornumber:1);
-                write(arg0, ' ');
-                write(arg0, minornumber:1);
-            end;
-            iloc:
-            begin
-                write(arg0, filenumber:1);
-                write(arg0, ' ');
-                write(arg0, linenumber:1);
-            end;
-
-            imask,
-            ifmask:
-            begin
-                put_hex10(arg0, regmask);
-                write(arg0, ', ');
-                write(arg0, regoffset:1);
-            end;
-            ient,
-            iaent:
-            begin
-                put_sym(arg0, symno);
-                write(arg0, ' ');
-                write(arg0, lexlevel:1);
-            end;
-            ibgnb,
-            iendb:
-            begin
-                write(arg0, symno:1);
-            end;
-            
-            icprestore:
-            begin
-                write(arg0, length:1);
-            end;
-
-            iset:
-            begin
-                write(arg0, ' ');
-                write(arg0, iopt_tab[set_value(length)]:0);
-            end;
-            ioption:
-            begin
-                write(arg0, ioption_type_tab[option]:0);
-                if option = o_exception_info then begin
-                    write(arg0, ' ');
-                end;
-                write(arg0, opt_len:1);
-            end;
-
-            inoalias,
-            ialias:
-            begin
-                write(arg0, reg_name_tab[basereg1]:0);
-                write(arg0, ',');
-                write(arg0, reg_name_tab[basereg2]:0);
-            end;
-
-            ilivereg,
-            igjaldef,
-            igjallive,
-            igjrlive:
-            begin
-                put_hex10(arg0, gpmask);
-                write(arg0, ',');
-                put_hex10(arg0, fpmask);
-            end;
-
-            icpload,
-            icpadd,
-            icpalias:
-            begin
-                write(arg0, reg_name_tab[reg1]:0);
-            end;
-
-            iedata:
-            begin
-                write(arg0, flag:1);
-                write(arg0, ' ');
-                put_sym(arg0, symno);
-                write(arg0, ' ');
-                put_sym(arg0, edata);
-            end;
-
-            itext:
-            begin
-                if in_file^.length <> 0 then begin
-                    put_string(arg0, false);
-                end;
-            end;
-
-            iloopno:
-            begin
-                write(arg0, loopnum:1);
-                write(arg0, ' ');
-                write(arg0, lflag:1);
-            end;
-
-            iprologue:
-            begin
-                write(arg0, lexlevel:1);
-            end;
-
-            imtag:
-            begin
-                write(arg0, tagnumber:1);
-                write(arg0, ',');
-                write(arg0, tagtype:1);
-            end;
-
-            idata, isdata, irdata, irestext:
-            
-            end;
-            writeln(arg0);
-            
-            if (instr = iloc) then begin
-                print_source(arg0, filenumber, linenumber);
             end;
         end;
-    end;
     end;
 end;
 
-procedure output_inst_ascii(var arg0: Stringtext; var arg1: Text);
+{ Reads a binasm file and writes the corresponding textual assembly output }
+procedure output_inst_ascii(var binasm_file_name: Filename; var outf: Text);
 begin
-    reset(in_file, arg0.ss);
+    reset(in_file, binasm_file_name);
 
     while not eof(in_file) do begin 
         if in_file^.instr = iocode then begin
-            write_instruction(arg1);
+            write_instruction(outf);
         end else begin
-            write_directive(arg1);
+            write_directive(outf);
         end;
         get(in_file)
     end;
-    
 end;

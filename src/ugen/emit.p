@@ -5,17 +5,8 @@
 #include "ibuffer.h"
 #include "report.h"
 
-procedure memset(p: pointer; value: integer; size: cardinal); external;
-
 procedure append_i(var inst: binasm); forward;
 procedure append_d(var inst: binasm); forward;
-
-var
-    debug_ugen: boolean;
-    has_calls: boolean;
-    uses_gp: boolean;
-    pic_level: integer;
-
 
 procedure save_i_ptrs();
 begin

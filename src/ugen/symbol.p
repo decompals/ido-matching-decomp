@@ -26,7 +26,7 @@ type
         { 0x08 } next: ^SymbolAlias;
     end;
 
-    Symbol = packed record
+    Symbol = record
         { 0x00 } unk0: integer; { id? }
         { 0x04 } unk4: integer;
         { 0x08 } next: ^Symbol; { next in hash table }
@@ -54,7 +54,6 @@ var
     non_local_mtag: integer;
     apc: boolean;
     excpt: u8;
-    source_language: integer; { see cmplrs/uoptions.h for values }
 
 function sym_hash(arg0: integer): integer;
 begin
