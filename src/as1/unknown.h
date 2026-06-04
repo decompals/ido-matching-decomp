@@ -80,7 +80,8 @@ typedef struct UnkEpsilon {
     /* 0x30 */ UNK_TYPE unk_30;
     /* 0x34 */ UNK_TYPE unk_34;
     /* 0x38 */ UNK_TYPE unk_38;
-    /* 0x3C */ UNK_TYPE unk_3C;
+    /* 0x3C */ unsigned short unk_3C;
+    /* 0x3E */ unsigned short unk_3E;
     /* 0x40 */ UNK_TYPE unk_40;
     /* 0x44 */ int unk_44_0 : 23;
     /* 0x44 */ unsigned char unk_44_23 : 1;
@@ -124,6 +125,7 @@ extern char keepflag;
 extern int optflag;
 extern char verbose;
 extern int binasm_count;
+extern char fp32regs;
 
 UnkZeta* find_branch_target(UnkEpsilon*);
 void xfree(void*);

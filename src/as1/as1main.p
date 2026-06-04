@@ -1,4 +1,5 @@
 #include "common_p.h"
+#include "asboth.h"
 
 { global types }
 
@@ -7,14 +8,6 @@ type
         mipsfmt_0, mipsfmt_1, mipsfmt_2, mipsfmt_3,
         mipsfmt_4, mipsfmt_5, mipsfmt_6, mipsfmt_7,
         mipsfmt_8, mipsfmt_9, mipsfmt_10
-    );
-
-    severity_levels = (
-        severity_level_0,
-        severity_level_1,
-        severity_level_2,
-        severity_level_3,
-        severity_level_4
     );
 
     Reorg_Enum = (
@@ -32,118 +25,6 @@ type
         Reorg_Val_11,
         Reorg_Val_12,
         Reorg_Val_13
-    );
-
-    options = (
-        option__EB,
-        option__EL,
-        option__G,
-        option__K,
-        option__M,
-        option__NR,
-        option__O,
-        option__O0,
-        option__O1,
-        option__O2,
-        option__O3,
-        option__O4,
-        option__Olimit,
-        option__R,
-        option__RD,
-        option__T,
-        option_e,
-        option_fli,
-        option_f,
-        option_f0,
-        option_f1,
-        option_f2,
-        option_f3,
-        option_f4,
-        option_g,
-        option_g0,
-        option_g1,
-        option_g2,
-        option_g3,
-        option_l,
-        option_o,
-        option_p,
-        option_p0,
-        option_p1,
-        option_p2,
-        option_p3,
-        option_r,
-        option_t,
-        option_v,
-        option_w,
-        option_w1,
-        option_w2,
-        option_w3,
-        option_no_const_opts,
-        option_no_lui_opts,
-        option_no_div_rem_opts,
-        option_no_at_compression,
-        option_no_branch_target,
-        option_mips1,
-        option_mips2,
-        option_mips3,
-        option_mips4,
-        option_nopool,
-        option_align8,
-        option_align16,
-        option_align32,
-        option_align64,
-        option_align_common,
-        option_gp_warn,
-        option_non_pic,
-        option_r3000,
-        option_r4000,
-        option_r6000,
-        option_r6000LHU,
-        option_r6000LWL,
-        option_trapuv,
-        option_nopeep,
-        option_peepdbg,
-        option_noswpipe,
-        option_swpdbg,
-        option_nosymregs,
-        option_noxbb,
-        option_aggr_xbb,
-        option_xbbdbg,
-        option_newhilo,
-        option_domtag,
-        option_fpstall_nop,
-        option_noglobal,
-        option_nobopt,
-        option_dwalign,
-        option_excpt,
-        option_diag,
-        option_mednat,
-        option_dwopcode,
-        option_64bit,
-        option_fp32regs,
-        option_extsyms,
-        option_pic0,
-        option_pic1,
-        option_pic2,
-        option_big_got,
-        option_coff,
-        option_elf,
-        option_mscoff,
-        option_mscoffT,
-        option_multi_issue,
-        option_nonzero_scnbase,
-        option_new_mdebug,
-        option_abi,
-        option_tfprev10,
-        option_force_branch_fixup,
-        option_r4200,
-        option_r4600,
-        option_tfp,
-        option_t5_r31,
-        option_t5_mtc1,
-        option_t5_muldiv,
-        option_t5_ll_sc_bug,
-        option_r4300_mul
     );
 
     ARRAY_DECLARE(PSymbol);
@@ -179,7 +60,7 @@ var
     nopinserted: integer;
     new_hilo: boolean;
     fpstall_nop: boolean;
-    nopsremaining: integer;    
+    nopsremaining: integer;
     non_pic_flag: boolean;
     num_issue: integer;
     mscoff: boolean;
@@ -234,14 +115,14 @@ var
     olimit_value: integer;
     gprmask: cardinal;
     fprmask: cardinal;
-    real_delays: boolean;    
+    real_delays: boolean;
     fixup_count: integer;
     use_ddopt_info: boolean;
     nonzero_scnbase: boolean;
     xpg_flag: boolean;
     nowarnflag: boolean;
     fp32regs: boolean;
-    
+
 
 { external functions }
 
@@ -279,7 +160,7 @@ var
     e_opt_string: GString;
     xpg_string: String;
     i: integer;
-    
+
 procedure init_all();
 var
     j: integer;
@@ -292,25 +173,25 @@ var
             case integer of
                 1: (w:integer);
                 2: (s:0..65535);
-            end;    
+            end;
     pad3: integer;
     pad4: integer;
     one: integer;
 
-    
-    
+
+
     procedure set_mips_inst_template(fop: opcodes; tmpl: cardinal; fmt: mipsformats);
     begin
         template[fop] := tmpl;
         opcodeformat[fop] := fmt;
     end;
-    
+
     procedure register_asmcode(fasm: asmcodes; fmt: asmformat; op: opcodes);
     begin
         asm2op[fasm] := op;
         asm2asmformat[fasm] := fmt;
     end;
-    
+
     function func_00440E8C(): boolean;
     var
         i: segments;
@@ -327,17 +208,17 @@ var
                 gp_tables[i] := nil;
             end;
         end;
-    
+
         for i := seg_sdata to seg_data do begin
             prev_sdata[i].unk00 := 0;
             prev_sdata[i].unk0C := 0;
             prev_sdata[i].unk04 := false;
-            prev_sdata[i].unk08 := 1;            
+            prev_sdata[i].unk08 := 1;
             prev_sdata[i].unk10 := 1;
         end;
         return ret;
     end;
-    
+
     function func_00440F68(arg0: opcodes): opcodes;
     begin
         if (isa >= ISA_MIPS2) then begin
@@ -346,7 +227,7 @@ var
             func_00440F68 := op_macro;
         end;
     end;
-    
+
     procedure func_00440FA0(var arg0: PSymbol; arg1: Byte);
     begin
         new(arg0);
@@ -354,7 +235,7 @@ var
         arg0^.unk30 := arg1;
         arg0^.unk37 := true;
     end;
-    
+
 begin
     new(emptystring.z);
     emptystring.z^[1] := chr(0);
@@ -385,12 +266,12 @@ begin
 
     for j := 1 to 5 do begin
         opts.unk_08[j] := 0;
-        opts.unk_00[j] := true;            
+        opts.unk_00[j] := true;
     end;
     opts.unk_1C := ALIGNMENT_3;
     opts.unk_1D := false;
     opts.unk_1E := false;
-    
+
     has_noreorder := false;
     dwalign := false;
     ent_pending := false;
@@ -398,7 +279,7 @@ begin
     last_bb[1] := 0;
     last_bb[2] := 0;
     last_bb[3] := 0;
-    
+
     unsafe_opt := false;
     xbb_opt := true;
     peep_opt := true;
@@ -417,7 +298,7 @@ begin
     currfunc_sym^.unk30 := 0;
 
     realsegments := [seg_text, seg_sdata, seg_data, seg_5, seg_6, seg_rdata, seg_15];
-    
+
     currentline := 0;
     currentent := 0;
     currentent_name.f := nil;
@@ -448,7 +329,7 @@ begin
     verbose := false;
     bigendian := isbigendianhost;
     pendinginstr := false;
-    notandm := true;        
+    notandm := true;
     listingflag := false;
     isa := ISA_UNSPEC;
     fp_pool_flag := true;
@@ -460,7 +341,7 @@ begin
     maybe_r4000 := true;
     cprestore_offset := -1;
     reorg := Reorg_Val_0;
-    
+
     func_00440FA0(s_pool_symbol, 5);
     func_00440FA0(d_pool_symbol, 6);
 
@@ -512,7 +393,7 @@ begin
         ARRAY_AT(memory, j).unk_08 := segments(j);
         ARRAY_AT(seg_ic, j) := 0;
         ARRAY_AT(nextlabelchain, j) := 0;
-    end;            
+    end;
 
     sym_tab.size := 0;
     neg_sym_tab.size := 0;
@@ -524,7 +405,7 @@ begin
         repeat
             get_lstring(index, arg);
             if (arg.o^[1] = '-') then begin
-                case (which_opt(arg)) of 
+                case (which_opt(arg)) of
                     option_r3000:
                         begin
                             reorg := Reorg_Val_1;
@@ -1632,7 +1513,7 @@ begin
     set_mips_inst_template(op_zmtpc, 16#4080C801, mipsfmt_5);
     set_mips_inst_template(op_zmfps, 16#4000C800, mipsfmt_5);
     set_mips_inst_template(op_zmtps, 16#4080C800, mipsfmt_5);
-    
+
     regnum[xnoreg] := 0;
     for j := 0 to 31 do begin
         regnum[registers(j)] := j;
@@ -1668,7 +1549,7 @@ begin
     pre_reorder_peepholes.unk_10 := -1;
     for i := 1 to 32 do begin
         pre_reorder_peepholes.unk_14[i] := chr(0);
-    end;        
+    end;
     endofbasicb := false;
 end;
 
@@ -1703,7 +1584,7 @@ var
                             ARRAY_AT(rld_list, nextrld).unk00 := 0;
                             ARRAY_AT(rld_list, nextrld).unk04 := s1^.unk00;
                             ARRAY_AT(rld_list, nextrld).unk10 := 17;
-                            ARRAY_AT(rld_list, nextrld).unk08 := arg0;                        
+                            ARRAY_AT(rld_list, nextrld).unk08 := arg0;
                             nextrld := nextrld + 1;
                             arg0^.unk20 := arg0^.unk20 + 1;
                             a0 := s1;
@@ -1740,7 +1621,7 @@ var
     len: integer;
     i: integer;
     sp6B: char;
-    sp6A: char;        
+    sp6A: char;
 begin
     if (mscoff) then begin
         sp6B := 'S';
@@ -1770,7 +1651,7 @@ begin
             len := len + 1;
             t_opt_string.f^[len] := sp6A;
         end;
-        
+
         t_opt_string.f^[len + 1] := chr(0);
     end;
 
@@ -1793,7 +1674,7 @@ begin
     if (t_opt_string.f^[1] <> chr(0)) then begin
         PostError("Because file contains iasm0 directive, -t option is ignored", input_fname, ErrorLevel_2);
     end;
-    
+
     st_cuinit();
     for i := 1 to strlen(outname.f) + 1 do begin
         t_opt_string.f^[i] := outname.f^[i];
@@ -1816,7 +1697,7 @@ begin { start of main }
         call_perror(1, input_fname);
         return 0;
     end;
-    
+
     init_binasm();
     if (binasmfyle^.instr = iasm0) then begin
         func_0044A0C0();
@@ -1827,11 +1708,11 @@ begin { start of main }
     end;
 
     if (severity >= severity_level_2) and not eof(binasm_file) then begin
-        if (profileflag >= 2) then begin 
+        if (profileflag >= 2) then begin
             mcount_address := enter_undef_sym(l_addr(mcount_sym));
         end;
 
-        repeat 
+        repeat
             func_00449724();
             restore_gp();
             parsestmt();
@@ -1850,10 +1731,10 @@ begin { start of main }
                         PostError("Mips4 opcode used without -mips4", emptystring, ErrorLevel_2);
                     end;
 
-                    if (isa <> ISA_MIPS1) and (pinstruction^[j].unk24 in c3_ops) then begin  
+                    if (isa <> ISA_MIPS1) and (pinstruction^[j].unk24 in c3_ops) then begin
                         PostError("Coprocessor 3 instructions are valid only for -mips1 (R2000/R3000)  ", emptystring, ErrorLevel_2);
                     end;
-                    
+
                 end;
             end;
 
@@ -1861,7 +1742,7 @@ begin { start of main }
                 traverse_bb();
             end;
         until eof(binasm_file) and not pendinginstr;
-    
+
         if is_nonleaf then begin
             create_function_table();
         end;

@@ -47,24 +47,24 @@ var
         var_s0: ^tree;
         var_s1: ^tree;
         var_v0_2: ^tree;
-        temp_s0: Uopcode;
+        opc: Uopcode;
         var_v1_2: integer;
         v0: integer;
     begin
         var_s2 := arg0;
         while var_s2 <> nil do begin
-            temp_s0 := var_s2^.u.Opc;
-            if (temp_s0 = Uclab) or (temp_s0 = Ulab) or (temp_s0 = Uent) or (temp_s0 = Uaent) then begin
+            opc := var_s2^.u.Opc;
+            if (opc = Uclab) or (opc = Ulab) or (opc = Uent) or (opc = Uaent) then begin
                 var_s2^.op1 := nil;
                 var_s2^.op2 := nil;
-            end else if (temp_s0 = Uujp) or (temp_s0 = Uxjp) or (temp_s0 = Uret) then begin
+            end else if (opc = Uujp) or (opc = Uxjp) or (opc = Uret) then begin
                 delete_dead_code(var_s2);
             end;
-            if (temp_s0 = Utjp) or (temp_s0 = Ufjp) or (temp_s0 = Uujp) then begin
-                if temp_s0 <> Uujp then begin
+            if (opc = Utjp) or (opc = Ufjp) or (opc = Uujp) then begin
+                if opc <> Uujp then begin
                     case var_s2^.op1^.u.Opc of
                         Uilod, Uisld, Ulod: begin
-                            if var_s2^.op1^.u.Lexlev & 1 <> 0 then begin
+                            if IS_VOLATILE_ATTR(var_s2^.op1^.u.Lexlev) then begin
                                 var_s2^.op2^.mark := mark;
                                 goto next_op;
                             end;
@@ -165,30 +165,30 @@ loop:
     { Original name: add_edge }
     procedure add_edge(arg0: ^Tree; arg1: ^Tree);
     var
-        ref: ^Tree;
-        temp_v0: ^Edge;
+        op1: ^Tree;
+        newEdge: ^Edge;
     begin
-        ref := arg0^.op1;
-        while (ref <> nil) do begin
-            if (arg1 = ref^.op2) then begin
+        op1 := arg0^.op1;
+        while (op1 <> nil) do begin
+            if (arg1 = op1^.op2) then begin
                 return;
             end;
-            ref := ref^.prior;
+            op1 := op1^.prior;
         end;
 
-        new(temp_v0);
+        new(newEdge);
 
-        if (temp_v0 = nil) then begin
+        if (newEdge = nil) then begin
             report_error(Internal, 229, "labelopt.p", "Insufficiant memory");
             return;
         end;
 
-        temp_v0^.op1 := arg0;
-        temp_v0^.op2 := arg1;
-        temp_v0^.next := arg0^.op1;
-        temp_v0^.prior := arg1^.op2;
-        arg0^.op1 := pointer(temp_v0);
-        arg1^.op2 := pointer(temp_v0);
+        newEdge^.op1 := arg0;
+        newEdge^.op2 := arg1;
+        newEdge^.next := arg0^.op1;
+        newEdge^.prior := arg1^.op2;
+        arg0^.op1 := pointer(newEdge);
+        arg1^.op2 := pointer(newEdge);
     end;
 
     { Original name: build_flow_graph }

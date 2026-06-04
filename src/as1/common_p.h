@@ -16,6 +16,7 @@
 type
     Byte = 0..16#FF;
     short = 0..16#FFFF;
+    error_str = array [1..80] of char;
 
     ZeroString = packed array[1..4] of char;
     GString = record
@@ -27,14 +28,136 @@ type
         5: (o: ^Identname;);
         6: (c: ^char;);
     end;
-    
+
     PBinasm = ^binasm;
     FileOfBinasm = File of binasm;
 
     ErrorLevel = (
         ErrorLevel_0,
         ErrorLevel_1,
-        ErrorLevel_2
+        ErrorLevel_2,
+        ErrorLevel_3,
+        ErrorLevel_4
+    );
+
+    options = (
+        option__EB,
+        option__EL,
+        option__G,
+        option__K,
+        option__M,
+        option__NR,
+        option__O,
+        option__O0,
+        option__O1,
+        option__O2,
+        option__O3,
+        option__O4,
+        option__Olimit,
+        option__R,
+        option__RD,
+        option__T,
+        option_e,
+        option_fli,
+        option_f,
+        option_f0,
+        option_f1,
+        option_f2,
+        option_f3,
+        option_f4,
+        option_g,
+        option_g0,
+        option_g1,
+        option_g2,
+        option_g3,
+        option_l,
+        option_o,
+        option_p,
+        option_p0,
+        option_p1,
+        option_p2,
+        option_p3,
+        option_r,
+        option_t,
+        option_v,
+        option_w,
+        option_w1,
+        option_w2,
+        option_w3,
+        option_no_const_opts,
+        option_no_lui_opts,
+        option_no_div_rem_opts,
+        option_no_at_compression,
+        option_no_branch_target,
+        option_mips1,
+        option_mips2,
+        option_mips3,
+        option_mips4,
+        option_nopool,
+        option_align8,
+        option_align16,
+        option_align32,
+        option_align64,
+        option_align_common,
+        option_gp_warn,
+        option_non_pic,
+        option_r3000,
+        option_r4000,
+        option_r6000,
+        option_r6000LHU,
+        option_r6000LWL,
+        option_trapuv,
+        option_nopeep,
+        option_peepdbg,
+        option_noswpipe,
+        option_swpdbg,
+        option_nosymregs,
+        option_noxbb,
+        option_aggr_xbb,
+        option_xbbdbg,
+        option_newhilo,
+        option_domtag,
+        option_fpstall_nop,
+        option_noglobal,
+        option_nobopt,
+        option_dwalign,
+        option_excpt,
+        option_diag,
+        option_mednat,
+        option_dwopcode,
+        option_64bit,
+        option_fp32regs,
+        option_extsyms,
+        option_pic0,
+        option_pic1,
+        option_pic2,
+        option_big_got,
+        option_coff,
+        option_elf,
+        option_mscoff,
+        option_mscoffT,
+        option_multi_issue,
+        option_nonzero_scnbase,
+        option_new_mdebug,
+        option_abi,
+        option_tfprev10,
+        option_force_branch_fixup,
+        option_r4200,
+        option_r4600,
+        option_tfp,
+        option_t5_r31,
+        option_t5_mtc1,
+        option_t5_muldiv,
+        option_t5_ll_sc_bug,
+        option_r4300_mul
+    );
+
+    severity_levels = (
+        severity_level_0,
+        severity_level_1,
+        severity_level_2,
+        severity_level_3,
+        severity_level_4
     );
 
     opcodes = (
@@ -255,7 +378,7 @@ type
     end;
 
     Alignment = (
-          ALIGNMENT_0,  
+          ALIGNMENT_0,
           ALIGNMENT_1,
           ALIGNMENT_2,
           ALIGNMENT_3,
@@ -282,8 +405,8 @@ type
 
     ARRAY_DECLARE(MultiRelocRec);
 
-    RldType = ( 
-        RLD_TYPE_0, 
+    RldType = (
+        RLD_TYPE_0,
         RLD_TYPE_1,
         RLD_TYPE_2,
         RLD_TYPE_3,
@@ -343,7 +466,7 @@ type
     u16 = 0..65535 ;
     u8 =  0..255 of char;
     s8 = -128..127;
-     
+
     PFileName = ^Filename;
 
 var
@@ -434,12 +557,9 @@ var
     num_pseudo: extern integer;
     sp_addu_index: extern integer;
     current_mem_tag: extern 0..16383; { 14 bits }
-    
+
 procedure ltoa(arg0: integer; arg1: ^char); external;
-procedure PostError(arg0: String; arg1: GString; arg2: ErrorLevel); external;
-procedure p_assertion_failed(arg0: String; arg1: String; arg2: cardinal); external;
 procedure definealabel(arg0: integer; arg1: integer; arg2: integer); external;
-function grow_array(var arg0: integer; arg1: cardinal; arg2: cardinal; arg3: pointer; arg4: boolean): pointer; external;
 function strlen(p : ^Filename): integer; external;
 procedure strcpy(dst: ^Filename; src: ^Filename); external;
 function xmalloc(size: integer): pointer; external;

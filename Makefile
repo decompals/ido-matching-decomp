@@ -18,7 +18,7 @@ ifeq ($(VERSION),7.1)
 else ifeq ($(VERSION),5.3)
 	IDO_VERSION := IDO_53
 #	IDO_TC      := cc acpp as0 as1 cfe copt ld ugen ujoin uld umerge uopt usplit
-	IDO_TC      := cc cfe as0
+	IDO_TC      := cc cfe as0 ugen
 else
 $(error Unknown or unsupported IDO version - $(VERSION))
 endif
@@ -98,7 +98,7 @@ MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
-CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
+CFLAGS += -G 0 -KPIC -K -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
 
 
 # -- Location of original IDO binaries

@@ -1,3 +1,4 @@
+// Original name: binasmio.c
 #include "errno.h"
 #include "stdio.h"
 #include "string.h"
@@ -6,7 +7,7 @@
 #include "unistd.h"
 #include "cmplrs/binasm.h"
 
-static FILE* binasm_file;
+static FILE* binasm_file; // Original name: bin_file
 static int unused;
 static char binasm_name[128];
 
@@ -14,7 +15,7 @@ void open_bin_file(char* fileName) {
     strcpy(binasm_name, fileName); // ! @bug: this can overflow binasm_name!
     binasm_file = fopen(fileName, "w");
     if (binasm_file == NULL) {
-        fprintf(stderr, "ugen: internal error opening %s:  %s\n", 
+        fprintf(stderr, "ugen: internal error opening %s:  %s\n",
             fileName, errno < sys_nerr ? sys_errlist[errno] : "(unknown)");
         exit(EXIT_FAILURE);
     }
@@ -50,7 +51,7 @@ void output_inst_bin(binasm* code, size_t codeSize, binasm* data, size_t dataSiz
 void cat_files(char* destPath, char* sourcePath) {
     char buf[0x2000];
     int destFd;
-    int sourceFd; 
+    int sourceFd;
     int bytesWritten;
     int bytesRead;
 

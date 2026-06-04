@@ -167,7 +167,7 @@ var
     sp1EC: integer;
     var_s4: integer;
     ucode: Bcrec;
-    sp1C4: Stringtextptr;
+    stringPtr: Stringtextptr;
     sp1C0: PTree;
     sp1BC: PTree;
     sp1B8: PTree;
@@ -616,28 +616,28 @@ var {extra var here makes sp128 initialize first}
     end;
 
     function func_0040F230(arg0: PTree): boolean;
-var
-    temp_v0: boolean;
-begin
-    if (arg0 = nil) then begin
-        return false;
-    end;
+    var
+      temp_v0: boolean;
+    begin
+      if (arg0 = nil) then begin
+          return false;
+      end;
 
-    if ((arg0^.u.Opc in [Uilod, Uistr, Ulod, Umov, Ustr]) and (arg0^.u.Lexlev & 1 <> 0)) then begin
-        return true;
+      if ((arg0^.u.Opc in [Uilod, Uistr, Ulod, Umov, Ustr]) and (arg0^.u.Lexlev & 1 <> 0)) then begin
+          return true;
+      end;
+      if (arg0^.op1 <> nil) then begin
+          temp_v0 := func_0040F230(arg0^.op1);
+          if (arg0^.op2 <> nil) then begin
+              if NOT (temp_v0) then begin
+                  temp_v0 := func_0040F230(arg0^.op2);
+              end;
+              return temp_v0;
+          end;
+          return temp_v0;
+      end;
+      return false;
     end;
-    if (arg0^.op1 <> nil) then begin
-        temp_v0 := func_0040F230(arg0^.op1);
-        if (arg0^.op2 <> nil) then begin
-            if NOT (temp_v0) then begin
-                temp_v0 := func_0040F230(arg0^.op2);
-            end;
-            return temp_v0;
-        end;
-        return temp_v0;
-    end;
-    return false;
-end;
 
     procedure func_0040F328();
     label next;
@@ -681,13 +681,13 @@ begin
         label_hash_table[var_s1] := nil;
     end;
 
-    new(sp1C4);
+    new(stringPtr);
 
     statement_list := nil;
     stack_pos := 0;
 
     while (true) do begin
-        readuinstr(ucode, sp1C4);
+        readuinstr(ucode, stringPtr);
         case ucode.Opc of
 
             {Parse different Uopcodes}
@@ -722,12 +722,12 @@ begin
 
             CASE_OPC(Ussym):
             begin
-                ucode.constval.chars := sp1C4;
+                ucode.constval.chars := stringPtr;
                 if (ucode.constval.Ival >= 9) then begin
                     ucode.constval.Ival := 8;
                     ucode.constval.chars^.ss[9] := char(0);
                 end;
-                new(sp1C4);
+                new(stringPtr);
                 tree_s3 := build_u(ucode);
                 tree_s3^.u.Dtype := Mdt;
                 append_statement(tree_s3);
@@ -736,8 +736,8 @@ begin
             CASE_OPC(Uinit):
             begin
                 if ucode.Dtype in [Mdt, Qdt, Rdt, Sdt, Xdt] then begin
-                    ucode.Initval.Chars := sp1C4;
-                    new(sp1C4, 1);
+                    ucode.Initval.Chars := stringPtr;
+                    new(stringPtr);
                 end;
                 add_init(ucode);
             end;
@@ -795,13 +795,13 @@ begin
                 if (ucode.Opc = Uloc) then begin
                     current_line := ucode.I1;
                 end else if (ucode.Opc = Ucomm) then begin
-                    ucode.Constval.Chars := sp1C4;
+                    ucode.Constval.Chars := stringPtr;
                     if (verbose) then begin
                         if ((statement_list^.prior <> nil) and (statement_list^.prior^.u.Opc = Uent)) then begin
                             sp181 := ' ';
                             var_s0 := ucode.Constval.Ival;
-                            while (sp1C4^.ss[var_s0] = sp181) do var_s0 := var_s0 - 1;
-                            write(err, sp181, sp1C4^.ss:var_s0);
+                            while (stringPtr^.ss[var_s0] = sp181) do var_s0 := var_s0 - 1;
+                            write(err, sp181, stringPtr^.ss:var_s0);
                         end;
                     end;
                 end else begin
@@ -1447,8 +1447,8 @@ begin
         CASE_OPC(Urldc):
         begin
             if ucode.Dtype in [Mdt,Qdt,Rdt,Sdt,Xdt] then begin
-                ucode.Constval.Chars := sp1C4;
-                new(sp1C4);
+                ucode.Constval.Chars := stringPtr;
+                new(stringPtr);
             end;
             tree_s0 := build_u(ucode);
             tree_s0^.u.Opc := Uldc;
@@ -1493,8 +1493,8 @@ begin
 
         CASE_OPC(Ulca):
         begin
-            ucode.Constval.Chars := sp1C4;
-            new(sp1C4);
+            ucode.Constval.Chars := stringPtr;
+            new(stringPtr);
             tree_s3 := build_u(ucode);
             stack_pos := stack_pos + 1;
             node_stack[stack_pos] := tree_s3;
@@ -1529,8 +1529,8 @@ begin
             dtype_stack[stack_pos] := Zdt;
             dtype_s1 := ucode.Dtype;
             if ucode.Dtype in [Mdt,Qdt,Rdt,Sdt] then begin
-                ucode.Constval.Chars := sp1C4;
-                new(sp1C4);
+                ucode.Constval.Chars := stringPtr;
+                new(stringPtr);
                 node_stack[stack_pos] := build_u(ucode);
             end else if (ucode.Dtype = Fdt) or (ucode.Dtype = Ndt) then begin
                 tree_s3 := build_op(Ulda);
@@ -2027,9 +2027,9 @@ begin
         CASE_OPC(Ucia):
         begin
             assert(stack_pos = 0);
-            ucode.Constval.Chars := sp1C4;
+            ucode.Constval.Chars := stringPtr;
             ucode.Constval.Ival := ucode.Length;
-            new(sp1C4);
+            new(stringPtr);
             sp183 := true;
             tree_s3 := build_u(ucode);
             if (tree_s3^.u.lexlev <> 0) or (sp15F) then begin

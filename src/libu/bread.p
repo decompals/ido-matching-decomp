@@ -59,7 +59,7 @@ var
             len := 8;
         end
         else
-        if 
+        if
         ((len = 9)
             and (str.ss[1] = '-')
             and (str.ss[2] = 'I')
@@ -94,7 +94,7 @@ begin
     end else begin
         u.Intarray[1] := ugetint();
         u.Intarray[2] := ugetint();
-        urec := utab[u.Opc]; 
+        urec := utab[u.Opc];
         instlength := urec.instlength;
 
         i := 3;
@@ -144,7 +144,7 @@ end;
 procedure initur(var uname: Filename);
 begin
     ugetinit(uname);
-    datachars := ['A', 'C', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'W', 'X', 'Z'];    
+    datachars := ['A', 'C', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'W', 'X', 'Z'];
     memorychars := ['A', 'M', 'P', 'R', 'S', 'Z'];
     setconstantchars := ['0'..'9', 'A'..'F'];
 
@@ -200,7 +200,7 @@ begin
         return;
     end;
 
-    if (u.Opc in [Udef, Udif, Ufill, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Uinn, Uint, Ulca, 
+    if (u.Opc in [Udef, Udif, Ufill, Uiequ, Uigeq, Uigrt, Uileq, Uiles, Uineq, Uinn, Uint, Ulca,
     Uldc, Umov, Usdef, Usgs, Uuni]) then begin
         u.Length := u.Length * 8;
         return;

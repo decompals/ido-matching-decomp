@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -26,7 +27,7 @@ DEFINES = [
     "-D_MIPS_SZLONG=32 ",
     "-D_MIPS_SZPTR=32 ",
     "-DLANGUAGE_PASCAL ",
-    "-D_LANGUAGE_PASCAL " "-Q ",
+    "-D_LANGUAGE_PASCAL -Q ",
     "-D__INLINE_INTRINSICS ",
     "-Dsgi",
     "-D__sgi ",
@@ -93,13 +94,18 @@ def import_c_file(in_file: Path) -> str:
 
 
 def postProcessOutput(output: str) -> str:
-    return output.replace("#ident ", "// #ident ")
+    output = output.replace("#ident ", "// #ident ")
+
+    # Delete all pre-processor lines
+    output = re.sub(r'^#\s+\d+\s+"[^"]+"$', "", output, flags=re.MULTILINE)
+
+    return output
 
 
 def main():
     parser = argparse.ArgumentParser(
         usage="./m2ctx.py path/to/file.p",
-        description="Creates a ctx.p file for m2c. " "Output will be saved as ctx.p",
+        description="Creates a ctx.p file for m2c. Output will be saved as ctx.p",
     )
     parser.add_argument("filepath", help="path of SGI Pascal file to be processed")
     args = parser.parse_args()
@@ -108,7 +114,7 @@ def main():
     print(f"Using file: {c_file_path}")
 
     output = import_c_file(c_file_path)
-    #output = postProcessOutput(output)
+    output = postProcessOutput(output)
 
     outputPath = root_dir / "ctx.p"
     with outputPath.open("w", encoding="UTF-8") as f:
