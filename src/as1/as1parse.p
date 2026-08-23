@@ -1,4 +1,5 @@
 #include "common_p.h"
+#include "asboth.h"
 
 var
     { .data }
@@ -11,9 +12,9 @@ var
     gp_disp_sym: Identname := "_gp_disp\0";
     saw_option_pic: boolean := false;
     last_globl_symno: integer := 0;
-    label_size: integer := 0;    
+    label_size: integer := 0;
     { .bss }
-    cprestore_offset: integer;    
+    cprestore_offset: integer;
     cpalias_register: registers;
     branchpending: boolean;
     frame_ptr: registers;
@@ -25,7 +26,7 @@ var
     currfunc_prolog: integer;
     lastsymno: integer;
     lastdata: integer;
-    lexicallevel: integer;    
+    lexicallevel: integer;
 
 procedure fill_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: integer; arg4: PSymbol; arg5: integer); external; { TODO signature }
 procedure st_pseudo(arg0: integer; arg1: integer; arg2: integer; arg3: registers; arg4: integer; arg5: integer; arg6: integer); external; { TODO signature }
@@ -109,7 +110,7 @@ begin
     with binasmfyle^ do begin
         if fasm = znop then begin
             if reorderflag then begin
-                PostError("nop must be inside .set noreorder section", emptystring, ErrorLevel_2);    
+                PostError("nop must be inside .set noreorder section", emptystring, ErrorLevel_2);
             end;
             emitnop(1);
             pinstruction^[bbindex].unk22 := false;
@@ -132,13 +133,13 @@ var
     offset: integer;
     buffer: GString;
 begin
-    
+
     length := binasmfyle^.immediate;
     endofbasicb := true;
     new(buffer.f);
-    
+
     offset := 0;
-    get_binasm(binasmfyle);    
+    get_binasm(binasmfyle);
     while length > 16 do begin
         for i := 1 to 16 do begin
             buffer.f^[i + offset] := binasmfyle^.data[i];
@@ -173,9 +174,9 @@ begin
             parsecia();
             return;
         end;
-        
+
         immed := immediate;
-        reg := reg1;    
+        reg := reg1;
 
         if diag_flag and (form = frri) then begin
             if fasm <> zlui then begin
@@ -184,7 +185,7 @@ begin
             emitalui(op_zlui, reg, reg2, bitand(rshift(immed, 16), 16#FFFF));
             return;
         end;
-        
+
         if form <> fri then begin
             p_assertion_failed("form = fri\0", "as1parse.p", 269);
         end;
@@ -227,7 +228,7 @@ var
     reg1: registers;
     reg2: registers;
     spCD: registers;
-    spCC: registers;    
+    spCC: registers;
     sym: PSymbol;
     spC6: opcodes;
     spC5: boolean;
@@ -242,7 +243,7 @@ begin
     end;
 
     ba := binasmfyle;
-    
+
     branchpending := true;
     reg1 := ba^.reg1;
 
@@ -268,7 +269,7 @@ begin
         reg2 := ba^.reg2;
     end else if ba^.form = fril then begin
         reg2 := xnoreg;
-        spC0 := ba^.immediate;        
+        spC0 := ba^.immediate;
         spC5 := true;
     end else begin
         p_assertion_failed("false\0", "as1parse.p", 376);
@@ -338,7 +339,7 @@ begin
                         otherwise:
                     end;
                 end;
-                
+
                 if spC5 and (spC0 <> 0) then begin
                     case fasm of
                         zbge:
@@ -451,7 +452,7 @@ begin
                                 if spC0 = -1 then begin
                                     return;
                                 end;
-                                spC0 := spC0 + 1;                                
+                                spC0 := spC0 + 1;
                             end;
                         otherwise:
                     end;
@@ -661,8 +662,8 @@ begin
         zcfc1,
         zcfc2,
         zcfc3,
-        zctc0,        
-        zctc1,        
+        zctc0,
+        zctc1,
         zctc2,
         zctc3,
         zmfpc,
@@ -881,7 +882,7 @@ begin
             emitbcond(asm2op[fasm], spC0^.reg1, spC8, spC4);
         end else begin
             emitbcond(asm2op[fasm], xfcc0, spC8, spC4);
-        end;        
+        end;
     end;
 end;
 
@@ -1014,7 +1015,7 @@ var
     c: integer;
 begin
     remember_symbol_size(last_globl_symno, 1);
-    
+
     with binasmfyle^ do begin
         if (currsegment = seg_text) or (currsegment = seg_15) then begin
             fill_pseudo(16, replicate, expression, 0, nil, 0);
@@ -1029,7 +1030,7 @@ begin
 
         c := expression;
         c := bitand(c, 16#FF);
-        
+
         count := replicate;
         if count > 0 then begin
             repeat
@@ -1135,10 +1136,10 @@ begin
     currsegment := seg;
     currsegmentindex := ord(seg);
     length := binasmfyle^.length;
-    
+
     if (seg = seg_text) and (length <> 0) then begin
         currsegment := seg_15;
-        
+
         get_binasm(binasmfyle);
 
         if lastusertextseg = -1 then begin
@@ -1157,7 +1158,7 @@ begin
                 while (i <= length) and (binasmfyle^.data[i] = ARRAY_AT(memory, j).unk_09[i]) do begin
                     i := i + 1;
                 end;
-                
+
                 if i > length then begin
                     currsegmentindex := j;
                     j := lastusertextseg + 1;
@@ -1215,11 +1216,11 @@ procedure create_function_table;
 
         if arg2 then begin
             ARRAY_GROW(rld_list, nextrld);
-            
+
             with ARRAY_AT(rld_list, nextrld) do begin
                 unk00 := 0;
                 unk04 := s0;
-                
+
                 currfunc_sym^.unk30 := currtextindex;
                 if arg0 <> 0 then begin
                     unk08 := stp(arg0);
@@ -1300,7 +1301,7 @@ var
     unused: integer;
 begin
     ba := binasmfyle;
-    
+
     if (bbindex = 0) or
        (which in [iend, ient, iaent]) or
        not((pinstruction^[bbindex].rfd = 16#7FFFFFFF) and (pseudo_type(bbindex) in [23, 24, 25, 26])) or
@@ -1408,7 +1409,7 @@ begin
             end;
             tmp := initial_loc;
         end;
-        
+
         if tmp then begin
             initial_loc := false;
         end;
@@ -1674,7 +1675,7 @@ begin
         end;
         arg2 := bitand(arg2, 16#FFFF);
         if sexchange then begin
-            arg2 := bitand(lshift(arg2,  8), 16#FF00) + 
+            arg2 := bitand(lshift(arg2,  8), 16#FF00) +
                     bitand(rshift(arg2,  8), 16#00FF);
         end;
     end else begin
@@ -1710,7 +1711,7 @@ begin
                     unk00 := 0;
                     unk04 := s2;
                     unk08 := arg3;
-                    
+
                     arg3^.unk20 := arg3^.unk20 + 1;
                     arg3^.unk3D := true;
 
@@ -1809,7 +1810,7 @@ begin
 
         ARRAY_GROW(ARRAY_AT(memory, arg5).unk_00.b, s2);
         ARRAY_AT(ARRAY_AT(memory, arg5).unk_00.w, s2 div 4) := arg2;
-        
+
         if not (sixtyfour_bit and elf_flag) and (arg4 <> nil) then begin
             ARRAY_GROW(rld_list, nextrld);
             with ARRAY_AT(rld_list, nextrld) do begin
@@ -1917,7 +1918,7 @@ procedure parseword(arg0: cardinal);
 var
     sp3C: PSymbol;
     sp2C: boolean;
-    sp34: integer;  
+    sp34: integer;
 begin
     remember_symbol_size(last_globl_symno, arg0);
 
@@ -1927,7 +1928,7 @@ begin
         end else begin
             sp3C := nil;
         end;
-    
+
         sp2C := (instr = igpword) and (picflag = 2);
         if not((currsegment = seg_text) or (currsegment = seg_15)) then begin
             if arg0 > 4 then begin
@@ -1960,12 +1961,12 @@ var
     saved_segment: segments;
     saved_segment_index: integer;
     sym: PSymbol;
-    symno: integer;    
+    symno: integer;
 begin
     saved_segment := currsegment;
     saved_segment_index := currsegmentindex;
     currsegment := seg_rdata;
-    currsegmentindex := ord(seg_rdata);    
+    currsegmentindex := ord(seg_rdata);
 
     symno := idn_for_data();
     enterstp(symno);
@@ -1974,7 +1975,7 @@ begin
     dodword(8, 1, arg0, arg1, arg2, ord(seg_rdata));
 
     currsegment := saved_segment;
-    currsegmentindex := saved_segment_index;    
+    currsegmentindex := saved_segment_index;
 
     return sym;
 end;

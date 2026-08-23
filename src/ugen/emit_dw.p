@@ -12,7 +12,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         emit_rrll(zbne, arg0, arg1, arg2);
         emit_rrll(zbne, succ(arg0), succ(arg1), arg2);
     end;
-    
+
     procedure func_0041AFE4(arg0: registers; arg1: registers; arg2: integer);
     var
         sp20: integer;
@@ -22,7 +22,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         emit_rrll(zbeq, succ(arg0), succ(arg1), arg2);
         define_label(sp20);
     end;
-    
+
     procedure func_0041B07C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -39,7 +39,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B1BC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -56,7 +56,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B2FC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -73,7 +73,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B43C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -90,7 +90,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B57C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -107,7 +107,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B6BC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -124,7 +124,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B7FC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -141,7 +141,7 @@ procedure emit_branch_rrll(arg0: asmcodes; arg1: registers; arg2: registers; arg
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041B93C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp30: integer;
@@ -189,7 +189,7 @@ var
         emit_rill(zbne, arg0, arg1, arg3);
         emit_rill(zbne, succ(arg0), arg2, arg3);
     end;
-    
+
     procedure func_0041BD30(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -199,7 +199,7 @@ var
         emit_rill(zbeq, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041BDC8(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -210,7 +210,7 @@ var
         emit_rill(zbgtu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041BE80(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -221,7 +221,7 @@ var
         emit_rill(zbgtu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041BF38(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -232,7 +232,7 @@ var
         emit_rill(zbgeu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041BFF0(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -243,7 +243,7 @@ var
         emit_rill(zbgeu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041C0A8(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -254,7 +254,7 @@ var
         emit_rill(zbltu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041C160(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -265,7 +265,7 @@ var
         emit_rill(zbltu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041C218(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -276,7 +276,7 @@ var
         emit_rill(zbleu, succ(arg0), arg2, arg3);
         define_label(sp20);
     end;
-    
+
     procedure func_0041C2D0(arg0: registers; arg1: integer; arg2: integer; arg3: integer);
     var
         sp20: integer;
@@ -322,7 +322,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
         emit_rri_(ztne, arg0, arg1, arg2, franone);
         emit_rri_(ztne, succ(arg0), succ(arg1), arg2, franone);
     end;
-    
+
     procedure func_0041C710(arg0: registers; arg1: registers; arg2: integer);
     var
         sp28: integer;
@@ -332,7 +332,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
         emit_rri_(zteq, succ(arg0), succ(arg1), arg2, franone);
         define_label(sp28);
     end;
-    
+
     procedure func_0041C7AC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp28: integer;
@@ -343,7 +343,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
         emit_rri_(ztltu, succ(arg0), succ(arg1), arg2, franone);
         define_label(sp28);
     end;
-    
+
     procedure func_0041C86C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp28: integer;
@@ -354,7 +354,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
         emit_rri_(zbltu, succ(arg0), succ(arg1), arg2, franone);
         define_label(sp28);
     end;
-    
+
     procedure func_0041C92C(arg0: registers; arg1: registers; arg2: integer);
     var
         sp28: integer;
@@ -365,7 +365,7 @@ procedure emit_trap_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: 
         emit_rri_(ztgeu, succ(arg0), succ(arg1), arg2, franone);
         define_label(sp28);
     end;
-    
+
     procedure func_0041C9EC(arg0: registers; arg1: registers; arg2: integer);
     var
         sp28: integer;
@@ -400,7 +400,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
         emit_ri_(ztne, arg0, arg1, franone);
         emit_ri_(ztne, succ(arg0), arg2, franone);
     end;
-    
+
     procedure func_0041CCD0(arg0: registers; arg1: integer; arg2: integer);
     var
         sp20: integer;
@@ -410,7 +410,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
         emit_ri_(zteq, succ(arg0), arg2, franone);
         define_label(sp20);
     end;
-    
+
     procedure func_0041CD64(arg0: registers; arg1: integer; arg2: integer);
     var
         sp20: integer;
@@ -421,7 +421,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
         emit_ri_(ztltu, succ(arg0), arg2, franone);
         define_label(sp20);
     end;
-    
+
     procedure func_0041CE18(arg0: registers; arg1: integer; arg2: integer);
     var
         sp20: integer;
@@ -432,7 +432,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
         emit_ri_(zbltu, succ(arg0), arg2, franone);
         define_label(sp20);
     end;
-    
+
     procedure func_0041CECC(arg0: registers; arg1: integer; arg2: integer);
     var
         sp20: integer;
@@ -443,7 +443,7 @@ procedure emit_trap_ri(arg0: asmcodes; arg1: registers; arg2: integer; arg3: int
         emit_ri_(ztgeu, succ(arg0), arg2, franone);
         define_label(sp20);
     end;
-    
+
     procedure func_0041CF80(arg0: registers; arg1: integer; arg2: integer);
     var
         sp20: integer;
@@ -501,7 +501,7 @@ var
         end;
         emit_dir0(iset, ord(set_at));
     end;
-    
+
     procedure func_0041D39C(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     begin
         emit_dir0(iset, ord(set_noat));
@@ -518,7 +518,7 @@ var
         end;
         emit_dir0(iset, ord(set_at));
     end;
-    
+
     procedure func_0041D534(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp43: registers;
@@ -571,7 +571,7 @@ var
         end;
         define_label(sp34);
     end;
-    
+
     procedure func_0041D958(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp43: registers;
@@ -632,7 +632,7 @@ var
         end;
         define_label(sp34);
     end;
-    
+
     procedure func_0041DDE0(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     begin
         emit_dir0(iset, ord(set_noat));
@@ -647,7 +647,7 @@ var
         end;
         emit_dir0(iset, ord(set_at));
     end;
-    
+
     procedure func_0041DF18(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp30: integer;
@@ -664,7 +664,7 @@ var
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041E05C(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp38: integer;
@@ -687,7 +687,7 @@ var
         end;
         define_label(sp38);
     end;
-    
+
     procedure func_0041E1C0(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp30: integer;
@@ -704,7 +704,7 @@ var
         end;
         define_label(sp30);
     end;
-    
+
     procedure func_0041E304(arg0: asmcodes; arg1: registers; arg2: registers; arg3: registers);
     var
         sp38: integer;
@@ -780,7 +780,7 @@ procedure dw_emit_rri(arg0: asmcodes; arg1: registers; arg2: registers; arg3: in
 var
     sp38: Valu;
     sp37: registers;
-    
+
     procedure func_0041E800(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         sp2B: registers;
@@ -815,7 +815,7 @@ var
         emit_dir0(iset, ord(set_at));
         emit_ri_(arg0, sp2B, arg3, franone);
     end;
-    
+
     procedure func_0041EA00(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         sp2B: registers;
@@ -850,7 +850,7 @@ var
         emit_rri_(zsubu, sp2A, sp28, arg4, franone);
         emit_ri_(arg0, sp2B, arg3, franone);
     end;
-    
+
     procedure func_0041EC08(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer);
     begin
         arg3 := arg3 & 63;
@@ -879,7 +879,7 @@ var
             end;
         end;
     end;
-    
+
     procedure func_0041EE78(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer);
     var
         sp38: integer;
@@ -917,7 +917,7 @@ var
             end;
         end;
     end;
-    
+
     procedure func_0041F194(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     begin
         emit_ri_(zli, arg1, arg4, franone);
@@ -942,7 +942,7 @@ var
         end;
         emit_dir0(iset, ord(set_at));
     end;
-    
+
     procedure func_0041F368(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -961,7 +961,7 @@ var
         end;
         define_label(temp_s0);
     end;
-    
+
     procedure func_0041F4F0(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -980,7 +980,7 @@ var
         end;
         define_label(temp_s0);
     end;
-    
+
     procedure func_0041F678(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -999,7 +999,7 @@ var
         end;
         define_label(temp_s0);
     end;
-    
+
     procedure func_0041F800(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -1018,7 +1018,7 @@ var
         end;
         define_label(temp_s0);
     end;
-    
+
     procedure func_0041F988(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -1037,7 +1037,7 @@ var
         end;
         define_label(temp_s0);
     end;
-    
+
     procedure func_0041FB10(arg0: asmcodes; arg1: registers; arg2: registers; arg3: integer; arg4: integer);
     var
         temp_s0: integer;
@@ -1175,13 +1175,13 @@ procedure dw_emit_rr(arg0: asmcodes; arg1: registers; arg2: registers; arg3: ^tr
         end;
         emit_dir0(iset, ord(set_at));
     end;
-    
+
     procedure func_00420524(arg0: asmcodes; arg1: registers; arg2: registers);
     begin
         emit_rr(arg0, arg1, arg2);
         emit_rr(arg0, succ(arg1), succ(arg2));
     end;
-    
+
     procedure func_00420590(arg0: asmcodes; arg1: registers; arg2: registers);
     var
         sp30: integer;
@@ -1192,7 +1192,7 @@ procedure dw_emit_rr(arg0: asmcodes; arg1: registers; arg2: registers; arg3: ^tr
         dw_emit_rr(znegu, arg1, arg2, arg3);
         define_label(sp30);
     end;
-    
+
     procedure func_00420654(arg0: asmcodes; arg1: registers; arg2: registers);
     begin
         emit_rr(arg0, arg1, arg2);

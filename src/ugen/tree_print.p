@@ -33,12 +33,12 @@ var
         "Z", "M", "P", "R", "S", "A", "T", "K"
     ];
     unused: integer := 0;
-    
+
 {External}
 function next_mark(): integer; external;
 
 procedure indent_tree(var f: Text; arg1: cardinal);
-var 
+var
     temp: cardinal;
     var_s0: cardinal;
 begin
@@ -47,7 +47,7 @@ begin
     if (temp <> 0) then begin
         var_s0 := temp;
         repeat begin
-            write(f, chr(9));        
+            write(f, chr(9));
             var_s0 := pred(var_s0);
         end until (var_s0 = 0);
     end;
@@ -113,7 +113,7 @@ begin
 
     if (u.Opc in [Uadj, Ubgn, Uilda, Uilod, Uinit, Uisld, Uisst, Uistr,
                   Ulda, Ulod, Umpmv, Upar, Updef, Upmov, Uregs, Urlod, Urpar,
-                  Urstr, Ustr, Uvreg, Uirld, Uirst]) then              
+                  Urstr, Ustr, Uvreg, Uirld, Uirst]) then
     begin
         write(f, " offset=",  u.Offset:1);
     end;
@@ -138,10 +138,10 @@ begin
             begin
                 if (u.Dtype in [Idt, Kdt]) then begin
                     write(f, " 64-bit-ival= ", u.Constval.dwval_h:1, ' ', u.Constval.dwval_l:1);
-                end else 
+                end else
                     write(f, " ival=", u.Constval.Ival:1);
             end;
-        otherwise: 
+        otherwise:
     end;
 end;
 
@@ -183,7 +183,7 @@ begin
         write(f, " prior=", arg1^.prior^.node_id:1);
     end;
 
-    writeln(f);        
+    writeln(f);
 end;
 
 procedure print_node(var f: Text; arg1: ^Tree);
@@ -196,7 +196,8 @@ var
     mark: integer;
     sp20: cardinal;
 
-    procedure func_00449D24(pTree: ^Tree; arg1: Cardinal);
+    { Original name: print_tree_internal }
+    procedure print_tree_internal(pTree: ^Tree; arg1: Cardinal);
     begin
         while (pTree <> nil) do begin
             if (pTree^.mark = mark) then break;
@@ -207,29 +208,29 @@ var
             if (arg1 < arg2) then begin
                 if (pTree^.op1 <> nil) then begin
                     if not ((pTree^.u.Opc in [Uaent, Ucg2, Uclab, Uent, Ulab, Unop])) then begin
-                        func_00449D24(pTree^.op1, succ(arg1));
+                        print_tree_internal(pTree^.op1, succ(arg1));
                     end;
                 end;
 
-                        
+
                 if (pTree^.op2 <> nil) then begin
                     if not ((pTree^.u.Opc in [Uaent, Uclab, Uent, Ufjp, Ulab, Unop, Utjp, Uujp, Uxjp])) then begin
-                        func_00449D24(pTree^.op2, succ(arg1));
+                        print_tree_internal(pTree^.op2, succ(arg1));
                     end;
                 end;
             end;
-    
+
             if (sp20 >= arg3) then break;
 
             sp20 := sp20 + 1;
             pTree := pTree^.next;
-        end;      
+        end;
     end;
 
 begin
     mark := next_mark();
     sp20 := 0;
-    func_00449D24(arg1, 0);
+    print_tree_internal(arg1, 0);
 end;
 
 procedure debug_tree(arg0: ^tree);

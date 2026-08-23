@@ -7,8 +7,8 @@
 
 type
     { Tree header? }
-    Punk = ^unk_record;
-    unk_record = Packed Record;
+    PEdge = ^Edge;
+    Edge = Packed Record;
         op1: ^tree;
         op2: ^tree;
         prior: ^tree;
@@ -23,7 +23,8 @@ var
     mark: integer;
     mark1: integer;
 
-    procedure func_004351C0(arg0: ^Tree);
+    { Original name: delete_dead_code }
+    procedure delete_dead_code(arg0: ^Tree);
     var
         var_s0: ^Tree;
     begin
@@ -36,7 +37,8 @@ var
         end;
     end;
 
-    procedure func_004352AC(arg0: ^tree);
+    { Original name: localopt }
+    procedure localopt(arg0: ^tree);
     label next_op;
     label loop;
     var
@@ -45,24 +47,24 @@ var
         var_s0: ^tree;
         var_s1: ^tree;
         var_v0_2: ^tree;
-        temp_s0: Uopcode;
+        opc: Uopcode;
         var_v1_2: integer;
         v0: integer;
     begin
         var_s2 := arg0;
         while var_s2 <> nil do begin
-            temp_s0 := var_s2^.u.Opc;
-            if (temp_s0 = Uclab) or (temp_s0 = Ulab) or (temp_s0 = Uent) or (temp_s0 = Uaent) then begin
+            opc := var_s2^.u.Opc;
+            if (opc = Uclab) or (opc = Ulab) or (opc = Uent) or (opc = Uaent) then begin
                 var_s2^.op1 := nil;
                 var_s2^.op2 := nil;
-            end else if (temp_s0 = Uujp) or (temp_s0 = Uxjp) or (temp_s0 = Uret) then begin
-                func_004351C0(var_s2);
+            end else if (opc = Uujp) or (opc = Uxjp) or (opc = Uret) then begin
+                delete_dead_code(var_s2);
             end;
-            if (temp_s0 = Utjp) or (temp_s0 = Ufjp) or (temp_s0 = Uujp) then begin
-                if temp_s0 <> Uujp then begin
+            if (opc = Utjp) or (opc = Ufjp) or (opc = Uujp) then begin
+                if opc <> Uujp then begin
                     case var_s2^.op1^.u.Opc of
                         Uilod, Uisld, Ulod: begin
-                            if var_s2^.op1^.u.Lexlev & 1 <> 0 then begin
+                            if IS_VOLATILE_ATTR(var_s2^.op1^.u.Lexlev) then begin
                                 var_s2^.op2^.mark := mark;
                                 goto next_op;
                             end;
@@ -102,7 +104,7 @@ loop:
                     var_s1 := var_s1^.next;
                 end;
                 if not var_a1 and (var_s2^.u.Opc <> Uujp) and (var_s1^.u.Opc = Uujp) then begin
-                    func_004351C0(var_s1);
+                    delete_dead_code(var_s1);
                     var_v0_2 := var_s1^.next;
                     while var_v0_2^.u.Opc in [Ubgnb, Ucomm, Udef, Uendb, Ulab, Ulex, Uloc, Unop, Uoptn, Usdef, Uunal]
  do begin
@@ -159,49 +161,51 @@ loop:
             var_s2 := var_s2^.next;
         end;
     end;
-    
-    procedure func_004357C4(arg0: ^Tree; arg1: ^Tree);
-    var 
-        ref: ^Tree;
-        temp_v0: ^unk_record;
+
+    { Original name: add_edge }
+    procedure add_edge(arg0: ^Tree; arg1: ^Tree);
+    var
+        op1: ^Tree;
+        newEdge: ^Edge;
     begin
-        ref := arg0^.op1;
-        while (ref <> nil) do begin
-            if (arg1 = ref^.op2) then begin    
+        op1 := arg0^.op1;
+        while (op1 <> nil) do begin
+            if (arg1 = op1^.op2) then begin
                 return;
             end;
-            ref := ref^.prior;
+            op1 := op1^.prior;
         end;
 
-        new(temp_v0);
+        new(newEdge);
 
-        if (temp_v0 = nil) then begin
+        if (newEdge = nil) then begin
             report_error(Internal, 229, "labelopt.p", "Insufficiant memory");
             return;
         end;
 
-        temp_v0^.op1 := arg0;
-        temp_v0^.op2 := arg1;
-        temp_v0^.next := arg0^.op1;
-        temp_v0^.prior := arg1^.op2;
-        arg0^.op1 := pointer(temp_v0);
-        arg1^.op2 := pointer(temp_v0);
+        newEdge^.op1 := arg0;
+        newEdge^.op2 := arg1;
+        newEdge^.next := arg0^.op1;
+        newEdge^.prior := arg1^.op2;
+        arg0^.op1 := pointer(newEdge);
+        arg1^.op2 := pointer(newEdge);
     end;
 
-    procedure func_0043595C(arg0: ^Tree);
+    { Original name: build_flow_graph }
+    procedure build_flow_graph(arg0: ^Tree);
     var
         var_s4: boolean;
         var_s1: ^tree;
         var_s3: ^tree;
         var_s5: ^tree;
         var_s0: ^tree;
-        
+
     begin
         var_s5 := nil;
         var_s1 := arg0;
 
         while (var_s1 <> nil) do begin
-            case var_s1^.u.Opc of 
+            case var_s1^.u.Opc of
                 Uaent,
                 Uent:
                 begin
@@ -212,7 +216,7 @@ loop:
                     if (var_s1^.u.Opc = Uent) then begin
                         var_s5 := var_s1;
                     end else begin
-                        func_004357C4(var_s5, var_s1);
+                        add_edge(var_s5, var_s1);
                     end;
                 end;
 
@@ -226,18 +230,18 @@ loop:
                     if ((var_s1^.mark <> mark) and (var_s1^.u.Lexlev = 0) and (var_s1^.u.Length = 0)) then begin
                         delete_statement(var_s1);
                         if not var_s4 then begin
-                            func_004351C0(var_s1);
+                            delete_dead_code(var_s1);
                         end;
                     end else begin
                             if ((var_s1^.u.Lexlev <> 0) or (var_s1^.u.Length <> 0)) then begin
-                                func_004357C4(var_s5, var_s1);
+                                add_edge(var_s5, var_s1);
                             end;
 
-                            if var_s4 then begin 
-                                func_004357C4(var_s3, var_s1);                                    
+                            if var_s4 then begin
+                                add_edge(var_s3, var_s1);
                             end;
                             var_s4 := true;
-                            
+
 
                             var_s3 := var_s1;
                             var_s1^.mark := mark1;
@@ -255,14 +259,14 @@ loop:
                 Uujp,
                 Uxjp:
                 begin
-                    func_004357C4(var_s3, var_s1^.op2);
+                    add_edge(var_s3, var_s1^.op2);
                     var_s4 := false;
                 end;
 
                 Ufjp,
                 Utjp:
                 begin
-                    func_004357C4(var_s3, var_s1^.op2);
+                    add_edge(var_s3, var_s1^.op2);
                 end;
 
                 Uijp:
@@ -271,19 +275,20 @@ loop:
                     var_s4 := false;
 
                     while (var_s0 <> nil) do begin
-                        func_004357C4(var_s3, var_s0^.op1);
+                        add_edge(var_s3, var_s0^.op1);
                         var_s0 := var_s0^.next;
                     end;
                 end;
 
                 otherwise:;
-                
+
             end;
             var_s1 := var_s1^.next;
         end;
     end;
 
-    procedure func_00435C44(arg0: ^Tree);
+    { Original name: print_edges }
+    procedure print_edges(arg0: ^Tree);
     var
         var_s1: ^tree;
     begin
@@ -308,22 +313,24 @@ loop:
         writeln(pFile);
     end;
 
-    procedure func_00435DE8(arg0: ^Tree);
+    { Original name: postorder_walk }
+    procedure postorder_walk(arg0: ^Tree);
     var
         var_s0: ^tree;
     begin
         if (arg0^.mark <> mark) then begin
             var_s0 := arg0^.op1;
             arg0^.mark := mark;
-            
+
             while (var_s0 <> nil) do begin
-                func_00435DE8(var_s0^.op2);
+                postorder_walk(var_s0^.op2);
                 var_s0 := var_s0^.prior;
             end;
         end;
     end;
 
-    function func_00435E68(arg0: Ptree; arg1: Ptree): boolean;
+    { Original name: no_edge }
+    function no_edge(arg0: Ptree; arg1: Ptree): boolean;
     var
         var_v0: Ptree;
     begin
@@ -338,7 +345,8 @@ loop:
         return true;
     end;
 
-    function func_00435EA0(arg0: ^Tree): pointer;
+    { Original name: next_bb }
+    function get_next_basic_block(arg0: ^Tree): pointer;
     var
         var_v1: ^tree;
     begin
@@ -347,11 +355,12 @@ loop:
         repeat begin
             var_v1 := var_v1^.next;
         end until (var_v1 = nil) or (var_v1^.u.Opc in [Uaent, Uent, Ulab]);
-        
+
         return var_v1;
     end;
 
-    function func_00435EF0(arg0: ^Tree): Ptree;
+    { Original name: prior_bb }
+    function get_previous_basic_block(arg0: ^Tree): Ptree;
     label loop;
     var
         var_v1: ^Tree;
@@ -367,8 +376,9 @@ loop:
         end;
         return var_v1;
     end;
-    
-    function func_00435F40(arg0: ^Tree): boolean;
+
+    { Original name: ends_in_xjp }
+    function ends_in_xjp(arg0: ^Tree): boolean;
     var
         var_v0: ^tree;
     begin
@@ -376,18 +386,19 @@ loop:
         while (true) do begin
             var_v0 := var_v0^.next;
             if (var_v0 = nil) then begin
-                func_00435F40 := false;
+                ends_in_xjp := false;
                 return;
             end;
 
             if (var_v0^.u.Opc in [Uaent, Uent, Ulab, Uxjp]) then begin
-                func_00435F40 := (var_v0^.u.Opc = Uxjp);
+                ends_in_xjp := (var_v0^.u.Opc = Uxjp);
                 return;
             end;
         end;
     end;
 
-    procedure func_00435FA4(arg0: Ptree);
+    { Original name: move_blocks }
+    procedure move_blocks(arg0: Ptree);
     var
         var_s0: ^Tree;
         var_s2: ^Tree;
@@ -403,15 +414,15 @@ loop:
         end;
 
         repeat begin
-            var_s2 := func_00435EA0(var_s0);
-            if func_00435E68(var_s0, var_s2) and (var_s2 <> nil) then begin
+            var_s2 := get_next_basic_block(var_s0);
+            if no_edge(var_s0, var_s2) and (var_s2 <> nil) then begin
                 temp_v1 := var_s2^.prior;
-            
+
                 if (temp_v1^.u.Opc = Uujp) then begin
                     var_s0 := temp_v1^.op2;
-                    var_s3 := func_00435EA0(var_s0);
+                    var_s3 := get_next_basic_block(var_s0);
 
-                    if (var_s3 <> nil) and (func_00435F40(var_s0) or func_00435E68(var_s0, var_s3)) and func_00435E68(func_00435EF0(var_s0), var_s0) then begin
+                    if (var_s3 <> nil) and (ends_in_xjp(var_s0) or no_edge(var_s0, var_s3)) and no_edge(get_previous_basic_block(var_s0), var_s0) then begin
                         temp_v1_2 := var_s0^.prior;
                         temp_a0 := var_s3^.prior;
                         temp_v1_2^.next := var_s3;
@@ -425,12 +436,13 @@ loop:
                     end;
                 end;
             end;
-    
+
             var_s0 := var_s2;
         end until var_s2 = nil;
     end;
 
-    procedure func_00436148(arg0: ^Tree);
+    { Original name: delete_dead_blocks }
+    procedure delete_dead_blocks(arg0: ^Tree);
     var
         var_s0: ^Tree;
         var_s2: boolean;
@@ -441,13 +453,13 @@ loop:
 
         while (var_s0 <> nil) do begin
             var_v0 := var_s0^.u.Opc;
-            if (var_v0 = Uent) or (var_v0 = Uaent) or (var_v0 = Ulab) or ((var_v0 = Uclab) and (var_s0^.u.Length <> 0)) then begin      
+            if (var_v0 = Uent) or (var_v0 = Uaent) or (var_v0 = Ulab) or ((var_v0 = Uclab) and (var_s0^.u.Length <> 0)) then begin
                 if ((var_v0 = Uent) or (var_v0 = Uaent))  then begin
-                    func_00435DE8(var_s0);
+                    postorder_walk(var_s0);
                 end;
-                
+
                 if (debugPhases) then begin
-                    func_00435C44(var_s0);
+                    print_edges(var_s0);
                 end;
 
                 if (var_s0^.u.Opc = Uclab) then begin
@@ -456,26 +468,26 @@ loop:
                     var_s2 := (var_s0^.mark <> mark) and (var_s0^.u.Lexlev = 0) and (var_s0^.u.Length = 0);
                 end;
             end;
-                
+
 
             if (var_s2) then begin
                 if not (var_s0^.u.Opc in [Ubgnb, Udef, Uend, Uendb, Ulex, Uoptn, Ustp]) then begin
                     delete_statement(var_s0);
                 end;
             end;
-            
+
             var_s0 := var_s0^.next;
-        end; 
-        
+        end;
+
     end;
-    
+
 begin
     mark := next_mark();
     mark1 := next_mark();
 
-    func_004352AC(arg0);
-    func_0043595C(arg0);
-    func_00435FA4(arg0);
+    localopt(arg0);
+    build_flow_graph(arg0);
+    move_blocks(arg0);
 
     if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st localopt:");
@@ -484,7 +496,7 @@ begin
         flush(pFile);
     end;
 
-    func_00436148(arg0);
+    delete_dead_blocks(arg0);
     if (debugPhases) then begin
         writeln(pFile, "Tree dump after 1st label phase:");
         print_tree(pFile, arg0, 16#7FFFFFFF, 16#7FFFFFFF);
@@ -505,9 +517,9 @@ begin
     mark := next_mark();
     mark1 := next_mark();
 
-    func_004352AC(arg0);
-    func_0043595C(arg0);
-    func_00436148(arg0);
+    localopt(arg0);
+    build_flow_graph(arg0);
+    delete_dead_blocks(arg0);
 
     if (debugPhases) then begin
         writeln(pFile, "Tree dump after 2nd label phase:");

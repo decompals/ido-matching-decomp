@@ -100,10 +100,10 @@ var
         Uadd: fadd_s,
         Usub: fsub_s,
         Umpy: fmul_s,
-        Udiv: fdiv_s,        
+        Udiv: fdiv_s,
         Uneg: fneg_s,
         Uabs: fabs_s,
-        Usqrt: fsqrt_s,        
+        Usqrt: fsqrt_s,
 
         Uldc: fli_s,
 
@@ -129,7 +129,7 @@ var
         Uadd: fadd_d,
         Usub: fsub_d,
         Umpy: fmul_d,
-        Udiv: fdiv_d,        
+        Udiv: fdiv_d,
         Uneg: fneg_d,
         Uabs: fabs_d,
         Usqrt: fsqrt_d,
@@ -243,7 +243,7 @@ var
         Idt: zld,
         Kdt: zld,
         Wdt: zld,
-        
+
         Rdt: fl_s,
         Qdt: fl_d,
 
@@ -263,7 +263,7 @@ var
         Idt: zsd,
         Kdt: zsd,
         Wdt: zsd,
-        
+
         Rdt: fs_s,
         Qdt: fs_d,
 
@@ -273,7 +273,7 @@ var
     load_table: asmcodearray := [
         zlb, zlbu, zlh, zlhu, zlw, zlwu, zld, fl_s, fl_d
     ];
-    
+
     store_table: asmcodearray := [
         zsb, zsb, zsh, zsh, zsw, zsw, zsd, fs_s, fs_d
     ];
@@ -290,7 +290,7 @@ var
     unaligned_load_store1: array[asmcodes] of asmcodes := [
         zlw: zlwl,
         zld: zlwl,
-        zsw: zswl,        
+        zsw: zswl,
         zsd: zswl,
 
         otherwise zbad
@@ -299,7 +299,7 @@ var
     unaligned_load_store2: array[asmcodes] of asmcodes := [
         zlw: zlwr,
         zld: zlwr,
-        zsw: zswr,        
+        zsw: zswr,
         zsd: zswr,
 
         otherwise zbad
@@ -314,7 +314,7 @@ var
         zlw: zulw,
         zlwu: zulwu,
         zsw: zusw,
-        zld: zuld,        
+        zld: zuld,
         zsd: zusd,
 
         otherwise zbad
@@ -846,7 +846,7 @@ begin
                 arg1 := arg1^.op1;
                 arg2 := not arg2;
                 goto start; {manual tail recursion}
-                {trap(arg0, arg1^.op1, not arg2);} 
+                {trap(arg0, arg1^.op1, not arg2);}
             end;
             Uleq, Ules, Uequ, Uneq, Ugeq, Ugrt: begin
                 if arg1^.u.Dtype in [Qdt, Rdt, Xdt] then begin
@@ -1079,7 +1079,7 @@ begin
             return r1;
         end;
     end;
-    
+
     return arg0^.reg;
 end;
 
@@ -1108,7 +1108,7 @@ var
                 return r1;
             end;
         end;
-        
+
         return arg0^.reg;
     end;
 begin
@@ -1141,7 +1141,7 @@ begin
         get_reg(arg1, arg0, 1);
     end;
 
-    arg0^.reg := arg1;    
+    arg0^.reg := arg1;
     return arg1;
 end;
 
@@ -1371,7 +1371,7 @@ var
             sp40 := arg3;
         end else begin
             sp40 := arg3 + 4;
-            sp3C := arg3;            
+            sp3C := arg3;
         end;
 
         if is_fp_reg(arg2) and (v1 = 4) then begin
@@ -2115,7 +2115,7 @@ begin
 
     t1 := arg0^.u.Length;
     t0 := arg0^.u.I1;
-    
+
     if (arg0^.u.Opc = Upmov) or (arg0^.u.Opc = Umpmv) then begin
         t0 := arg0^.u.Lexlev;
     end;
@@ -2350,8 +2350,8 @@ var
     a0: registers;
     a3: integer;
     a2: integer;
-    t0: boolean;    
-    
+    t0: boolean;
+
 begin
     if basicint = 0 then begin
         a2 := 4;
@@ -2432,10 +2432,10 @@ begin
                     return ((v1 + 8) div 8) * 8;
                 end;
             end;
-            
+
             otherwise;
         end;
-            
+
         arg0 := arg0^.next;
     end;
 end;
@@ -2463,7 +2463,7 @@ begin
             if not pass_in_reg(s3) then begin
                 break;
             end;
-        
+
             v0 := parm_reg(s3);
             if v0 in [xfr0..xfr31] then begin
                 saved_regs := saved_regs + [v0];
@@ -2483,12 +2483,12 @@ begin
                 end;
             end;
         end;
-        
+
         s3 := s3^.next;
     end;
 
 out:
-    
+
     if arg0 <> -1 then begin
         arg0 := (arg0 mod 16#10000) div 4;
         for r := registers(ord(gpr_a0) + arg0) to registers(ord(gpr_a0) + n_parm_regs - 1) do begin
@@ -2502,7 +2502,7 @@ begin
     repeat
         arg0^.temp_id := 0;
         arg0^.reg := xnoreg;
-        
+
         if (arg0^.op1 <> nil) and not(arg0^.u.Opc in [Uent, Uaent, Ulab, Uclab, Ucg2]) then begin
             clean_tree(arg0^.op1);
         end;
@@ -2585,15 +2585,15 @@ function rnd_tab(arg0: Datatype; arg1: Datatype): asmcodes;
 begin
     if arg0 = Rdt then begin
         case arg1 of
-            Adt, Hdt, Ldt: return zroundu_w_s;            
+            Adt, Hdt, Ldt: return zroundu_w_s;
             Jdt: return zround_w_s;
             Idt: return zround_l_s;
             Kdt, Wdt: return zround_l_s;
             otherwise return znop;
-        end;        
+        end;
     end else if arg0 = Qdt then begin
         case arg1 of
-            Adt, Hdt, Ldt: return zroundu_w_d;            
+            Adt, Hdt, Ldt: return zroundu_w_d;
             Jdt: return zround_w_d;
             Idt: return zround_l_d;
             Kdt, Wdt: return zround_l_d;
@@ -2849,7 +2849,7 @@ begin
                     eval(sp15C, xnoreg);
                 end;
                 generate_again := false;
-                if (ibuffer^[i_ptr - 1].instr = iocode) and (ibuffer^[i_ptr - 1].op = zb) then begin 
+                if (ibuffer^[i_ptr - 1].instr = iocode) and (ibuffer^[i_ptr - 1].op = zb) then begin
                     emit_dir1(ialign, 0, 5);
                 end;
                 output_pool();
@@ -2902,7 +2902,7 @@ begin
                 gen_entry_exit(
                     entry_point_index,
                     sp147,
-                    curlev, 
+                    curlev,
                     frame_size,
                     local_var_size,
                     not has_calls,
@@ -4144,7 +4144,7 @@ begin
             end;
             emit_dir0(irdata, 0);
             define_label(arg0^.u.I1);
-            
+
             temp_v0_11 := arg0^.u.Length;
 
             if (temp_v0_11 <> 0) then begin
@@ -4155,7 +4155,7 @@ begin
                     var_s0_13 := var_s0_13 - 1;
                 end until (var_s0_13 = 0);
             end;
-            
+
             if current_text_sec.Ival <> 0 then begin
                 emit_itext(current_text_sec);
             end else begin
@@ -4652,7 +4652,7 @@ procedure eval_int_int_cvt{(arg0: ^tree; arg1: registers)};
             move_to_dest(temp_a0, temp_s1, arg0^.u.Dtype);
         end;
     end;
-    
+
     procedure func_00434500(arg0: ^tree; arg1: registers);
     var
         sp2B: registers;
@@ -4667,7 +4667,7 @@ procedure eval_int_int_cvt{(arg0: ^tree; arg1: registers)};
                 emit_ri_(zli, arg1, 0, franone);
             end;
         end;
-        
+
         procedure func_00434430(arg0: ^tree; arg1: registers);
         begin
             if lsb_first then begin
@@ -4694,7 +4694,7 @@ procedure eval_int_int_cvt{(arg0: ^tree; arg1: registers)};
             move_to_dest(arg1, sp2B, arg0^.u.Dtype);
         end;
     end;
-    
+
     procedure func_00434618(arg0: ^tree; arg1: registers);
     var
         sp33: registers;

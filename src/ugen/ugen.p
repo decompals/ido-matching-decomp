@@ -73,7 +73,7 @@ var
     no_jal_use_jalr_only: boolean;
     non_local_mtag: integer;
     nooffsetopt: boolean;
-    opt_labels: u8;
+    opt_labels: boolean;
     print_warnings: boolean;
     saw_cap_g: boolean;
     sgi_unsigned_conv: boolean;
@@ -101,7 +101,7 @@ procedure set_opts(arg0: OptLevels; arg1: DebugLevels); external;
 
 program ugen;
 
-label default;
+label default; { original name: badoption }
 var
     treeDumpFileName: Filename; {Name of the file where the different tree phases are dumped/logged}
     treeDumpFile: Text; {File where the different tree phases are dumped/logged}
@@ -109,10 +109,10 @@ var
     ugenTempFileName: Filename; {sp19C8}
     ugenTempFileFd: integer; {sp19C4}
     pad1: integer;
-    sp15C0: Filename; {sp15C0}
+    inputUcodeFileName: Filename; {inputUcodeFileName}
     outputFileName: Filename;
     asmOutputFilePath: Filename; {spD40}
-    sp9C0: Filename; {sp9C0}
+    treeUcodeFileName: Filename;
     stFileName: st_string; {Symbol table file name}
     debugTree: boolean; {sp93F}
     verbose: boolean; {sp93E}
@@ -137,6 +137,7 @@ var
 
     { Inner functions.. }
 
+    { Original name: atoi }
     function str_atoi(var arg0: Filename): integer;
     var
         len: integer;
@@ -153,7 +154,8 @@ var
         return value;
     end;
 
-    procedure func_0044B2EC(arg0: ^Tree);
+    { Original name: assign_dense_labels }
+    procedure assign_dense_labels(arg0: ^Tree);
     var
         iter: ^tree;
     begin
@@ -166,9 +168,10 @@ var
         end;
     end;
 
-    procedure func_0044B384(opt: char; regs: integer);
+    { Original name: process_reg }
+    procedure process_reg(opt: char; regs: integer);
     begin
-        case opt of                                 /* irregular */
+        case opt of
             CASE_ARG('a')
             begin
                 n_parm_regs := regs;
@@ -202,8 +205,8 @@ var
         end;
     end;
 
-
-    procedure set_fp_regs(opt: char; regs: integer);
+    { Original name: process_fp_reg }
+    procedure process_fp_reg(opt: char; regs: integer);
     begin
         case (opt) of
             CASE_ARG('a')
@@ -245,6 +248,7 @@ var
         end;
     end;
 
+    { Original name: dump_tree }
     procedure dump_tree(t: ^Tree; phase: ugen_str);
     begin
         if (treeDumpFileName[1] <> chr(0)) then begin
@@ -261,6 +265,7 @@ var
         end;
     end;
 
+    { original name: filenameassign }
     procedure copy_filename(var dest: Filename; src: opt_str);
     var
         len: integer;
@@ -277,7 +282,7 @@ var
         end;
     end;
 
-
+    { Original name: make_temp_file }
     procedure create_temp_file();
     var
         fd: integer;
@@ -293,12 +298,14 @@ var
         end;
     end;
 
+    { Original name: remove_temp_file }
     procedure unlink_temp_file();
     begin
         unlink(ugenTempFileName);
     end;
 
 
+    { Original name: filenameeq }
     function streq(var str1: Filename; str2: opt_str): boolean;
     var pos: integer;
     begin
@@ -326,7 +333,7 @@ begin
         writeln(err, "Usage is: ugen [-o binfile] [-l listfile] [-e dumpfile] [-t symbolfilename] [-d] [-trapuv] [-G smallsize] [-p] file.F");
         return 0;
     end else begin
-        sp15C0[1] := chr(0);
+        inputUcodeFileName[1] := chr(0);
         sdata_max := 8;
 
         {Null terminate the strings?}
@@ -334,7 +341,7 @@ begin
         outputFileName[1] := chr(0);
         asmOutputFilePath[1] := chr(0);
         lsb_first := false;
-        sp9C0[1] := chr(0);
+        treeUcodeFileName[1] := chr(0);
         stFileName[1] := chr(0);
         fp_initialized := 0;
         ugenTempFileName[1] := chr(0);
@@ -420,7 +427,7 @@ begin
                                     halt(1);
                                 end;
                                 index := index + 1;
-                                argv(index, sp9C0);
+                                argv(index, treeUcodeFileName);
                             end else goto default;
 
                         CASE_ARG('l')
@@ -457,6 +464,10 @@ begin
                             end else goto default;
 
                         CASE_ARG('e')
+                        begin
+                            writeln('E!');
+                            writeln('arg[3] ', ord(arg[3]));
+                            writeln('arg[4] ', ord(arg[4]));
                             if (ARG_OPT(3,  ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -e");
@@ -469,7 +480,7 @@ begin
                             end else if (ARG_OPT(3,  'x') and (ARG_OPT(4, 'c')) and (ARG_OPT(5, 'p')) and (ARG_OPT(6, 't')) and (ARG_OPT(7, ' '))) then begin
                                 excpt := true;
                             end else goto default;
-
+                        end;
                         CASE_ARG('d')
                         begin
                             if (IS_OPT("-dwopcode")) then begin
@@ -528,7 +539,7 @@ begin
                                 index := index + 1;
                                 var_s0 := arg[5];
                                 argv(index, arg);
-                                func_0044B384(var_s0, str_atoi(arg));
+                                process_reg(var_s0, str_atoi(arg));
                             end else goto default;
 
                         CASE_ARG('f')
@@ -536,7 +547,7 @@ begin
                                 index := index + 1;
                                 var_s0 := arg[6];
                                 argv(index, arg);
-                                set_fp_regs(var_s0, str_atoi(arg));
+                                process_fp_reg(var_s0, str_atoi(arg));
                             end else begin
                                 if (streq(arg, "-fp32regs")) then begin
                                     fp32regs := true;
@@ -675,7 +686,7 @@ begin
                                 end;
 
                                 for var_a0 := 3 to var_s1 + 1 do begin
-                                    sp15C0[var_a0 - 2] := xpgEnvVar[var_a0];
+                                    inputUcodeFileName[var_a0 - 2] := xpgEnvVar[var_a0];
                                 end;
 
                             end;
@@ -685,16 +696,16 @@ begin
                                 writeln(err, arg:0, " not understood");
                     end;
                 end else begin
-                    argv(index, sp15C0);
+                    argv(index, inputUcodeFileName);
 
-                    SKIP_END_SPACES(var_s1, sp15C0);
+                    SKIP_END_SPACES(var_s1, inputUcodeFileName);
                 end;
 
                 index := index + 1;
              until (index >= argc);
         end;
 
-        if (sp15C0[1] = chr(0)) then begin
+        if (inputUcodeFileName[1] = chr(0)) then begin
             writeln(err, "Must specify .F file");
             halt(1);
         end;
@@ -722,7 +733,7 @@ begin
 
             if (stFileName[1] = chr(0)) then begin
                 for index := 1 to var_s1 - 1 do begin
-                    stFileName[index] := sp15C0[index];
+                    stFileName[index] := inputUcodeFileName[index];
                 end;
                 var_v0_3 := var_s1;
                 stFileName[var_v0_3] := 'T';
@@ -743,10 +754,10 @@ begin
         initialize_tree();
         init_ibuffer();
         uini();
-        initur(sp15C0);
+        initur(inputUcodeFileName);
 
         if (outputFileName[1] = chr(0)) then begin
-            outputFileName := sp15C0;
+            outputFileName := inputUcodeFileName;
             outputFileName[var_s1] := 'G'; {binasm extension}
             var_v0_3 := var_s1;
         end else begin
@@ -795,7 +806,7 @@ begin
                 dump_tree(pTree, "Translate");
             end;
 
-            if (opt_labels <> 0) then begin
+            if (opt_labels) then begin
                 if (treeDumpFileName[1] <> chr(0)) then begin
                     labelopt(pTree, treeDumpFile, debugTree, debugLabelOptPhase);
                 end else begin
@@ -803,11 +814,14 @@ begin
                 end;
             end;
 
-            func_0044B2EC(pTree);
+            assign_dense_labels(pTree);
 
-            if (sp9C0[1] <> chr(0)) then begin
-                inituwrite(sp9C0);
+            if (treeUcodeFileName[1] <> chr(0)) then begin
+                { Save the ucode represented by the tree }
+                inituwrite(treeUcodeFileName);
                 u_tree(pTree);
+                {@bug: The output file will be truncated, since the call of uputclose is missing }
+                uputclose();
             end;
 
             init_eval();

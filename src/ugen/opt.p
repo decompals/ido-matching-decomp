@@ -18,7 +18,7 @@ var
 *  @param optLevel   Optimization level (see OptLevels)
 *  @param debugLevel Debug level (see DebugLevels)
 *)
-#line 22 "opt.p"
+#line 21 "opt.p"
 procedure set_opts(optLevel: OptLevels; debugLevel: DebugLevels);
 begin
     glevel := debugLevel;
@@ -27,8 +27,9 @@ begin
         optLevel := OPT_LEVEL_O1;
     end;
 
-    case optLevel of
-        OPT_LEVEL_O0:
+    { Required to match }
+    case ord(optLevel) of
+        ord(OPT_LEVEL_O0):
         begin
             opt_cse := 1;
             opt_labels := false;
@@ -36,7 +37,7 @@ begin
             ignore_vreg := false;
             tail_call_opt := false;
         end;
-        OPT_LEVEL_O1:
+        ord(OPT_LEVEL_O1):
         begin
             if (debugLevel = DEBUG_LEVEL_g0) or (debugLevel = DEBUG_LEVEL_g3) then begin
                 opt_cse := 2;
@@ -49,9 +50,9 @@ begin
             ignore_vreg := false;
             tail_call_opt := false;
         end;
-        OPT_LEVEL_O2,
-        OPT_LEVEL_O3,
-        OPT_LEVEL_O4:
+        ord(OPT_LEVEL_O2),
+        ord(OPT_LEVEL_O3),
+        ord(OPT_LEVEL_O4):
         begin
             if (debugLevel = DEBUG_LEVEL_g0) or (debugLevel = DEBUG_LEVEL_g3) then begin
                 opt_cse := 2;

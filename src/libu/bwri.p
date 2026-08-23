@@ -6,7 +6,7 @@ procedure uputint(i: integer); external;
 procedure uputkill(); external;
 procedure uputclose(); external;
 
-var 
+var
     dtyname: Array [first(Datatype)..last(Datatype)] of char;
     mtyname: Array [first(Memtype)..last(Memtype)] of char;
     noerrorsyet: boolean;
@@ -48,7 +48,7 @@ begin
 end;
 
 function idlen(var id: Identname): integer;
-var 
+var
     len: integer;
 begin
     for len := Identlength downto 1 do begin
@@ -145,11 +145,11 @@ begin
     new(u.Constval.Chars);
 
     { Skip end spaces }
-    while ((u.Constval.Ival > 0) and (Tag[u.Constval.Ival] = ' ')) do begin  
-        u.Constval.Ival := u.Constval.Ival - 1; 
+    while ((u.Constval.Ival > 0) and (Tag[u.Constval.Ival] = ' ')) do begin
+        u.Constval.Ival := u.Constval.Ival - 1;
     end;
 
-    for i := 1 to u.Constval.Ival do begin 
+    for i := 1 to u.Constval.Ival do begin
         u.Constval.Chars^.ss[i] := Tag[i];
     end;
 
@@ -164,7 +164,7 @@ var
     i: integer;
     u: Bcrec;
 begin
-    for i := 1 to Maxinstlength do begin    
+    for i := 1 to Maxinstlength do begin
         u.Intarray[i] := 0;
     end;
 
@@ -175,7 +175,7 @@ begin
         u.Constval.Ival := Filenamelen;
     end;
 
-    for i := 1 to u.Constval.Ival do begin 
+    for i := 1 to u.Constval.Ival do begin
         u.Constval.Chars^.ss[i] := fname[i];
     end;
 

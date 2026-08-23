@@ -21,22 +21,22 @@ static int UgetBufLen = -1;
 static int UgetFd = -1;
 static int UputFd = -1;
 
- 
+
 void uputinit(char* path) {
     char* pos;
 
     // Delete path spaces
-    for (pos = UputPath; 
-        pos < &UputPath[Filenamelen] 
-        && *pos != '\0' 
-        && *pos != ' '; 
+    for (pos = UputPath;
+        pos < &UputPath[Filenamelen]
+        && *pos != '\0'
+        && *pos != ' ';
         pos++, path++) {
         *pos = (signed)*path;
     }
     *pos = '\0';
-    
+
     if (UputPath[0] != '\0') {
-        if (UputFd = open(UputPath, UPUT_FD_FLAGS, UPUT_FD_MODE) < 0) {
+        if ((UputFd = open(UputPath, UPUT_FD_FLAGS, UPUT_FD_MODE)) < 0) {
             perror(UputPath);
             exit(EXIT_FAILURE);
         }
@@ -98,15 +98,15 @@ void uputkill(void) {
 void ugetinit(char* path) {
     char* pos;
 
-    for (pos = UgetPath; 
+    for (pos = UgetPath;
         pos < &UgetPath[Filenamelen]
-        && *path != '\0' 
-        && *path != ' '; 
+        && *path != '\0'
+        && *path != ' ';
         pos++, path++) {
         *pos = (signed)*path;
     }
     *pos = '\0';
-    
+
     if (UgetPath[0] != '\0') {
         if ((UgetFd = open(UgetPath, O_RDONLY, 0)) < 0) {
             perror(UgetPath);
@@ -164,7 +164,7 @@ int ugeteof(void) {
     if (UgetBufLen == 0) {
         return 1;
     }
-    
+
     UgetPos--;
     return 0;
 }
@@ -180,5 +180,3 @@ void ugetclose(void) {
     }
     UgetFd = -1;
 }
-
-

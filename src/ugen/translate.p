@@ -23,7 +23,6 @@
 #define OP1_EQU(x, y) (x^.op1 = y^.op1)
 #define OP2_EQU(x, y) (x^.op2 = y^.op2)
 
-
 type unk_cast_rec = packed record
     case integer of
         4: (as_u32: cardinal);
@@ -54,10 +53,10 @@ var
 var
     calls: integer;
     pseudo_leaf: boolean;
-    expr_count: 0..5;
-    exprs: array [1..5] of ^tree;
-    load_count: 0..5;
-    loads: array [1..5] of ^tree;
+    expr_count: 0..10;
+    exprs: array [1..10] of ^tree;
+    load_count: 0..10;
+    loads: array [1..10] of ^tree;
     current_line: cardinal;
     opt_cse: u8;
     bb_size: integer;

@@ -1,3 +1,4 @@
+{ Original name: parm_utils }
 #include "tree.h"
 #include "tree_utils.h"
 #include "report.h"
@@ -35,25 +36,25 @@ end;
 procedure map_pdefs_to_regs(arg0: ^Tree; arg1: integer);
 var
     var_v0: integer;
-    var_v1: cardinal;
+    i: cardinal;
 begin
-    for var_v1 := 1 to n_fp_parm_regs do begin
+    for i := 1 to n_fp_parm_regs do begin
         if arg0 = nil then begin
             return;
         end;
-            
+
         Assert(arg0^.u.Opc = Updef);
 
         if not (arg0^.u.Dtype in [Qdt, Rdt, Xdt]) then begin
             break;
         end;
 
-        if (arg1 <> -1) and (arg1 < integer((var_v1 - 1) * 2) * 4) then begin
+        if (arg1 <> -1) and (arg1 < integer((i - 1) * 2) * 4) then begin
             break;
         end;
 
-        arg0^.u.Constval.dwval_h := integer((var_v1 - 1) * 2) * 4 + 16#B0;
-        arg0 := arg0^.next;                
+        arg0^.u.Constval.dwval_h := integer((i - 1) * 2) * 4 + 16#B0;
+        arg0 := arg0^.next;
     end;
 
     while (arg0 <> nil) do begin
@@ -90,7 +91,7 @@ begin
     assert(arg0^.u.Opc = Umst);
     arg0^.u.I1 := 0;
     v0 := arg0;
-    
+
     a := 3;
     for i := 0 to a do pars[i] := -1;
 
@@ -120,7 +121,7 @@ begin
 
         var_a3 := abs(arg0^.u.Offset - first_pmt_offset);
         if basicint = 0 then begin
-        
+
             if (arg0^.u.Opc <> Upmov) then begin
                 if (var_a3 < (n_parm_regs * 4)) then begin
                     arg0^.u.Offset2 := var_a3 + 16;
@@ -141,7 +142,7 @@ begin
         end;
         arg0 := arg0^.next;
     end;
-    
+
 done:
     if (arg0^.u.Opc = Ucup) and (IS_REALLOC_ARG_ATTR(arg0^.u.Extrnal)) then begin
         v0^.u.I1 := 1;
@@ -152,7 +153,7 @@ function check_amt(arg0: ^Tree): integer;
 var
     temp: integer;
 begin
-  
+
     Assert(arg0^.u.Offset >= 0);
     temp := 4;
     if (basicint = 0) then begin
@@ -177,9 +178,9 @@ begin
     loop:
     arg0 := arg0;
     temp_val := 4; {Required to match}
-    
+
     if (basicint = 0) then begin
-        if (((arg0^.u.Opc = Ulod) and (arg0^.u.Mtype = Amt)) and ((arg0^.u.Offset < (n_parm_regs * 4)) 
+        if (((arg0^.u.Opc = Ulod) and (arg0^.u.Mtype = Amt)) and ((arg0^.u.Offset < (n_parm_regs * 4))
             or (arg0^.u.Offset < (n_fp_parm_regs * 2 * temp_val)))) then begin
             pars[arg0^.u.Offset div 4] := -1;
             fix_amt[arg0^.u.Offset div 4] := true;
@@ -190,14 +191,14 @@ begin
         fix_amt[arg0^.u.Offset div 8] := true;
         return;
     end;
-    
+
     if ((arg0^.op1 <> nil) and (arg0^.u.opc <> Ucg2)) then begin
         check_amt_ref(arg0^.op1);
     end;
     if (arg0^.op2 <> nil) then begin
 	check_amt_ref(arg0^.op2);
     end;
-    
+
 end;
 
 procedure fix_amt_ref(arg0: ^tree);
@@ -206,16 +207,16 @@ var
     temp_v1: integer;
     temp_v0: ^tree;
     var_s0: ^tree; {s0}
-    
+
 begin
     temp_v1 := 3;
-    
+
     for i := 0 to temp_v1 do begin
         fix_amt[i] := false;
     end;
 
     var_s0 := arg0^.next;
-    while not (var_s0^.u.Opc in [Ucia, Ucup, Uicuf, Urcuf]) do begin        
+    while not (var_s0^.u.Opc in [Ucia, Ucup, Uicuf, Urcuf]) do begin
         if (var_s0^.u.Opc = Upar) then begin
             check_amt_ref(var_s0^.op1);
         end;
@@ -243,5 +244,5 @@ begin
             arg0^.next := temp_v0;
         end;
     end;
-    
+
 end;
