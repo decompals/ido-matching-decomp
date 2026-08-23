@@ -1,4 +1,5 @@
 #include "common_p.h"
+#include "asboth.h"
 
 function emit_dword_item(arg0: cardinal; arg1: cardinal; arg2: PSymbol): PSymbol; external;
 procedure parse_dli_dla; external;

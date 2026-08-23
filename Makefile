@@ -98,7 +98,7 @@ MIPS_VERSION := -mips2
 ASFLAGS := -march=vr4300 -32 -Iinclude -KPIC
 
 IDO_WARNINGS := -fullwarn -woff 624,649,838,712,835
-CFLAGS += -G 0 -KPIC -K -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
+CFLAGS += -G 0 -KPIC -Xcpluscomm $(IINC) -nostdinc -Wab,-r4300_mul $(IDO_WARNINGS) -D$(IDO_VERSION)
 
 
 # -- Location of original IDO binaries
