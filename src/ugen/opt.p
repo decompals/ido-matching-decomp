@@ -18,7 +18,7 @@ var
 *  @param optLevel   Optimization level (see OptLevels)
 *  @param debugLevel Debug level (see DebugLevels)
 *)
-#line 21 "opt.p"
+#line 20 "opt.p"
 procedure set_opts(optLevel: OptLevels; debugLevel: DebugLevels);
 begin
     glevel := debugLevel;
