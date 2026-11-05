@@ -106,31 +106,31 @@ var
     treeDumpFileName: Filename; {Name of the file where the different tree phases are dumped/logged}
     treeDumpFile: Text; {File where the different tree phases are dumped/logged}
 var
-    ugenTempFileName: Filename; {sp19C8}
-    ugenTempFileFd: integer; {sp19C4}
+    ugenTempFileName: Filename;
+    ugenTempFileFd: integer;
     pad1: integer;
-    inputUcodeFileName: Filename; {inputUcodeFileName}
+    inputFileName: Filename;
     outputFileName: Filename;
-    asmOutputFilePath: Filename; {spD40}
+    asmOutputFilePath: Filename;
     treeUcodeFileName: Filename;
-    stFileName: st_string; {Symbol table file name}
-    debugTree: boolean; {sp93F}
-    verbose: boolean; {sp93E}
-    arg: Filename; {sp53E}
-    asmOutputFile: Text; {asmOutputFile}
-    var_s1: integer; {sp530}
-    var_a0: integer;
-    var_s2: cardinal;
-    var_v0_4: integer;
-    var_v0_3: integer;
+    stFileName: st_string;
+    debugTree: boolean;
+    verbose: boolean;
+    arg: Filename;
+    asmOutputFile: Text;
+    inputFileNameLen: integer;
+    i: integer;
+    pad2: cardinal;
+    ugenTempFileNameLen: integer;
+    nameLen: integer;
     debugLevel: ugen_debug_levels;
-    optLevel: ugen_opt_levels; { Optimization level }
-    var_s0: char;
+    optLevel: ugen_opt_levels;
+    reg: char;
     debugLabelOptPhase: boolean;
     useTempFile: boolean; {sp515}
     warnLevel: cardinal; {sp510}
     useXpgEnv: boolean; {sp50F}
-    pad6: integer;
+    pad3: integer;
     xpgEnvVar: Filename;
     index: cardinal;
     pTree: ^Tree;
@@ -333,7 +333,7 @@ begin
         writeln(err, "Usage is: ugen [-o binfile] [-l listfile] [-e dumpfile] [-t symbolfilename] [-d] [-trapuv] [-G smallsize] [-p] file.F");
         return 0;
     end else begin
-        inputUcodeFileName[1] := chr(0);
+        inputFileName[1] := chr(0);
         sdata_max := 8;
 
         {Null terminate the strings?}
@@ -465,9 +465,6 @@ begin
 
                         CASE_ARG('e')
                         begin
-                            writeln('E!');
-                            writeln('arg[3] ', ord(arg[3]));
-                            writeln('arg[4] ', ord(arg[4]));
                             if (ARG_OPT(3,  ' ')) then begin
                                 if ((index + 1) = argc) then begin
                                     writeln(err, "filename required after -e");
@@ -537,17 +534,17 @@ begin
                         CASE_ARG('r')
                             if ((ARG_OPT(3, 'e')) and (arg[4] = 'g')) then begin
                                 index := index + 1;
-                                var_s0 := arg[5];
+                                reg := arg[5];
                                 argv(index, arg);
-                                process_reg(var_s0, str_atoi(arg));
+                                process_reg(reg, str_atoi(arg));
                             end else goto default;
 
                         CASE_ARG('f')
                             if (ARG_OPT(3, 'r') and ARG_OPT(4, 'e') and ARG_OPT(5, 'g')) then begin
                                 index := index + 1;
-                                var_s0 := arg[6];
+                                reg := arg[6];
                                 argv(index, arg);
-                                process_fp_reg(var_s0, str_atoi(arg));
+                                process_fp_reg(reg, str_atoi(arg));
                             end else begin
                                 if (streq(arg, "-fp32regs")) then begin
                                     fp32regs := true;
@@ -677,16 +674,16 @@ begin
                             if ((useXpgEnv = true) and ARG_OPT(3, '-')) then begin
                                 argv(index, xpgEnvVar);
 
-                                SKIP_END_SPACES(var_s1, xpgEnvVar);
+                                SKIP_END_SPACES(inputFileNameLen, xpgEnvVar);
 
-                                if (var_s1 <> 0) then begin
-                                    xpgEnvVar[var_s1 + 1] := chr(0);
+                                if (inputFileNameLen <> 0) then begin
+                                    xpgEnvVar[inputFileNameLen + 1] := chr(0);
                                 end else begin
                                     writeln(err, arg:0, " not understood");
                                 end;
 
-                                for var_a0 := 3 to var_s1 + 1 do begin
-                                    inputUcodeFileName[var_a0 - 2] := xpgEnvVar[var_a0];
+                                for i := 3 to inputFileNameLen + 1 do begin
+                                    inputFileName[i - 2] := xpgEnvVar[i];
                                 end;
 
                             end;
@@ -696,16 +693,16 @@ begin
                                 writeln(err, arg:0, " not understood");
                     end;
                 end else begin
-                    argv(index, inputUcodeFileName);
+                    argv(index, inputFileName);
 
-                    SKIP_END_SPACES(var_s1, inputUcodeFileName);
+                    SKIP_END_SPACES(inputFileNameLen, inputFileName);
                 end;
 
                 index := index + 1;
              until (index >= argc);
         end;
 
-        if (inputUcodeFileName[1] = chr(0)) then begin
+        if (inputFileName[1] = chr(0)) then begin
             writeln(err, "Must specify .F file");
             halt(1);
         end;
@@ -726,25 +723,25 @@ begin
         end;
 
         if (ascii_out) then begin
-            SKIP_END_SPACES(var_v0_3, asmOutputFilePath);
-            asmOutputFilePath[var_v0_3 + 1] := chr(0);
+            SKIP_END_SPACES(nameLen, asmOutputFilePath);
+            asmOutputFilePath[nameLen + 1] := chr(0);
 
             rewrite(asmOutputFile, asmOutputFilePath);
 
             if (stFileName[1] = chr(0)) then begin
-                for index := 1 to var_s1 - 1 do begin
-                    stFileName[index] := inputUcodeFileName[index];
+                for index := 1 to inputFileNameLen - 1 do begin
+                    stFileName[index] := inputFileName[index];
                 end;
-                var_v0_3 := var_s1;
-                stFileName[var_v0_3] := 'T';
+                nameLen := inputFileNameLen;
+                stFileName[nameLen] := 'T';
             end else begin
-                var_v0_3 := sizeof(stFileName) - 1;
-                while ((var_v0_3 <> 0) and (stFileName[var_v0_3] = ' ')) do begin
-                    var_v0_3 := var_v0_3 - 1;
+                nameLen := sizeof(stFileName) - 1;
+                while ((nameLen <> 0) and (stFileName[nameLen] = ' ')) do begin
+                    nameLen := nameLen - 1;
                 end;
             end;
 
-            stFileName[var_v0_3 + 1] := chr(0);
+            stFileName[nameLen + 1] := chr(0);
             if (st_readbinary(stFileName, 'r') < 0) then begin
                 writeln(err, "Cannot read symbol table file");
                 halt(1);
@@ -754,23 +751,23 @@ begin
         initialize_tree();
         init_ibuffer();
         uini();
-        initur(inputUcodeFileName);
+        initur(inputFileName);
 
         if (outputFileName[1] = chr(0)) then begin
-            outputFileName := inputUcodeFileName;
-            outputFileName[var_s1] := 'G'; {binasm extension}
-            var_v0_3 := var_s1;
+            outputFileName := inputFileName;
+            outputFileName[inputFileNameLen] := 'G'; {binasm extension}
+            nameLen := inputFileNameLen;
         end else begin
-           SKIP_END_SPACES(var_v0_3, outputFileName);
+           SKIP_END_SPACES(nameLen, outputFileName);
         end;
 
-        outputFileName[var_v0_3 + 1] := chr(0);
+        outputFileName[nameLen + 1] := chr(0);
 
         if (ugenTempFileName[1] = chr(0)) then begin
             create_temp_file();
         end else begin
-            SKIP_END_SPACES(var_v0_4, ugenTempFileName);
-            ugenTempFileName[var_v0_4 + 1] := chr(0);
+            SKIP_END_SPACES(ugenTempFileNameLen, ugenTempFileName);
+            ugenTempFileName[ugenTempFileNameLen + 1] := chr(0);
         end;
 
         if (treeDumpFileName[1] <> chr(0)) then begin
@@ -821,7 +818,6 @@ begin
                 inituwrite(treeUcodeFileName);
                 u_tree(pTree);
                 {@bug: The output file will be truncated, since the call of uputclose is missing }
-                uputclose();
             end;
 
             init_eval();
@@ -845,7 +841,7 @@ begin
         end;
 
         if (ascii_out) then begin
-            outputFileName[var_v0_3 + 1] := ' ';
+            outputFileName[nameLen + 1] := ' ';
             output_inst_ascii(outputFileName, asmOutputFile);
         end;
 

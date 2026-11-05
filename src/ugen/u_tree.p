@@ -22,12 +22,10 @@ begin
 
             uwrite(p_Tree^.u);
 
-            {
             if (p_Tree^.u.Opc = Uend) then begin
                 u.Opc := Uret;
                 uwrite(u);
             end;
-            }
         end;
         p_Tree := p_Tree^.next;
     end until (p_Tree = nil);
