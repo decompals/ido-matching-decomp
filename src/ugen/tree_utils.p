@@ -69,7 +69,7 @@ begin
     return p_tree;
 end;
 
-{ Builds a tree node with one child }
+{ Builds a tree node with one operand }
 function build_u1(var u: Bcrec; op1: ^Tree): pointer;
 var
     p_tree: ^tree;
@@ -80,7 +80,7 @@ begin
     return p_tree;
 end;
 
-{ Builds a tree node with two childs }
+{ Builds a tree node with two operands }
 function build_u2(var u: Bcrec; op1: ^Tree; op2: ^Tree): pointer;
 var
     p_tree: ^tree;
@@ -303,7 +303,7 @@ begin
     return temp_v0;
 end;
 
-function rvalue(Dtype: Datatype; arg1: Identname): pointer;
+function rvalue(Dtype: Datatype; ident: Identname): pointer;
 var
     p_tree: ^tree;
     temp_v0_2: stringtextptr;
@@ -320,7 +320,7 @@ begin
     end;
 
     len := 1;
-    while (arg1[len] <> ' ') do begin
+    while (ident[len] <> ' ') do begin
         len := len + 1;
     end;
 
@@ -332,7 +332,7 @@ begin
         report_error(Internal, 377, "tree_utils.p", "Insufficiant memory");
     end else begin
         for len := 1 to len - 1 do begin
-            p_tree^.u.Constval.chars^.ss[len] := arg1[len];
+            p_tree^.u.Constval.chars^.ss[len] := ident[len];
         end;
     end;
 
@@ -383,7 +383,8 @@ end;
 
 function const_equal(arg0: ^Tree; arg1: ^Tree): boolean;
 
-    function func_0044AED0(): boolean;
+    { Original name: str_equ }
+    function str_equ(): boolean;
     var
         len: cardinal;
     begin
@@ -411,7 +412,7 @@ begin
     end;
 
     if ((arg0^.u.Dtype in [Qdt, Rdt, Xdt]) and (arg1^.u.Dtype = arg0^.u.Dtype) and
-        (arg0^.u.Constval.Ival = arg1^.u.Constval.Ival) and (func_0044AED0())) then begin
+        (arg0^.u.Constval.Ival = arg1^.u.Constval.Ival) and (str_equ())) then begin
         return true;
     end;
 
