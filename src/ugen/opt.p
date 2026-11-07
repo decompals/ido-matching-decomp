@@ -23,6 +23,8 @@ procedure set_opts(optLevel: OptLevels; debugLevel: DebugLevels);
 begin
     glevel := debugLevel;
     olevel := optLevel;
+
+    { if -g2 -O2 fallback to -O1 }
     if (debugLevel = DEBUG_LEVEL_g2) and (optLevel >= OPT_LEVEL_O2) then begin
         optLevel := OPT_LEVEL_O1;
     end;
@@ -45,6 +47,7 @@ begin
                 opt_cse := 1;
             end;
 
+            { Optimize branches with -g0 or -g3 }
             opt_labels := (debugLevel = DEBUG_LEVEL_g0) or (debugLevel = DEBUG_LEVEL_g3);
             opt_parms := true;
             ignore_vreg := false;
