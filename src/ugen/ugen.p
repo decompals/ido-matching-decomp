@@ -138,7 +138,7 @@ var
     { Inner functions.. }
 
     { Original name: atoi }
-    function str_atoi(var arg0: Filename): integer;
+    function str_atoi(var str: Filename): integer;
     var
         len: integer;
         value: integer;
@@ -146,20 +146,20 @@ var
         len := 1;
         value := 0;
 
-        while (arg0[len] <> ' ') do begin
-            Assert(arg0[len] in ['0'..'9']);
-            value := value * 10 + (ord(arg0[len]) - ord('0'));
+        while (str[len] <> ' ') do begin
+            Assert(str[len] in ['0'..'9']);
+            value := value * 10 + (ord(str[len]) - ord('0'));
             len := len + 1;
         end;
         return value;
     end;
 
     { Original name: assign_dense_labels }
-    procedure assign_dense_labels(arg0: ^Tree);
+    procedure assign_dense_labels(t: ^Tree);
     var
         iter: ^tree;
     begin
-        iter := arg0;
+        iter := t;
         while (iter <> nil) do begin
             if (((iter^.u.Opc = Ulab) and (iter^.u.Lexlev <> GOOB_TARGET)) or (iter^.u.Opc = Uclab)) then begin
                 iter^.u.I1 := gen_label_id();
@@ -206,9 +206,9 @@ var
     end;
 
     { Original name: process_fp_reg }
-    procedure process_fp_reg(opt: char; regs: integer);
+    procedure process_fp_reg(reg: char; regs: integer);
     begin
-        case (opt) of
+        case (reg) of
             CASE_ARG('a')
                 begin
                     n_fp_parm_regs := regs;
@@ -409,7 +409,7 @@ begin
                                     writeln(err, 'filename required after -o');
                                     halt(1);
                                 end;
-                                index := index + 1; {Stop immediately}
+                                index := index + 1;
                                 argv(index, outputFileName);
                             end else goto default;
 
