@@ -38,7 +38,7 @@ int cfe(int argc, char** argv) {
     if (origfile->unk_10 == -1) {
         init_mips_st(0);
     }
-    if (!options) {} // @FAKE
+    // if (!options) {} // @FAKE
     init_sem();
 
     while (TRUE) {
