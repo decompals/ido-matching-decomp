@@ -153,7 +153,7 @@ function parm_reg(arg0: ^Tree): integer; external;
 #define CASE_OPC(x) (x)
 
 function build_tree(verbose: boolean): pointer;
-label binop_out;
+label binop_out; { Original name: next }
 const
     stack_size = 400;
 var
@@ -207,6 +207,7 @@ var {extra var here makes sp128 initialize first}
 
     { Inner functions }
 
+    { Original name: append_statement }
     procedure append_statement(stmt: PTree);
     begin
         statement_list^.next := stmt;
@@ -214,6 +215,7 @@ var {extra var here makes sp128 initialize first}
         statement_list := stmt;
     end;
 
+    { Original name: append_list }
     procedure extend_statement_list(new_list: PTree);
     begin
         statement_list^.next := new_list;
@@ -227,6 +229,7 @@ var {extra var here makes sp128 initialize first}
         statement_list := new_list;
     end;
 
+    { Original name: insert_list }
     procedure list_insert(list: PTree; sublist: PTree);
     var
         next: ^Tree;
@@ -241,7 +244,8 @@ var {extra var here makes sp128 initialize first}
         sublist^.next := next;
     end;
 
-    procedure func_0040E2AC(pos: 1..stack_size);
+    { Original name: force_add }
+    procedure force_add(pos: 1..stack_size);
     var
         dtype: Datatype;
     begin
@@ -271,7 +275,8 @@ var {extra var here makes sp128 initialize first}
         lexlev_stack[pos] := 0;
     end;
 
-    procedure func_0040E474(arg0: ^Tree);
+    { Original name: note_pmt }
+    procedure note_pmt(arg0: ^Tree);
     var
         i: integer;
         t1: integer;
@@ -361,7 +366,8 @@ var {extra var here makes sp128 initialize first}
 
     end;
 
-    function func_0040E884(arg0: ^Tree): boolean;
+    { Original name: can_add_vreg }
+    function can_add_vreg(arg0: ^Tree): boolean;
     var
         a1: integer;
         a3: integer;
@@ -444,7 +450,8 @@ var {extra var here makes sp128 initialize first}
                ((arg0^.u.Dtype in [Qdt, Rdt, Xdt]) and (v02 >= 44) and (v02 <= cardinal(42 + 2 * n_fp_parm_regs)));
     end;
 
-    procedure func_0040EC54(arg0: PTree);
+    { Original name: add_vreg }
+    procedure add_vreg(arg0: PTree);
     var
         var_s0: PTree;
         sp2C : PTree;
@@ -495,25 +502,27 @@ var {extra var here makes sp128 initialize first}
         end;
     end;
 
-    procedure func_0040EED4();
+    { Original name: add_parm_vregs }
+    procedure add_parm_vregs();
     var
     s0: PTree;
     v0: PTree;
     begin
         s0 := sp1B8;
         while s0 <> nil do begin
-            if func_0040E884(s0) then begin
+            if can_add_vreg(s0) then begin
                 v0 := build_u(s0^.u);
                 v0^.u.Opc := Uvreg;
                 v0^.u.Lexlev := 0;
                 v0^.u.Offset2 := s0^.u.Offset2;
-                func_0040EC54(v0);
+                add_vreg(v0);
             end;
             s0:= s0^.next;
         end;
     end;
 
-    procedure func_0040EF8C(arg0: PTree);
+    { Original name: assign_vreg_mtag }
+    procedure assign_vreg_mtag(arg0: PTree);
     begin
         while arg0 <> nil do begin
             sp158 := sp158 + 1;
@@ -523,8 +532,8 @@ var {extra var here makes sp128 initialize first}
     end;
 
 
-
-    procedure func_0040EFBC(arg0: PTree);
+    { Original name: assign_syms_mtag }
+    procedure assign_syms_mtag(arg0: PTree);
     var
         mtag: PTree;
         t: PTree;
@@ -553,7 +562,8 @@ var {extra var here makes sp128 initialize first}
         end;
     end;
 
-    procedure func_0040F0B8(arg0: PTree);
+    { Original name: add_pdef }
+    procedure add_pdef(arg0: PTree);
     var
         v0: PTree;
         next: PTree;
@@ -602,8 +612,8 @@ var {extra var here makes sp128 initialize first}
         v0^.next := arg0;
     end;
 
-
-    procedure func_0040F1BC(arg0: ^Tree);
+    { Original name: add_to_ijp_labels }
+    procedure add_to_ijp_labels(arg0: ^Tree);
     var
         temp_v0 : PTree;
     begin
@@ -615,7 +625,8 @@ var {extra var here makes sp128 initialize first}
         sp1A8 := temp_v0;
     end;
 
-    function func_0040F230(arg0: PTree): boolean;
+    { Original name: side_effect }
+    function side_effect(arg0: PTree): boolean;
     var
       temp_v0: boolean;
     begin
@@ -627,10 +638,10 @@ var {extra var here makes sp128 initialize first}
           return true;
       end;
       if (arg0^.op1 <> nil) then begin
-          temp_v0 := func_0040F230(arg0^.op1);
+          temp_v0 := side_effect(arg0^.op1);
           if (arg0^.op2 <> nil) then begin
               if NOT (temp_v0) then begin
-                  temp_v0 := func_0040F230(arg0^.op2);
+                  temp_v0 := side_effect(arg0^.op2);
               end;
               return temp_v0;
           end;
@@ -639,7 +650,8 @@ var {extra var here makes sp128 initialize first}
       return false;
     end;
 
-    procedure func_0040F328();
+    { Original name: process_out_parms }
+    procedure process_out_parms();
     label next;
     var
         var_s2 : PTree;
@@ -924,23 +936,23 @@ begin
                 ((sp182) or ((sp1F0 = 0) and (sp17C <> -1)) or (pseudo_leaf <> 0)) then if
                 ((source_language <> ADA_SOURCE) or (not sp167)) then if
                 (not sp165) then begin
-                    func_0040EED4();
+                    add_parm_vregs();
                 end;
 
                 if (sp17B <> 0) then begin
-                    func_0040F328();
+                    process_out_parms();
                 end;
             end;
 
             if (sp1BC <> nil) then begin
                 if domtag then begin
-                    func_0040EF8C(sp1BC);
+                    assign_vreg_mtag(sp1BC);
                 end;
                 list_insert(sp1C0, sp1BC);
             end;
 
             if (syms <> nil) then begin
-                func_0040EFBC(syms);
+                assign_syms_mtag(syms);
                 list_insert(sp1C0, syms);
                 syms := nil;
             end;
@@ -954,13 +966,13 @@ begin
             end;
 
             if (sp1A8 <> nil) then begin
-            tree_s2 := sp1C0;
-            while (tree_s2 <> sp1A4) do begin
-                if (tree_s2^.u.Opc = Uijp) then begin
-                    tree_s2^.op2 := sp1A8;
+                tree_s2 := sp1C0;
+                while (tree_s2 <> sp1A4) do begin
+                    if (tree_s2^.u.Opc = Uijp) then begin
+                        tree_s2^.op2 := sp1A8;
+                    end;
+                    tree_s2 := tree_s2^.next;
                 end;
-                tree_s2 := tree_s2^.next;
-            end;
             end;
             return;
         end;
@@ -968,7 +980,7 @@ begin
         CASE_OPC(Updef):
         begin
             tree_s3 := build_u(ucode);
-            func_0040F0B8(tree_s3);
+            add_pdef(tree_s3);
             if tree_s3^.u.Lexlev <> 1 then sp17B := 1;
         end;
 
@@ -989,7 +1001,7 @@ begin
         CASE_OPC(Uvreg):
         begin
             ucode.Constval.Ival := -1;
-            func_0040EC54(build_u(ucode));
+            add_vreg(build_u(ucode));
         end;
 
         CASE_OPC(Uunal):
@@ -1015,7 +1027,7 @@ begin
 
         CASE_OPC(Uijp):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u1(ucode, node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
             assert(stack_pos = 0);
@@ -1025,7 +1037,7 @@ begin
         CASE_OPC(Utjp),
         CASE_OPC(Ufjp):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u2(ucode, node_stack[stack_pos], find_label(ucode.I1));
             stack_pos :=  stack_pos - 1;
             assert(stack_pos = 0);
@@ -1059,7 +1071,7 @@ begin
             tree_s3^.u.Offset2 := 0;
             append_statement(tree_s3);
             if IS_IJP_ATTR(ucode.Lexlev) then begin
-                func_0040F1BC(tree_s3);
+                add_to_ijp_labels(tree_s3);
             end;
             if IS_EXCEPTION_ATTR(ucode.Lexlev) then begin
                 sp166 := true;
@@ -1196,7 +1208,7 @@ begin
             end else begin
                 value_stack[stack_pos] := value_stack[stack_pos] - ucode.lbound;
                 lexlev_stack[stack_pos] := 0;
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
                 tree_s2 := node_stack[stack_pos];
                 if ucode.Dtype in [Idt, Kdt, Wdt] then begin
                     dtype_s1 := Kdt;
@@ -1256,7 +1268,7 @@ begin
                 writeln(err, "Internal error due to probable C source error. Please recompile your C code with the -prototypes flag to cc(1)");
                 report_error(Internal, 1708, "build.p", "Cannot continue");
             end;
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u1(ucode, node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
             assert(stack_pos = 0);
@@ -1285,7 +1297,7 @@ begin
 
         CASE_OPC(Uicuf):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u1(ucode, node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
             assert(stack_pos = 0);
@@ -1298,8 +1310,8 @@ begin
 
         CASE_OPC(Umov):
         begin
-            func_0040E2AC(stack_pos);
-            func_0040E2AC(stack_pos - 1);
+            force_add(stack_pos);
+            force_add(stack_pos - 1);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos := pred(pred(stack_pos));
             assert(stack_pos = 0);
@@ -1318,7 +1330,7 @@ begin
             if (ucode.Opc = Uaos) or (ucode.Opc = Ustsp) then begin
                 use_fp := 1;
             end;
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u1(ucode, node_stack[stack_pos]);
             if (ucode.Opc = Ustr)
                and (node_stack[stack_pos]^.u.Opc = Ulod)
@@ -1341,7 +1353,7 @@ begin
                 end;
                 extend_statement_list(tree_s3);
                 if (tree_s3^.u.Opc = Ustr) and (tree_s3^.u.Mtype = Pmt) then begin
-                    func_0040E474(tree_s3);
+                    note_pmt(tree_s3);
                 end;
                 if (tree_s3^.u.Opc = Uaos) or (tree_s3^.u.Opc = Ustsp) then begin
                     tree_s3^.u.Dtype := addr_dtype;
@@ -1352,7 +1364,7 @@ begin
         CASE_OPC(Uisst):
         begin
             ucode.Offset2 := 0;
-            if nooffsetopt then func_0040E2AC(stack_pos - 1);
+            if nooffsetopt then force_add(stack_pos - 1);
             if node_stack[stack_pos - 1] = nil then begin
                 temp_fp := value_stack[stack_pos - 1] + ucode.Offset;
                 ucode.Offset := (bitxor(bitand(temp_fp, 16#FFFF), 16#8000) - 16#8000);
@@ -1365,7 +1377,7 @@ begin
                 ucode.Offset := ucode.Offset + value_stack[stack_pos - 1];
             end;
             value_stack[stack_pos - 1] := 0;
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos := pred(pred(stack_pos));
             assert(stack_pos = 0);
@@ -1375,7 +1387,7 @@ begin
         CASE_OPC(Uistr):
         begin
             ucode.Offset2 := ucode.Offset;
-            if nooffsetopt then func_0040E2AC( stack_pos - 1);
+            if nooffsetopt then force_add( stack_pos - 1);
             if stack_pos < 2 then stack_pos := 2;
             if node_stack[stack_pos - 1] = nil then begin
                 temp_fp := value_stack[stack_pos - 1] + ucode.I1;
@@ -1389,7 +1401,7 @@ begin
                 ucode.Offset := ucode.I1 + value_stack[stack_pos - 1];
             end;
             value_stack[stack_pos - 1] := 0;
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos :=  pred(pred(stack_pos));
             assert(stack_pos = 0);
@@ -1399,10 +1411,10 @@ begin
 
         CASE_OPC(Uirst):
         begin
-            func_0040E2AC( stack_pos - 1);
+            force_add( stack_pos - 1);
             if stack_pos < 2 then stack_pos := 2;
             value_stack[stack_pos - 1] := 0;
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos :=  pred(pred(stack_pos));
             assert(stack_pos = 0);
@@ -1479,7 +1491,7 @@ begin
             tree_s0 := build_u(ucode);
             tree_s0^.u.Opc := Ulda;
             tree_s0^.u.Dtype := addr_dtype;
-            if ucode.Mtype = Pmt then func_0040E474(tree_s0);
+            if ucode.Mtype = Pmt then note_pmt(tree_s0);
             tree_s3 := build_op(Ustr);
             tree_s3^.u.Dtype := addr_dtype;
             tree_s3^.u.Mtype := Rmt;
@@ -1513,7 +1525,7 @@ begin
                     sp188 := min(sp188, ucode.Offset2);
                 end;
             end else if ucode.Mtype = Pmt then begin
-                func_0040E474(tree_s3);
+                note_pmt(tree_s3);
             end;
             stack_pos := stack_pos + 1;
             node_stack[stack_pos] := tree_s3;
@@ -1572,13 +1584,13 @@ begin
             node_stack[stack_pos] := tree_s3;
             value_stack[stack_pos] := 0;
             lexlev_stack[stack_pos] := 0;
-            if (tree_s3^.u.Opc = Ulod) and (tree_s3^.u.Mtype = Pmt) then func_0040E474(tree_s3);
+            if (tree_s3^.u.Opc = Ulod) and (tree_s3^.u.Mtype = Pmt) then note_pmt(tree_s3);
             if (tree_s3^.u.Opc = Uldsp) or (tree_s3^.u.Opc = Uldap) then tree_s3^.u.Dtype := addr_dtype;
         end;
 
         CASE_OPC(Uchkt):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             ucode.I1 := 10;
             tree_s3 := build_u1(ucode, node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
@@ -1592,8 +1604,8 @@ begin
         CASE_OPC(Utplt),
         CASE_OPC(Utpne):
         begin
-            func_0040E2AC(stack_pos - 1);
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos - 1);
+            force_add(stack_pos);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos :=  pred(pred(stack_pos));
             if (tree_s3^.u.Dtype in [Qdt, Rdt, Xdt]) then begin
@@ -1611,7 +1623,7 @@ begin
             if not (ucode.Dtype in similar_data_types[ucode.Dtype2]) or
                 (IS_OVERFLOW_ATTR(ucode.Lexlev) and ((ucode.Dtype in [Idt, Jdt]) <> (ucode.Dtype2 in [Idt, Jdt])) or
                 ((opcode_arch = ARCH_64) and not (ucode.Dtype in similar_data_types_dw[ucode.Dtype2]))) then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
                 node_stack[stack_pos] := build_u1(ucode, node_stack[stack_pos]);
             end;
         end;
@@ -1632,14 +1644,14 @@ begin
         CASE_OPC(Usqrt),
         CASE_OPC(Utyp):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             node_stack[stack_pos] := build_u1(ucode, node_stack[stack_pos]);
         end;
 
         CASE_OPC(Uneg):
         begin
             if IS_OVERFLOW_ATTR(ucode.Lexlev) and (value_stack[stack_pos] = 16#80000000) then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
             end;
             value_stack[stack_pos] := -value_stack[stack_pos];
             if node_stack[stack_pos] <> nil then begin
@@ -1651,7 +1663,7 @@ begin
         begin
             temp_fp := value_stack[stack_pos] + ucode.I1;
             if IS_OVERFLOW_ATTR(ucode.Lexlev) and (add_overflow(ucode.Dtype, value_stack[stack_pos], ucode.I1)) then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
                 temp_fp := ucode.I1;
             end;
             value_stack[stack_pos] := temp_fp;
@@ -1662,7 +1674,7 @@ begin
         begin
             temp_fp := value_stack[stack_pos] - ucode.I1;
             if (IS_OVERFLOW_ATTR(ucode.Lexlev) and (sub_overflow(ucode.Dtype, value_stack[stack_pos], ucode.I1))) then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
                 temp_fp := -ucode.I1;
             end;
             value_stack[stack_pos] := temp_fp;
@@ -1673,7 +1685,7 @@ begin
         begin
             ucode.Offset2 := 0;
             if nooffsetopt then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
             end;
             if node_stack[stack_pos] = nil then begin
                 temp_fp := value_stack[stack_pos] + ucode.Offset;
@@ -1696,7 +1708,7 @@ begin
         begin
             ucode.Offset2 := ucode.Offset;
             if nooffsetopt then begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
             end;
             if (node_stack[stack_pos] = nil) then begin
                 temp_fp := value_stack[stack_pos] + ucode.I1;
@@ -1716,7 +1728,7 @@ begin
 
         CASE_OPC(Uirld):
         begin
-            func_0040E2AC(stack_pos);
+            force_add(stack_pos);
             node_stack[stack_pos] := build_u1(ucode, node_stack[stack_pos]);
             value_stack[stack_pos] := 0;
             lexlev_stack[stack_pos] := 0;
@@ -1729,7 +1741,7 @@ begin
                 node_stack[stack_pos] := nil;
                 value_stack[stack_pos] := value_stack[stack_pos - 1];
             end else begin
-                func_0040E2AC(stack_pos - 1);
+                force_add(stack_pos - 1);
                 node_stack[stack_pos] := dup_tree(node_stack[stack_pos - 1]);
                 value_stack[stack_pos] := 0;
             end;
@@ -1777,8 +1789,8 @@ begin
             or ((node_stack[stack_pos] <> nil) and (ucode.Dtype <> node_stack[stack_pos]^.u.Dtype))
             or (ucode.Lexlev <> lexlev_stack[stack_pos - 1])
             or (ucode.Lexlev <> lexlev_stack[stack_pos]))) then begin
-                func_0040E2AC(stack_pos - 1);
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos - 1);
+                force_add(stack_pos);
             end;
             case ucode.Opc of
             CASE_OPC(Uadd):
@@ -1788,7 +1800,7 @@ begin
                     sp18C := lexlev_stack[stack_pos - 1];
                     value_stack[stack_pos - 1] := 0;
                     lexlev_stack[stack_pos - 1] := 0;
-                    func_0040E2AC(stack_pos);
+                    force_add(stack_pos);
                 end else begin
                     temp_fp := value_stack[stack_pos - 1] + value_stack[stack_pos];
                     value_stack[stack_pos - 1] := 0;
@@ -1816,7 +1828,7 @@ begin
                     temp_fp := value_stack[stack_pos - 1];
                     sp18C := lexlev_stack[stack_pos - 1];
                     value_stack[stack_pos - 1] := 0;
-                    func_0040E2AC(stack_pos);
+                    force_add(stack_pos);
                 end else begin
                     temp_fp := value_stack[stack_pos - 1] - value_stack[stack_pos];
                     value_stack[stack_pos - 1] := 0;
@@ -1928,8 +1940,8 @@ begin
             end;
 
             binop_out:
-            func_0040E2AC(stack_pos);
-            func_0040E2AC(stack_pos - 1);
+            force_add(stack_pos);
+            force_add(stack_pos - 1);
             tree_s3 := build_u2(ucode, node_stack[stack_pos - 1], node_stack[stack_pos]);
             stack_pos := stack_pos - 1;
             node_stack[stack_pos] := tree_s3;
@@ -1947,9 +1959,9 @@ begin
             (ucode.Lexlev <> lexlev_stack[stack_pos - 2])
             or (ucode.Lexlev <> lexlev_stack[stack_pos - 1])
             or (ucode.Lexlev <> lexlev_stack[stack_pos])) then begin
-                func_0040E2AC(stack_pos);
-                func_0040E2AC(stack_pos - 1);
-                func_0040E2AC(pred(pred(stack_pos)));
+                force_add(stack_pos);
+                force_add(stack_pos - 1);
+                force_add(pred(pred(stack_pos)));
             end;
             if (node_stack[stack_pos - 2] = nil) and (node_stack[stack_pos - 1] = nil) then begin
                 tree_s3 := node_stack[stack_pos];
@@ -1974,8 +1986,8 @@ begin
                     temp_fp := value_stack[stack_pos];
                     value_stack[stack_pos] := 0;
                 end;
-                func_0040E2AC(pred(pred(stack_pos)));
-                func_0040E2AC(stack_pos - 1);
+                force_add(pred(pred(stack_pos)));
+                force_add(stack_pos - 1);
                 if (node_stack[stack_pos - 2] <> nil) or (value_stack[stack_pos - 2] <> 1) then begin
                     node_stack[stack_pos - 1] := build_2op(Umpy, node_stack[stack_pos - 1], node_stack[stack_pos - 2]);
                     node_stack[stack_pos - 1]^.u.Lexlev := ucode.Lexlev;
@@ -2002,10 +2014,10 @@ begin
 
         CASE_OPC(Upop):
         begin
-            if not func_0040F230(node_stack[stack_pos]) then begin
+            if not side_effect(node_stack[stack_pos]) then begin
                 stack_pos :=  stack_pos - 1;
             end else begin
-                func_0040E2AC(stack_pos);
+                force_add(stack_pos);
                 tree_s3 := build_u1(ucode, node_stack[stack_pos]);
                 stack_pos := stack_pos - 1;
                 tree_s3^.u.Opc := Ustr;
