@@ -40,6 +40,7 @@ typedef struct TreeNodeList {
 #include "mem.h"
 #include "linklist.h"
 #include "error.h"
+#include "error_fmt.h"
 #include "scan.h"
 #include "main.h"
 #include "modes.h"
@@ -47,6 +48,7 @@ typedef struct TreeNodeList {
 #include "screener.h"
 #include "tree.h"
 #include "os.h"
+#include "c.h"
 #include "unknown.h"
 
 #endif

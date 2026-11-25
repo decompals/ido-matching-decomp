@@ -51,7 +51,7 @@ void UWRITE(void* ucode, int size) {
         fprintf(dbgout, "writing ucode size=%d\n", size);
     }
     if (fwrite(ucode, 1, size, Ucw_binout) != (unsigned int)size) {
-        error(0x50087, LEVEL_FATAL, -1, infile ? infile : "");
+        error(MSG_CANNOT_WRITE_UCODE_FILE, LEVEL_FATAL, -1, infile ? infile : "");
     }
 }
 
@@ -108,9 +108,9 @@ void UW_CONST_f(char* arg0, double arg2, int arg4) {
     if (arg0 == NULL) {
         sprintf(buf, "%.16e", arg2);
         if (strncmp(buf, "inf", strlen("inf")) == 0) {
-            error(0x3010C, LEVEL_WARNING, arg4, "infinity");
+            error(MSG_VALUE_OVERFLOWS_TYPE, LEVEL_WARNING, arg4, "infinity");
         } else if (strncmp(buf, "-inf", strlen("-inf")) == 0) {
-            error(0x3010C, LEVEL_WARNING, arg4, "-infinity");
+            error(MSG_VALUE_OVERFLOWS_TYPE, LEVEL_WARNING, arg4, "-infinity");
         }
         UW_CONST_str(buf);
         return;

@@ -57,11 +57,11 @@ int main(int argc, char** argv) {
     message_files[error_mode++] = "/usr/lib/cmplrs/err.cc";
 
     if (IS_RELAXED_ANSI) {
-        error_mode = 2;
+        error_mode = ERROR_MODE_XANSI;
     } else if (IS_ANSI) {
-        error_mode = 1;
+        error_mode = ERROR_MODE_ANSI;
     } else {
-        error_mode = 0;
+        error_mode = ERROR_MODE_KR;
     }
 
     if (!error_init(message_files, NULL, error_mode)) {
@@ -75,11 +75,11 @@ int main(int argc, char** argv) {
     }
 
     if (IS_RELAXED_ANSI) {
-        error_mode = 2;
+        error_mode = ERROR_MODE_XANSI;
     } else if (IS_ANSI) {
-        error_mode = 1;
+        error_mode = ERROR_MODE_ANSI;
     } else {
-        error_mode = 0;
+        error_mode = ERROR_MODE_KR;
     }
 
     set_error_mode(error_mode);
@@ -344,7 +344,7 @@ static void parse_cmdline(int argc, char** argv) {
                         case 'v':
                             if (strcmp(argv[i], "-Xvolatile") == 0) {
                                 options[OPTION_VOLATILE] = TRUE;
-                                error(0x4015F, 1, -1, "-volatile");
+                                error(MSG_DEPRECATED_OPTION, LEVEL_WARNING, -1, "-volatile");
                                 break;
                             }
                             if (strcmp(argv[i], "-Xv") == 0) {
@@ -507,7 +507,7 @@ static void parse_cmdline(int argc, char** argv) {
             if (infile == NULL) {
                 infile = argv[i];
             } else if (get_program_id(argv[0]) != 2) {
-                error(0x40040, 2, -1, argv[i]);
+                error(MSG_TOO_MANY_INPUT_FILES, LEVEL_ERROR, -1, argv[i]);
             }
         }
     }
@@ -519,11 +519,11 @@ static void parse_cmdline(int argc, char** argv) {
         options[OPTION_LITERAL_CONST] = IS_ANSI && !IS_RELAXED_ANSI;
     }
     if (options[OPTION_FULLWARN] && has_woff_error) {
-        error(0x40135, 1, -1, "such as ", woff_warn_num, 500, 856);
+        error(MSG_WARNING_OPTION_RANGE_INVALID, LEVEL_WARNING, -1, "such as ", woff_warn_num, 500, 856);
     }
     if (options[OPTION_FULLWARN] && invalid_woff) {
-        error(0x40135, 1, -1, "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 607, 500,
-              856);
+        error(MSG_WARNING_OPTION_RANGE_INVALID, LEVEL_WARNING, -1,
+              "numbers (ranges) should be seperated by commas only: e.g. -woff 505-550,", 607, 500, 856);
     }
 }
 

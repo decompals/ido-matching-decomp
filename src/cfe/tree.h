@@ -652,5 +652,8 @@ TreeNode* make_pointer(TreeNode* arg0);
 TreeNode* duplicate_node(TreeNode* t);
 float str_to_float(char* arg0, int arg1, int arg2);
 double str_to_double(char* arg0, int arg1, int arg2);
+void init_trees(void);
+void make_std_trees(void);
+void display_tree(TreeNode* t);
 
 #endif

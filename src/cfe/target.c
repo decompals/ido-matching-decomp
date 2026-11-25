@@ -241,7 +241,7 @@ double str_to_double(char* str, int location, int warning_level) {
     set_fpc_csr(0);
     result = atof(str);
     if (fp_class_d(result) == FP_POS_INF) {
-        error(0x3010D, warning_level, location, "double");
+        error(MSG_VALUE_OUT_OF_RANGE, warning_level, location, "double");
     }
     return result;
 }
@@ -252,9 +252,9 @@ float str_to_float(char* str, int location, int warning_level) {
 
     result = atof(str);
     if (fp_class_d(result) == FP_POS_INF) {
-        error(0x3010D, warning_level, location, "float");
+        error(MSG_VALUE_OUT_OF_RANGE, warning_level, location, "float");
     } else if (result != 0 && (result > FLT_MAX || result < FLT_MIN - epsilon)) {
-        error(0x3010D, warning_level, location, "float");
+        error(MSG_VALUE_OUT_OF_RANGE, warning_level, location, "float");
     }
     return result;
 }

@@ -30,16 +30,6 @@ typedef struct ParseLevel {
     MemCtx* saved_ctx;
 } ParseLevel;
 
-typedef struct ErrorFmt {
-    short unk_00;
-    short unk_02;
-} ErrorFmt;
-
-typedef struct FmtArr {
-    char* unk_00;
-    int unk_04;
-} FmtArr;
-
 typedef struct Scope {
     /* 0x00 */ TreeNode* unk_00;
     /* 0x04 */ unsigned int level;
@@ -50,8 +40,19 @@ typedef struct Scope {
     /* 0x18 */ TreeNode* unk_18;
 } Scope; // size = 0x1C
 
-extern short act_to_imp[];
-extern short imp_to_act[];
+typedef struct OrigFileStruct2 {
+    /*  0x00 */ char unk_00[0x18];
+    /*  0x18 */ char unk_18[1];
+} OrigFileStruct2;
+
+typedef struct OrigFileStruct {
+    /*  0x00 */ int unk_00;
+    /*  0x04 */ int unk_04;
+    /*  0x08 */ int unk_08;
+    /*  0x0C */ OrigFileStruct2* unk_0C;
+    /*  0x10 */ int unk_10;
+} OrigFileStruct;
+
 extern int mode;
 extern char debug_arr[];
 extern FILE* dbgout;
@@ -62,15 +63,13 @@ extern char* myname;
 extern int imm_flag;
 extern int num_warns;
 extern int num_errs;
-extern ErrorFmt err_fmts[];
-extern FmtArr fmts_arr[];
 extern char* infile;
 extern CppLineArr cpplinearr;
 extern unsigned int cppline;
 extern int yyfile;
 extern int yyline;
 extern char* infile;
-extern int origfile;
+extern OrigFileStruct* origfile;
 extern int curloc;
 extern TreeNode* char_type;
 extern TreeNode* uchar_type;
@@ -109,7 +108,6 @@ extern MemCtx* pmhandle;
 extern LinkedList* psymb_handle;
 extern LinkedList* isymb_handle;
 extern FILE* dbgout;
-extern int err_options[];
 extern MemCtx* general_handle;
 extern int xpg_flag;
 extern char* command_line_file_name;
@@ -126,6 +124,7 @@ extern Scope* function_scope;
 extern Scope* current_scope;
 extern Scope* file_scope;
 extern void* current_function;
+extern int return_code;
 
 int real_file_line(int, char**, int*, int);
 void __assert(char*, char*, int);
@@ -150,5 +149,14 @@ void mips_st_extundefined(TreeNode*);
 void lint_setref(TreeNode*, int, int);
 void lint_checks(TreeNode*);
 int type_compatible(TreeNode* arg0, TreeNode* arg1, int arg2);
+void create_symtab(void);
+void init_layout(void);
+void init_mips_st(int);
+void init_sem(void);
+TreeNode* semantics(TreeNode*);
+int init_codegen(char* arg0, FILE* arg1, int arg2);
+void codegen(TreeNode*);
+void lint_outdef(int, TreeNode*, int);
+void end_mips_st(void);
 
 #endif

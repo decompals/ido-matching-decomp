@@ -141,7 +141,7 @@ TreeNode* make_topdecl(TreeNode* type, int attr, int typespec, TreeNode* ids, in
     if (type != NULL) {
 		TREE_TYPE(decl) = type;
         if (typespec != 0) {
-            error(0x2010F, LEVEL_WARNING, location);
+            error(MSG_USELESS_KEYWORD, LEVEL_WARNING, location);
         }
         return decl;
     } else {
@@ -158,7 +158,7 @@ static TreeNode* make_pre_update_cast(int pre_update_code, int location, TreeNod
     TreeNode* pointer;    
     
     if (!options[OPTION_MSFT]) {
-        error(0x3015A, LEVEL_WARNING, location);
+        error(MSG_MICROSOFT_EXTENSION, LEVEL_WARNING, location);
     }
     
     if (cast_expr == NULL || BINARY_EXPR(cast_expr).operand[0] == NULL) {
@@ -365,7 +365,7 @@ unary_expression
 			TreeNode* ident_ellipsis = make(Identifier, $2, builtins[6]);
 			$$ = make(Addr_expr, $1, ident_ellipsis);
 			if (IS_STRICT_ANSI) {
-				error(0x2012D, LEVEL_WARNING, $2);
+				error(MSG_INVALID_AMPERSAND_ELLIPSIS, LEVEL_WARNING, $2);
 			}
 		}
 	| SIZEOF unary_expression { $$ = make(Sizeof_expr, $1, $2); }
@@ -500,7 +500,7 @@ declaration
 	: declaration_specifiers init_declarator_list ';'
 		{
 			if (depth == 0) {
-                error(0x2007B, LEVEL_ERROR, curloc);
+                error(MSG_SYNTAX_ERROR, LEVEL_ERROR, curloc);
             }
 			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, $2.first, $1.location);
 			cur_lvl->type_ident_expected = TRUE;
@@ -509,7 +509,7 @@ declaration
 	| declaration_specifiers ';'
 		{
 			if (depth == 0) {
-                error(0x2007B, LEVEL_ERROR, curloc);
+                error(MSG_SYNTAX_ERROR, LEVEL_ERROR, curloc);
             }
 			$$ = make_topdecl($1.type, $1.type_attr, $1.type_spec, NULL, $1.location);
 			cur_lvl->type_ident_expected = TRUE;
@@ -533,7 +533,7 @@ top_declaration
 	| init_declarator_list ';'
 		{
 			$$ = make_topdecl(NULL, 0, 0, $1.first, TREE_LOCATION($1.first));
-			error(0x20092, LEVEL_DEFAULT, TREE_LOCATION($1.first));
+			error(MSG_EMPTY_DECL_SPECIFIERS, LEVEL_DEFAULT, TREE_LOCATION($1.first));
 		}
 	;
 
@@ -544,9 +544,9 @@ declaration_specifiers
 	| declaration_specifiers storage_class_specifier
 		{
 			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
-				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_ONE_STORAGE_CLASS_MAX, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else if ($$.type_attr & $2.type_attr) {
-				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
 				$$.type_attr |= $2.type_attr;
 				$$.location = $2.location;
@@ -555,19 +555,19 @@ declaration_specifiers
 	| declaration_specifiers type_specifier
 		{
 			if ($$.type != NULL) {
-				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.type));
+				error(MSG_USELESS_TYPE_NAME, LEVEL_WARNING, TREE_LOCATION($$.type));
 			}
 			if ($2.type != NULL) {
 				$$.type = $2.type;
 			} else if ($$.type_spec & $2.type_spec) {
 				if ($2.type_spec == TYPESPEC_LONG) {
 					if (IS_STRICT_ANSI) {
-						error(0x20131, LEVEL_WARNING, $2.location, "long long");
+						error(MSG_NON_ANSI_KEYWORD, LEVEL_WARNING, $2.location, "long long");
 					}
 					$$.type_spec = $$.type_spec ^ $2.type_spec;
 					$$.type_spec |= TYPESPEC_LONGLONG;
 				} else {
-					error(0x20094, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
+					error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
 				}
 			} else {
 				$$.type_spec |= $2.type_spec;
@@ -576,9 +576,9 @@ declaration_specifiers
 	| declaration_specifiers type_qualifier
 		{
 			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
-				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_ONE_STORAGE_CLASS_MAX, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else if ($$.type_attr & $2.type_attr) {
-				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
 				$$.type_attr |= $2.type_attr;
 				$$.location = $2.location;
@@ -588,9 +588,9 @@ declaration_specifiers
 	| declaration_specifiers fct_specifier
 		{
 			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
-				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_ONE_STORAGE_CLASS_MAX, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else if ($$.type_attr & $2.type_attr) {
-				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
 				$$.type_attr |= $2.type_attr;
 				$$.location = $2.location;
@@ -857,7 +857,7 @@ struct_or_union
 	;
 
 struct_declaration_list_semi
-	: struct_declaration_list { error(0x20097, LEVEL_DEFAULT, curloc); } 
+	: struct_declaration_list { error(MSG_MISSING_SEMICOLON_STRUCT, LEVEL_DEFAULT, curloc); } 
 	| struct_declaration_list ';'
 	;
 
@@ -883,19 +883,19 @@ specifier_qualifier_list
 	| specifier_qualifier_list type_specifier
 		{
 			if ($$.type != NULL) {
-				error(0x20162, LEVEL_WARNING, TREE_LOCATION($$.type));
+				error(MSG_USELESS_TYPE_NAME, LEVEL_WARNING, TREE_LOCATION($$.type));
 			}
 			if ($2.type != NULL) {
 				$$.type = $2.type;
 			} else if ($$.type_spec & $2.type_spec) {
 				if ($2.type_spec == TYPESPEC_LONG) {
 					if (IS_STRICT_ANSI) {
-						error(0x20131, LEVEL_WARNING, $2.location, "long long");
+						error(MSG_NON_ANSI_KEYWORD, LEVEL_WARNING, $2.location, "long long");
 					}
 					$$.type_spec = $$.type_spec ^ $2.type_spec;
 					$$.type_spec |= TYPESPEC_LONGLONG;
 				} else {
-					error(0x20094, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
+					error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, type_to_string($2.type_spec));
 				}
 			} else {
 				$$.type_spec |= $2.type_spec;
@@ -904,9 +904,9 @@ specifier_qualifier_list
 	| specifier_qualifier_list type_qualifier
 		{
 			if (($$.type_attr & STORAGE_CLASS_ATTRIBUTE) && ($2.type_attr & STORAGE_CLASS_ATTRIBUTE)) {
-				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_ONE_STORAGE_CLASS_MAX, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else if ($$.type_attr & $2.type_attr) {
-				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
 				$$.type_attr |= $2.type_attr;
 				$$.location = $2.location;
@@ -952,7 +952,7 @@ struct_declarator
 		}
 	|
 		{
-			error(0x20098, LEVEL_DEFAULT, curloc);
+			error(MSG_MISSING_MEMBER_NAME_STRUCT, LEVEL_DEFAULT, curloc);
 			$$ = make(Field_decl, curloc);
 		}
 	;
@@ -962,7 +962,7 @@ enum_specifier
 		{
 			ENUM_TYPE($$).literals = $4.first;
 			if ($5 != -1) {
-				error(0x2007E, LEVEL_DEFAULT, $5);
+				error(MSG_TRAILING_COMMA_ENUM, LEVEL_DEFAULT, $5);
 			}
 			if (depth == 0) {
                 tree_handle = cur_lvl->saved_ctx;
@@ -980,7 +980,7 @@ enum_specifier
 			ENUM_TYPE($$).ename = make(Id_decl, $2.location, $2.symbol);
 			ENUM_TYPE($$).literals = $5.first;
 			if ($6 != -1) {
-				error(0x2007E, LEVEL_DEFAULT, $6);
+				error(MSG_TRAILING_COMMA_ENUM, LEVEL_DEFAULT, $6);
 			}
 			if (depth == 0) {
                 tree_handle = cur_lvl->saved_ctx;
@@ -1214,9 +1214,9 @@ type_qualifier_list
 	| type_qualifier_list type_qualifier
 		{
 			if (($$.type_attr & 0x1F000000) && ($2.type_attr & 0x1F000000)) {
-				error(0x20103, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_ONE_STORAGE_CLASS_MAX, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else if ($$.type_attr & $2.type_attr) {
-				error(0x20094, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
+				error(MSG_DUPLICATE_SPECIFIER, LEVEL_WARNING, $2.location, attribute_to_string($2.type_attr));
 			} else {
 				$$.type_attr |= $2.type_attr;
 				$$.location = $2.location;
@@ -1266,7 +1266,7 @@ parameter_type_list
 			sp98 = make(Declare_decl, $1, ellipsis, sp98);
 			LIST_INIT($$, sp98);
 			if (IS_STRICT_ANSI) {
-				error(0x2012C, LEVEL_WARNING, $1);
+				error(MSG_VARARGS_REQUIRES_FORMAL_PARAM, LEVEL_WARNING, $1);
 			}
 		}
 	| parameter_list ',' ELLIPSIS
@@ -1658,7 +1658,7 @@ external_definition
 	| top_declaration
 	| ';'
 		{
-			error(0x2007F, LEVEL_DEFAULT, $1);
+			error(MSG_EMPTY_DECLARATION, LEVEL_DEFAULT, $1);
 			$$ = NULL;
 		}
 	| error
@@ -1690,7 +1690,7 @@ function_definition
 				}
 			}
 			if (ID_DECL($1.unk_04).qualifiers == NULL || TREE_CODE(ID_DECL($1.unk_04).qualifiers) != Func_type) {
-				error(0x2010A, LEVEL_DEFAULT, TREE_LOCATION($2), ID_DECL($1.unk_04).id->name);
+				error(MSG_MUST_HAVE_FUNCTION_TYPE_2, LEVEL_DEFAULT, TREE_LOCATION($2), ID_DECL($1.unk_04).id->name);
 			} else if (TREE_LINK($2) != NULL) {
 				FUNC_TYPE(ID_DECL($1.unk_04).qualifiers).decls = TREE_LINK($2);
 				ID_DECL($1.unk_04).init_value = $2;
@@ -1714,7 +1714,7 @@ function_definition
 				}
 			}
 			if (ID_DECL($2.unk_04).qualifiers == NULL || TREE_CODE(ID_DECL($2.unk_04).qualifiers) != Func_type) {
-				error(0x2010A, LEVEL_DEFAULT, TREE_LOCATION($4), ID_DECL($2.unk_04).id->name);
+				error(MSG_MUST_HAVE_FUNCTION_TYPE_2, LEVEL_DEFAULT, TREE_LOCATION($4), ID_DECL($2.unk_04).id->name);
 			} else if (TREE_LINK($4) != NULL) {
 				FUNC_TYPE(ID_DECL($2.unk_04).qualifiers).decls = TREE_LINK($4);
 				ID_DECL($2.unk_04).init_value = $4;

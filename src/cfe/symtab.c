@@ -507,11 +507,11 @@ TreeNode* lookup_id(Symbol* arg0, TreeNode* arg1, int arg2, int arg3, int arg4, 
 
     if ((!t2 || s0 == NULL) && arg3) {
         if (v1 != NULL) {
-            error(0x300FE, LEVEL_WARNING, arg4, arg0->name);
+            error(MSG_STRUCT_NO_MEMBER, LEVEL_WARNING, arg4, arg0->name);
             return v1;
         } else {
             sp34 = tree_handle;
-            error(0x30082, LEVEL_ERROR, arg4, arg0->name);
+            error(MSG_SYMBOL_UNDEFINED, LEVEL_ERROR, arg4, arg0->name);
             tree_handle = general_handle;
             s0 = make(Id_decl, arg4, arg0);
             declarator(s0, arg1, 0, arg2, 0, any_type);
@@ -649,11 +649,12 @@ static int func_004194B4(TreeNode* arg0, TreeNode* arg1, int arg2) {
         sp48 = FALSE;
 
         if (ID_DECL(arg0).init_value != NULL) {
-            error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
+            error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
         } else {
             if (IS_ANSI || ID_DECL(arg1).init_value == NULL) {
-                error(0x300F5, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name);
-                error(0x3009C, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
+                error(MSG_STATIC_EXTERN_CONFLICT, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name);
+                error(MSG_PREVIOUS_DECLARATION_NOTE, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58,
+                      sp5C);
                 sp48 = FALSE;
             }
 
@@ -667,9 +668,9 @@ static int func_004194B4(TreeNode* arg0, TreeNode* arg1, int arg2) {
                !(TREE_ATTRIBUTE(arg1) & STATIC_ATTRIBUTE) &&
                !(TREE_CODE(TREE_TYPE(arg1)) == Func_type && ID_DECL(arg1).init_value == NULL)) {
 
-        error(0x300F5, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name);
+        error(MSG_STATIC_EXTERN_CONFLICT, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name);
         real_file_line(TREE_LOCATION(arg0), &sp5C, &sp58, 0);
-        error(0x3009C, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
+        error(MSG_PREVIOUS_DECLARATION_NOTE, LEVEL_WARNING, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
 
         sp44 = TREE_CODE(sp4C) == Func_type;
         sp48 = FALSE;
@@ -691,7 +692,7 @@ static int func_004194B4(TreeNode* arg0, TreeNode* arg1, int arg2) {
     } else if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && TREE_CODE(sp4C) != Func_type &&
                (TREE_ATTRIBUTE(arg0) & STATIC_ATTRIBUTE) && (TREE_ATTRIBUTE(arg1) & STATIC_ATTRIBUTE)) {
         real_file_line(TREE_LOCATION(arg0), &sp5C, &sp58, 0);
-        error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
+        error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg1), ID_DECL(arg1).id->name, sp58, sp5C);
         sp48 = FALSE;
     }
 
@@ -758,7 +759,7 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
             (ID_DECL(arg0).oclass != 3 || ID_DECL(s0).context == ID_DECL(arg0).context)) {
 
             if (ID_DECL(arg0).oclass == 3) {
-                error(0x300B5, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
+                error(MSG_DUPLICATE_MEMBER, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
                 return FALSE;
             }
 
@@ -770,16 +771,16 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                     real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
 
                     if (TREE_ATTRIBUTE(arg0) & TREE_ATTRIBUTE(s0) & CONST_ATTRIBUTE) {
-                        error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                        error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                         return FALSE;
                     } else if (sp74 == label_type) {
-                        error(0x300C9, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
+                        error(MSG_DUPLICATE_LABEL, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
                         return FALSE;
                     } else if (TREE_CODE(sp74) == Func_type) {
-                        error(0x300F8, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                        error(MSG_REDEFINITION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                         return FALSE;
                     } else {
-                        error(0x30099, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
+                        error(MSG_INITIALIZED_TWICE, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name);
                         return FALSE;
                     }
                 }
@@ -811,7 +812,7 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                 if (!options[OPTION_CPLUSPLUS] && !(options[OPTION_ANSI_MODE] & 1) && TREE_CODE(sp74) != Func_type &&
                     (TREE_ATTRIBUTE(arg0) & STATIC_ATTRIBUTE) && (TREE_ATTRIBUTE(s0) & STATIC_ATTRIBUTE)) {
                     real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-                    error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                    error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                     return FALSE;
                 }
 
@@ -839,14 +840,14 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                         return FALSE;
                     } else {
                         real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-                        error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                        error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                         return FALSE;
                     }
                 }
 
                 if (TREE_UNKNOWN_MACRO_4(sp70) && !sp5C && ID_DECL(s0).oclass == 2) {
                     real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-                    error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                    error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                     return FALSE;
                 }
 
@@ -883,7 +884,6 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                     return sp58;
                 }
 
-                // 10a8
                 if (ID_DECL(arg0).init_value != NULL && ID_DECL(s0).init_value == NULL) {
                     return func_004194B4(s0, arg0, TRUE);
                 } else if (ID_DECL(arg0).init_value == NULL && ID_DECL(s0).init_value != NULL) {
@@ -913,7 +913,7 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                     real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
                     if (options[OPTION_CPLUSPLUS] || (options[OPTION_ANSI_MODE] & 1) ||
                         (TREE_ATTRIBUTE(arg0) != TYPEDEF_ATTRIBUTE) || (TREE_ATTRIBUTE(arg1) != TYPEDEF_ATTRIBUTE)) {
-                        error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                        error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                         return FALSE;
                     } else {
                         return TRUE;
@@ -926,9 +926,9 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                 ((ID_DECL(arg0).sclass == 5 || ID_DECL(arg0).sclass == 6) && ID_DECL(arg0).level == 2)) {
                 if ((TREE_CODE(TREE_TYPE(arg0)) == Enum_type || TREE_CODE(TREE_TYPE(arg0)) == Pointer_type ||
                      TREE_CODE(TREE_TYPE(arg0)) >= Double_type && TREE_CODE(TREE_TYPE(arg0)) <= Ushort_type) &&
-                    sp68 == 0x300DA) {
+                    sp68 == MSG_TYPE_INCOMPATIBLE) {
                     real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-                    error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                    error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
                 }
 
                 TREE_TYPE(s0) = TREE_TYPE(arg0);
@@ -945,15 +945,16 @@ static int func_00419B80(TreeNode* arg0, TreeNode* arg1) {
                 return TRUE;
             }
 
-            if (sp68 == 0x300D3) {
+            if (sp68 == MSG_QUALIFIER_INCOMPATIBILITY) {
                 error(sp68, LEVEL_ERROR, TREE_LOCATION(arg0));
                 real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-                error(0x3009C, LEVEL_WARNING, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+                error(MSG_PREVIOUS_DECLARATION_NOTE, LEVEL_WARNING, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60,
+                      sp64);
                 return FALSE;
             }
 
             real_file_line(TREE_LOCATION(s0), &sp64, &sp60, 0);
-            error(0x30081, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
+            error(MSG_REDECLARATION, LEVEL_ERROR, TREE_LOCATION(arg0), ID_DECL(arg0).id->name, sp60, sp64);
             ID_DECL(arg0).flags |= 0x200;
             return FALSE;
         }
@@ -991,7 +992,7 @@ void check_static_functions(void) {
 
             if ((TREE_ATTRIBUTE(s0) & STATIC_ATTRIBUTE) && (ID_DECL(s0).flags & 0x30) &&
                 ID_DECL(s0).init_value == NULL) {
-                error(0x30116, LEVEL_ERROR, TREE_LOCATION(s0), ID_DECL(s0).id->name);
+                error(MSG_STATIC_FUNCTION_UNDEFINED, LEVEL_ERROR, TREE_LOCATION(s0), ID_DECL(s0).id->name);
             }
             s0 = ID_DECL(s0).st_list;
         }

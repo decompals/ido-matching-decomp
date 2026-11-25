@@ -19,14 +19,14 @@ typedef struct ErrorStruct {
     /* 0x10 */ char* params[4];
 } ErrorStruct; // size = 0x20
 
-static int default_error_levels[7][3] = {
-    { LEVEL_ERROR, LEVEL_ERROR, LEVEL_ERROR },
-    { LEVEL_WARNING, LEVEL_WARNING, LEVEL_WARNING },
-    { LEVEL_FATAL, LEVEL_FATAL, LEVEL_FATAL },
-    { LEVEL_WARNING, LEVEL_ERROR, LEVEL_WARNING },
-    { LEVEL_SUPPRESSED, LEVEL_SUPPRESSED, LEVEL_SUPPRESSED },
-    { LEVEL_SUPPRESSED, LEVEL_WARNING, LEVEL_WARNING },
-    { LEVEL_SUPPRESSED, LEVEL_ERROR, LEVEL_ERROR },
+static int default_error_levels[ERRCLASS_MAX][ERROR_MODE_MAX] = {
+    { LEVEL_ERROR, LEVEL_ERROR, LEVEL_ERROR },                // ERRCLASS_ALWAYS_ERROR
+    { LEVEL_WARNING, LEVEL_WARNING, LEVEL_WARNING },          // ERRCLASS_ALWAYS_WARNING
+    { LEVEL_FATAL, LEVEL_FATAL, LEVEL_FATAL },                // ERRCLASS_ALWAYS_FATAL
+    { LEVEL_WARNING, LEVEL_ERROR, LEVEL_WARNING },            // ERRCLASS_STRICT_ANSI_ERROR
+    { LEVEL_SUPPRESSED, LEVEL_SUPPRESSED, LEVEL_SUPPRESSED }, // ERRCLASS_DISABLED
+    { LEVEL_SUPPRESSED, LEVEL_WARNING, LEVEL_WARNING },       // ERRCLASS_ANSI_WARNING
+    { LEVEL_SUPPRESSED, LEVEL_ERROR, LEVEL_ERROR },           // ERRCLASS_ANSI_ERROR
 };
 
 /* .data      */
@@ -155,8 +155,8 @@ void lint_warning(ErrorStruct* arg0) {
 
     if (arg0->location != -1 && real_file_line(arg0->location, &sp3C, &sp38, 0) == 1) {
         if (sp3C != 0) {
-            error(0x170154, LEVEL_6, -1, sp3C);
-            error(0x170155, LEVEL_6, -1);
+            error(MSG_INCLUDED_AS, LEVEL_6, -1, sp3C);
+            error(MSG_SEPARATOR_LINE, LEVEL_6, -1);
         }
         if (sp38 != 0) {
             sprintf(error_buffer, "(%d)  ", sp38);
@@ -273,7 +273,7 @@ int error(int message, enum ErrorLevels level, int location, ...) {
     static int isFlushing = FALSE;
     int unused;
 
-    if (msgid > 356) {
+    if (msgid >= 357) {
         real_level = LEVEL_FATAL;
     } else if (level == LEVEL_DEFAULT) {
         real_level = default_error_levels[err_options[msgid]][mode];
@@ -297,20 +297,20 @@ int error(int message, enum ErrorLevels level, int location, ...) {
     }
 
     ers = get_link_elem(error_list);
-    if (msgid < 0x165) {
-        if (err_fmts[msgid].unk_00 != 0) {
+    if (msgid < 357) {
+        if (err_fmts[msgid].num_args != 0) {
             va_list args;
             va_start(args, location);
-            for (i = 0; i < err_fmts[msgid].unk_00; i++) {
-                switch (fmts_arr[err_fmts[msgid].unk_02 + i].unk_04) {
+            for (i = 0; i < err_fmts[msgid].num_args; i++) {
+                switch (fmts_arr[err_fmts[msgid].index + i].arg_type) {
                     case 1:
-                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].unk_02 + i].unk_00, va_arg(args, int));
+                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].index + i].format, va_arg(args, int));
                         break;
                     case 3:
-                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].unk_02 + i].unk_00, va_arg(args, double));
+                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].index + i].format, va_arg(args, double));
                         break;
                     case 2:
-                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].unk_02 + i].unk_00, va_arg(args, char*));
+                        sprintf(error_buffer, fmts_arr[err_fmts[msgid].index + i].format, va_arg(args, char*));
                         break;
                 }
 
@@ -366,7 +366,7 @@ int error(int message, enum ErrorLevels level, int location, ...) {
         isFlushing = TRUE;
         error_flush(-1);
         isFlushing = FALSE;
-        error(0x40007, LEVEL_FATAL, -1);
+        error(MSG_TOO_MANY_ERRORS_ABORT, LEVEL_FATAL, -1);
     }
 
     return real_level;

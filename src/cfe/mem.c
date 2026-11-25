@@ -2,34 +2,35 @@
 
 #define REGION_SIZE 0x1000
 
-char* ident = "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $";
+char* ident =
+    "$Header: /hosts/bonnie/proj/irix6.4-ssg/isms/cmplrs/targucode/cfe/RCS/mem.c,v 1.2 1994/07/18 00:21:05 dlai Exp $";
 
 void* Malloc(size_t size) {
     void* ret;
-    
+
     ret = malloc(size);
     if (ret == NULL && size != 0) {
-        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
+        error(MSG_OUT_OF_MEMORY, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
 
 void* Calloc(size_t nmemb, size_t size) {
     void* ret;
-    
+
     ret = calloc(nmemb, size);
     if (ret == NULL && nmemb * size != 0) {
-        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
+        error(MSG_OUT_OF_MEMORY, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
 
 void* Realloc(void* ptr, size_t size) {
     void* ret;
-    
+
     ret = realloc(ptr, size);
     if (ret == NULL && size != 0) {
-        error(0x40000, LEVEL_FATAL, -1, infile != NULL ? infile : "");
+        error(MSG_OUT_OF_MEMORY, LEVEL_FATAL, -1, infile != NULL ? infile : "");
     }
     return ret;
 }
@@ -65,7 +66,8 @@ void* __mem_alloc(MemCtx* s, size_t size) {
     s->ptr = *s->current_region + size;
 
     if (debug_arr['m'] > 0) {
-        fprintf(dbgout, "__mem_alloc returns s=%x r=%x cr=%x d=%x\n", s, s->list_start, s->current_region, *s->current_region);
+        fprintf(dbgout, "__mem_alloc returns s=%x r=%x cr=%x d=%x\n", s, s->list_start, s->current_region,
+                *s->current_region);
     }
     return *s->current_region;
 }
