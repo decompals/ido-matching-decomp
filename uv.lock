@@ -1,0 +1,71 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[[package]]
+name = "ido-matching-decomp"
+version = "0.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "pyelftools" },
+    { name = "rabbitizer" },
+    { name = "spimdisasm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pyelftools", specifier = ">=0.31" },
+    { name = "rabbitizer", specifier = ">=1.3.1" },
+    { name = "spimdisasm", specifier = ">=1.13.3" },
+]
+
+[[package]]
+name = "pyelftools"
+version = "0.33"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a3/11/767522582afab1b884d277de0e6e011640cb9d7292a38694b4b1a1df1ae8/pyelftools-0.33.tar.gz", hash = "sha256:660d82dcbeb8e83d1702bd97f223f761625da06111c0cc988eac6b8ab0c1b61f", size = 15068655, upload-time = "2026-05-29T12:56:22.553Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/2a/f9697576603dae937727827505a6126a066affb227034e77e6f9068910da/pyelftools-0.33-py3-none-any.whl", hash = "sha256:f215ad5f47d3f1373a21496a6c9e0707c622840d0622f23ff7ce08678b020036", size = 201178, upload-time = "2026-05-29T12:56:20.587Z" },
+]
+
+[[package]]
+name = "rabbitizer"
+version = "1.16.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/bf/d9f65a5c788e79342135dce170128f46d201bf5cddd87f3080816ed9b365/rabbitizer-1.16.2.tar.gz", hash = "sha256:29b624573bb57f3287eb4a88f18e5daf5616f22b19230f6c75a7ae3283cdd048", size = 180503, upload-time = "2026-05-29T12:10:21.314Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/06/962f4dd6a04163777aab0e75955ed204e0687e7ea736908a8d7a1b7632e3/rabbitizer-1.16.2-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:7086ad7dd15fb2df042271d77e652cd7b1ef90f0e452f5ddd10007f8840af0b3", size = 145088, upload-time = "2026-05-29T12:09:23.316Z" },
+    { url = "https://files.pythonhosted.org/packages/70/a0/a2d85f9d59f2d1c1635f59fdf9ad658b72d5f516573889fd5154b43d7f4e/rabbitizer-1.16.2-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:32ff28c8c85bec9fb7d48d1782049398840747f1d38206d187a03940e091e6c1", size = 145543, upload-time = "2026-05-29T12:09:24.787Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/1a/b99ae7a1dd3e4b6d13a3904b718524f15abf8e5a21d30595bc5fe7e6e210/rabbitizer-1.16.2-cp314-cp314t-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:5527e479427d4ed8856fc1a5fbcf2f9daa7eb75f624d009722de7db255e1c4bd", size = 440372, upload-time = "2026-05-29T12:09:26.162Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/1b/c2ad2271c5ce43d1aaa9daa03bf4f1b30fd44dcbb7cc57052a026a0ac9bf/rabbitizer-1.16.2-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4c8294d5a2901010d2cd9b06f6e91cbde7ec08d80acab5dfe32633a36fd68438", size = 442618, upload-time = "2026-05-29T12:09:27.433Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/af/fe23e62a1ec35ffb15eba60d65b271f5e24d62865cb6c49490b193f89ddc/rabbitizer-1.16.2-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:363aa53083718248c4d69def9e2f719a1387a5ce1c37316144da5f12364bc358", size = 396922, upload-time = "2026-05-29T12:09:28.961Z" },
+    { url = "https://files.pythonhosted.org/packages/32/22/e172b479e584dfd1385e6b484a193487c92c606513061afc98ea72b568fb/rabbitizer-1.16.2-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:897b0dab691312c5d3840313c9ccecad7c1faa9fa07869cdc40386ba0f4113f4", size = 396040, upload-time = "2026-05-29T12:09:30.368Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/58/d479e89c5df841b244d8be717a40750498aa88a0af5416ab83a2e4a872ee/rabbitizer-1.16.2-cp314-cp314t-win32.whl", hash = "sha256:66806d3d0112ccfd7f50b5d242ebfb4853f60dccdc18af720aea4036a8bcfe68", size = 128257, upload-time = "2026-05-29T12:09:32.016Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/98/0f746197a333a9362cfd40678a7ecc8f1f3af345662d2c919f516317c7c8/rabbitizer-1.16.2-cp314-cp314t-win_amd64.whl", hash = "sha256:d8b4be676cd7be3e2a7471141d21576866a3df5b2e324e05d2aa7afea7ac187f", size = 128551, upload-time = "2026-05-29T12:09:33.349Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/7e/bd710a560c4fca6e615e7dfd20552008d7868075ab466e536bf0716f984c/rabbitizer-1.16.2-cp314-cp314t-win_arm64.whl", hash = "sha256:fa793d3d6a4386c8c5dd3497b39db379d910d6dd2b2e72cea6fc650ef782b9c8", size = 121837, upload-time = "2026-05-29T12:09:34.573Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/96/023616a3636b7d04b4505b4f79ef9f63da31a418b014480dfd54f4c6efd0/rabbitizer-1.16.2-cp34-abi3-android_21_arm64_v8a.whl", hash = "sha256:c1d9f6fa69c6856f717b52749abf235892876dd4b17c568f78b30a2ef781324b", size = 414959, upload-time = "2026-05-29T12:09:35.974Z" },
+    { url = "https://files.pythonhosted.org/packages/d4/94/8c5fa459103f89397919d540bdbcc44c82cdd5fc30695af50b3322ff492c/rabbitizer-1.16.2-cp34-abi3-android_21_x86_64.whl", hash = "sha256:a65ee3fe7649dfcb82841a4aceba5d5baea79e30b7315edf6ef5f58e6936f9e3", size = 421373, upload-time = "2026-05-29T12:09:37.279Z" },
+    { url = "https://files.pythonhosted.org/packages/88/53/878ce64093616e4708a6dd8cf2cbbc1ed9d331c6e538d5a7f6b42923a251/rabbitizer-1.16.2-cp34-abi3-ios_13_0_arm64_iphoneos.whl", hash = "sha256:fa28b2ddb0a326b673c8ee66380f3e7acc85e8032306418b5ef35d7c6480b4be", size = 140522, upload-time = "2026-05-29T12:09:38.596Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/f0/fe96754f1d4bbb2021b3d6a86842137e51cb2ae83f8e2c95adabefc0b218/rabbitizer-1.16.2-cp34-abi3-ios_13_0_arm64_iphonesimulator.whl", hash = "sha256:0f2b2c814b82cfcbd540db7baadc487301f8275c51bd2e6eb415d4e1121c103f", size = 144669, upload-time = "2026-05-29T12:09:39.866Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/e6/4c1ad38e9f4d3c884c47e8c028147f2918c1a2f55d86a856e3ef244467c0/rabbitizer-1.16.2-cp34-abi3-macosx_10_9_x86_64.whl", hash = "sha256:ac7925ad8e39c8db153abda8b31032a7aa6f94bef955583883e5f3da3d8f7fdd", size = 144455, upload-time = "2026-05-29T12:09:41.139Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/8e/ea4181bca02e34d04bd19875c4759ebb4f22c7ec5a97a105ecaa38885dac/rabbitizer-1.16.2-cp34-abi3-macosx_11_0_arm64.whl", hash = "sha256:7b7a7f26b82317c57ab59895924bac66b33e0598e9f367eab6bf00909fdb6e22", size = 145051, upload-time = "2026-05-29T12:09:42.58Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/d8/0e8e996904e7295f968512281cd7079c80c39f7d4f51c3956e1669ef6cfa/rabbitizer-1.16.2-cp34-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:eafe91e07c9f400d2abc44c029c3b380cb68e65d2c32eb7e2015d391a51d2182", size = 418728, upload-time = "2026-05-29T12:09:44.032Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/b5/e995b16e3e3873f3891df6695062ace92b618a5be4c5a130a40fdc9b54d0/rabbitizer-1.16.2-cp34-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:48436b435bdfc61262d17c2ac477e762d0fd6a5e9ef1157d256360d3942524af", size = 421764, upload-time = "2026-05-29T12:09:45.758Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/cc/d5c9f2779202f673de4fcc0fdae8f818e3fb5bf3c69bb6aae525647c76ce/rabbitizer-1.16.2-cp34-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:0277d3ce6a3f8e3e5e68712a6a1af3df29fc4f0790651db2416b44ee4a0b3da5", size = 371968, upload-time = "2026-05-29T12:09:47.001Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/31/febc2a3c781ada4d0eeb101f94215b585a7e04b058aafe35d97fd6f82a04/rabbitizer-1.16.2-cp34-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:5bbb8e0c75cca9eda74c67931ef9b06461c74af20e342f56bc187e8c33109a82", size = 370592, upload-time = "2026-05-29T12:09:48.386Z" },
+    { url = "https://files.pythonhosted.org/packages/99/2b/afc9adafba84c738f799d807d0b2842de586f4c2d34380b4288f375a8ccb/rabbitizer-1.16.2-cp34-abi3-win32.whl", hash = "sha256:36e4db66ba1439346a3361cfcb38733c3fd1d975a727f8637a25be48e0b6c804", size = 121719, upload-time = "2026-05-29T12:09:49.627Z" },
+    { url = "https://files.pythonhosted.org/packages/25/fa/56eb68dbd6414590d0c0e843e3fd6eac1c1d9b6ad1b1f8a78e4d82b0cd0f/rabbitizer-1.16.2-cp34-abi3-win_amd64.whl", hash = "sha256:3066c0484b9ea458a5b446ca41cf42b9ee9163f602a7796b699037f2aa9a8524", size = 125350, upload-time = "2026-05-29T12:09:50.885Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/e4/0183fd9f3a5f57da2ee2a6b499ca59b5d40c8b45985966fb5fd1cb7a425e/rabbitizer-1.16.2-cp34-abi3-win_arm64.whl", hash = "sha256:e80c8451f12700fae95790f4fb1c79d1a2220d3051ad33036850a536c746f0ca", size = 119051, upload-time = "2026-05-29T12:09:52.052Z" },
+]
+
+[[package]]
+name = "spimdisasm"
+version = "1.42.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "rabbitizer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7c/31/65d8d495cf76ab134641f5baa31b5b78b91753cd3bbbef92fd1116533fd9/spimdisasm-1.42.4.tar.gz", hash = "sha256:0a2c8db54615226288b7f6c86edcc844a654df96321572fa8b8e35667e1b903f", size = 110790, upload-time = "2026-08-06T12:12:29.659Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3f/c4/20a1e2966a536c3ab3882acec2c42a08c0f8a06c5ec906c51c886363c0bc/spimdisasm-1.42.4-py3-none-any.whl", hash = "sha256:816111a7d80a9037029a8fff0b12eec5a55358a52407f85498aa9b14e9e69a5f", size = 141215, upload-time = "2026-08-06T12:12:28.228Z" },
+]

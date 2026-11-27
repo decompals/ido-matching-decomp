@@ -14,12 +14,10 @@ jobs:
         version: [7.1, 5.3]
 
     steps:
-    - name: Checkout reposistory
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Check for warnings
       # Passing CC="@:" prevents actually compiling the C files
       # Passing an empty MIPS_BINUTILS_PREFIX bypasses the check for having mips binutils installed
-      run: make yacc MIPS_BINUTILS_PREFIX= && make -j $(nproc) WERROR=1 VERSION=${{ matrix.version }} CC="@:" MIPS_BINUTILS_PREFIX=
+      run: make yacc MIPS_BINUTILS_PREFIX= && make -j "$(nproc)" WERROR=1 VERSION=${{ matrix.version }} CC="@:" MIPS_BINUTILS_PREFIX=
