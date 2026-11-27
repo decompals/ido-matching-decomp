@@ -1,7 +1,8 @@
 offset,vram,.text
 006610,00406610,entry
 006740,00406740,cc
-0335D0,004335D0,mld
+0335D0,004335D0,libmld/sex
+033600,00433600,pad_433600
 
 offset,vram,.dummy
 033600,00433600,init
