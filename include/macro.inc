@@ -49,7 +49,8 @@
 # Label to signal the symbol haven't been matched yet.
 .macro nonmatching label, size=1
     .global \label\().NON_MATCHING
-    .type \label\().NON_MATCHING, @object
+    # NOTYPE keeps objdiff from using these size-1 markers to infer section sizes.
+    .type \label\().NON_MATCHING, @notype
     .size \label\().NON_MATCHING, \size
     \label\().NON_MATCHING:
 .endm
