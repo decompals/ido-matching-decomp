@@ -55,6 +55,7 @@ dkms.conf
 
 build/
 asm/
+objdiff.json
 tools/ido_recomp/
 tools/yacc/yacc
 src/cfe/c.c
@@ -62,5 +63,6 @@ src/cfe/c.c
 ctx.c
 ctx.c.m2c
 __pycache__/
+.venv/
 
 context/
