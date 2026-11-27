@@ -1509,9 +1509,9 @@ label2:
     }
 }
 
-#ifdef NON_MATCHING
-// url: https://decomp.me/scratch/9YiHT
-// score: 16(99.95%)
+//  NON_MATCHING
+//  url: https://decomp.me/scratch/9YiHT
+//  score: 16(99.95%)
 int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     char* vv;
     int sp58;
@@ -1634,10 +1634,6 @@ int cpp_line_ptr(char* arg0, char* arg1, int arg2) {
     *var_a3++ = 0;
     return 1;
 }
-#else
-int cpp_line_ptr(char* arg0, char* arg1, int arg2);
-#pragma GLOBAL_ASM("asm/7.1/functions/cfe/scan/cpp_line_ptr.s")
-#endif
 
 void init_scan(void) {
     long long longmax;

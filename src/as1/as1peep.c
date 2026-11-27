@@ -5,16 +5,16 @@
 #include "sys/inst.h"
 
 typedef struct UnkStruct_10023CF8_s {
-    /* 0x0 */ short unk0;                             /* inferred */
-    /* 0x2 */ short unk2;                             /* inferred */
-    /* 0x4 */ int unk4;                             /* inferred */
-} UnkStruct_10023CF8;                               /* size = 0x8 */
+    /* 0x0 */ short unk0; /* inferred */
+    /* 0x2 */ short unk2; /* inferred */
+    /* 0x4 */ int unk4;   /* inferred */
+} UnkStruct_10023CF8;     /* size = 0x8 */
 
 typedef struct UnkStruct_ctnt_s {
-    /* 0x0 */ unsigned int unk0;                             /* inferred */
-    /* 0x4 */ unsigned short unk4;                             /* inferred */
-    /* 0x6 */ unsigned short unk6;                             /* inferred */
-} UnkStruct_ctnt;                                   /* size = 0x8 */
+    /* 0x0 */ unsigned int unk0;   /* inferred */
+    /* 0x4 */ unsigned short unk4; /* inferred */
+    /* 0x6 */ unsigned short unk6; /* inferred */
+} UnkStruct_ctnt;                  /* size = 0x8 */
 static unsigned int B_10023CF0;
 static unsigned int B_10023CF4;
 static UnkStruct_10023CF8* B_10023CF8; // n_memory
@@ -47,7 +47,10 @@ void func_00416294(void) {
     imm_psym = recalloc(imm_psym, (temp_v0 * 4) + 0x140, (B_10023CF4 * 4) + 0x140);
 }
 
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416364.s")
+// NON_EQUIVALENT
+
+void func_00416364(void) {
+}
 
 int get_mem_reg(int arg0, short arg1, int arg2) {
     short var_a1;
@@ -85,7 +88,6 @@ int func_00416670(unsigned int arg0) {
     return -1;
 }
 
-
 // find_def_mem
 unsigned int func_00416710(int arg0, short arg1, int arg2, int arg3) {
     int temp_a0;
@@ -105,7 +107,8 @@ unsigned int func_00416710(int arg0, short arg1, int arg2, int arg3) {
 
     for (i = 0x50; i < B_10023CF0 + 0x50; i++) {
         if ((ctnt[i].unk0 != 0) && (arg3 == ctnt[i].unk4)) {
-            if ((arg0 == B_10023CF8[i - 0x50].unk2) && (arg1 == B_10023CF8[i - 0x50].unk0) && (arg2 == B_10023CF8[i - 0x50].unk4)) {
+            if ((arg0 == B_10023CF8[i - 0x50].unk2) && (arg1 == B_10023CF8[i - 0x50].unk0) &&
+                (arg2 == B_10023CF8[i - 0x50].unk4)) {
                 return i;
             }
         }
@@ -113,74 +116,3 @@ unsigned int func_00416710(int arg0, short arg1, int arg2, int arg3) {
 
     return -1;
 }
-
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416880.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416A08.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416B30.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416BDC.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416C60.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416CC4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/change_bb.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00416FE4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00417254.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00417844.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00417ACC.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00417D3C.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00417DC0.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_004180DC.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/redundant.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00418F08.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00418FA8.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/defined_in_between.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_004195F0.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_004196D4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_004198CC.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00419AB4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00419CC4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00419E14.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_00419FE4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041A4BC.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041AB40.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041AC0C.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041BB98.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041BBA4.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041C08C.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041C0C8.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/func_0041C354.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/do_passI_opt.s")
-
-#pragma GLOBAL_ASM("asm/7.1/functions/as1/as1peep/do_passII_opt.s")
