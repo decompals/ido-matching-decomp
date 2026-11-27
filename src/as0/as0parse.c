@@ -55,8 +55,8 @@ extern int isStruct;
 
 // as0parse.c
 //.data
-static char* D_10000004[4] = { "", "operand 1", "operand 2", "operand 3" };
 int gform_extn = 0;
+static char* D_10000004[4] = { "", "operand 1", "operand 2", "operand 3" };
 static struct unk_struct* D_10000014 = NULL;
 
 //.bss
@@ -172,113 +172,114 @@ static void func_00404B80(int operand_index, int reg, int asm_index) {
     unsigned var_v0;
 
     switch (operand_index) {
-    default:
-    case 1:
-        var_v0 = asm_info[asm_index].unk4 << 0x11 >> 0x1B;
-        break;
-    case 2:
-        var_v0 = asm_info[asm_index].unk4 << 0x16 >> 0x1B;
-        break;
-    case 3:
-        var_v0 = asm_info[asm_index].unk4 & 0x1F;
-        break;
+        default:
+        case 1:
+            var_v0 = asm_info[asm_index].unk4 << 0x11 >> 0x1B;
+            break;
+        case 2:
+            var_v0 = asm_info[asm_index].unk4 << 0x16 >> 0x1B;
+            break;
+        case 3:
+            var_v0 = asm_info[asm_index].unk4 & 0x1F;
+            break;
     }
     switch (var_v0) {
-    case 0: break;
-    case 1:
-        if ((atflag != 0) && (reg == 1)) {
-            posterror("Used $at without .set noat",D_10000004[operand_index], 2);
-        } else if ((reg < 0) || (reg >= 0x20)) {
-            posterror("Should be gp register",D_10000004[operand_index], 1);
-        }
-        break;
-    case 2:
-        if ((isa < ISA_MIPS3) && ((reg < 0) || (reg >= 0x20) || (reg & 1))) {
-            posterror("Should be even gp register",D_10000004[operand_index], 1);
-        }
-        break;
-    case 3:
-        if (((reg < 0) || (reg >= 0x20)) && (reg != 0x48)) {
-            posterror("Should be gp register",D_10000004[operand_index], 1);
-        } else if (atflag != 0) {
-            if (reg == 1) {
-            posterror("Used $at without .set noat",D_10000004[operand_index], 2);
+        case 0:
+            break;
+        case 1:
+            if ((atflag != 0) && (reg == 1)) {
+                posterror("Used $at without .set noat", D_10000004[operand_index], 2);
+            } else if ((reg < 0) || (reg >= 0x20)) {
+                posterror("Should be gp register", D_10000004[operand_index], 1);
             }
-        }
-        break;
-    case 7:
-        if ((reg < 0) || (reg >= 0x20)) {
-            posterror("Should be coprocessor register",D_10000004[operand_index], 1);
-        }
-        break;
-    case 8:
-        if ((isa < ISA_MIPS3) && ((reg < 0) || (reg >= 0x20) || (reg & 1))) {
-            posterror("Should be even coprocessor register",D_10000004[operand_index], 1);
-        }
-        break;
-    case 4:
-        if ((reg < 0x20) || (reg >= 0x40)) {
-            posterror("Should be floating point register",D_10000004[operand_index], 1);
-        }
-        break;
-    case 5:
+            break;
+        case 2:
+            if ((isa < ISA_MIPS3) && ((reg < 0) || (reg >= 0x20) || (reg & 1))) {
+                posterror("Should be even gp register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 3:
+            if (((reg < 0) || (reg >= 0x20)) && (reg != 0x48)) {
+                posterror("Should be gp register", D_10000004[operand_index], 1);
+            } else if (atflag != 0) {
+                if (reg == 1) {
+                    posterror("Used $at without .set noat", D_10000004[operand_index], 2);
+                }
+            }
+            break;
+        case 7:
+            if ((reg < 0) || (reg >= 0x20)) {
+                posterror("Should be coprocessor register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 8:
+            if ((isa < ISA_MIPS3) && ((reg < 0) || (reg >= 0x20) || (reg & 1))) {
+                posterror("Should be even coprocessor register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 4:
+            if ((reg < 0x20) || (reg >= 0x40)) {
+                posterror("Should be floating point register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 5:
 #ifdef IDO_71
-        if ((reg < 0x20) || (reg >= 0x40)) {
-            posterror("Should be floating point register", D_10000004[operand_index], 1);
-        } else if ((isa < 3) && (reg & 1)) {
-            posterror("Should be even floating point register", D_10000004[operand_index], 1);
-        }
-#else
-        if (isa < ISA_MIPS3) {
-            if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
+            if ((reg < 0x20) || (reg >= 0x40)) {
+                posterror("Should be floating point register", D_10000004[operand_index], 1);
+            } else if ((isa < 3) && (reg & 1)) {
                 posterror("Should be even floating point register", D_10000004[operand_index], 1);
             }
-        }
+#else
+            if (isa < ISA_MIPS3) {
+                if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
+                    posterror("Should be even floating point register", D_10000004[operand_index], 1);
+                }
+            }
 #endif
-        break;
-    case 6:
+            break;
+        case 6:
 #ifdef IDO_71
-        if ((reg < 0x20) || (reg >= 0x40)) {
-            posterror("Should be floating point register",D_10000004[operand_index], 1);
-        } else if ((isa >= ISA_MIPS3) && (reg & 1)) {
-            posterror("Should be even floating point register",D_10000004[operand_index], 1);
-        } else if ((isa < ISA_MIPS3) && (reg & 3)) {
-            posterror("Should be multiple-of-4 floating point register",D_10000004[operand_index], 1);
-        }
-#else
-        if (isa >= ISA_MIPS3) {
-            if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
+            if ((reg < 0x20) || (reg >= 0x40)) {
+                posterror("Should be floating point register", D_10000004[operand_index], 1);
+            } else if ((isa >= ISA_MIPS3) && (reg & 1)) {
                 posterror("Should be even floating point register", D_10000004[operand_index], 1);
+            } else if ((isa < ISA_MIPS3) && (reg & 3)) {
+                posterror("Should be multiple-of-4 floating point register", D_10000004[operand_index], 1);
             }
-        } else if ((reg < 0x20) || (reg >= 0x40) || (reg & 3)) {
-            posterror("Should be multiple-of-4 floating point register", D_10000004[operand_index], 1);
-        }
-        #endif
-        break;
-    case 9:
-        if ((isa < ISA_MIPS3) && (reg >= 0x20) && (reg & 1)) {
-            posterror("Should be fp double or gp single register", D_10000004[operand_index], 1);
-        }
-        break;
-    case 10:
-        if ((isa < ISA_MIPS3) && (reg & 1)) {
-            posterror("Should be multiple-of-2 register", D_10000004[operand_index], 1);
-        }
-        break;
-    case 11:
-        if (isa >= ISA_MIPS3) {
-            if (reg & 1) {
+#else
+            if (isa >= ISA_MIPS3) {
+                if ((reg < 0x20) || (reg >= 0x40) || (reg & 1)) {
+                    posterror("Should be even floating point register", D_10000004[operand_index], 1);
+                }
+            } else if ((reg < 0x20) || (reg >= 0x40) || (reg & 3)) {
+                posterror("Should be multiple-of-4 floating point register", D_10000004[operand_index], 1);
+            }
+#endif
+            break;
+        case 9:
+            if ((isa < ISA_MIPS3) && (reg >= 0x20) && (reg & 1)) {
+                posterror("Should be fp double or gp single register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 10:
+            if ((isa < ISA_MIPS3) && (reg & 1)) {
                 posterror("Should be multiple-of-2 register", D_10000004[operand_index], 1);
             }
-        } else if (reg & 3) {
-            posterror("Should be multiple-of-4 register", D_10000004[operand_index], 1);
-        }
-        break;
-    case 12:
-        if ((reg < 0x40) || (reg >= 0x48)) {
-            posterror("Should be floating point condition code register", D_10000004[operand_index], 1);
-        }
-        break;
+            break;
+        case 11:
+            if (isa >= ISA_MIPS3) {
+                if (reg & 1) {
+                    posterror("Should be multiple-of-2 register", D_10000004[operand_index], 1);
+                }
+            } else if (reg & 3) {
+                posterror("Should be multiple-of-4 register", D_10000004[operand_index], 1);
+            }
+            break;
+        case 12:
+            if ((reg < 0x40) || (reg >= 0x48)) {
+                posterror("Should be floating point condition code register", D_10000004[operand_index], 1);
+            }
+            break;
     }
 }
 
@@ -356,11 +357,11 @@ static void func_00405178(int arg0, int arg1, int arg2, int arg3, unsigned arg4,
             break;
 
         default:
-            #ifdef IDO_71
+#ifdef IDO_71
             assertion_failed("false", "as0parse.c", 241);
-            #else
+#else
             assertion_failed("false", "as0parse.c", 237);
-            #endif
+#endif
             break;
     }
     put_binasmfyle();
@@ -1018,11 +1019,11 @@ static void func_004076A0(int fasm) {
                 posterror("lui expression not in 0..65535", NULL, 1);
             }
             if (fasm != zli) {
-                #ifdef IDO_71
+#ifdef IDO_71
                 assertion_failed("fasm == zli", "as0parse.c", 1098);
-                #else
+#else
                 assertion_failed("fasm == zli", "as0parse.c", 1094);
-                #endif
+#endif
             }
             func_00405178(0, 0x14C, sp48, 0x48, 2, 0x48, sp38);
             func_00405178(0, 0x14C, sp48, 0x48, 2, 0x48, sp34);
@@ -1055,17 +1056,19 @@ static void func_004076A0(int fasm) {
     }
 }
 
+// NON_MATCHING in 7.1, reg swap v1 <-> a3
+
 static void func_00407A20(asmcodes asm_code) {
     sym* sp5C;
     sym* sp58;
     sym* sp54;
     sym* sp50;
     sym* sp4C;
-    int has_immed; // sp+48
-    int immed_lo; // sp+44
-    int immed_hi; // sp+40
+    int has_immed;     // sp+48
+    int immed_lo;      // sp+44
+    int immed_hi;      // sp+40
     int outside_int32; // sp+3C
-    int temp_atflag; // sp+38
+    int temp_atflag;   // sp+38
 
     immed_lo = 0;
     sp54 = NULL;
@@ -1101,9 +1104,8 @@ static void func_00407A20(asmcodes asm_code) {
             return;
         }
 
-        if ((Tokench == 'i') || (Tokench == 'd') || (Tokench == 'h')
-            || (Tokench == '+') || (Tokench == '-') || (Tokench == '~')
-            || (Tokench == '"') || (Tokench == '(')) {
+        if ((Tokench == 'i') || (Tokench == 'd') || (Tokench == 'h') || (Tokench == '+') || (Tokench == '-') ||
+            (Tokench == '~') || (Tokench == '"') || (Tokench == '(')) {
             if (isa <= 2) {
                 immed_lo = GetExpr();
             } else {
@@ -1263,28 +1265,28 @@ static void func_00407A20(asmcodes asm_code) {
             if (has_immed) {
                 posterror("immed operand not allowed on fp ", NULL, 1);
             }
-        break;
-        #ifdef IDO_71
+            break;
+#ifdef IDO_71
         case zmovt:
         case zmovf:
         case fmovt_s:
         case fmovt_d:
         case fmovf_s:
         case fmovf_d:
-        if (has_immed != 0) {
-            posterror("immed operand not allowed for cc ", NULL, 1);
-        }
-        #endif
-        break;
+            if (has_immed != 0) {
+                posterror("immed operand not allowed for cc ", NULL, 1);
+            }
+#endif
+            break;
 
-        default: 
+        default:
             break;
     }
 
     if (has_immed) {
         temp_atflag = atflag;
         if (outside_int32) {
-            switch (asm_code){
+            switch (asm_code) {
                 case zadd:
                 case zaddu:
                 case zdiv:
@@ -1901,11 +1903,11 @@ static void parse_verstamp(void) {
     version = GetExpr();
     GetExpr();
 
-    #ifdef IDO_71
+#ifdef IDO_71
     if (version != 7) {
-    #else
+#else
     if (version != 3) {
-    #endif
+#endif
         posterror("version stamp does not match", NULL, 2);
     }
 }
@@ -2117,11 +2119,11 @@ static void func_0040AAD4(int arg0) {
             sp30 = 0x22;
             break;
         default:
-            #ifdef IDO_71
+#ifdef IDO_71
             assertion_failed("false", "as0parse.c", 2578);
-            #else
+#else
             assertion_failed("false", "as0parse.c", 2568);
-            #endif
+#endif
             break;
     }
     sym_define(sp34->unk18, sp30, sp2C);
@@ -2178,11 +2180,13 @@ static void func_0040AF00(itype iop) {
             CurrentSegment = 0xF;
             break;
         default:
-            #ifdef IDO_71
-            assertion_failed("iop == irdata", "as0parse.c", 2637);
-            #else
-            assertion_failed("iop == irdata", "as0parse.c", 2627);
-            #endif
+            if (iop != irdata) {
+#ifdef IDO_71
+                assertion_failed("iop == irdata", "as0parse.c", 2637);
+#else
+                assertion_failed("iop == irdata", "as0parse.c", 2627);
+#endif
+            }
             break;
     }
 }
@@ -2362,7 +2366,8 @@ static void func_0040B984(void) {
 
         if (Tokench == 'i') {
             if (opLookUp(&Tstring[0], &cur_symbol) == 0) {
-                posterror("bad section name\0bad section name", NULL, 1);
+                posterror("bad section name", NULL, 1);
+                stubbed_printf("bad section name");
             } else if (cur_symbol->unk10 == 2) {
                 switch (cur_symbol->reg) { /* irregular */
                     case 21:
@@ -2471,16 +2476,19 @@ static int func_0040BEBC(int* arg0, int* arg1, int* arg2) {
 
         if (sp24->unk10 == 4) {
             GetItem(arg1, arg2);
+#ifndef IDO_71
             return 1;
-        }
-        if (sp24->unk10 == 3) {
+#endif
+        } else if (sp24->unk10 == 3) {
             *arg0 = sp24->unk18;
             nexttoken();
             func_00405A80(arg1, arg2);
 
             if (Tokench == ',') {
                 nexttoken();
+#ifndef IDO_71
                 return 1;
+#endif
             }
         } else {
             posterror("Bad id in expression", &Tstring[0], 1);
@@ -2686,11 +2694,11 @@ static void parse_option(void) {
     }
     binasm_rec.unk0 = 0;
     binasm_rec.unk5_003F = ioption;
-    
+
     opt_name = malloc(Tstringlength + 2);
-    
+
     opt_name[0] = '-';
-    
+
     strcpy(&opt_name[1], &Tstring[0]);
     opt = which_opt(opt_name);
     free(opt_name);
@@ -2745,15 +2753,11 @@ static void parse_option(void) {
 
 static int func_0040CC44(char* name) {
     int var_s0;
-    char** var_s1;
-
-    var_s1 = sset_value;
 
     for (var_s0 = 0; var_s0 <= 0x10; var_s0++) {
-        if (strcmp(name, *var_s1) == 0) {
+        if (strcmp(name, sset_value[var_s0]) == 0) {
             return var_s0;
         }
-        var_s1++;
     }
     return 0;
 }
@@ -2915,7 +2919,7 @@ static void func_0040D284(char* arg0) {
 
     // TODO: Maybe introduce a AVOID_UB flag to fix this..
 #ifdef __GNUC__
-    #pragma GCC diagnostic ignored "-Woverflow"
+#pragma GCC diagnostic ignored "-Woverflow"
 #endif
     binasm_rec.unk5_003F = ~0x3F;
 
@@ -2988,7 +2992,7 @@ void Parsestmt(void) {
             parse_type();
         } else {
             posterror("undefined assembler operation", sp38, 1);
-            return;    
+            return;
         }
         return;
     }
@@ -3134,11 +3138,11 @@ void Parsestmt(void) {
                 if (mednat) {
                     func_0040A530();
                 } else {
-                    #ifdef IDO_71
+#ifdef IDO_71
                     assertion_failed("false", "as0parse.c", 3592);
-                    #else
+#else
                     assertion_failed("false", "as0parse.c", 3537);
-                    #endif
+#endif
                 }
                 break;
             case irestext:
@@ -3146,11 +3150,11 @@ void Parsestmt(void) {
                     binasm_rec.unk5_003F = 0x3A;
                     put_binasmfyle();
                 } else {
-                    #ifdef IDO_71
+#ifdef IDO_71
                     assertion_failed("false", "as0parse.c", 3600);
-                    #else
+#else
                     assertion_failed("false", "as0parse.c", 3545);
-                    #endif
+#endif
                 }
                 break;
             case iprologue:
@@ -3175,11 +3179,11 @@ void Parsestmt(void) {
                 parse_cpalias();
                 break;
             default:
-                #ifdef IDO_71
+#ifdef IDO_71
                 assertion_failed("false", "as0parse.c", 3624);
-                #else
+#else
                 assertion_failed("false", "as0parse.c", 3569);
-                #endif
+#endif
                 break;
         }
         if (!printedline && (Tokench != '#')) {
@@ -3244,11 +3248,11 @@ void Parsestmt(void) {
                 func_004086EC(temp_a0);
                 break;
             default:
-                #ifdef IDO_71
+#ifdef IDO_71
                 assertion_failed("false", "as0parse.c", 3687);
-                #else
+#else
                 assertion_failed("false", "as0parse.c", 3632);
-                #endif
+#endif
                 break;
         }
         if (!printedline && (Tokench != '#')) {

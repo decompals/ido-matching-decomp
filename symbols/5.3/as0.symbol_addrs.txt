@@ -1,0 +1,2 @@
+asm_info = 0x10000304 // size:0xD70
+opt_strings = 0x100010AC // size:0x1A8

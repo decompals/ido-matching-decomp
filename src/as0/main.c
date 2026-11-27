@@ -10,10 +10,10 @@
 
 // External data
 extern struct _struct_asm_info_0x8 asm_info[0x1AF];
-extern char *sframereg;
-extern char *sframesize;
-extern char *sitype[0x3F];
-extern char *sregisters[0x49];
+extern char* sframereg;
+extern char* sframesize;
+extern char* sitype[0x3F];
+extern char* sregisters[0x49];
 
 //.bss
 /* 027EA0 10008EA0 */ int binasm_count;
@@ -26,19 +26,19 @@ extern char *sregisters[0x49];
 /* 027EBC 10008EBC */ int atflag;
 /* 027EC0 10008EC0 */ int isStruct; // BOOL
 /* 027EC4 10008EC4 */ int StructOrg;
-/* 027EC8 10008EC8 */ sym *LastLabel;
+/* 027EC8 10008EC8 */ sym* LastLabel;
 /* 027ECC 10008ECC */ int in_repeat_block;
 /* 027ED0 10008ED0 */ unsigned int rep_count;
 /* 027ED4 10008ED4 */ size_t rep_size;
 /* 027ED8 10008ED8 */ struct {
-    binasm_r *unk0;
+    binasm_r* unk0;
     size_t unk4;
 } rep_buffer;
 /* 027EE0 10008EE0 */ int invent_locs;
 /* 027EE4 10008EE4 */ int gp_warn;
 /* 027EE8 10008EE8 */ int linelength;
 /* 027EEC 10008EEC */ int nextinline;
-/* 027EF0 10008EF0 */ char *line[0x36C];
+/* 027EF0 10008EF0 */ char* line[0x36C];
 /* 02825C 1000925C */ char B_1000925C[0xB4]; // P a d
 /* 028310 10009310 */ int CurrentFile;
 /* 028310 10009310 */ int CurrentLine;
@@ -50,57 +50,57 @@ extern char *sregisters[0x49];
 /* 028720 10009720 */ char Tokench;
 /* 028728 10009728 */ char Tstring[0x400];
 /* 028B28 10009B28 */ int Tstringlength;
-/* 028B30 10009B30 */ char *token_tmp[0x100];
+/* 028B30 10009B30 */ char* token_tmp[0x100];
 /* 028F30 10009F30 */ int printedline;
 /* 028F34 10009F34 */ int severity;
-/* 028F38 10009F38 */ sym *reg_ptr[0x20];
-/* 028FB8 10009FB8 */ sym *hashtable[0x80];
+/* 028F38 10009F38 */ sym* reg_ptr[0x20];
+/* 028FB8 10009FB8 */ sym* hashtable[0x80];
 /* 0291B8 1000A1B8 */ int LastSym; // UNUSED
-/* 0291C0 1000A1C0 */ sym *ophashtable[0x80];
+/* 0291C0 1000A1C0 */ sym* ophashtable[0x80];
 /* 0293C0 1000A3C0 */ int local_label[0x100];
 /* 0297C0 1000A7C0 */ binasm_r binasm_rec;
-/* 0297D0 1000A7D0 */ FILE *binasmfyle;
-/* 0297D4 1000A7D4 */ FILE *in_file;
+/* 0297D0 1000A7D0 */ FILE* binasmfyle;
+/* 0297D4 1000A7D4 */ FILE* in_file;
 /* 0297D8 1000A7D8 */ int mednat;
 /* 0297DC 1000A7DC */ int diag_flag;
 /* 0297E0 1000A7E0 */ int shftaddr;
-/* 0297E4 1000A7E4 */ FILE *extsyms_file;
+/* 0297E4 1000A7E4 */ FILE* extsyms_file;
 /* 0297E8 1000A7E8 */ int list_extsyms; // Boolean
-/* 0297EC 1000A7EC */ static char *assembler_file;
-/* 0297F0 1000A7F0 */ static char *B_1000A7F0; // Output binasm file path
-/* 0297F4 1000A7F4 */ static char *B_1000A7F4;
-/* 0297F8 1000A7F8 */ static char *B_1000A7F8;
+/* 0297EC 1000A7EC */ static char* assembler_file;
+/* 0297F0 1000A7F0 */ static char* B_1000A7F0; // Output binasm file path
+/* 0297F4 1000A7F4 */ static char* B_1000A7F4;
+/* 0297F8 1000A7F8 */ static char* B_1000A7F8;
 
 // External function call
-extern void posterror(char *, char *, int);
-extern void call_perror(int arg0, const char *arg1);
-extern int which_opt(char *);
-extern sym *alloc_new_sym(void);
-extern int hash(char *);
-extern void make_file(const char *arg0);
+extern void posterror(char*, char*, int);
+extern void call_perror(int arg0, const char* arg1);
+extern int which_opt(char*);
+extern sym* alloc_new_sym(void);
+extern int hash(char*);
+extern void make_file(const char* arg0);
 extern void put_binasmfyle(void);
 extern void sym_init(int arg0);
 extern void readinline(void);
-extern void sym_finish(char *arg0, char *arg1);
+extern void sym_finish(char* arg0, char* arg1);
 extern void Parsestmt(void);
 extern void do_dot_end(int arg0);
 
 // Internal function call
 static void func_00403F10(void);
 static void func_00404008(void);
-static sym *func_00404108(registers reg, char *name, registers next_reg);
-static void func_004041A8(char *arg0, int arg1);
-static void func_00404234(int argc, char **argv);
+static sym* func_00404108(registers reg, char* name, registers next_reg);
+static void func_004041A8(char* arg0, int arg1);
+static void func_00404234(int argc, char** argv);
 
 // func_00403F10
 static void func_00403F10(void) {
-    struct _struct_asm_info *var_s2;
+    struct _struct_asm_info* var_s2;
     int operand_hash;
     int index;
-    char *name;
-    sym *cur_symbol;
+    char* name;
+    sym* cur_symbol;
 
-    for (index = 0, var_s2 = (struct _struct_asm_info *) &asm_info; index < 0x1AE; index++, var_s2++) {
+    for (index = 0, var_s2 = (struct _struct_asm_info*)&asm_info; index < 0x1AE; index++, var_s2++) {
         name = var_s2->name;
         if (name[0] != '\0') {
             operand_hash = hash(name);
@@ -124,8 +124,8 @@ static void func_00403F10(void) {
 static void func_00404008(void) {
     int directives_hash;
     int index;
-    char *asm_directives;
-    struct sym *cur_symbol;
+    char* asm_directives;
+    struct sym* cur_symbol;
 
     for (index = 0; index < 0x3F; index++) {
         if (*sitype[index] == 0x2E) {
@@ -145,8 +145,8 @@ static void func_00404008(void) {
     }
 }
 
-static sym *func_00404108(registers reg, char *name, registers next_reg) {
-    sym *cur_symbol;
+static sym* func_00404108(registers reg, char* name, registers next_reg) {
+    sym* cur_symbol;
     int reg_hash;
 
     reg_hash = hash(name);
@@ -163,10 +163,10 @@ static sym *func_00404108(registers reg, char *name, registers next_reg) {
     return cur_symbol;
 }
 
-static void func_004041A8(char *arg0, int arg1) {
+static void func_004041A8(char* arg0, int arg1) {
     int unused;
     int sp20;
-    sym *cur_symbol;
+    sym* cur_symbol;
 
     sp20 = hash(arg0);
     cur_symbol = alloc_new_sym();
@@ -179,8 +179,8 @@ static void func_004041A8(char *arg0, int arg1) {
     hashtable[sp20] = cur_symbol;
 }
 
-// func_00404234:
-static void func_00404234(int argc, char **argv) {
+// NON_MATCHING: reordering in the last loop
+static void func_00404234(int argc, char** argv) {
     int j;
     int i;
     int k;
@@ -207,7 +207,7 @@ static void func_00404234(int argc, char **argv) {
     mednat = 0;
 
     for (i = 1; i < argc; i++) {
-        char *cur_arg = argv[i];
+        char* cur_arg = argv[i];
 
         if (*cur_arg == '-') {
             switch (which_opt(cur_arg)) {
@@ -350,11 +350,15 @@ static void func_00404234(int argc, char **argv) {
             exit(1);
         }
     }
-    binasm_rec.unk5_003F =
-        0x2A;            //!< Is this something like a universal signature for every binasm file?
-    binasm_rec.unk0 = 0; // symno
+    binasm_rec.unk5_003F = 0x2A; //!< Is this something like a universal signature for every binasm file?
+    binasm_rec.unk0 = 0;         // symno
+#ifdef IDO_71
+    binasm_rec.unk8 = 7;
+    binasm_rec.unkC = 10;
+#else
     binasm_rec.unk8 = 3;
-    binasm_rec.unkC = 0x13;
+    binasm_rec.unkC = 19;
+#endif
     put_binasmfyle();
     sym_init(debugflag);
 
@@ -398,7 +402,7 @@ static void func_00404234(int argc, char **argv) {
 }
 
 // main
-int main(int argc, char **arg1) {
+int main(int argc, char** arg1) {
     func_00404234(argc, arg1);
     while (!feof(in_file)) {
         readinline();

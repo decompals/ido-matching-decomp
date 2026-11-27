@@ -81,13 +81,13 @@ begin
 end;
 
 { unused function }
-procedure restricted_reg(reg: registers);
+procedure add_restricted_reg(reg: registers);
 begin
     restricted_regs[reg] := restricted_regs[reg] + 1;
 end;
 
 { unused function }
-procedure restricted_fp_reg(reg: registers);
+procedure add_restricted_fp_reg(reg: registers);
 begin
     restricted_fp_regs[reg] := restricted_fp_regs[reg] + 1;
 end;
