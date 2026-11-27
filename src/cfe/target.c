@@ -142,10 +142,14 @@ TreeNode* max_type_of_size(int size, int is_signed) {
     // no value returned
 }
 
-#ifdef NON_EQUIVALENT
+// NON_EQUIVALENT
 
 #define SAME_SIGNS(x, y) ((x ^ y) >= 0)
 #define DIFFERENT_SIGNS(x, y) ((x ^ y) < 0)
+#define IS_SIGNED_TYPE(t)                                                                                          \
+    (TREE_CODE(t) == Int_type || TREE_CODE(t) == Long_type || TREE_CODE(t) == Longlong_type ||                    \
+     TREE_CODE(t) == Short_type || TREE_CODE(t) == Signed_type || TREE_CODE(t) == Char_type)
+#define IS_64BIT_TYPE(t) (BASIC_TYPE(t).size == 64)
 
 int overflows(int expr_code, TreeNode* type, TreeNode* op1, TreeNode* op2) {
     long long val1 = ICONSTANT(op1).value;
@@ -230,10 +234,6 @@ int overflows(int expr_code, TreeNode* type, TreeNode* op1, TreeNode* op2) {
 
     return FALSE;
 }
-
-#else
-#pragma GLOBAL_ASM("asm/7.1/functions/cfe/target/overflows.s")
-#endif
 
 double str_to_double(char* str, int location, int warning_level) {
     double result;
