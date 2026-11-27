@@ -7,14 +7,18 @@ offset,vram,.dummy
 offset,vram,.text
 002740,00402740,usplit_002740
 002870,00402870,usplit_002870
-003120,00403120,usplit_003120
-003B10,00403B10,usplit_003B10
-005C10,00405C10,usplit_005C10
-008A90,00408A90,usplit_008A90
-009B80,00409B80,usplit_009B80
-00A7C0,0040A7C0,usplit_00A7C0
-00AC50,0040AC50,usplit_00AC50
-00C860,0040C860,usplit_00C860
+003120,00403120,libmld/stcu
+003AF0,00403AF0,pad_403AF0
+003B10,00403B10,libmld/stio
+005C10,00405C10,libmld/swap
+008A90,00408A90,libmld/stfd
+009B80,00409B80,libmld/md_stfd
+00A2E0,0040A2E0,libmld/sex
+00A310,0040A310,libmld/md_mldfunc
+00A7C0,0040A7C0,libmld/md_stcu
+00AC50,0040AC50,libmld/ldfsymorder
+00AFB0,0040AFB0,libmld/stfe
+00C860,0040C860,libmld/staux
 00D1B0,0040D1B0,usplit_00D1B0
 
 offset,vram,.dummy
@@ -22,16 +26,24 @@ offset,vram,.dummy
 
 offset,vram,.rodata
 00E000,1000E000,usplit_00E000
-00E420,1000E420,usplit_00E420
-00E630,1000E630,usplit_00E630
-00E880,1000E880,usplit_00E880
-00E910,1000E910,usplit_00E910
-00EA00,1000EA00,usplit_00EA00
-00EB10,1000EB10,usplit_00EB10
-00EBA0,1000EBA0,usplit_00EBA0
+00E1D0,1000E1D0,libmld/stcu
+00E420,1000E420,libmld/stio
+00E5E0,1000E5E0,libmld/swap
+00E630,1000E630,libmld/stfd
+00E880,1000E880,libmld/md_stfd
+00E910,1000E910,libmld/md_mldfunc
+00EA00,1000EA00,libmld/md_stcu
+00EB10,1000EB10,libmld/stfe
+00EBA0,1000EBA0,libmld/staux
+00EC00,1000EC00,usplit_00EBA0
 
 offset,vram,.data
-00EC60,1000EC60,usplit_00EC60
+00EC60,1000EC60,libmld/stcu
+00EC70,1000EC70,libmld/stio
+00ECA0,1000ECA0,libmld/stfd
+00ED60,1000ED60,libmld/md_stfd
+00EE10,1000EE10,libmld/md_mldfunc
+00EE80,1000EE80,libmld/stfe
 
 offset,vram,.dummy
 00EE90,1000EE90,got
