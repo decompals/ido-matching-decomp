@@ -6,6 +6,8 @@
 #define TRUE 1
 #define FALSE 0
 
+#define stubbed_printf(x) ((void)(x))
+
 struct _struct_asm_info_0x8 {
     /* 0x0 */ char* name;
     /* 0x4 */ unsigned int unk4;
@@ -16,6 +18,14 @@ struct _struct_asm_info {
     /* 0x4 */ unsigned unk4_FE : 7;
     /* 0x4 */ unsigned unk4_1FFFFFF_ : 0x19;
 };
+
+#ifdef IDO_71
+#define DECLARE_T5_OPTIONS                                                                                       \
+    /* 0x68 */ DECLARE_OPTION(t5_r31), /* 0x69 */ DECLARE_OPTION(t5_mtc1), /* 0x6A */ DECLARE_OPTION(t5_muldiv), \
+        /* 0x6B */ DECLARE_OPTION(t5_ll_sc_bug),
+#else
+#define DECLARE_T5_OPTIONS
+#endif
 
 #define DECLARE_OPTIONS                                                                                                \
     /*  0x0 */ DECLARE_OPTION(EB), /*  0x1 */ DECLARE_OPTION(EL), /*  0x2 */ DECLARE_OPTION(G),                        \
@@ -54,7 +64,8 @@ struct _struct_asm_info {
         /* 0x5F */ DECLARE_OPTION(multi_issue), /* 0x60 */ DECLARE_OPTION(nonzero_scnbase),                            \
         /* 0x61 */ DECLARE_OPTION(new_mdebug), /* 0x62 */ DECLARE_OPTION(abi), /* 0x63 */ DECLARE_OPTION(tfprev10),    \
         /* 0x64 */ DECLARE_OPTION(force_branch_fixup), /* 0x65 */ DECLARE_OPTION(r4200),                               \
-        /* 0x66 */ DECLARE_OPTION(r4600), /* 0x67 */ DECLARE_OPTION(tfp), /* 0x68 */ DECLARE_OPTION(r4300_mul)
+        /* 0x66 */ DECLARE_OPTION(r4600), /* 0x67 */ DECLARE_OPTION(tfp),                                              \
+        DECLARE_T5_OPTIONS /* 0x68 (5.3) / 0x6C (7.1) */ DECLARE_OPTION(r4300_mul)
 
 #define DECLARE_OPTION(name) OPTION_##name
 typedef enum option_name { DECLARE_OPTIONS, OPTION_MAX } OPTION;

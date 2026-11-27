@@ -1,0 +1,1 @@
+sopt_type = 0x10012480 // size:0x10

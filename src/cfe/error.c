@@ -30,7 +30,7 @@ static int default_error_levels[ERRCLASS_MAX][ERROR_MODE_MAX] = {
 };
 
 /* .data      */
-static FILE* D_1001BA78 = stderr; // not sure if it's correct value
+static FILE* D_1001BA78 = stderr;
 
 /* .bss       */
 /* 0x10020F20 */ static char** message_files;
